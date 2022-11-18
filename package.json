@@ -1,0 +1,36 @@
+{
+  "name": "react-native-chat-library",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AsteriskZuo/react-native-chat-library.git"
+  },
+  "author": "Asterisk Zuo <zuoyuhsywn@hotmail.com>",
+  "private": true,
+  "workspaces": [
+    "packages/react-native-chat-uikit",
+    "examples/*",
+    "example"
+  ],
+  "devDependencies": {
+    "@commitlint/config-conventional": "^17.0.2",
+    "commitlint": "^17.0.2",
+    "eslint-config-satya164": "^3.1.11",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "lerna": "^6.0.3",
+    "metro-react-native-babel-preset": "^0.67.0",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "lerna run clean",
+    "build": "lerna run prepack"
+  },
+  "prettier": {
+    "quoteProps": "consistent",
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  }
+}

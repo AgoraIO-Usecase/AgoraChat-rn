@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig",
+  "references": [
+    { "path": "../packages/react-native-chat-uikit" },
+  ],
+  "compilerOptions": {
+    // Avoid expo-cli auto-generating a tsconfig
+  }
+}
