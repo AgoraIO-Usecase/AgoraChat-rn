@@ -28,7 +28,7 @@
   "scripts": {
     "test": "jest",
     "typescript": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.{js,ts,tsx}\"",
+    "lint": "yarn run eslint \"src/**/*.{js,ts,tsx}\"",
     "prepare": "bob build",
     "release": "release-it",
     "bootstrap": "yarn install",
@@ -67,7 +67,7 @@
     "react-native": "0.68.5",
     "react-native-builder-bob": "^0.20.1",
     "release-it": "^15.0.0",
-    "typescript": "^4.7.4"
+    "typescript": "~4.7.4"
   },
   "resolutions": {
     "@types/react": "17.0.21"

@@ -9,5 +9,3 @@ __tests__/
 .expo/
 .yarn/
 .vscode/
-
-webpack.config.js

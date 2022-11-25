@@ -2,7 +2,7 @@
   "name": "example",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint \"src/**/*.{js,ts,tsx}\"",
+    "lint": "yarn run eslint \"src/**/*.{js,ts,tsx}\"",
     "gse": "node scripts/generate-env.js",
     "cg": "del src/env.ts",
     "start": "expo start --dev-client",

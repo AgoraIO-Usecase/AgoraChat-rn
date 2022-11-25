@@ -1,7 +1,7 @@
 import {
+  Platform,
   requireNativeComponent,
   UIManager,
-  Platform,
   ViewStyle,
 } from 'react-native';
 import { ChatClient, ChatOptions } from 'react-native-chat-sdk';
