@@ -2,12 +2,17 @@
   "name": "example",
   "version": "1.0.0",
   "scripts": {
+    "lint": "eslint \"src/**/*.{js,ts,tsx}\"",
+    "gse": "node scripts/generate-env.js",
+    "cg": "del src/env.ts",
     "start": "expo start --dev-client",
     "startr": "expo start --dev-client --clear",
     "android": "expo run:android",
     "androidi": "expo run:android --device \"MX6\"",
+    "androids": "expo run:android --device \"generic_arm64\"",
     "ios": "expo run:ios",
-    "iosi": "expo run:ios --device=\"Asterisk’s iPhone\""
+    "iosi": "expo run:ios --device=\"Asterisk’s iPhone\"",
+    "ioss": "expo run:ios --device=\"iphone-12.4\""
   },
   "dependencies": {
     "expo": "~45.0.4",

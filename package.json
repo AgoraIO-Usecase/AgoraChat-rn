@@ -15,6 +15,7 @@
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "commitlint": "^17.0.2",
+    "del-cli": "^5.0.0",
     "eslint-config-satya164": "^3.1.11",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "lerna": "^6.0.3",
@@ -22,9 +23,14 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "lerna run clean",
-    "build": "lerna run prepack"
+    "generate-source-version": "node scripts/generate-version.js",
+    "generate-source-env": "yarn workspace example run gse",
+    "generate-source": "yarn run generate-source-version && yarn run generate-source-env",
+    "generate-lib": "lerna run gl",
+    "generate": "yarn run generate-source && yarn run generate-lib",
+    "clean-generate": "lerna run cg",
+    "lint": "lerna run lint",
+    "start": "yarn workspace example run start"
   },
   "prettier": {
     "quoteProps": "consistent",
