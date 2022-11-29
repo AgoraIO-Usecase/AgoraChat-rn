@@ -1,8 +1,16 @@
+import './biz/utils/globals';
+
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { ChatClient, ChatOptions } from 'react-native-chat-sdk';
 import { ChatUikitView, multiply } from 'react-native-chat-uikit';
+
+import Dev from './__dev__';
+
+if (Platform.OS === 'web') {
+  console.error('web platforms are not supported.');
+}
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
@@ -15,12 +23,16 @@ export default function App() {
     console.log('test:', r);
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-      <ChatUikitView color="#32a852" style={styles.box} />
-    </View>
-  );
+  if (__DEV__) {
+    return Dev();
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text>Result: {result}</Text>
+        <ChatUikitView color="#32a852" style={styles.box} />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

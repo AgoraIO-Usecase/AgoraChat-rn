@@ -1,5 +1,5 @@
 {
-  "extends": "satya164",
+  "extends": ["satya164"],
   "plugins": ["simple-import-sort"],
   "settings": {
     "react": {
