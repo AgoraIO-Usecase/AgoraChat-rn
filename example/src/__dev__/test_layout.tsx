@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View } from 'react-native';
+import { DevDebug } from 'react-native-chat-uikit';
 
-import DevDebug from '../common/screens/DevDebug';
 import TestColor from './test_color';
 
 export default function test_layout(): JSX.Element {

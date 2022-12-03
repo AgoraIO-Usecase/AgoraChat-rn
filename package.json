@@ -13,13 +13,22 @@
     "example"
   ],
   "devDependencies": {
+    "@arkweid/lefthook": "^0.7.7",
     "@commitlint/config-conventional": "^17.0.2",
+    "@types/jest": "^28.1.2",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
+    "jest": "^28.1.1",
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-config-satya164": "^3.1.11",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "lerna": "^6.0.3",
     "metro-react-native-babel-preset": "^0.67.0",
+    "pod-install": "^0.1.0",
+    "prettier": "^2.0.5",
+    "release-it": "^15.0.0",
     "typescript": "~4.7.4"
   },
   "scripts": { 
@@ -38,5 +47,24 @@
     "useTabs": false,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "preset": "react-native",
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/packages/react-native-chat-uikit/lib/",
+      "<rootDir>/packages/react-native-chat-uikit/node_modules/"
+    ]
   }
 }

@@ -32,3 +32,34 @@ export const ChatUikitView =
     : () => {
         throw new Error(LINKING_ERROR);
       };
+
+// import type rn from 'react-native';
+// import type { addons } from 'react-native';
+
+export { Container, ContainerProps } from './containers';
+export { default as DevDebug } from './screens/DevDebug';
+export { default as Placeholder } from './screens/Placeholder';
+export { default as DarkTheme } from './theme/DarkTheme';
+export { default as DefaultTheme } from './theme/DefaultTheme';
+export { default as LightTheme } from './theme/LightTheme';
+export { default as ThemeContext } from './theme/ThemeContext';
+export { default as ThemeProvider } from './theme/ThemeProvider';
+export { default as useTheme } from './theme/useTheme';
+export * from './types';
+
+// declare module 'example/src/common' {
+//   import type DevDebugInternal from './example/src/common/screens/DevDebug';
+//   export interface TestModuleStatic {
+//     verifySnapshot: (done: (indicator?: any) => void) => void;
+//     markTestPassed: (indicator: any) => void;
+//     markTestCompleted: () => void;
+//   }
+
+//   export const TestModule: DevDebugInternal;
+//   export type TestModule = DevDebugInternal;
+// }
+
+// function test222(): void {
+//   interface ss extends rn.addons.TestModule {}
+//   interface sss extends addons.TestModule {}
+// }
