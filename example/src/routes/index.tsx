@@ -276,4 +276,4 @@ export type {
   RootParamsNameList,
   ScreenParamsList,
 } from './list';
-export { rootParamsList, rootParamsNameList } from './list';
+export { SCREEN_LIST, SCREEN_NAME_LIST } from './list';

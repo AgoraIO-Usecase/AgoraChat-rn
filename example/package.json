@@ -10,7 +10,7 @@
     "android": "expo run:android",
     "androidi": "expo run:android --device \"MX6\"",
     "androids": "expo run:android --device \"generic_arm64\"",
-    "ios": "expo run:ios --device=\"环信的 iPhone\"",
+    "ios": "expo run:ios",
     "iosi": "expo run:ios --device=\"Asterisk’s iPhone\"",
     "ioss12": "expo run:ios --device=\"iphone-12.4\"",
     "ioss15": "expo run:ios --device=\"iphone-15.5\""

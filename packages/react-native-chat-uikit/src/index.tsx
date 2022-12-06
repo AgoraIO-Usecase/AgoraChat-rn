@@ -36,9 +36,16 @@ export const ChatUikitView =
 // import type rn from 'react-native';
 // import type { addons } from 'react-native';
 
+export { default as Divider } from './components/Divider';
+export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
 export { Container, ContainerProps } from './containers';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
+export {
+  createScaleFactor,
+  DEFAULT_SCALE_FACTOR,
+} from './styles/createScaleFactor';
+export { default as createStyleSheet } from './styles/createStyleSheet';
 export { default as DarkTheme } from './theme/DarkTheme';
 export { default as DefaultTheme } from './theme/DefaultTheme';
 export { default as LightTheme } from './theme/LightTheme';

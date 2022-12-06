@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import TestLayout from './test_layout';
+import DevApp from './test_icon';
 
 export default function dev(): JSX.Element {
-  return <TestLayout />;
+  return <DevApp />;
 }

@@ -97,7 +97,7 @@ export type ScreenParamsList<
   [K in keyof T]: Omit<T[K], U>;
 };
 
-export const rootParamsList: RootParamsList = {
+export const SCREEN_LIST: RootParamsList = {
   SignIn: {
     option: undefined,
     params: undefined,
@@ -187,6 +187,6 @@ export const rootParamsList: RootParamsList = {
     params: undefined,
   },
 };
-export const rootParamsNameList: RootParamsNameList = Object.keys(
-  rootParamsList
+export const SCREEN_NAME_LIST: RootParamsNameList = Object.keys(
+  SCREEN_LIST
 ) as (keyof RootParamsList)[];

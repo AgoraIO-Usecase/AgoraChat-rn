@@ -3,10 +3,10 @@ import type { Theme } from '../types';
 const LightTheme: Theme = {
   scheme: 'light',
   colors: {
-    primary: 'rgb(10, 132, 255)',
-    background: 'rgb(100, 1, 1)',
-    text: 'rgb(229, 229, 231)',
-    border: 'rgb(39, 39, 41)',
+    primary: 'rgb(0, 122, 255)',
+    background: 'rgb(242, 242, 242)',
+    text: 'rgb(28, 28, 30)',
+    border: 'rgb(216, 216, 216)',
   },
 };
 

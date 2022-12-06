@@ -116,7 +116,7 @@ export default function App() {
     console.log('test:');
   }, []);
 
-  if (!__DEV__) {
+  if (__DEV__) {
     return Dev();
   } else {
     const isLightTheme = LightTheme.scheme === 'light';

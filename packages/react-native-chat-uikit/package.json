@@ -33,7 +33,9 @@
     "release": "release-it",
     "bootstrap": "yarn install",
     "gl": "bob build",
-    "cg": "del lib && del src/version.ts"
+    "cg": "del lib && del src/version.ts",
+    "generate-bundle": "node scripts/bundle-icons.js",
+    "change-icon-name": "node scripts/change-icons-name.js"
   },
   "keywords": [
     "react-native",
@@ -57,6 +59,7 @@
     "@types/jest": "^28.1.2",
     "@types/react": "~17.0.21",
     "@types/react-native": "0.70.0",
+    "@types/react-native-vector-icons": "^6.4.12",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
