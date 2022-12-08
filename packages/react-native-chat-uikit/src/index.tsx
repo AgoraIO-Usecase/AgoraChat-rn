@@ -40,6 +40,7 @@ export { default as Divider } from './components/Divider';
 export { LocalIcon, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
 export { default as Modal } from './components/Modal';
+export { default as Switch } from './components/Switch';
 export { Container, ContainerProps } from './containers';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
