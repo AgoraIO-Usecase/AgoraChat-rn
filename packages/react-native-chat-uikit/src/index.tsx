@@ -37,7 +37,9 @@ export const ChatUikitView =
 // import type { addons } from 'react-native';
 
 export { default as Divider } from './components/Divider';
-export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
+export { LocalIcon, VectorIcon } from './components/Icon';
+export { default as Image } from './components/Image';
+export { default as Modal } from './components/Modal';
 export { Container, ContainerProps } from './containers';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';

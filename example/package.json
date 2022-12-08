@@ -27,6 +27,7 @@
     "react-dom": "17.0.2",
     "react-native": "0.68.5",
     "react-native-chat-sdk": "^1.0.10",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-pager-view": "^6.1.1",
     "react-native-paper": "^4.12.5",

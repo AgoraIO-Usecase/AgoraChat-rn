@@ -78,6 +78,7 @@
   "dependencies": {
     "eslint-config-satya164": "^3.1.11",
     "react-native-chat-sdk": "^1.0.10",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-pager-view": "^6.1.1",
     "react-native-paper": "^4.12.5",
@@ -90,6 +91,7 @@
     "react": "*",
     "react-native": "*",
     "react-native-chat-sdk": "*",
+    "react-native-fast-image": "*",
     "react-native-gesture-handler": "*",
     "react-native-pager-view": "*",
     "react-native-paper": "*",
@@ -97,6 +99,11 @@
     "react-native-screens": "*",
     "react-native-tab-view": "*",
     "react-native-vector-icons": "*"
+  },
+  "peerDependenciesMeta": {
+    "react-native-fast-image": {
+      "optional": true
+    }
   },
   "jest": {
     "preset": "react-native",

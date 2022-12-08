@@ -3,15 +3,11 @@
 /* eslint-disable import/no-commonjs */
 const fs = require('node:fs');
 const path = require('node:path');
-// const prettier = require('prettier');
 
 const root = path.resolve(__dirname, '..');
 
 const ignorePatterns = /@2x|@3x/g;
-// const requireBasePath = './icons/';
 const iconDir = path.join(root, 'src', 'assets', 'icons');
-// const indexDir = path.join(root, 'src', 'assets');
-// const icons = {};
 
 fs.readdirSync(iconDir).forEach((filename) => {
   if (filename.match(ignorePatterns)) {
