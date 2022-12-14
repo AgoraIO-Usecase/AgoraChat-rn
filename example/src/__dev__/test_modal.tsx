@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import {
   Alert,
   Modal as RNModal,
@@ -10,15 +10,18 @@ import {
 import { Modal } from 'react-native-chat-uikit';
 
 const App = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [changeModalType, setChangeModalType] = useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [changeModalType, setChangeModalType] = React.useState(false);
+  const [transparent, setTransparent] = React.useState(false);
+  const [disableBackgroundClose, setDisableBackgroundClose] =
+    React.useState(false);
   return (
     <View style={styles.centeredView}>
       {changeModalType ? (
         // 动画导致快速点击关闭按钮无响应 将 slide 替换为 none
         <RNModal
           animationType="slide"
-          transparent
+          transparent={transparent}
           visible={modalVisible}
           onRequestClose={() => {
             Alert.alert('Modal has been closed.');
@@ -42,26 +45,32 @@ const App = () => {
         </RNModal>
       ) : (
         <Modal
-          type="slide"
+          // type="slide"
+          transparent={transparent}
           visible={modalVisible}
           backgroundStyle={{ alignItems: 'center', justifyContent: 'flex-end' }}
-          onClose={() => {
-            setModalVisible(false);
+          onClose={(): Promise<void> => {
+            console.log('test:onClose:');
+            return new Promise((resolve) => {
+              console.log('test:setModalVisible:', resolve);
+              setModalVisible(false);
+              resolve();
+            });
           }}
+          disableBackgroundClose={disableBackgroundClose}
         >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>My Modal</Text>
+          <FadeView fadeOpacity={0} />
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>My Modal</Text>
 
-              <TouchableHighlight
-                style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <Text style={styles.textStyle}>Hide Modal</Text>
-              </TouchableHighlight>
-            </View>
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: '#2196F3' }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableHighlight>
           </View>
         </Modal>
       )}
@@ -85,7 +94,79 @@ const App = () => {
       >
         <Text style={styles.textStyle}>Change Modal type</Text>
       </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton3}
+        onPress={() => {
+          setTransparent(!transparent);
+          console.log('setTransparent:', !transparent);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton4}
+        onPress={() => {
+          setDisableBackgroundClose(!disableBackgroundClose);
+          console.log('disableBackgroundClose:', !disableBackgroundClose);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton2}
+        onPress={() => {
+          setChangeModalType(!changeModalType);
+          setModalVisible(false);
+          console.log('changeModalType:', !changeModalType);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton2}
+        onPress={() => {
+          setChangeModalType(!changeModalType);
+          setModalVisible(false);
+          console.log('changeModalType:', !changeModalType);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton2}
+        onPress={() => {
+          setChangeModalType(!changeModalType);
+          setModalVisible(false);
+          console.log('changeModalType:', !changeModalType);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        style={styles.openButton2}
+        onPress={() => {
+          setChangeModalType(!changeModalType);
+          setModalVisible(false);
+          console.log('changeModalType:', !changeModalType);
+        }}
+      >
+        <Text style={styles.textStyle}>Change Modal type</Text>
+      </TouchableHighlight>
     </View>
+  );
+};
+
+const FadeView: React.ComponentType<{ fadeOpacity: number }> = ({
+  fadeOpacity,
+}): JSX.Element => {
+  return (
+    <View
+      style={{
+        backgroundColor: 'rgba(233, 23, 23, 0.7)',
+        opacity: fadeOpacity,
+      }}
+      pointerEvents="none"
+    />
   );
 };
 
@@ -95,10 +176,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
+    backgroundColor: 'rgba(233, 233, 23, 0.7)',
+    // backgroundColor: '#a9a9a9',
+    // opacity: 0.8,
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 25, 255, 1)',
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
@@ -110,6 +194,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    // opacity: 1,
   },
   openButton: {
     backgroundColor: '#F194FF',
@@ -119,6 +204,18 @@ const styles = StyleSheet.create({
   },
   openButton2: {
     backgroundColor: '#0194FF',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  openButton4: {
+    backgroundColor: '#01942F',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  openButton3: {
+    backgroundColor: '#f234FF',
     borderRadius: 20,
     padding: 10,
     elevation: 2,

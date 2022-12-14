@@ -1,37 +1,37 @@
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
-import { DEFAULT_SCALE_FACTOR } from './createScaleFactor';
+import { defaultScaleFactor as scaleFactor } from './createScaleFactor';
 
 type NamedStyle = ViewStyle | TextStyle | ImageStyle;
 type StylePreprocessor<T extends NamedStyle = NamedStyle> = {
   [key in keyof T]: (val: NonNullable<T[key]>) => typeof val;
 };
 
-const SCALE_FACTOR_WITH_STR = (val: string | number) =>
-  typeof val === 'string' ? val : DEFAULT_SCALE_FACTOR(val);
+const scaleFactor2 = (val: string | number) =>
+  typeof val === 'string' ? val : scaleFactor(val);
 
 const preProcessor: Partial<StylePreprocessor> = {
-  fontSize: DEFAULT_SCALE_FACTOR,
-  lineHeight: DEFAULT_SCALE_FACTOR,
-  borderRadius: DEFAULT_SCALE_FACTOR,
-  minWidth: SCALE_FACTOR_WITH_STR,
-  minHeight: SCALE_FACTOR_WITH_STR,
-  height: SCALE_FACTOR_WITH_STR,
-  width: SCALE_FACTOR_WITH_STR,
-  padding: SCALE_FACTOR_WITH_STR,
-  paddingTop: SCALE_FACTOR_WITH_STR,
-  paddingBottom: SCALE_FACTOR_WITH_STR,
-  paddingLeft: SCALE_FACTOR_WITH_STR,
-  paddingRight: SCALE_FACTOR_WITH_STR,
-  margin: SCALE_FACTOR_WITH_STR,
-  marginTop: SCALE_FACTOR_WITH_STR,
-  marginBottom: SCALE_FACTOR_WITH_STR,
-  marginLeft: SCALE_FACTOR_WITH_STR,
-  marginRight: SCALE_FACTOR_WITH_STR,
-  left: SCALE_FACTOR_WITH_STR,
-  right: SCALE_FACTOR_WITH_STR,
-  top: SCALE_FACTOR_WITH_STR,
-  bottom: SCALE_FACTOR_WITH_STR,
+  fontSize: scaleFactor,
+  lineHeight: scaleFactor,
+  borderRadius: scaleFactor,
+  minWidth: scaleFactor2,
+  minHeight: scaleFactor2,
+  height: scaleFactor2,
+  width: scaleFactor2,
+  padding: scaleFactor2,
+  paddingTop: scaleFactor2,
+  paddingBottom: scaleFactor2,
+  paddingLeft: scaleFactor2,
+  paddingRight: scaleFactor2,
+  margin: scaleFactor2,
+  marginTop: scaleFactor2,
+  marginBottom: scaleFactor2,
+  marginLeft: scaleFactor2,
+  marginRight: scaleFactor2,
+  left: scaleFactor2,
+  right: scaleFactor2,
+  top: scaleFactor2,
+  bottom: scaleFactor2,
 };
 
 const preProcessorKeys = Object.keys(
@@ -56,15 +56,15 @@ export default function createStyleSheet<
     keys.forEach((key) => {
       if (preProcessor.hasOwnProperty(key) && style.hasOwnProperty(key)) {
         const f = preProcessor[key as keyof typeof preProcessor];
-        if (typeof f === typeof DEFAULT_SCALE_FACTOR) {
-          const c = f as typeof DEFAULT_SCALE_FACTOR;
+        if (typeof f === typeof scaleFactor) {
+          const c = f as typeof scaleFactor;
           const d = Object.getOwnPropertyDescriptor(style, key);
           if (d) {
             d.value = c(d.value as number);
             Object.defineProperty(style, key, d);
           }
-        } else if (typeof f === typeof SCALE_FACTOR_WITH_STR) {
-          const c = f as typeof SCALE_FACTOR_WITH_STR;
+        } else if (typeof f === typeof scaleFactor2) {
+          const c = f as typeof scaleFactor2;
           const d = Object.getOwnPropertyDescriptor(style, key);
           if (d) {
             d.value = c(d.value as string | number);

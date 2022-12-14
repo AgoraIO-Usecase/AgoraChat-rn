@@ -3,7 +3,6 @@ import { Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import DarkTheme from '../theme/DarkTheme';
-import DefaultTheme from '../theme/DefaultTheme';
 import LightTheme from '../theme/LightTheme';
 import ThemeProvider from '../theme/ThemeProvider';
 import type { Theme } from '../types';
@@ -44,7 +43,7 @@ export function Container({
         return theme;
       }
     }
-    return DefaultTheme;
+    return LightTheme;
   }, [theme]);
   // return (
   //   <ThemeProvider value={t}>

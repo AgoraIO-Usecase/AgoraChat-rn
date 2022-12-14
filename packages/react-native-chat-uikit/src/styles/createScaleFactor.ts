@@ -11,7 +11,7 @@ export function createScaleFactor(deviceWidth = DESIGNED_DEVICE_WIDTH) {
 }
 
 createScaleFactor.updateScaleFactor = (scaleFactor: (dp: number) => number) => {
-  DEFAULT_SCALE_FACTOR = scaleFactor;
+  defaultScaleFactor = scaleFactor;
 };
 
-export let DEFAULT_SCALE_FACTOR = createScaleFactor();
+export let defaultScaleFactor = createScaleFactor();

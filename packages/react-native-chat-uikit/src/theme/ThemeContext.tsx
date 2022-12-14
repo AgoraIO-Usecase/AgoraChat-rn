@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 import type { Theme } from '../types';
-import DefaultTheme from './DefaultTheme';
+import LightTheme from './LightTheme';
 
-const ThemeContext = React.createContext<Theme>(DefaultTheme);
+const ThemeContext = React.createContext<Theme>(LightTheme);
 
 ThemeContext.displayName = 'IMUIKitThemeContext';
 

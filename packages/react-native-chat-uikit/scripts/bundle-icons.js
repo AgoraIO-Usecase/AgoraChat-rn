@@ -14,48 +14,62 @@ const iconDir = path.join(root, 'src', 'assets', 'icons');
 const indexDir = path.join(root, 'src', 'assets');
 const icons = {};
 
-// const arr = [{xx:['.png' '', '2x', '3x']}, ...];
+// const arr = [{xx:['', '.png' '', '2x', '3x']}, ...];
 const arr = [];
-fs.readdirSync(iconDir).forEach((filename) => {
-  if (filename.match(ignorePatterns)) return;
 
-  const extType = filename.match(matchBigger)
-    ? '_2x'
-    : filename.match(matchMax)
-    ? '_3x'
-    : '';
-  const ext = path.extname(filename);
-  const key = filename.replace(ext, '').replace(/_2x|_3x/g, '');
-
-  let last = arr[arr.length - 1];
-  if (last === undefined) {
-    arr.push({
-      [key]: [ext],
-    });
-    last = arr[arr.length - 1];
-  }
-
-  const k = Object.keys(last).at(0);
-  const v = last[k];
-
-  if (v.length === 0) {
-    v.push(extType);
-  } else {
-    if (k === key) {
-      v.push(extType);
+const parseIcons = (iconDir, relativeDir) => {
+  // console.log('iconDir:', iconDir, 'relativeDir:', relativeDir);
+  fs.readdirSync(iconDir).forEach((filename) => {
+    const s = fs.statSync(path.join(iconDir, filename));
+    // console.log('isDirectory:', s.isDirectory(), 'filename:', filename);
+    if (s.isDirectory()) {
+      parseIcons(
+        path.join(iconDir, filename),
+        path.join(relativeDir, filename)
+      );
     } else {
-      arr.push({
-        [key]: [ext],
-      });
-      last = arr[arr.length - 1];
-      last[key].push(extType);
+      if (filename.match(ignorePatterns)) return;
+
+      const extType = filename.match(matchBigger)
+        ? '_2x'
+        : filename.match(matchMax)
+        ? '_3x'
+        : '';
+      const ext = path.extname(filename);
+      const key = filename.replace(ext, '').replace(/_2x|_3x/g, '');
+
+      let last = arr[arr.length - 1];
+      if (last === undefined) {
+        arr.push({
+          [key]: [relativeDir, ext],
+        });
+        last = arr[arr.length - 1];
+      }
+
+      const k = Object.keys(last).at(0);
+      const v = last[k];
+
+      if (v.length === 0) {
+        v.push(extType);
+      } else {
+        if (k === key) {
+          v.push(extType);
+        } else {
+          arr.push({
+            [key]: [relativeDir, ext],
+          });
+          last = arr[arr.length - 1];
+          last[key].push(extType);
+        }
+      }
     }
-  }
-});
+  });
+};
+parseIcons(iconDir, '');
 
 arr.forEach((obj) => {
   const key = Object.keys(obj).at(0);
-  const [ext, x, x2, x3] = obj[key];
+  const [rel, ext, x, x2, x3] = obj[key];
   const d1 = x;
   let d2 = x2;
   let d3 = x3;
@@ -70,7 +84,7 @@ arr.forEach((obj) => {
   }
   icons[
     key
-  ] = `$$start(size: string) => { if (size === '3x') { return require('./icons/${key}${d3}${ext}'); } else if (size === '2x') { return require('./icons/${key}${d2}${ext}'); } else { return require('./icons/${key}${d1}${ext}'); }}$$end`;
+  ] = `$$start(size: string) => { if (size === '3x') { return require('./icons/${rel}/${key}${d3}${ext}'); } else if (size === '2x') { return require('./icons/${rel}/${key}${d2}${ext}'); } else { return require('./icons/${rel}/${key}${d1}${ext}'); }}$$end`;
 });
 
 const serializedIcons = JSON.stringify(icons, null, 4).replace(
