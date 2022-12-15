@@ -38,6 +38,7 @@ export const ChatUikitView =
 
 export { default as ActionMenu } from './components/ActionMenu';
 export { default as BottomSheet } from './components/BottomSheet';
+export { default as Button } from './components/Button';
 export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
 export { LocalIcon, VectorIcon } from './components/Icon';

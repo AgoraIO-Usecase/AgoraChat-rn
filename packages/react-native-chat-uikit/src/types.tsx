@@ -11,6 +11,11 @@ export type FontAttributes = Pick<
   'fontFamily' | 'fontSize' | 'lineHeight' | 'letterSpacing' | 'fontWeight'
 >;
 
+export type ComponentColor = {
+  background: string;
+  content: string;
+};
+
 export type Theme = {
   scheme: 'light' | 'dark' | string;
   colors: {
@@ -20,6 +25,11 @@ export type Theme = {
     border: string;
     card: string;
     mask: string;
+    button: {
+      disabled: ComponentColor;
+      enabled: ComponentColor;
+      pressed: ComponentColor;
+    };
   };
   fonts: {
     primary: FontAttributes;

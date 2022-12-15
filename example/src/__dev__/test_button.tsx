@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button as RNButton, View } from 'react-native';
+import { Button as UIButton } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
 export default function TestButton() {
@@ -29,6 +30,16 @@ export default function TestButton() {
         >
           change icon
         </RNButton>
+      </View>
+      <View>
+        <UIButton
+          onPress={() => {
+            console.log(icon);
+            setIcon(!icon);
+          }}
+        >
+          change icon
+        </UIButton>
       </View>
     </View>
   );

@@ -1,7 +1,11 @@
 import * as React from 'react';
 
-import DevApp from './test_modal';
+import DevApp from './test_button';
 
 export default function dev(): JSX.Element {
-  return <DevApp />;
+  return (
+    <React.StrictMode>
+      <DevApp />
+    </React.StrictMode>
+  );
 }
