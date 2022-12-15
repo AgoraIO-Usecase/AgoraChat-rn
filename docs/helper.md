@@ -3,3 +3,5 @@
 [simple selector](https://www.reactnative.cn/docs/colors)
 [icon helper](https://github.com/oblador/react-native-vector-icons)
 [material icon searcher](https://materialdesignicons.com)
+[theme helper](https://callstack.github.io/react-native-paper/theming.html)
+[font helper](https://callstack.github.io/react-native-paper/fonts.html)

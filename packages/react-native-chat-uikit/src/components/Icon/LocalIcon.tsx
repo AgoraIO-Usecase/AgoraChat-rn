@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 
 import { ICON_ASSETS } from '../../assets/icons';
+import { useThemeContext } from '../../contexts/ThemeContext';
 import createStyleSheet from '../../styles/createStyleSheet';
-import useTheme from '../../theme/useTheme';
 
 export enum IconSize {
   ICON_NORMAL,
@@ -59,7 +59,7 @@ export default function LocalIcon({
     width: size,
     height: size,
   };
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <View style={parentStyle ?? styles.container}>
       <Image

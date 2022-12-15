@@ -37,6 +37,7 @@ export const ChatUikitView =
 // import type { addons } from 'react-native';
 
 export { default as ActionMenu } from './components/ActionMenu';
+export { default as Alert } from './components/Alert';
 export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
 export { default as DialogBox } from './components/DialogBox';
@@ -45,8 +46,19 @@ export { LocalIcon, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
 export { default as Loading } from './components/Loading';
 export { default as Modal } from './components/Modal';
+export { default as Prompt } from './components/Prompt';
 export { default as Switch } from './components/Switch';
+export { default as TextInput } from './components/TextInput';
 export { Container, ContainerProps } from './containers';
+export {
+  HeaderStyleProvider,
+  useHeaderContext,
+} from './contexts/HeaderContext';
+export {
+  ChatSdkContextProvider,
+  useChatSdkContext,
+} from './contexts/ImSdkContext';
+export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
 export {
@@ -56,9 +68,6 @@ export {
 export { default as createStyleSheet } from './styles/createStyleSheet';
 export { default as DarkTheme } from './theme/DarkTheme';
 export { default as LightTheme } from './theme/LightTheme';
-export { default as ThemeContext } from './theme/ThemeContext';
-export { default as ThemeProvider } from './theme/ThemeProvider';
-export { default as useTheme } from './theme/useTheme';
 export * from './types';
 
 // declare module 'example/src/common' {

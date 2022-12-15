@@ -1,34 +1,45 @@
-import type React from 'react';
 import type { TextStyle } from 'react-native';
 import type { ChatClient } from 'react-native-chat-sdk';
 
-export type Keyof<T extends {}> = Extract<keyof T, string>;
+import type { ColorPaletteType } from './utils/defaultColorPalette';
 
-export type ProviderProps<T extends {}> = Required<React.PropsWithChildren<T>>;
+export type Keyof<T extends {}> = Extract<keyof T, string>;
 
 export type FontAttributes = Pick<
   TextStyle,
   'fontFamily' | 'fontSize' | 'lineHeight' | 'letterSpacing' | 'fontWeight'
 >;
 
-export type ComponentColor = {
+export type ButtonColor = {
   background: string;
   content: string;
 };
 
-export type Theme = {
+export type InputColor = {
+  background: string;
+  text: string;
+  highlight: string;
+  placeholder: string;
+};
+
+export type ThemeContextType = {
   scheme: 'light' | 'dark' | string;
+  paperColors: ColorPaletteType;
   colors: {
     primary: string;
     background: string;
     text: string;
     border: string;
     card: string;
-    mask: string;
+    backdrop: string;
     button: {
-      disabled: ComponentColor;
-      enabled: ComponentColor;
-      pressed: ComponentColor;
+      disabled: ButtonColor;
+      enabled: ButtonColor;
+      pressed: ButtonColor;
+    };
+    input: {
+      enabled: InputColor;
+      disabled: InputColor;
     };
   };
   fonts: {
@@ -42,7 +53,14 @@ export type Theme = {
   };
 };
 
-export type ChatSdk = {
+export type ChatSdkContextType = {
   client: ChatClient;
   isLogged: boolean;
+};
+
+export type HeaderContextType = {
+  defaultHeight: number;
+  defaultStatusBarTranslucent: boolean;
+  defaultTitleAlign: 'left' | 'center';
+  defaultTopInset: number;
 };

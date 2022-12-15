@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
 
-import useTheme from '../theme/useTheme';
+import { useThemeContext } from '../contexts/ThemeContext';
 import { LocalIcon } from './Icon';
 
 type LoadingProps = {
@@ -15,7 +15,7 @@ export default function Loading({
   color,
   style,
 }: LoadingProps): JSX.Element {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <Rotate style={style}>
       <LocalIcon name="loading" size={size} color={color ?? colors.primary} />

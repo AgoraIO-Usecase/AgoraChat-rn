@@ -1,27 +1,43 @@
-import type { Theme } from '../types';
+import type { ThemeContextType } from '../types';
+import { lightPalette } from '../utils/defaultColorPalette';
 import BaseTheme from './BaseTheme';
 
-const LightTheme: Theme = {
+const LightTheme: ThemeContextType = {
   scheme: 'light',
+  paperColors: lightPalette,
   colors: {
-    primary: 'rgb(0, 122, 255)',
-    background: 'rgb(242, 242, 242)',
-    text: 'rgb(28, 28, 30)',
-    border: 'rgb(216, 216, 216)',
-    card: 'rgb(255, 255, 255)',
-    mask: 'rgba(200, 200, 200, 0.6)',
+    primary: lightPalette.primary,
+    background: lightPalette.background,
+    text: lightPalette.primary,
+    border: lightPalette.secondary,
+    card: lightPalette.primaryContainer,
+    backdrop: lightPalette.backdrop,
     button: {
       enabled: {
-        background: 'rgba(10, 132, 255, 1)',
-        content: 'rgba(242, 242, 242, 1)',
+        background: lightPalette.primary,
+        content: lightPalette.onPrimary,
       },
       disabled: {
-        background: 'rgba(180, 180, 180, 1)',
-        content: 'rgba(211, 211, 211, 1)',
+        background: lightPalette.secondary,
+        content: lightPalette.onSecondary,
       },
       pressed: {
-        background: 'rgba(0, 71, 179, 1)',
-        content: 'rgba(211, 211, 211, 1)',
+        background: lightPalette.secondary,
+        content: lightPalette.onSecondary,
+      },
+    },
+    input: {
+      enabled: {
+        background: lightPalette.background,
+        text: lightPalette.primary,
+        highlight: lightPalette.tertiary,
+        placeholder: lightPalette.secondary,
+      },
+      disabled: {
+        background: lightPalette.background,
+        text: lightPalette.secondary,
+        highlight: lightPalette.secondary,
+        placeholder: lightPalette.secondary,
       },
     },
   },

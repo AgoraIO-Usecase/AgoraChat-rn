@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
+import { ThemeProvider } from '../contexts/ThemeContext';
 import DarkTheme from '../theme/DarkTheme';
 import LightTheme from '../theme/LightTheme';
-import ThemeProvider from '../theme/ThemeProvider';
-import type { Theme } from '../types';
+import type { ThemeContextType } from '../types';
 
 export type ContainerProps = React.PropsWithChildren<{
   option?: {
@@ -13,7 +13,7 @@ export type ContainerProps = React.PropsWithChildren<{
     autoLogin: boolean;
   };
   localization?: {};
-  theme?: Theme | undefined;
+  theme?: ThemeContextType | undefined;
   context?: {};
   hook?: {};
   service?: {};
@@ -31,7 +31,7 @@ export function Container({
   children,
 }: ContainerProps): JSX.Element {
   console.log(option, localization, theme, context, hook, service, sdk);
-  const t = React.useMemo<Theme>(() => {
+  const t = React.useMemo<ThemeContextType>(() => {
     console.log('test:Container:', theme);
     if (theme) {
       if (theme.scheme === 'light') {

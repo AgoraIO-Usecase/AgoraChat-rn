@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ColorValue, StyleSheet, Text } from 'react-native';
 
-import useTheme from '../../theme/useTheme';
+import { useThemeContext } from '../../contexts/ThemeContext';
 
 // Optionally require vector-icons referenced from react-native-paper:
 // https://github.com/callstack/react-native-paper/blob/4b26429c49053eaa4c3e0fae208639e01093fa87/src/components/MaterialCommunityIcon.tsx#L14
@@ -100,7 +100,7 @@ export default function VectorIcon({
   size,
   color,
 }: IconProps): JSX.Element {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <MaterialCommunityIcons
       name={name}

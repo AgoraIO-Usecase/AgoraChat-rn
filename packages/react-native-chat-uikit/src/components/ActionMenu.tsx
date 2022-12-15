@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
+import { useHeaderContext } from '../contexts/HeaderContext';
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
 import DialogBox from './DialogBox';
 import Loading from './Loading';
 import Modal from './Modal';
@@ -31,21 +32,26 @@ export default function ActionMenu({
   title,
   menuItems,
 }: ActionMenuProps): JSX.Element {
-  const { colors, fonts } = useTheme();
+  const { colors, fonts } = useThemeContext();
+  const { defaultStatusBarTranslucent } = useHeaderContext();
   const [pending, setPending] = useState(false);
+  const transparent = true;
   const _onHide = () => {
     if (!pending) onHide();
   };
 
   return (
     <Modal
+      type="fade"
       onClose={_onHide}
       onDismiss={onDismiss}
-      statusBarTranslucent={false}
+      statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}
       backgroundStyle={{ alignItems: 'center', justifyContent: 'center' }}
+      transparent={transparent}
+      // backdropColor="rgba(100, 10, 200, 0.5)"
     >
-      <DialogBox>
+      <DialogBox style={{ backgroundColor: colors.card }}>
         <View style={styles.title}>
           <Text
             numberOfLines={1}
@@ -120,5 +126,8 @@ const styles = createStyleSheet({
   button: {
     paddingHorizontal: 24,
     paddingVertical: 12,
+  },
+  container: {
+    backgroundColor: 'rgba(235, 235, 235, 1)',
   },
 });

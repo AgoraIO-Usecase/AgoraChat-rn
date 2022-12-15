@@ -2,6 +2,8 @@ import React from 'react';
 import { TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useHeaderContext } from '../contexts/HeaderContext';
+import { useThemeContext } from '../contexts/ThemeContext';
 import DialogSheet from './DialogSheet';
 import type { LocalIconName } from './Icon';
 import Modal from './Modal';
@@ -27,16 +29,21 @@ export default function BottomSheet({
   visible,
   sheetItems,
 }: BottomSheetProps): JSX.Element {
+  const { defaultStatusBarTranslucent } = useHeaderContext();
+  const { colors } = useThemeContext();
   const { width } = useWindowDimensions();
   const { bottom, left, right } = useSafeAreaInsets();
+  const transparent = true;
   return (
     <Modal
       type="slide"
       onClose={onHide}
       onDismiss={onDismiss}
-      statusBarTranslucent
+      statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}
       backgroundStyle={{ alignItems: 'center', justifyContent: 'flex-end' }}
+      transparent={transparent}
+      backdropColor={colors.backdrop}
     >
       <DialogSheet style={{ width, paddingBottom: bottom }}>
         {sheetItems.map(({ onPress, ...props }, idx) => (

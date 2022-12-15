@@ -1,9 +1,9 @@
 import React from 'react';
 import { Pressable, StyleProp, Text, ViewStyle } from 'react-native';
 
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
-import type { ComponentColor } from '../types';
+import type { ButtonColor } from '../types';
 import type { LocalIconName } from './Icon';
 import { LocalIcon } from './Icon';
 
@@ -12,7 +12,7 @@ type ButtonProps = React.PropsWithChildren<{
   disabled?: boolean | undefined;
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
-  color?: ComponentColor | undefined;
+  color?: Partial<ButtonColor> | undefined;
 }>;
 export default function Button({
   icon,
@@ -22,7 +22,7 @@ export default function Button({
   color,
   children,
 }: ButtonProps): JSX.Element {
-  const { colors, fonts } = useTheme();
+  const { colors, fonts } = useThemeContext();
 
   const getStateColor = (pressed: boolean, disabled?: boolean) => {
     if (disabled) return colors.button.disabled;

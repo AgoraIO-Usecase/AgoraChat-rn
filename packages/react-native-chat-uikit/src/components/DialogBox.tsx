@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
 
 type DialogBoxProps = React.PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
 }>;
 const DialogBox = ({ style, children }: DialogBoxProps) => {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <View style={[styles.container, { backgroundColor: colors.card }, style]}>
       {children}

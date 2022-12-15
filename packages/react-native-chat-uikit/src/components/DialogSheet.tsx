@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleProp, Text, View, ViewStyle } from 'react-native';
 
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
 import type { LocalIconName } from './Icon';
 import { LocalIcon } from './Icon';
 
@@ -12,7 +12,7 @@ type DialogSheetProps = React.PropsWithChildren<{
 const DialogSheet: ((props: DialogSheetProps) => JSX.Element) & {
   Item: typeof SheetItem;
 } = ({ style, children }) => {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <View style={[styles.container, { backgroundColor: colors.card }, style]}>
       {children}
@@ -27,7 +27,7 @@ export type SheetItemProps = {
   titleColor?: string;
 };
 const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
-  const { colors, fonts } = useTheme();
+  const { colors, fonts } = useThemeContext();
   return (
     <View style={[styles.sheetItemContainer, { backgroundColor: colors.card }]}>
       {icon && (

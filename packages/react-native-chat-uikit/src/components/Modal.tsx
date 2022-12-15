@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Animated,
+  ColorValue,
   Dimensions,
   KeyboardAvoidingView,
   Modal as RNModal,
@@ -16,16 +17,17 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import { useHeaderContext } from '../contexts/HeaderContext';
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
-import defaultHeaderHeight from '../utils/defaultHeaderHeight';
 
 type ModalProps = {
-  type?: 'slide' | 'fade';
+  type?: 'slide' | 'fade' | undefined;
   onClose: () => void;
-  backgroundStyle?: StyleProp<ViewStyle>;
-  disableBackgroundClose?: boolean;
-  enableKeyboardAvoid?: boolean;
+  backgroundStyle?: StyleProp<ViewStyle> | undefined;
+  disableBackgroundClose?: boolean | undefined;
+  enableKeyboardAvoid?: boolean | undefined;
+  backdropColor?: ColorValue | undefined;
 } & Omit<RNModalProps, 'animationType' | 'onRequestClose'>;
 
 const useModalPanResponder = (
@@ -138,11 +140,13 @@ export default function Modal({
   disableBackgroundClose = false,
   enableKeyboardAvoid = false,
   statusBarTranslucent,
+  backdropColor,
+  transparent,
   ...props
 }: ModalProps): JSX.Element {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   const { width, height } = useWindowDimensions();
-  const defaultHeight = defaultHeaderHeight(width > height);
+  const { defaultHeight } = useHeaderContext();
   const [modalVisible, setModalVisible] = React.useState(false);
   const { content, backdrop, showTransition, hideTransition } =
     useModalAnimation(type);
@@ -162,7 +166,7 @@ export default function Modal({
 
   return (
     <RNModal
-      transparent
+      transparent={transparent}
       hardwareAccelerated
       visible={modalVisible}
       onRequestClose={onClose}
@@ -184,7 +188,10 @@ export default function Modal({
         <Animated.View
           style={[
             StyleSheet.absoluteFill,
-            { opacity: backdrop.opacity, backgroundColor: colors.mask },
+            {
+              opacity: transparent ? (backdropColor ? backdrop.opacity : 0) : 1,
+              backgroundColor: backdropColor ?? colors.backdrop,
+            },
           ]}
         />
       </TouchableWithoutFeedback>

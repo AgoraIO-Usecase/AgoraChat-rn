@@ -1,8 +1,8 @@
 import React from 'react';
 import { Animated, Platform, Pressable } from 'react-native';
 
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
 
 type SwitchProps = {
   trackColor?: string | undefined;
@@ -23,7 +23,7 @@ export default function Switch({
   onChangeValue,
   size,
 }: SwitchProps): JSX.Element {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   const position = React.useRef(new Animated.Value(0)).current;
 
   const changedStyles = React.useMemo(() => {

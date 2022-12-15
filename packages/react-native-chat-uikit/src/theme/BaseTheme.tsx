@@ -1,7 +1,7 @@
 import { defaultScaleFactor } from '../styles/createScaleFactor';
-import type { Theme } from '../types';
+import type { ThemeContextType } from '../types';
 
-const BaseTheme: Partial<Theme> = {
+const BaseTheme: Partial<ThemeContextType> = {
   fonts: {
     primary: {
       fontWeight: 'normal',

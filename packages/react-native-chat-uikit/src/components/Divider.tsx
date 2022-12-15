@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 
+import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import useTheme from '../theme/useTheme';
 
 type DividerProps = {
   style?: StyleProp<ViewStyle>;
@@ -10,7 +10,7 @@ type DividerProps = {
 };
 
 export default function Divider({ style, space }: DividerProps) {
-  const { colors } = useTheme();
+  const { colors } = useThemeContext();
   return (
     <View style={[style, styles.divider, { paddingHorizontal: space }]}>
       <View style={[styles.inner, { backgroundColor: colors.background }]} />
