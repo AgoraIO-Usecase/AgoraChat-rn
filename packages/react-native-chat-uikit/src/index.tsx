@@ -54,6 +54,7 @@ export {
   HeaderStyleProvider,
   useHeaderContext,
 } from './contexts/HeaderContext';
+export { I18nContextProvider, useI18nContext } from './contexts/I18nContext';
 export {
   ChatSdkContextProvider,
   useChatSdkContext,
@@ -61,6 +62,15 @@ export {
 export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
+export {
+  createStringSetEn as createStringSetEn2,
+  createStringSetFEn as createStringSetFEn2,
+  UIKitStringSet as UIKitStringSet2,
+} from './I18n2/CStringSet.en';
+export {
+  CreateStringSet as CreateStringSet2,
+  StringSetOptions as StringSetOptions2,
+} from './I18n2/CStringSet.type';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
 export {

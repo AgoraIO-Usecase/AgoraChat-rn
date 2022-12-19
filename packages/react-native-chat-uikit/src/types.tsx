@@ -100,3 +100,13 @@ export type ExtensionStringSet<T extends {} | undefined> = Omit<
 
 export type StringSet<T extends {} | undefined> = UIKitStringSet &
   ExtensionStringSet<T>;
+
+export interface StringSetContextType {
+  xxx: {
+    yyy: string;
+    zzz: (a: Date) => string;
+  };
+  ttt: {
+    yyy: string;
+  };
+}
