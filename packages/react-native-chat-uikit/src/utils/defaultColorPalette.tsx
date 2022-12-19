@@ -90,5 +90,3 @@ export const defaultColorPalette = {
   lightPalette,
   darkPalette,
 };
-
-export type ColorPaletteType = typeof lightPalette | typeof darkPalette;

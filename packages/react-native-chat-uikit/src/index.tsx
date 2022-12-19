@@ -59,6 +59,8 @@ export {
   useChatSdkContext,
 } from './contexts/ImSdkContext';
 export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
+export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
+export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
 export {
@@ -69,6 +71,14 @@ export { default as createStyleSheet } from './styles/createStyleSheet';
 export { default as DarkTheme } from './theme/DarkTheme';
 export { default as LightTheme } from './theme/LightTheme';
 export * from './types';
+export { darkPalette, lightPalette } from './utils/defaultColorPalette';
+export { default as defaultHeaderHeight } from './utils/defaultHeaderHeight';
+export {
+  messageTimestamp,
+  truncateContent,
+  truncatedBadgeCount,
+} from './utils/format';
+export { seqId, timestamp, uuid } from './utils/generator';
 
 // declare module 'example/src/common' {
 //   import type DevDebugInternal from './example/src/common/screens/DevDebug';

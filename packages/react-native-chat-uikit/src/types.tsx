@@ -1,9 +1,27 @@
 import type { TextStyle } from 'react-native';
 import type { ChatClient } from 'react-native-chat-sdk';
 
-import type { ColorPaletteType } from './utils/defaultColorPalette';
+import type { darkPalette, lightPalette } from './utils/defaultColorPalette';
 
 export type Keyof<T extends {}> = Extract<keyof T, string>;
+
+export type PartialDeep<T> = T extends object
+  ? T extends Function
+    ? T
+    : {
+        [P in keyof T]?: PartialDeep<T[P]>;
+      }
+  : T;
+
+export type RequiredDeep<T> = T extends object
+  ? T extends Function
+    ? T
+    : {
+        [P in keyof T]-?: RequiredDeep<T[P]>;
+      }
+  : T;
+
+export type ColorPaletteType = typeof lightPalette | typeof darkPalette;
 
 export type FontAttributes = Pick<
   TextStyle,
@@ -64,3 +82,21 @@ export type HeaderContextType = {
   defaultTitleAlign: 'left' | 'center';
   defaultTopInset: number;
 };
+
+export type UIKitStringSet = {
+  xxx: {
+    yyy: string;
+    zzz: (a: Date) => string;
+  };
+  ttt: {
+    yyy: string;
+  };
+};
+
+export type ExtensionStringSet<T extends {} | undefined> = Omit<
+  T,
+  keyof UIKitStringSet
+>;
+
+export type StringSet<T extends {} | undefined> = UIKitStringSet &
+  ExtensionStringSet<T>;
