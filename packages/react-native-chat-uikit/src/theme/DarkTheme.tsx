@@ -40,6 +40,7 @@ const DarkTheme: ThemeContextType = {
         placeholder: darkPalette.secondary,
       },
     },
+    error: darkPalette.error,
   },
   fonts: BaseTheme.fonts!,
 };

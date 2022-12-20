@@ -40,6 +40,9 @@ export type InputColor = {
   placeholder: string;
 };
 
+export type ToastType = 'normal' | 'error' | 'success';
+export type ToastContextType = { show(text: string, type?: ToastType): void };
+
 export type ThemeContextType = {
   scheme: 'light' | 'dark' | string;
   paperColors: ColorPaletteType;
@@ -59,6 +62,7 @@ export type ThemeContextType = {
       enabled: InputColor;
       disabled: InputColor;
     };
+    error: string;
   };
   fonts: {
     primary: FontAttributes;

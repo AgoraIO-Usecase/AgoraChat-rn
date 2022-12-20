@@ -45,10 +45,12 @@ export { default as Divider } from './components/Divider';
 export { LocalIcon, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
 export { default as Loading } from './components/Loading';
+export { default as MenuBar } from './components/MenuBar';
 export { default as Modal } from './components/Modal';
 export { default as Prompt } from './components/Prompt';
 export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';
+export { default as Toast } from './components/Toast';
 export { Container, ContainerProps } from './containers';
 export {
   HeaderStyleProvider,
@@ -60,6 +62,7 @@ export {
   useChatSdkContext,
 } from './contexts/ImSdkContext';
 export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
+export { ToastProvider, useToastContext } from './contexts/ToastContext';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
 export {

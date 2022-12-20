@@ -40,6 +40,7 @@ const LightTheme: ThemeContextType = {
         placeholder: lightPalette.secondary,
       },
     },
+    error: lightPalette.error,
   },
   fonts: BaseTheme.fonts!,
 };
