@@ -34,7 +34,7 @@ const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
         <LocalIcon
           name={icon}
           color={iconColor ?? colors.primary}
-          parentStyle={styles.sheetItemIcon}
+          containerStyle={styles.sheetItemIcon}
         />
       )}
       <Text

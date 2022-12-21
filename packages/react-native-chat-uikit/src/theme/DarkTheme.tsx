@@ -41,6 +41,12 @@ const DarkTheme: ThemeContextType = {
       },
     },
     error: darkPalette.error,
+    badge: {
+      content: 'white',
+      background: 'red',
+    },
+    avatar: darkPalette.onBackground,
+    transparent: 'transparent',
   },
   fonts: BaseTheme.fonts!,
 };

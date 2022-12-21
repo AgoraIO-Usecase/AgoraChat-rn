@@ -35,7 +35,7 @@ export default function MenuBar({
             name={icon}
             size={variant === 'contained' ? 16 : 24}
             color={colors.primary}
-            parentStyle={[
+            containerStyle={[
               styles.icon,
               variant === 'contained' && styles.containedIcon,
               variant === 'contained' && {

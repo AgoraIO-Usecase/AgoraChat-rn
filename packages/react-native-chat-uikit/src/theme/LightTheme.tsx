@@ -41,6 +41,12 @@ const LightTheme: ThemeContextType = {
       },
     },
     error: lightPalette.error,
+    badge: {
+      content: 'white',
+      background: 'red',
+    },
+    avatar: lightPalette.onBackground,
+    transparent: 'transparent',
   },
   fonts: BaseTheme.fonts!,
 };

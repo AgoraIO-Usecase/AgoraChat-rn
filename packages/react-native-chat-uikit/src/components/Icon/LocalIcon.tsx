@@ -45,7 +45,7 @@ type Props = {
   color?: ColorValue | undefined;
   size?: number | undefined;
   style?: StyleProp<ImageStyle>;
-  parentStyle?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
 export default function LocalIcon({
@@ -53,7 +53,7 @@ export default function LocalIcon({
   color,
   size = 24,
   style,
-  parentStyle,
+  containerStyle,
 }: Props): JSX.Element {
   const sizeStyle = sizeStyles[size as SizeList] ?? {
     width: size,
@@ -61,7 +61,7 @@ export default function LocalIcon({
   };
   const { colors } = useThemeContext();
   return (
-    <View style={parentStyle ?? styles.container}>
+    <View style={containerStyle ?? styles.container}>
       <Image
         resizeMode="contain"
         source={
@@ -71,7 +71,11 @@ export default function LocalIcon({
             ? localLocalIcon(name, IconSize.ICON_BIGGER)
             : localLocalIcon(name, IconSize.ICON_MAX)
         }
-        style={[{ tintColor: color ?? colors.primary }, sizeStyle, style]}
+        style={[
+          color ? { tintColor: color ?? colors.primary } : undefined,
+          sizeStyle,
+          style,
+        ]}
       />
     </View>
   );

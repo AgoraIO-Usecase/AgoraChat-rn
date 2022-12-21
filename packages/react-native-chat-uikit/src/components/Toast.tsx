@@ -70,7 +70,7 @@ export default function Toast({
         <LocalIcon
           name={type === 'success' ? 'alert_success' : 'alert_error'}
           color={color}
-          parentStyle={styles.icon}
+          containerStyle={styles.icon}
         />
       )}
       <Text

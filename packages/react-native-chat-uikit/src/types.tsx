@@ -28,7 +28,7 @@ export type FontAttributes = Pick<
   'fontFamily' | 'fontSize' | 'lineHeight' | 'letterSpacing' | 'fontWeight'
 >;
 
-export type ButtonColor = {
+export type ItemColor = {
   background: string;
   content: string;
 };
@@ -54,15 +54,18 @@ export type ThemeContextType = {
     card: string;
     backdrop: string;
     button: {
-      disabled: ButtonColor;
-      enabled: ButtonColor;
-      pressed: ButtonColor;
+      disabled: ItemColor;
+      enabled: ItemColor;
+      pressed: ItemColor;
     };
     input: {
       enabled: InputColor;
       disabled: InputColor;
     };
     error: string;
+    badge: ItemColor;
+    avatar: string;
+    transparent: 'transparent';
   };
   fonts: {
     primary: FontAttributes;

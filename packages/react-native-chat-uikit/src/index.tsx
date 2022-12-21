@@ -38,6 +38,8 @@ export const ChatUikitView =
 
 export { default as ActionMenu } from './components/ActionMenu';
 export { default as Alert } from './components/Alert';
+export { default as Avatar } from './components/Avatar';
+export { default as Badge } from './components/Badge';
 export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
 export { default as DialogBox } from './components/DialogBox';
