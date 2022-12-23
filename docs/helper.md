@@ -5,3 +5,4 @@
 [material icon searcher](https://materialdesignicons.com)
 [theme helper](https://callstack.github.io/react-native-paper/theming.html)
 [font helper](https://callstack.github.io/react-native-paper/fonts.html)
+[pod install helper](https://juejin.cn/post/6914204711935705096)

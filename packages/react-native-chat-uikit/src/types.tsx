@@ -4,6 +4,11 @@ import type { ChatClient } from 'react-native-chat-sdk';
 import type { darkPalette, lightPalette } from './utils/defaultColorPalette';
 
 export type Keyof<T extends {}> = Extract<keyof T, string>;
+export type Nullable<T> = T | null;
+export type Undefinable<T> = T | undefined;
+export type PartialNullable<T> = {
+  [P in keyof T]?: T[P] | null;
+};
 
 export type PartialDeep<T> = T extends object
   ? T extends Function

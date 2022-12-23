@@ -28,6 +28,8 @@ target 'example' do
   )
 
   pod 'react-native-chat-uikit', :path => '../../packages/react-native-chat-uikit'
+  # https://juejin.cn/post/6914204711935705096
+  pod 'GoogleUtilities', :modular_headers => true
 
   # Uncomment to opt-in to using Flipper
   # Note that if you have use_frameworks! enabled, Flipper will not work
