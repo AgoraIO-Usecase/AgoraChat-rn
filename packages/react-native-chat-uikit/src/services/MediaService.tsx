@@ -1,5 +1,9 @@
 import React from 'react';
 import { Platform } from 'react-native';
+import type {
+  PlayBackType,
+  RecordBackType,
+} from 'react-native-audio-recorder-player';
 
 import type { Nullable, PartialNullable } from '../types';
 import { generateFileName, getFileExtension, getFileType } from '../utils/file';
@@ -10,6 +14,8 @@ import type {
   OpenCameraOptions,
   OpenMediaLibraryOptions,
   OpenResult,
+  PlayAudioOptions,
+  RecordAudioOptions,
   SaveFileOptions,
   VideoProps,
   VideoThumbnailOptions,
@@ -19,6 +25,44 @@ export class MediaServiceImplement implements MediaService {
   option: MediaServiceOptions;
   constructor(option: MediaServiceOptions) {
     this.option = option;
+  }
+  async startRecordAudio(option: RecordAudioOptions): Promise<boolean> {
+    const recorder = this.option.audioRecorderModule;
+    try {
+      recorder.addRecordBackListener((e: RecordBackType) => {
+        option.onPosition?.(e.currentPosition);
+      });
+      const uri = await recorder.startRecorder(option.url, option.audio);
+      option.onSaved?.(uri.replace(/file:\/\//, ''));
+      return true;
+    } catch (error) {
+      console.warn('startRecordAudio:', error);
+      return false;
+    }
+  }
+  async stopRecordAudio(): Promise<void> {
+    const recorder = this.option.audioRecorderModule;
+    await recorder.stopRecorder();
+    recorder.removeRecordBackListener();
+  }
+  async playAudio(option: PlayAudioOptions): Promise<boolean> {
+    const recorder = this.option.audioRecorderModule;
+    try {
+      recorder.addPlayBackListener((value: PlayBackType) => {
+        option.onPlay?.({ ...value });
+      });
+      const url = await recorder.startPlayer(option.url, option.opt);
+      option.onFile?.(url.replace(/file:\/\//, ''));
+      return true;
+    } catch (error) {
+      console.warn('playAudio:', error);
+      return false;
+    }
+  }
+  async stopAudio(): Promise<void> {
+    const recorder = this.option.audioRecorderModule;
+    await recorder.stopPlayer();
+    recorder.removePlayBackListener();
   }
   private resultReduction({
     uri,

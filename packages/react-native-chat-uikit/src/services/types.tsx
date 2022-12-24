@@ -1,6 +1,8 @@
 import type { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
 import type Clipboard from '@react-native-clipboard/clipboard';
 import type FirebaseMessage from '@react-native-firebase/messaging';
+import type { AudioSet } from 'react-native-audio-recorder-player';
+import type AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import type CreateThumbnail from 'react-native-create-thumbnail';
 import type * as DocumentPicker from 'react-native-document-picker';
 import type FileAccess from 'react-native-file-access';
@@ -45,6 +47,26 @@ export interface SaveFileOptions {
   fileName: string;
   fileType?: string | null;
 }
+export interface RecordAudioOptions {
+  url?: string;
+  audio: AudioSet;
+  onPosition?: (position: number) => void;
+  onSaved?: (path: string) => void;
+}
+export interface PlayAudioOptions {
+  url: string;
+  opt?: Record<string, string>;
+  onPlay?: ({
+    isMuted,
+    currentPosition,
+    duration,
+  }: {
+    isMuted?: boolean;
+    currentPosition: number;
+    duration: number;
+  }) => void;
+  onFile?: (path: string) => void;
+}
 export type ClipboardServiceOption = {
   clipboard: typeof Clipboard;
 };
@@ -61,6 +83,7 @@ export type MediaServiceOptions = {
   documentPickerModule: typeof DocumentPicker;
   mediaLibraryModule: typeof MediaLibrary;
   fsModule: typeof FileAccess;
+  audioRecorderModule: AudioRecorderPlayer;
   permission: PermissionService;
 };
 export interface MediaService {
@@ -81,6 +104,11 @@ export interface MediaService {
    * @param options save file options.
    */
   save(options: SaveFileOptions): Promise<Nullable<string>>;
+
+  startRecordAudio(option: RecordAudioOptions): Promise<boolean>;
+  stopRecordAudio(): Promise<void>;
+  playAudio(option: PlayAudioOptions): Promise<boolean>;
+  stopAudio(): Promise<void>;
 }
 // export interface ImageService {}
 // export interface NetworkService {}
