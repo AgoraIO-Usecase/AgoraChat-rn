@@ -3,7 +3,10 @@ import './utils/globals';
 import { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import FirebaseMessage from '@react-native-firebase/messaging';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import {
+  createMaterialBottomTabNavigator,
+  MaterialBottomTabScreenProps,
+} from '@react-navigation/material-bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
   DarkTheme as NDarkTheme,
@@ -56,21 +59,12 @@ if (Platform.OS === 'web') {
 
 const Root = createNativeStackNavigator<RootParamsList>();
 
-// Type '({ route, navigation, }: NativeStackScreenProps<NativeStackParams, 'MyText'>) => JSX.Element' is not assignable to type 'ScreenComponentType<ParamListBase, "MyText"> | undefined'.
-// export const RootStack = createNativeStackNavigator();
-// const RootStack = createNativeStackNavigator<NativeStackParams>();
-
-export type NativeStackParams = {
-  MyText: { age: number } | undefined;
-  Article: { author: string } | undefined;
-};
-
 const Contact = createMaterialTopTabNavigator<RootParamsList>();
 
 const ContactScreen = ({
   navigation,
   route,
-}: NativeStackScreenProps<ParamListBase, 'Contact'>) => {
+}: MaterialBottomTabScreenProps<ParamListBase, 'Contact'>): JSX.Element => {
   console.log(route, navigation);
   return (
     <Contact.Navigator>
@@ -86,7 +80,7 @@ const Home = createMaterialBottomTabNavigator<RootParamsList>();
 const HomeScreen = ({
   navigation,
   route,
-}: NativeStackScreenProps<ParamListBase, 'Home'>) => {
+}: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element => {
   console.log(route, navigation);
   return (
     <Home.Navigator>
@@ -102,7 +96,7 @@ const Login = createNativeStackNavigator<RootParamsList>();
 const LoginScreen = ({
   navigation,
   route,
-}: NativeStackScreenProps<ParamListBase, 'Login'>) => {
+}: NativeStackScreenProps<ParamListBase, 'Login'>): JSX.Element => {
   console.log(route, navigation);
   return (
     <Login.Navigator>
@@ -112,7 +106,7 @@ const LoginScreen = ({
   );
 };
 
-const HomeHeaderRight = (props: HeaderButtonProps) => {
+const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
   console.log('props:', props);
   const navigation = useNavigation<NavigationProp<ScreenParamsList>>();
   return (
@@ -128,71 +122,88 @@ const HomeHeaderRight = (props: HeaderButtonProps) => {
   );
 };
 
+const __TEST__ = false;
+
+console.log('DEV:', __DEV__);
+console.log('TEST:', __TEST__);
+
 export default function App() {
   React.useEffect(() => {
     console.log('test:');
   }, []);
 
-  if (__DEV__) {
+  if (__TEST__) {
     return Dev();
-  } else {
-    const isLightTheme = LightTheme.scheme === 'light';
-
-    const permission = Services.createPermissionService({
-      permissions: Permissions,
-      firebaseMessage: FirebaseMessage,
-    });
-
-    return (
-      <Container
-        option={{ appKey: '', autoLogin: false }}
-        theme={isLightTheme ? LightTheme : DarkTheme}
-        localization={createStringSetEn()}
-        sdk={{ client: ChatClient.getInstance(), isLogged: false }}
-        services={{
-          clipboard: Services.createClipboardService({
-            clipboard: Clipboard,
-          }),
-          notification: Services.createNotificationService({
-            firebaseMessage: FirebaseMessage,
-            permission: permission,
-          }),
-          media: Services.createMediaService({
-            videoModule: VideoComponent,
-            videoThumbnail: CreateThumbnail,
-            imagePickerModule: ImagePicker,
-            documentPickerModule: DocumentPicker,
-            mediaLibraryModule: MediaLibrary,
-            fsModule: FileAccess,
-            audioModule: Audio,
-            permission: permission,
-          }),
-          permission: permission,
-        }}
-      >
-        <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
-          <Root.Navigator initialRouteName="SignIn">
-            <Root.Screen name="Login" component={LoginScreen} />
-            <Root.Screen
-              name="Home"
-              options={{
-                headerRight: HomeHeaderRight,
-              }}
-              component={HomeScreen}
-            />
-            <Root.Group>
-              <Root.Screen
-                name="Add"
-                options={{ headerShown: true, presentation: 'modal' }}
-                component={Add}
-              />
-              <Root.Screen name="AddContact" component={AddContact} />
-            </Root.Group>
-          </Root.Navigator>
-        </NavigationContainer>
-      </Container>
-    );
   }
+
+  const isLightTheme = LightTheme.scheme === 'light';
+
+  const permission = Services.createPermissionService({
+    permissions: Permissions,
+    firebaseMessage: FirebaseMessage,
+  });
+
+  return (
+    <Container
+      option={{ appKey: '', autoLogin: false }}
+      theme={isLightTheme ? LightTheme : DarkTheme}
+      localization={createStringSetEn()}
+      sdk={{ client: ChatClient.getInstance(), isLogged: false }}
+      header={{
+        defaultTitleAlign: 'center',
+        defaultStatusBarTranslucent: true,
+        defaultHeight: 44,
+        defaultTopInset: 44,
+      }}
+      services={{
+        clipboard: Services.createClipboardService({
+          clipboard: Clipboard,
+        }),
+        notification: Services.createNotificationService({
+          firebaseMessage: FirebaseMessage,
+          permission: permission,
+        }),
+        media: Services.createMediaService({
+          videoModule: VideoComponent,
+          videoThumbnail: CreateThumbnail,
+          imagePickerModule: ImagePicker,
+          documentPickerModule: DocumentPicker,
+          mediaLibraryModule: MediaLibrary,
+          fsModule: FileAccess,
+          audioModule: Audio,
+          permission: permission,
+        }),
+        permission: permission,
+      }}
+    >
+      <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
+        <Root.Navigator initialRouteName="SignIn">
+          <Root.Screen
+            name="Login"
+            options={{
+              headerShown: false,
+            }}
+            component={LoginScreen}
+          />
+          <Root.Screen
+            name="Home"
+            options={{
+              headerRight: HomeHeaderRight,
+            }}
+            component={HomeScreen}
+          />
+          <Root.Group>
+            <Root.Screen
+              name="Add"
+              options={{ headerShown: true, presentation: 'modal' }}
+              component={Add}
+            />
+            <Root.Screen name="AddContact" component={AddContact} />
+          </Root.Group>
+        </Root.Navigator>
+      </NavigationContainer>
+    </Container>
+  );
 }
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);

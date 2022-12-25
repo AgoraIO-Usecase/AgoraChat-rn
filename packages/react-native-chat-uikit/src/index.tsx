@@ -65,6 +65,7 @@ export {
 } from './contexts/ImSdkContext';
 export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
 export { ToastProvider, useToastContext } from './contexts/ToastContext';
+export { useUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
 export {

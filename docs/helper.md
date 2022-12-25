@@ -7,3 +7,4 @@
 [font helper](https://callstack.github.io/react-native-paper/fonts.html)
 [pod install helper](https://juejin.cn/post/6914204711935705096)
 [push notification helper](https://rnfirebase.io/)
+[make app icon](https://makeappicon.com/)
