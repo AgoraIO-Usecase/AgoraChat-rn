@@ -50,13 +50,16 @@ export class PermissionServiceImplement implements PermissionService {
       permission.PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
     ];
   }
-  private async camera(
+  private async cameraAndMic(
     check: CheckMultipleType | RequestMultipleType
   ): Promise<boolean> {
     const s = this.option.permissions;
     const cameraPermissions: Permission[] = Platform.select({
       ios: [s.PERMISSIONS.IOS.CAMERA, s.PERMISSIONS.IOS.MICROPHONE],
-      android: [s.PERMISSIONS.ANDROID.CAMERA],
+      android: [
+        s.PERMISSIONS.ANDROID.CAMERA,
+        s.PERMISSIONS.ANDROID.RECORD_AUDIO,
+      ],
       default: [],
     });
     return this.resultReduction(await check(cameraPermissions), () => {});
@@ -84,11 +87,11 @@ export class PermissionServiceImplement implements PermissionService {
     return this.resultReduction(await check(locationPermissions), () => {});
   }
 
-  async hasCameraPermission(): Promise<boolean> {
-    return this.camera(this.option.permissions.checkMultiple);
+  async hasCameraAndMicPermission(): Promise<boolean> {
+    return this.cameraAndMic(this.option.permissions.checkMultiple);
   }
-  async requestCameraPermission(): Promise<boolean> {
-    return this.camera(this.option.permissions.requestMultiple);
+  async requestCameraAndMicPermission(): Promise<boolean> {
+    return this.cameraAndMic(this.option.permissions.requestMultiple);
   }
   hasLocationPermission(): Promise<boolean> {
     return this.location(this.option.permissions.checkMultiple);

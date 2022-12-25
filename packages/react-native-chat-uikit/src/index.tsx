@@ -78,6 +78,7 @@ export {
 } from './I18n2/CStringSet.type';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
+export * from './services';
 export {
   createScaleFactor,
   defaultScaleFactor,

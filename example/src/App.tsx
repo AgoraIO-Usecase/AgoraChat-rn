@@ -1,5 +1,8 @@
 import './utils/globals';
 
+import { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
+import Clipboard from '@react-native-clipboard/clipboard';
+import FirebaseMessage from '@react-native-firebase/messaging';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
@@ -18,8 +21,22 @@ import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/types
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { Platform } from 'react-native';
-import { Container, DarkTheme, LightTheme } from 'react-native-chat-uikit';
+import * as Audio from 'react-native-audio-recorder-player';
+import { ChatClient } from 'react-native-chat-sdk';
+import {
+  Container,
+  createStringSetEn,
+  DarkTheme,
+  LightTheme,
+  Services,
+} from 'react-native-chat-uikit';
+import CreateThumbnail from 'react-native-create-thumbnail';
+import * as DocumentPicker from 'react-native-document-picker';
+import FileAccess from 'react-native-file-access';
+import ImagePicker from 'react-native-image-picker';
 import { Button } from 'react-native-paper';
+import Permissions from 'react-native-permissions';
+import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
 import type { RootParamsList, ScreenParamsList } from './routes';
@@ -120,9 +137,39 @@ export default function App() {
     return Dev();
   } else {
     const isLightTheme = LightTheme.scheme === 'light';
-    // return <Container theme={isLightTheme ? LightTheme : DarkTheme} />;
+
+    const permission = Services.createPermissionService({
+      permissions: Permissions,
+      firebaseMessage: FirebaseMessage,
+    });
+
     return (
-      <Container theme={isLightTheme ? LightTheme : DarkTheme}>
+      <Container
+        option={{ appKey: '', autoLogin: false }}
+        theme={isLightTheme ? LightTheme : DarkTheme}
+        localization={createStringSetEn()}
+        sdk={{ client: ChatClient.getInstance(), isLogged: false }}
+        services={{
+          clipboard: Services.createClipboardService({
+            clipboard: Clipboard,
+          }),
+          notification: Services.createNotificationService({
+            firebaseMessage: FirebaseMessage,
+            permission: permission,
+          }),
+          media: Services.createMediaService({
+            videoModule: VideoComponent,
+            videoThumbnail: CreateThumbnail,
+            imagePickerModule: ImagePicker,
+            documentPickerModule: DocumentPicker,
+            mediaLibraryModule: MediaLibrary,
+            fsModule: FileAccess,
+            audioModule: Audio,
+            permission: permission,
+          }),
+          permission: permission,
+        }}
+      >
         <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
           <Root.Navigator initialRouteName="SignIn">
             <Root.Screen name="Login" component={LoginScreen} />

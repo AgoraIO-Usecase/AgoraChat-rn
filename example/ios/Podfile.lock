@@ -172,6 +172,44 @@ PODS:
   - nanopb/decode (2.30909.0)
   - nanopb/encode (2.30909.0)
   - OpenSSL-Universal (1.1.1100)
+  - Permission-AppTrackingTransparency (3.6.1):
+    - RNPermissions
+  - Permission-BluetoothPeripheral (3.6.1):
+    - RNPermissions
+  - Permission-Calendars (3.6.1):
+    - RNPermissions
+  - Permission-Camera (3.6.1):
+    - RNPermissions
+  - Permission-Contacts (3.6.1):
+    - RNPermissions
+  - Permission-FaceID (3.6.1):
+    - RNPermissions
+  - Permission-LocationAccuracy (3.6.1):
+    - RNPermissions
+  - Permission-LocationAlways (3.6.1):
+    - RNPermissions
+  - Permission-LocationWhenInUse (3.6.1):
+    - RNPermissions
+  - Permission-MediaLibrary (3.6.1):
+    - RNPermissions
+  - Permission-Microphone (3.6.1):
+    - RNPermissions
+  - Permission-Motion (3.6.1):
+    - RNPermissions
+  - Permission-Notifications (3.6.1):
+    - RNPermissions
+  - Permission-PhotoLibrary (3.6.1):
+    - RNPermissions
+  - Permission-PhotoLibraryAddOnly (3.6.1):
+    - RNPermissions
+  - Permission-Reminders (3.6.1):
+    - RNPermissions
+  - Permission-Siri (3.6.1):
+    - RNPermissions
+  - Permission-SpeechRecognition (3.6.1):
+    - RNPermissions
+  - Permission-StoreKit (3.6.1):
+    - RNPermissions
   - PromisesObjC (2.1.1)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
@@ -474,6 +512,8 @@ PODS:
     - React-jsi (= 0.68.5)
     - React-logger (= 0.68.5)
     - React-perflogger (= 0.68.5)
+  - RNAudioRecorderPlayer (3.5.1):
+    - React-Core
   - RNCClipboard (1.11.1):
     - React-Core
   - RNFastImage (8.6.3):
@@ -522,6 +562,7 @@ DEPENDENCIES:
   - EXSplashScreen (from `../../node_modules/expo-splash-screen/ios`)
   - FBLazyVector (from `../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../node_modules/react-native/React/FBReactNativeSpec`)
+  - FirebaseCore
   - Flipper (= 0.125.0)
   - Flipper-Boost-iOSX (= 1.76.0.1.11)
   - Flipper-DoubleConversion (= 3.2.0)
@@ -546,6 +587,25 @@ DEPENDENCIES:
   - glog (from `../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - GoogleUtilities
   - OpenSSL-Universal (= 1.1.1100)
+  - Permission-AppTrackingTransparency (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency`)
+  - Permission-BluetoothPeripheral (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral`)
+  - Permission-Calendars (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars`)
+  - Permission-Camera (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Camera`)
+  - Permission-Contacts (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts`)
+  - Permission-FaceID (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID`)
+  - Permission-LocationAccuracy (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy`)
+  - Permission-LocationAlways (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways`)
+  - Permission-LocationWhenInUse (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-MediaLibrary (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary`)
+  - Permission-Microphone (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone`)
+  - Permission-Motion (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Motion`)
+  - Permission-Notifications (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications`)
+  - Permission-PhotoLibrary (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary`)
+  - Permission-PhotoLibraryAddOnly (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly`)
+  - Permission-Reminders (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders`)
+  - Permission-Siri (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Siri`)
+  - Permission-SpeechRecognition (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition`)
+  - Permission-StoreKit (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit`)
   - RCT-Folly (from `../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../node_modules/react-native/Libraries/TypeSafety`)
@@ -583,6 +643,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../node_modules/react-native/ReactCommon`)
+  - RNAudioRecorderPlayer (from `../../node_modules/react-native-audio-recorder-player`)
   - "RNCClipboard (from `../../node_modules/@react-native-clipboard/clipboard`)"
   - RNFastImage (from `../../node_modules/react-native-fast-image`)
   - "RNFBApp (from `../../node_modules/@react-native-firebase/app`)"
@@ -654,6 +715,44 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../../node_modules/react-native/third-party-podspecs/glog.podspec"
+  Permission-AppTrackingTransparency:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency"
+  Permission-BluetoothPeripheral:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral"
+  Permission-Calendars:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars"
+  Permission-Camera:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Camera"
+  Permission-Contacts:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts"
+  Permission-FaceID:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID"
+  Permission-LocationAccuracy:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy"
+  Permission-LocationAlways:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways"
+  Permission-LocationWhenInUse:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse"
+  Permission-MediaLibrary:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary"
+  Permission-Microphone:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone"
+  Permission-Motion:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Motion"
+  Permission-Notifications:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications"
+  Permission-PhotoLibrary:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary"
+  Permission-PhotoLibraryAddOnly:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly"
+  Permission-Reminders:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders"
+  Permission-Siri:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Siri"
+  Permission-SpeechRecognition:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition"
+  Permission-StoreKit:
+    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit"
   RCT-Folly:
     :podspec: "../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -724,6 +823,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../node_modules/react-native/ReactCommon"
+  RNAudioRecorderPlayer:
+    :path: "../../node_modules/react-native-audio-recorder-player"
   RNCClipboard:
     :path: "../../node_modules/@react-native-clipboard/clipboard"
   RNFastImage:
@@ -781,6 +882,25 @@ SPEC CHECKSUMS:
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
+  Permission-AppTrackingTransparency: 9eedbc3b5a2907b8cb2c971461754616eac1661d
+  Permission-BluetoothPeripheral: 67708853584bb9208c76d36d0e0ea4eafb97ea5b
+  Permission-Calendars: dd55f36958c398a487f141d4c89119907e34dca8
+  Permission-Camera: bf6791b17c7f614b6826019fcfdcc286d3a107f6
+  Permission-Contacts: 2484d274171688b1ca80978b949ac771259b51f0
+  Permission-FaceID: e70223280292a1a5e4b8ad943b70cd9229a7d2c3
+  Permission-LocationAccuracy: 76df17de5c6b8bc2eee34e61ee92cdd7a864c73d
+  Permission-LocationAlways: 8d99b025c9f73c696e0cdb367e42525f2e9a26f2
+  Permission-LocationWhenInUse: 3ba99e45c852763f730eabecec2870c2382b7bd4
+  Permission-MediaLibrary: a994236bae41b3597a376ff08298fb1c6d84729b
+  Permission-Microphone: 48212dd4d28025d9930d583e3c7a56da7268665c
+  Permission-Motion: d3e5ac6c989b2594a3c5c5ab19ffe9453fa3eb5c
+  Permission-Notifications: 150484ae586eb9be4e32217582a78350a9bb31c3
+  Permission-PhotoLibrary: 5b34ca67279f7201ae109cef36f9806a6596002d
+  Permission-PhotoLibraryAddOnly: 6dba8924024e239af2e282daa8a88967679b4983
+  Permission-Reminders: dd6692dab69ae8a4e2473860e25b6304f9bcd326
+  Permission-Siri: 9853b319177b9f2460bd3e0bdd26bdebe6238def
+  Permission-SpeechRecognition: 7bda51c7a3b68f259a98436ed431afdf84a19ecf
+  Permission-StoreKit: 7dcf43ad1b8cdc7ae21e547d49df9ac9b6ea7270
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
   RCTRequired: 0f06b6068f530932d10e1a01a5352fad4eaacb74
@@ -817,6 +937,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: 9819a3bf6230e4b2a99877c21268b0b2416157a1
   React-runtimeexecutor: b1f1995089b90696dbc2a7ffe0059a80db5c8eb1
   ReactCommon: 149e2c0acab9bac61378da0db5b2880a1b5ff59b
+  RNAudioRecorderPlayer: 308940de4f9d1448a064874fd9d83479ae47c7a7
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: 9295dac8a4e8857918bcff90328b197807ee0dc1
@@ -832,6 +953,6 @@ SPEC CHECKSUMS:
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
   ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
-PODFILE CHECKSUM: 6874b7fa1f813f4839b11e85f967c8638de6559c
+PODFILE CHECKSUM: 24ec6ae48526782ffc2bb796567d327eefd8c314
 
 COCOAPODS: 1.11.3

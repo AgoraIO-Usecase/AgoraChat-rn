@@ -1,8 +1,7 @@
 import type { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
 import type Clipboard from '@react-native-clipboard/clipboard';
 import type FirebaseMessage from '@react-native-firebase/messaging';
-import type { AudioSet } from 'react-native-audio-recorder-player';
-import type AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import type * as Audio from 'react-native-audio-recorder-player';
 import type CreateThumbnail from 'react-native-create-thumbnail';
 import type * as DocumentPicker from 'react-native-document-picker';
 import type FileAccess from 'react-native-file-access';
@@ -31,7 +30,7 @@ export interface VideoThumbnailOptions {
   quality?: number;
 }
 export interface OpenResult {
-  onOpenFailure?: (error: Error) => void;
+  onFailed?: (error: Error) => void;
 }
 export interface OpenMediaLibraryOptions extends OpenResult {
   selectionLimit?: number;
@@ -47,13 +46,13 @@ export interface SaveFileOptions {
   fileName: string;
   fileType?: string | null;
 }
-export interface RecordAudioOptions {
+export interface RecordAudioOptions extends OpenResult {
   url?: string;
-  audio: AudioSet;
+  audio: Audio.AudioSet;
   onPosition?: (position: number) => void;
   onSaved?: (path: string) => void;
 }
-export interface PlayAudioOptions {
+export interface PlayAudioOptions extends OpenResult {
   url: string;
   opt?: Record<string, string>;
   onPlay?: ({
@@ -83,7 +82,7 @@ export type MediaServiceOptions = {
   documentPickerModule: typeof DocumentPicker;
   mediaLibraryModule: typeof MediaLibrary;
   fsModule: typeof FileAccess;
-  audioRecorderModule: AudioRecorderPlayer;
+  audioModule: typeof Audio;
   permission: PermissionService;
 };
 export interface MediaService {
@@ -105,9 +104,9 @@ export interface MediaService {
    */
   save(options: SaveFileOptions): Promise<Nullable<string>>;
 
-  startRecordAudio(option: RecordAudioOptions): Promise<boolean>;
+  startRecordAudio(options: RecordAudioOptions): Promise<boolean>;
   stopRecordAudio(): Promise<void>;
-  playAudio(option: PlayAudioOptions): Promise<boolean>;
+  playAudio(options: PlayAudioOptions): Promise<boolean>;
   stopAudio(): Promise<void>;
 }
 // export interface ImageService {}
@@ -117,8 +116,8 @@ export type PermissionServiceOption = {
   firebaseMessage: typeof FirebaseMessage;
 };
 export interface PermissionService {
-  hasCameraPermission(): Promise<boolean>;
-  requestCameraPermission(): Promise<boolean>;
+  hasCameraAndMicPermission(): Promise<boolean>;
+  requestCameraAndMicPermission(): Promise<boolean>;
   hasLocationPermission(): Promise<boolean>;
   requestLocationPermission(): Promise<boolean>;
   hasMediaLibraryPermission(): Promise<boolean>;

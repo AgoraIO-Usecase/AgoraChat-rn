@@ -1,5 +1,6 @@
 import React from 'react';
 import { Platform } from 'react-native';
+import type AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import type {
   PlayBackType,
   RecordBackType,
@@ -23,17 +24,29 @@ import type {
 
 export class MediaServiceImplement implements MediaService {
   option: MediaServiceOptions;
+  audioPlayer: AudioRecorderPlayer;
   constructor(option: MediaServiceOptions) {
     this.option = option;
+    this.audioPlayer = new this.option.audioModule.default();
   }
-  async startRecordAudio(option: RecordAudioOptions): Promise<boolean> {
-    const recorder = this.option.audioRecorderModule;
+  async startRecordAudio(options: RecordAudioOptions): Promise<boolean> {
+    const hasPermission =
+      await this.option.permission.hasCameraAndMicPermission();
+    if (!hasPermission) {
+      const granted =
+        await this.option.permission.requestCameraAndMicPermission();
+      if (!granted) {
+        options?.onFailed?.(new Error('Failed to obtain permission.'));
+        return false;
+      }
+    }
     try {
+      const recorder = this.audioPlayer;
       recorder.addRecordBackListener((e: RecordBackType) => {
-        option.onPosition?.(e.currentPosition);
+        options.onPosition?.(e.currentPosition);
       });
-      const uri = await recorder.startRecorder(option.url, option.audio);
-      option.onSaved?.(uri.replace(/file:\/\//, ''));
+      const uri = await recorder.startRecorder(options.url, options.audio);
+      options.onSaved?.(uri.replace(/file:\/\//, ''));
       return true;
     } catch (error) {
       console.warn('startRecordAudio:', error);
@@ -41,18 +54,28 @@ export class MediaServiceImplement implements MediaService {
     }
   }
   async stopRecordAudio(): Promise<void> {
-    const recorder = this.option.audioRecorderModule;
+    const recorder = this.audioPlayer;
     await recorder.stopRecorder();
     recorder.removeRecordBackListener();
   }
-  async playAudio(option: PlayAudioOptions): Promise<boolean> {
-    const recorder = this.option.audioRecorderModule;
+  async playAudio(options: PlayAudioOptions): Promise<boolean> {
+    const hasPermission =
+      await this.option.permission.hasMediaLibraryPermission();
+    if (!hasPermission) {
+      const granted =
+        await this.option.permission.requestMediaLibraryPermission();
+      if (!granted) {
+        options?.onFailed?.(new Error('Failed to obtain permission.'));
+        return false;
+      }
+    }
     try {
+      const recorder = this.audioPlayer;
       recorder.addPlayBackListener((value: PlayBackType) => {
-        option.onPlay?.({ ...value });
+        options.onPlay?.({ ...value });
       });
-      const url = await recorder.startPlayer(option.url, option.opt);
-      option.onFile?.(url.replace(/file:\/\//, ''));
+      const url = await recorder.startPlayer(options.url, options.opt);
+      options.onFile?.(url.replace(/file:\/\//, ''));
       return true;
     } catch (error) {
       console.warn('playAudio:', error);
@@ -60,7 +83,7 @@ export class MediaServiceImplement implements MediaService {
     }
   }
   async stopAudio(): Promise<void> {
-    const recorder = this.option.audioRecorderModule;
+    const recorder = this.audioPlayer;
     await recorder.stopPlayer();
     recorder.removePlayBackListener();
   }
@@ -87,7 +110,7 @@ export class MediaServiceImplement implements MediaService {
       const granted =
         await this.option.permission.requestMediaLibraryPermission();
       if (!granted) {
-        options?.onOpenFailure?.(new Error('Failed to obtain permission.'));
+        options?.onFailed?.(new Error('Failed to obtain permission.'));
         return [];
       }
     }
@@ -115,7 +138,7 @@ export class MediaServiceImplement implements MediaService {
     });
     if (response.didCancel) return [];
     if (response.errorCode === 'camera_unavailable') {
-      options?.onOpenFailure?.(new Error(response.errorMessage));
+      options?.onFailed?.(new Error(response.errorMessage));
       return [];
     }
 
@@ -129,11 +152,13 @@ export class MediaServiceImplement implements MediaService {
   async openCamera(
     options?: OpenCameraOptions | undefined
   ): Promise<Nullable<FileType>> {
-    const hasPermission = await this.option.permission.hasCameraPermission();
+    const hasPermission =
+      await this.option.permission.hasCameraAndMicPermission();
     if (!hasPermission) {
-      const granted = await this.option.permission.requestCameraPermission();
+      const granted =
+        await this.option.permission.requestCameraAndMicPermission();
       if (!granted) {
-        options?.onOpenFailure?.(new Error('Failed to obtain permission.'));
+        options?.onFailed?.(new Error('Failed to obtain permission.'));
         return null;
       }
     }
@@ -157,7 +182,7 @@ export class MediaServiceImplement implements MediaService {
     });
     if (response.didCancel) return null;
     if (response.errorCode === 'camera_unavailable') {
-      options?.onOpenFailure?.(new Error('Failed to obtain permission.'));
+      options?.onFailed?.(new Error('Failed to obtain permission.'));
       return null;
     }
 
@@ -188,7 +213,7 @@ export class MediaServiceImplement implements MediaService {
         !this.option.documentPickerModule.isCancel(e) &&
         this.option.documentPickerModule.isInProgress(e)
       ) {
-        options?.onOpenFailure?.(new Error('Failed to obtain permission.'));
+        options?.onFailed?.(new Error('Failed to obtain permission.'));
       }
       return null;
     }

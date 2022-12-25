@@ -1,6 +1,7 @@
 import { ClipboardServiceImplement } from './ClipboardService';
 import { MediaServiceImplement } from './MediaService';
 import { NotificationServiceImplement } from './NotificationService';
+import { PermissionServiceImplement } from './PermissionService';
 import type {
   ClipboardService,
   ClipboardServiceOption,
@@ -8,17 +9,25 @@ import type {
   MediaServiceOptions,
   NotificationService,
   NotificationServiceOption,
+  PermissionService,
+  PermissionServiceOption,
 } from './types';
-
-export function createClipboardService(): ClipboardService {
-  return {} as any;
-}
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Services {
   static cbs: ClipboardService;
   static ms: MediaService;
   static ns: NotificationService;
+  static ps: PermissionService;
+
+  public static createPermissionService(
+    option: PermissionServiceOption
+  ): PermissionService {
+    if (Services.ps === undefined) {
+      Services.ps = new PermissionServiceImplement(option);
+    }
+    return Services.ps;
+  }
 
   public static createClipboardService(
     option: ClipboardServiceOption
@@ -45,3 +54,5 @@ export class Services {
     return Services.ns;
   }
 }
+
+export * from './types';
