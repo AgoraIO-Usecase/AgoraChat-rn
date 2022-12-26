@@ -28,13 +28,13 @@ const LightTheme: ThemeContextType = {
     },
     input: {
       enabled: {
-        background: lightPalette.background,
+        background: lightPalette.surfaceVariant,
         text: lightPalette.primary,
         highlight: lightPalette.tertiary,
         placeholder: lightPalette.secondary,
       },
       disabled: {
-        background: lightPalette.background,
+        background: lightPalette.surfaceVariant,
         text: lightPalette.secondary,
         highlight: lightPalette.secondary,
         placeholder: lightPalette.secondary,

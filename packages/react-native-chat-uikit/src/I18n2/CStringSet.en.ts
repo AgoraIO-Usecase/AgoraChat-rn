@@ -36,11 +36,11 @@ export const createStringSet: CreateStringSet = ({
 };
 
 export function createStringSetFEn(
-  params: StringSetContextType
+  params?: StringSetContextType
 ): StringSetContextType {
   return createStringSet({ locate: en, overrides: params });
 }
 
-export const createStringSetEn = (params: StringSetContextType) => {
+export const createStringSetEn = (params?: StringSetContextType) => {
   return createStringSet({ locate: en, overrides: params });
 };

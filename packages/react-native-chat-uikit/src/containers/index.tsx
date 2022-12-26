@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Text } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { HeaderStyleProvider } from '../contexts/HeaderContext';
 import { I18nContextProvider } from '../contexts/I18nContext';
@@ -95,11 +95,9 @@ export function Container({
               {children ? (
                 children
               ) : (
-                <SafeAreaView edges={['right', 'bottom', 'left']}>
-                  <Text style={{ backgroundColor: theme.colors.error }}>
-                    children node is empty.
-                  </Text>
-                </SafeAreaView>
+                <Text style={{ backgroundColor: theme.colors.error }}>
+                  children node is empty.
+                </Text>
               )}
             </ChatSdkContextProvider>
           </HeaderStyleProvider>

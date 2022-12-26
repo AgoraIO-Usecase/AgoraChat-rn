@@ -8,3 +8,5 @@
 [pod install helper](https://juejin.cn/post/6914204711935705096)
 [push notification helper](https://rnfirebase.io/)
 [make app icon](https://makeappicon.com/)
+[color names](https://reactnative.cn/docs/next/colors#%E9%A2%9C%E8%89%B2%E5%90%8D%E7%A7%B0)
+[color names](https://reactnative.dev/docs/colors#named-colors)

@@ -28,7 +28,7 @@ import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
   Container,
-  createStringSetEn,
+  createStringSetEn2,
   DarkTheme,
   LightTheme,
   Services,
@@ -42,6 +42,7 @@ import Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
+import { AppUIKitStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList, ScreenParamsList } from './routes';
 import Add from './screens/Add';
 import AddContact from './screens/add/AddContact';
@@ -100,7 +101,13 @@ const LoginScreen = ({
   console.log(route, navigation);
   return (
     <Login.Navigator>
-      <Root.Screen name="SignIn" component={SignIn} />
+      <Root.Screen
+        name="SignIn"
+        options={{
+          headerShown: false,
+        }}
+        component={SignIn}
+      />
       <Root.Screen name="SignUp" component={SignUp} />
     </Login.Navigator>
   );
@@ -144,65 +151,67 @@ export default function App() {
   });
 
   return (
-    <Container
-      option={{ appKey: '', autoLogin: false }}
-      theme={isLightTheme ? LightTheme : DarkTheme}
-      localization={createStringSetEn()}
-      sdk={{ client: ChatClient.getInstance(), isLogged: false }}
-      header={{
-        defaultTitleAlign: 'center',
-        defaultStatusBarTranslucent: true,
-        defaultHeight: 44,
-        defaultTopInset: 44,
-      }}
-      services={{
-        clipboard: Services.createClipboardService({
-          clipboard: Clipboard,
-        }),
-        notification: Services.createNotificationService({
-          firebaseMessage: FirebaseMessage,
+    <React.StrictMode>
+      <Container
+        option={{ appKey: '', autoLogin: false }}
+        theme={isLightTheme ? LightTheme : DarkTheme}
+        localization={createStringSetEn2(new AppUIKitStringSet())}
+        sdk={{ client: ChatClient.getInstance(), isLogged: false }}
+        header={{
+          defaultTitleAlign: 'center',
+          defaultStatusBarTranslucent: true,
+          defaultHeight: 44,
+          defaultTopInset: 44,
+        }}
+        services={{
+          clipboard: Services.createClipboardService({
+            clipboard: Clipboard,
+          }),
+          notification: Services.createNotificationService({
+            firebaseMessage: FirebaseMessage,
+            permission: permission,
+          }),
+          media: Services.createMediaService({
+            videoModule: VideoComponent,
+            videoThumbnail: CreateThumbnail,
+            imagePickerModule: ImagePicker,
+            documentPickerModule: DocumentPicker,
+            mediaLibraryModule: MediaLibrary,
+            fsModule: FileAccess,
+            audioModule: Audio,
+            permission: permission,
+          }),
           permission: permission,
-        }),
-        media: Services.createMediaService({
-          videoModule: VideoComponent,
-          videoThumbnail: CreateThumbnail,
-          imagePickerModule: ImagePicker,
-          documentPickerModule: DocumentPicker,
-          mediaLibraryModule: MediaLibrary,
-          fsModule: FileAccess,
-          audioModule: Audio,
-          permission: permission,
-        }),
-        permission: permission,
-      }}
-    >
-      <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
-        <Root.Navigator initialRouteName="SignIn">
-          <Root.Screen
-            name="Login"
-            options={{
-              headerShown: false,
-            }}
-            component={LoginScreen}
-          />
-          <Root.Screen
-            name="Home"
-            options={{
-              headerRight: HomeHeaderRight,
-            }}
-            component={HomeScreen}
-          />
-          <Root.Group>
+        }}
+      >
+        <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
+          <Root.Navigator initialRouteName="SignIn">
             <Root.Screen
-              name="Add"
-              options={{ headerShown: true, presentation: 'modal' }}
-              component={Add}
+              name="Login"
+              options={{
+                headerShown: false,
+              }}
+              component={LoginScreen}
             />
-            <Root.Screen name="AddContact" component={AddContact} />
-          </Root.Group>
-        </Root.Navigator>
-      </NavigationContainer>
-    </Container>
+            <Root.Screen
+              name="Home"
+              options={{
+                headerRight: HomeHeaderRight,
+              }}
+              component={HomeScreen}
+            />
+            <Root.Group>
+              <Root.Screen
+                name="Add"
+                options={{ headerShown: true, presentation: 'modal' }}
+                component={Add}
+              />
+              <Root.Screen name="AddContact" component={AddContact} />
+            </Root.Group>
+          </Root.Navigator>
+        </NavigationContainer>
+      </Container>
+    </React.StrictMode>
   );
 }
 
