@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { ImageRequireSource } from 'react-native';
 import type {
   FastImageProps,
   ResizeMode,
@@ -19,13 +20,22 @@ const convertCache = (
   }
 };
 
-const convertSource = (source: ImageProps['source']): Source | number => {
+const convertSource = (
+  source: ImageProps['source']
+): Source | ImageRequireSource => {
+  console.log('test:source:', source, typeof source);
   if (Array.isArray(source)) {
     return convertSource(source[0]);
   }
 
   if (typeof source === 'number') {
     return source;
+  }
+
+  if (typeof source === 'object') {
+    if (source.uri && typeof source.uri === 'number') {
+      return source.uri;
+    }
   }
 
   return {
@@ -93,7 +103,7 @@ const FastImageWrapper: ImageComponent = ({
         (() =>
           onError({
             error: {
-              source: '',
+              source: source,
               description: `Image loading error occurred!`,
             },
           }))

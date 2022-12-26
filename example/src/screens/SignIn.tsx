@@ -9,7 +9,7 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getLogo } from '../components/Logo';
+import { getLogo2 } from '../components/Logo';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { ScreenParamsList } from '../routes';
 
@@ -64,7 +64,7 @@ export default function SignInScreen({
             }
             pointerEvents="box-none"
           >
-            {getLogo({ size: 200, radius: 100 })}
+            {getLogo2({ size: 200, radius: 100 })}
             <View style={{ alignItems: 'center' }}>
               <Text
                 style={{

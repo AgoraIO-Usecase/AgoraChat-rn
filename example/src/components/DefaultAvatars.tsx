@@ -1,16 +1,16 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Image, timestamp } from 'react-native-chat-uikit';
+import { Avatar, Image, timestamp } from 'react-native-chat-uikit';
 
+// import { Avatar } from 'react-native-paper';
 import { AVATAR_ASSETS } from '../assets/images';
 
-export function getDefaultAvatar({
-  size,
-  radius,
-}: {
+type AvatarProps = {
   size: number;
   radius: number;
-}): JSX.Element {
+};
+
+export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
   const mod = ((timestamp('second') % 12) + 1) as keyof typeof AVATAR_ASSETS;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -25,6 +25,15 @@ export function getDefaultAvatar({
           console.log(e);
         }}
       />
+    </View>
+  );
+}
+
+export function getDefaultAvatar2({ size, radius }: AvatarProps): JSX.Element {
+  const mod = ((timestamp('second') % 12) + 1) as keyof typeof AVATAR_ASSETS;
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Avatar uri={AVATAR_ASSETS[mod]()} size={size} radius={radius} />
     </View>
   );
 }
