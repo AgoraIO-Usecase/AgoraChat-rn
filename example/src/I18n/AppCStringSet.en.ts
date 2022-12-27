@@ -2,7 +2,7 @@ import type { Locale } from 'date-fns';
 import en from 'date-fns/locale/en-US';
 import { UIKitStringSet2 } from 'react-native-chat-uikit';
 
-export class AppUIKitStringSet extends UIKitStringSet2 {
+export class AppStringSet extends UIKitStringSet2 {
   login: {
     logo: string;
     id: string;
@@ -14,7 +14,7 @@ export class AppUIKitStringSet extends UIKitStringSet2 {
   constructor(locate: Locale = en) {
     super(locate);
     this.login = {
-      logo: 'AograChat',
+      logo: 'AgoraChat',
       id: 'AgoraId',
       pass: 'Password',
       button: 'Log in',

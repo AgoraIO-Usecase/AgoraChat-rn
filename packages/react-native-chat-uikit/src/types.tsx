@@ -83,10 +83,9 @@ export type ThemeContextType = {
   };
 };
 
-export type ChatSdkContextType = {
+export interface ChatSdkContextType {
   client: ChatClient;
-  isLogged: boolean;
-};
+}
 
 export type HeaderContextType = {
   defaultHeight: number;

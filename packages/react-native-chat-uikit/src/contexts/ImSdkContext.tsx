@@ -1,6 +1,14 @@
 import React from 'react';
+import type { ChatClient } from 'react-native-chat-sdk';
 
 import type { ChatSdkContextType } from '../types';
+
+export class UIKitChatSdkContext implements ChatSdkContextType {
+  client: ChatClient;
+  constructor(client: ChatClient) {
+    this.client = client;
+  }
+}
 
 type ImSdkProps = React.PropsWithChildren<{ sdk: ChatSdkContextType }>;
 

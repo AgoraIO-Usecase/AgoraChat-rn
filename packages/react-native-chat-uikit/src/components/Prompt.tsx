@@ -70,6 +70,7 @@ export default function Prompt({
         inputRef.current?.focus();
       }, 250);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoFocus, visible, `${width}-${height}`]);
 
   return (

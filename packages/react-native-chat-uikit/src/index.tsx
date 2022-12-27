@@ -61,6 +61,7 @@ export {
 export { I18nContextProvider, useI18nContext } from './contexts/I18nContext';
 export {
   ChatSdkContextProvider,
+  UIKitChatSdkContext,
   useChatSdkContext,
 } from './contexts/ImSdkContext';
 export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';

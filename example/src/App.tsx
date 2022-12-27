@@ -42,7 +42,8 @@ import Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
-import { AppUIKitStringSet } from './I18n/AppCStringSet.en';
+import { AppChatSdkContext } from './contexts/AppImSdkContext';
+import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList, ScreenParamsList } from './routes';
 import Add from './screens/Add';
 import AddContact from './screens/add/AddContact';
@@ -155,8 +156,13 @@ export default function App() {
       <Container
         option={{ appKey: '', autoLogin: false }}
         theme={isLightTheme ? LightTheme : DarkTheme}
-        localization={createStringSetEn2(new AppUIKitStringSet())}
-        sdk={{ client: ChatClient.getInstance(), isLogged: false }}
+        localization={createStringSetEn2(new AppStringSet())}
+        sdk={
+          new AppChatSdkContext({
+            client: ChatClient.getInstance(),
+            autoLogin: false,
+          })
+        }
         header={{
           defaultTitleAlign: 'center',
           defaultStatusBarTranslucent: true,
