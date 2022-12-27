@@ -28,6 +28,7 @@ import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
   Container,
+  createScaleFactor,
   createStringSetEn2,
   DarkTheme,
   LightTheme,
@@ -54,6 +55,7 @@ import MySetting from './screens/MySetting';
 import RequestList from './screens/RequestList';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
+import { createAppScaleFactor } from './styles/createAppScaleFactor';
 
 if (Platform.OS === 'web') {
   console.error('web platforms are not supported.');
@@ -136,6 +138,8 @@ console.log('DEV:', __DEV__);
 console.log('TEST:', __TEST__);
 
 export default function App() {
+  createScaleFactor.updateScaleFactor(createAppScaleFactor());
+
   React.useEffect(() => {
     console.log('test:');
   }, []);

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import {
   Button,
+  createStyleSheet,
   TextInput,
   useHeaderContext,
   useThemeContext,
@@ -26,10 +27,8 @@ export default function SignInScreen({
     default: false,
   });
   const enableKeyboardAvoid = true;
-  const {
-    defaultStatusBarTranslucent: statusBarTranslucent,
-    defaultTopInset: topInset,
-  } = useHeaderContext();
+  const { defaultStatusBarTranslucent: statusBarTranslucent } =
+    useHeaderContext();
   const { colors } = useThemeContext();
   const { login } = useAppI18nContext();
   const [, setId] = React.useState('');
@@ -37,46 +36,21 @@ export default function SignInScreen({
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       edges={['right', 'left', 'bottom']}
     >
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          // backgroundColor: 'darkcyan'
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            width: '80%',
-            justifyContent: 'center',
-            // backgroundColor: 'darkorange',
-            flexGrow: 10,
-          }}
-        >
+      <View style={styles.container1}>
+        <View style={styles.container2}>
           <KeyboardAvoidingView
             enabled={enableKeyboardAvoid}
             behavior={Platform.select({ ios: 'padding', default: 'height' })}
             keyboardVerticalOffset={
-              enableKeyboardAvoid && statusBarTranslucent ? -topInset : 0
+              enableKeyboardAvoid && statusBarTranslucent ? 80 : 0
             }
             pointerEvents="box-none"
           >
-            {getLogo2({ size: 200, radius: 100 })}
-            <View style={{ alignItems: 'center' }}>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 40,
-                  fontWeight: '600',
-                  marginTop: -35,
-                  marginBottom: 35,
-                }}
-              >
-                {login.logo}
-              </Text>
+            <View style={styles.logo}>
+              {getLogo2({ size: 250, radius: 0 })}
             </View>
             <TextInput
               autoFocus={AUTO_FOCUS}
@@ -84,7 +58,7 @@ export default function SignInScreen({
               placeholder={login.id}
               clearButtonMode="while-editing"
               onChangeText={(text) => setId(text)}
-              style={{ height: 40, borderRadius: 40 }}
+              style={styles.item}
             />
             <TextInput
               autoFocus={AUTO_FOCUS}
@@ -94,19 +68,20 @@ export default function SignInScreen({
               visible-password={false}
               secureTextEntry
               onChangeText={(text) => setPassword(text)}
-              style={{ height: 40, borderRadius: 40 }}
+              style={styles.item}
             />
             <Button
-              style={{ height: 40, borderRadius: 40 }}
+              style={styles.button}
               onPress={() => {
                 navigation.push('Home', { params: undefined });
               }}
             >
               {login.button}
             </Button>
-            <View style={{ flexDirection: 'row' }}>
-              <Text>{login.tip}</Text>
+            <View style={styles.tr}>
+              <Text style={styles.tip}>{login.tip}</Text>
               <Text
+                style={styles.register}
                 onPress={() => {
                   navigation.push('SignUp', { params: undefined });
                 }}
@@ -116,15 +91,47 @@ export default function SignInScreen({
             </View>
           </KeyboardAvoidingView>
         </View>
-        <View
-          style={{
-            flex: 1,
-            width: '90%',
-            // backgroundColor: 'darkorchid',
-            flexGrow: 1,
-          }}
-        />
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = createStyleSheet({
+  container1: {
+    flex: 1,
+    alignItems: 'center',
+    // backgroundColor: 'darkcyan',
+  },
+  container2: {
+    flex: 1,
+    width: '87.2%',
+    justifyContent: 'center',
+    // backgroundColor: 'darkorange',
+    flexGrow: 1,
+  },
+  logo: {
+    marginBottom: 35,
+  },
+  item: {
+    height: 48,
+    borderRadius: 24,
+    marginBottom: 18,
+  },
+  button: {
+    height: 48,
+    borderRadius: 24,
+    marginBottom: 31,
+  },
+  tr: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  tip: {
+    color: 'rgba(153, 153, 153, 1)',
+  },
+  register: {
+    paddingLeft: 10,
+    color: 'rgba(17, 78, 255, 1)',
+    fontWeight: '600',
+  },
+});

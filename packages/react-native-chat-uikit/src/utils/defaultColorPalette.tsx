@@ -41,6 +41,26 @@ export const lightPalette = {
   surfaceDisabled: 'rgba(27, 27, 31, 0.12)',
   onSurfaceDisabled: 'rgba(27, 27, 31, 0.38)',
   backdrop: 'rgba(48, 48, 56, 0.4)',
+  input: {
+    background: 'rgba(242, 242, 242, 1)',
+    text: 'rgba(0, 0, 0, 1)',
+    highlight: 'rgba(17, 78, 255, 1)',
+    placeholder: 'rgba(153, 153, 153, 1)',
+  },
+  button: {
+    enabled: {
+      background: 'rgba(17, 78, 255, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+    disabled: {
+      background: 'rgba(153, 179, 255, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+    pressed: {
+      background: 'rgba(15, 70, 229, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+  },
 };
 
 export const darkPalette = {
@@ -84,6 +104,26 @@ export const darkPalette = {
   surfaceDisabled: 'rgba(229, 225, 230, 0.12)',
   onSurfaceDisabled: 'rgba(229, 225, 230, 0.38)',
   backdrop: 'rgba(48, 48, 56, 0.4)',
+  input: {
+    background: 'rgba(242, 242, 242, 1)',
+    text: 'rgba(0, 0, 0, 1)',
+    highlight: 'rgba(17, 78, 255, 1)',
+    placeholder: 'rgba(153, 153, 153, 1)',
+  },
+  button: {
+    enabled: {
+      background: 'rgba(17, 78, 255, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+    disabled: {
+      background: 'rgba(153, 179, 255, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+    pressed: {
+      background: 'rgba(15, 70, 229, 1)',
+      content: 'rgba(255, 255, 255, 1)',
+    },
+  },
 };
 
 export const defaultColorPalette = {

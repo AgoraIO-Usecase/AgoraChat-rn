@@ -15,3 +15,6 @@ createScaleFactor.updateScaleFactor = (scaleFactor: (dp: number) => number) => {
 };
 
 export let defaultScaleFactor = createScaleFactor();
+
+export const defaultScaleFactorS = (val: string | number) =>
+  typeof val === 'string' ? val : defaultScaleFactor(val);

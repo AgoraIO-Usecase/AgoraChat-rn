@@ -17,7 +17,7 @@ export class AppStringSet extends UIKitStringSet2 {
       logo: 'AgoraChat',
       id: 'AgoraId',
       pass: 'Password',
-      button: 'Log in',
+      button: 'Log In',
       tip: 'No account?',
       register: 'Register',
     };

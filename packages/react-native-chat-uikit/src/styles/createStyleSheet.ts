@@ -1,37 +1,37 @@
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
-import { defaultScaleFactor as scaleFactor } from './createScaleFactor';
+import {
+  defaultScaleFactor as scaleFactor,
+  defaultScaleFactorS as scaleFactorS,
+} from './createScaleFactor';
 
 type NamedStyle = ViewStyle | TextStyle | ImageStyle;
 type StylePreprocessor<T extends NamedStyle = NamedStyle> = {
   [key in keyof T]: (val: NonNullable<T[key]>) => typeof val;
 };
 
-const scaleFactor2 = (val: string | number) =>
-  typeof val === 'string' ? val : scaleFactor(val);
-
 const preProcessor: Partial<StylePreprocessor> = {
   fontSize: scaleFactor,
   lineHeight: scaleFactor,
   borderRadius: scaleFactor,
-  minWidth: scaleFactor2,
-  minHeight: scaleFactor2,
-  height: scaleFactor2,
-  width: scaleFactor2,
-  padding: scaleFactor2,
-  paddingTop: scaleFactor2,
-  paddingBottom: scaleFactor2,
-  paddingLeft: scaleFactor2,
-  paddingRight: scaleFactor2,
-  margin: scaleFactor2,
-  marginTop: scaleFactor2,
-  marginBottom: scaleFactor2,
-  marginLeft: scaleFactor2,
-  marginRight: scaleFactor2,
-  left: scaleFactor2,
-  right: scaleFactor2,
-  top: scaleFactor2,
-  bottom: scaleFactor2,
+  minWidth: scaleFactorS,
+  minHeight: scaleFactorS,
+  height: scaleFactorS,
+  width: scaleFactorS,
+  padding: scaleFactorS,
+  paddingTop: scaleFactorS,
+  paddingBottom: scaleFactorS,
+  paddingLeft: scaleFactorS,
+  paddingRight: scaleFactorS,
+  margin: scaleFactorS,
+  marginTop: scaleFactorS,
+  marginBottom: scaleFactorS,
+  marginLeft: scaleFactorS,
+  marginRight: scaleFactorS,
+  left: scaleFactorS,
+  right: scaleFactorS,
+  top: scaleFactorS,
+  bottom: scaleFactorS,
 };
 
 const preProcessorKeys = Object.keys(
@@ -63,8 +63,8 @@ export default function createStyleSheet<
             d.value = c(d.value as number);
             Object.defineProperty(style, key, d);
           }
-        } else if (typeof f === typeof scaleFactor2) {
-          const c = f as typeof scaleFactor2;
+        } else if (typeof f === typeof scaleFactorS) {
+          const c = f as typeof scaleFactorS;
           const d = Object.getOwnPropertyDescriptor(style, key);
           if (d) {
             d.value = c(d.value as string | number);

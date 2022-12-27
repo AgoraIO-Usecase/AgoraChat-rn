@@ -45,7 +45,7 @@ export function Container({
   services,
   children,
 }: ContainerProps): JSX.Element {
-  console.log(option, localization, theme, sdk, header, services);
+  console.log('test:Container:', option);
 
   if (theme === undefined) {
     throw new Error('theme is undefined.');

@@ -13,7 +13,6 @@ type ThemeType = {
 type ThemeProps = React.PropsWithChildren<ThemeType>;
 
 export function ThemeProvider({ value, children }: ThemeProps) {
-  console.log('ThemeContext:', ThemeContext.displayName);
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );

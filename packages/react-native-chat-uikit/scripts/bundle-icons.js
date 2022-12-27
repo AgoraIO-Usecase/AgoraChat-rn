@@ -6,6 +6,7 @@ const path = require('node:path');
 const prettier = require('prettier');
 
 const root = path.resolve(__dirname, '..');
+// const root = path.resolve(__dirname, '../../../example');
 
 const matchBigger = /_2x/;
 const matchMax = /_3x/;

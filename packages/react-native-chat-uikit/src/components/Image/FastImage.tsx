@@ -23,7 +23,6 @@ const convertCache = (
 const convertSource = (
   source: ImageProps['source']
 ): Source | ImageRequireSource => {
-  console.log('test:source:', source, typeof source);
   if (Array.isArray(source)) {
     return convertSource(source[0]);
   }

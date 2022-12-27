@@ -11,12 +11,11 @@ export type ImageComponent = (props: ImageProps) => JSX.Element;
 
 function getImageComponent(): ImageComponent {
   const hasFastImage = Boolean(NativeModules.FastImageView);
-  console.log('hasFastImage:', hasFastImage);
   if (hasFastImage) {
     try {
       return require('./FastImage').default;
     } catch (e) {
-      console.warn(e);
+      console.warn('getImageComponent:', e);
       return require('./Image').default;
     }
   } else {

@@ -84,6 +84,7 @@ export * from './services';
 export {
   createScaleFactor,
   defaultScaleFactor,
+  defaultScaleFactorS,
 } from './styles/createScaleFactor';
 export { default as createStyleSheet } from './styles/createStyleSheet';
 export { default as DarkTheme } from './theme/DarkTheme';

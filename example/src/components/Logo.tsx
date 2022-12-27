@@ -13,7 +13,9 @@ export function getLogo({ size, radius }: LogoProps): JSX.Element {
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image
-        source={ICON_ASSETS['logo']()}
+        source={ICON_ASSETS['login_icon'](
+          size < 24 ? '' : size < 96 ? '2x' : '3x'
+        )}
         resizeMode="cover"
         style={{ height: size, width: size, borderRadius: radius }}
         onLoad={(e) => {
@@ -30,7 +32,13 @@ export function getLogo({ size, radius }: LogoProps): JSX.Element {
 export function getLogo2({ size, radius }: LogoProps): JSX.Element {
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Avatar uri={ICON_ASSETS['logo']()} size={size} radius={radius} />
+      <Avatar
+        uri={ICON_ASSETS['login_icon'](
+          size < 24 ? '' : size < 96 ? '2x' : '3x'
+        )}
+        size={size}
+        radius={radius}
+      />
     </View>
   );
 }
