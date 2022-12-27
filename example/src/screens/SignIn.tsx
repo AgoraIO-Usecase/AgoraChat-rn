@@ -32,8 +32,18 @@ export default function SignInScreen({
   const { defaultStatusBarTranslucent: statusBarTranslucent } =
     useHeaderContext();
   const { login } = useAppI18nContext();
-  const [, setId] = React.useState('');
-  const [, setPassword] = React.useState('');
+  const [id, setId] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [disabled, setDisabled] = React.useState(true);
+
+  React.useEffect(() => {
+    if (id.length > 0 && password.length > 0) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [id.length, password.length]);
+
   return (
     <SafeAreaView
       mode="padding"
@@ -72,6 +82,7 @@ export default function SignInScreen({
               style={styles.item}
             />
             <Button
+              disabled={disabled}
               style={styles.button}
               onPress={() => {
                 navigation.push('Home', { params: undefined });
