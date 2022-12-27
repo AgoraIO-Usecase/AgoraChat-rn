@@ -77,3 +77,16 @@ export default function createStyleSheet<
 
   return StyleSheet.create<T>(styles);
 }
+
+type Return<T> = T | StyleSheet.NamedStyles<T>;
+type F<T, P> = (p: P) => Return<T>;
+
+export function createStyleSheetP<
+  T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>,
+  P
+>(f: F<T, P>, p: P): T {
+  // console.log('test:', f, typeof f);
+  // console.log('test:f:', f(p));
+  let styles: StyleSheet.NamedStyles<any> | StyleSheet.NamedStyles<T> = f(p);
+  return createStyleSheet(styles);
+}

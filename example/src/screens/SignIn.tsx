@@ -4,7 +4,9 @@ import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import {
   Button,
   createStyleSheet,
+  createStyleSheetP,
   TextInput,
+  ThemeContextType,
   useHeaderContext,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -29,14 +31,13 @@ export default function SignInScreen({
   const enableKeyboardAvoid = true;
   const { defaultStatusBarTranslucent: statusBarTranslucent } =
     useHeaderContext();
-  const { colors } = useThemeContext();
   const { login } = useAppI18nContext();
   const [, setId] = React.useState('');
   const [, setPassword] = React.useState('');
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left', 'bottom']}
     >
       <View style={styles.container1}>
@@ -135,3 +136,13 @@ const styles = createStyleSheet({
     fontWeight: '600',
   },
 });
+
+const useStyleSheet = () => {
+  const styles = createStyleSheetP((theme: ThemeContextType) => {
+    const { colors } = theme;
+    return {
+      safe: { flex: 1, backgroundColor: colors.background },
+    };
+  }, useThemeContext());
+  return styles;
+};

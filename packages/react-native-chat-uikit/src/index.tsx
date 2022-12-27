@@ -86,7 +86,10 @@ export {
   defaultScaleFactor,
   defaultScaleFactorS,
 } from './styles/createScaleFactor';
-export { default as createStyleSheet } from './styles/createStyleSheet';
+export {
+  default as createStyleSheet,
+  createStyleSheetP,
+} from './styles/createStyleSheet';
 export { default as DarkTheme } from './theme/DarkTheme';
 export { default as LightTheme } from './theme/LightTheme';
 export * from './types';
