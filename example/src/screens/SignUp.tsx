@@ -128,7 +128,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
       <Alert
         visible={success}
         onHide={function (): void {
-          console.log('test:');
+          console.log('test:Alert:');
         }}
         title={register.comment(5)}
         buttons={[

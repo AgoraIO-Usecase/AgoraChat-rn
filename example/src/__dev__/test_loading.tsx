@@ -7,6 +7,11 @@ export default function TestBox() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);
+  // return (
+  //   <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+  //     <Loading color="red" size={45} />
+  //   </View>
+  // );
 
   return (
     <View style={{ marginTop: 100 }}>

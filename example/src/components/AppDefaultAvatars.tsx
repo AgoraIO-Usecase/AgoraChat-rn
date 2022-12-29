@@ -19,10 +19,10 @@ export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
         resizeMode="cover"
         style={{ height: size, width: size, borderRadius: radius }}
         onLoad={(e) => {
-          console.log(e);
+          console.log('test:getDefaultAvatar:', e);
         }}
         onError={(e) => {
-          console.log(e);
+          console.log('test:getDefaultAvatar:', e);
         }}
       />
     </View>

@@ -6,8 +6,7 @@ import type { ScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<ScreenParamsList>;
 
-export default function AddScreen({ route, navigation }: Props): JSX.Element {
-  console.log('test:', route, navigation);
+export default function AddScreen({ navigation }: Props): JSX.Element {
   return (
     <View>
       <Button

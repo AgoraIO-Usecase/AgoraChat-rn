@@ -10,6 +10,6 @@ export default function ConversationListScreen({
   route,
   navigation,
 }: Props): JSX.Element {
-  console.log(route, navigation);
+  console.log('test:ConversationListScreen:', route, navigation);
   return <Placeholder content={`${ConversationListScreen.name}`} />;
 }

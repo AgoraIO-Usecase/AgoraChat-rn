@@ -18,11 +18,7 @@ import type { ScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<ScreenParamsList>;
 
-export default function SignInScreen({
-  route,
-  navigation,
-}: Props): JSX.Element {
-  console.log('route:', route);
+export default function SignInScreen({ navigation }: Props): JSX.Element {
   const AUTO_FOCUS = Platform.select({
     ios: false,
     android: true,

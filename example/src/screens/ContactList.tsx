@@ -10,6 +10,6 @@ export default function ContactListScreen({
   route,
   navigation,
 }: Props): JSX.Element {
-  console.log(route, navigation);
+  console.log('test:ContactListScreen:', route, navigation);
   return <Placeholder content={`${ContactListScreen.name}`} />;
 }

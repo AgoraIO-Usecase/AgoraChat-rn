@@ -16,6 +16,7 @@
     "ioss15": "expo run:ios --device=\"iphone-15.5\""
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-camera-roll/camera-roll": "^5.2.0",
     "@react-native-clipboard/clipboard": "^1.11.1",
     "@react-native-firebase/app": "^16.5.0",

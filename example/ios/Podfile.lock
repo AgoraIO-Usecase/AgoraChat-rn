@@ -514,6 +514,8 @@ PODS:
     - React-perflogger (= 0.68.5)
   - RNAudioRecorderPlayer (3.5.1):
     - React-Core
+  - RNCAsyncStorage (1.17.11):
+    - React-Core
   - RNCClipboard (1.11.1):
     - React-Core
   - RNFastImage (8.6.3):
@@ -644,6 +646,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../node_modules/react-native/ReactCommon`)
   - RNAudioRecorderPlayer (from `../../node_modules/react-native-audio-recorder-player`)
+  - "RNCAsyncStorage (from `../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../../node_modules/@react-native-clipboard/clipboard`)"
   - RNFastImage (from `../../node_modules/react-native-fast-image`)
   - "RNFBApp (from `../../node_modules/@react-native-firebase/app`)"
@@ -825,6 +828,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon"
   RNAudioRecorderPlayer:
     :path: "../../node_modules/react-native-audio-recorder-player"
+  RNCAsyncStorage:
+    :path: "../../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
     :path: "../../node_modules/@react-native-clipboard/clipboard"
   RNFastImage:
@@ -938,6 +943,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: b1f1995089b90696dbc2a7ffe0059a80db5c8eb1
   ReactCommon: 149e2c0acab9bac61378da0db5b2880a1b5ff59b
   RNAudioRecorderPlayer: 308940de4f9d1448a064874fd9d83479ae47c7a7
+  RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: 9295dac8a4e8857918bcff90328b197807ee0dc1

@@ -134,3 +134,10 @@ export interface NotificationService {
   getFCMToken(): Promise<Nullable<string>>;
   onTokenRefresh(handler: (token: string) => void): Unsubscribe;
 }
+
+export interface LocalStorageService {
+  getAllKeys(): Promise<readonly string[]>;
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+  removeItem(key: string): Promise<void>;
+}

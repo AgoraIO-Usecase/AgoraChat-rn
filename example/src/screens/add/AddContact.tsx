@@ -9,7 +9,7 @@ export default function AddContactScreen({
   route,
   navigation,
 }: Props): JSX.Element {
-  console.log('test:', route, navigation);
+  console.log('test:AddContactScreen:', route, navigation);
   return (
     <View>
       <Button

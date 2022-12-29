@@ -1,10 +1,12 @@
 import { ClipboardServiceImplement } from './ClipboardService';
+import { LocalStorageServiceImplement } from './LocalStorageService';
 import { MediaServiceImplement } from './MediaService';
 import { NotificationServiceImplement } from './NotificationService';
 import { PermissionServiceImplement } from './PermissionService';
 import type {
   ClipboardService,
   ClipboardServiceOption,
+  LocalStorageService,
   MediaService,
   MediaServiceOptions,
   NotificationService,
@@ -19,6 +21,7 @@ export class Services {
   static ms: MediaService;
   static ns: NotificationService;
   static ps: PermissionService;
+  static ls: LocalStorageService;
 
   public static createPermissionService(
     option: PermissionServiceOption
@@ -52,6 +55,18 @@ export class Services {
       Services.ns = new NotificationServiceImplement(option);
     }
     return Services.ns;
+  }
+
+  public static createLocalStorageService(
+    service?: LocalStorageService
+  ): LocalStorageService {
+    if (Services.ns === undefined) {
+      if (service) {
+        Services.ls = service;
+      }
+      Services.ls = new LocalStorageServiceImplement();
+    }
+    return Services.ls;
   }
 }
 

@@ -8,6 +8,7 @@ import { ChatSdkContextProvider } from '../contexts/ImSdkContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import type {
   ClipboardService,
+  LocalStorageService,
   MediaService,
   NotificationService,
   PermissionService,
@@ -33,6 +34,7 @@ export type ContainerProps = React.PropsWithChildren<{
     media?: MediaService | undefined;
     notification?: NotificationService | undefined;
     permission?: PermissionService | undefined;
+    storage?: LocalStorageService | undefined;
   };
 }>;
 
@@ -81,6 +83,10 @@ export function Container({
 
   if (services?.permission === undefined) {
     throw new Error('permission is undefined.');
+  }
+
+  if (services?.storage === undefined) {
+    throw new Error('storage is undefined.');
   }
 
   return (

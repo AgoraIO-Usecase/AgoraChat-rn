@@ -11,8 +11,10 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import {
   DarkTheme as NDarkTheme,
   DefaultTheme as NDefaultTheme,
+  NavigationAction,
   NavigationContainer,
   NavigationProp,
+  NavigationState,
   ParamListBase,
   useNavigation,
 } from '@react-navigation/native';
@@ -23,15 +25,16 @@ import {
 import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/typescript/src/types';
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
-import { Platform } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
-  Container,
+  Container as UIKitContainer,
   createScaleFactor,
   createStringSetEn2,
   DarkTheme,
   LightTheme,
+  Loading,
   Services,
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
@@ -69,7 +72,7 @@ const ContactScreen = ({
   navigation,
   route,
 }: MaterialBottomTabScreenProps<ParamListBase, 'Contact'>): JSX.Element => {
-  console.log(route, navigation);
+  console.log('test:ContactScreen:', route, navigation);
   return (
     <Contact.Navigator>
       <Contact.Screen name="ContactList" component={ContactList} />
@@ -85,7 +88,7 @@ const HomeScreen = ({
   navigation,
   route,
 }: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element => {
-  console.log(route, navigation);
+  console.log('test:HomeScreen:', route, navigation);
   return (
     <Home.Navigator>
       <Home.Screen name="ConversationList" component={ConversationList} />
@@ -97,11 +100,9 @@ const HomeScreen = ({
 
 const Login = createNativeStackNavigator<RootParamsList>();
 
-const LoginScreen = ({
-  navigation,
-  route,
-}: NativeStackScreenProps<ParamListBase, 'Login'>): JSX.Element => {
-  console.log(route, navigation);
+const LoginScreen = (
+  _props: NativeStackScreenProps<ParamListBase, 'Login'>
+): JSX.Element => {
   return (
     <Login.Navigator>
       <Root.Screen
@@ -123,7 +124,7 @@ const LoginScreen = ({
 };
 
 const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
-  console.log('props:', props);
+  console.log('test:HomeHeaderRight:', props);
   const navigation = useNavigation<NavigationProp<ScreenParamsList>>();
   return (
     <Button
@@ -138,6 +139,7 @@ const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
   );
 };
 
+const __KEY__ = '__KEY__';
 const __TEST__ = false;
 
 console.log('DEV:', __DEV__);
@@ -146,14 +148,6 @@ console.log('TEST:', __TEST__);
 export default function App() {
   createScaleFactor.updateScaleFactor(createAppScaleFactor());
 
-  React.useEffect(() => {
-    console.log('test:');
-  }, []);
-
-  if (__TEST__) {
-    return Dev();
-  }
-
   const isLightTheme = LightTheme.scheme === 'light';
 
   const permission = Services.createPermissionService({
@@ -161,9 +155,48 @@ export default function App() {
     firebaseMessage: FirebaseMessage,
   });
 
+  const storage = Services.createLocalStorageService();
+
+  const [isReady, setIsReady] = React.useState(__DEV__ ? false : true);
+  const [initialState, setInitialState] = React.useState();
+
+  React.useEffect(() => {
+    const restoreState = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+
+        if (Platform.OS !== 'web' && initialUrl == null) {
+          // Only restore state if there's no deep link and we're not on web
+          const savedStateString = await storage.getItem(__KEY__);
+          const state = savedStateString
+            ? JSON.parse(savedStateString)
+            : undefined;
+
+          if (state !== undefined) {
+            setInitialState(state);
+          }
+        }
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    if (!isReady) {
+      restoreState();
+    }
+  }, [isReady, storage]);
+
+  if (!isReady) {
+    return null;
+  }
+
+  if (__TEST__) {
+    return Dev();
+  }
+
   return (
     <React.StrictMode>
-      <Container
+      <UIKitContainer
         option={{ appKey: '', autoLogin: false }}
         theme={isLightTheme ? LightTheme : DarkTheme}
         localization={createStringSetEn2(new AppStringSet())}
@@ -198,9 +231,31 @@ export default function App() {
             permission: permission,
           }),
           permission: permission,
+          storage: storage,
         }}
       >
-        <NavigationContainer theme={isLightTheme ? NDefaultTheme : NDarkTheme}>
+        <NavigationContainer
+          initialState={initialState}
+          theme={isLightTheme ? NDefaultTheme : NDarkTheme}
+          onStateChange={(state: NavigationState | undefined) => {
+            console.log('test:onStateChange:', state);
+            storage.setItem(__KEY__, JSON.stringify(state));
+          }}
+          onUnhandledAction={(action: NavigationAction) => {
+            console.log('test:onUnhandledAction:', action);
+          }}
+          fallback={
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+              }}
+            >
+              <Loading color="rgba(15, 70, 230, 1)" size={45} />
+            </View>
+          }
+        >
           <Root.Navigator initialRouteName="SignIn">
             <Root.Screen
               name="Login"
@@ -211,8 +266,10 @@ export default function App() {
             />
             <Root.Screen
               name="Home"
-              options={{
-                headerRight: HomeHeaderRight,
+              options={() => {
+                return {
+                  headerRight: HomeHeaderRight,
+                };
               }}
               component={HomeScreen}
             />
@@ -226,7 +283,7 @@ export default function App() {
             </Root.Group>
           </Root.Navigator>
         </NavigationContainer>
-      </Container>
+      </UIKitContainer>
     </React.StrictMode>
   );
 }
