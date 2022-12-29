@@ -2,8 +2,8 @@ import React from 'react';
 import { StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { HeaderContextType } from '../types';
 import defaultHeaderHeight from '../utils/defaultHeaderHeight';
+import type { HeaderContextType } from './types';
 
 export const HeaderContext = React.createContext<HeaderContextType>({
   defaultHeight: defaultHeaderHeight(false),
@@ -11,7 +11,7 @@ export const HeaderContext = React.createContext<HeaderContextType>({
   defaultTitleAlign: 'left',
   defaultTopInset: StatusBar.currentHeight ?? 0,
 });
-HeaderContext.displayName = 'HeaderContext';
+HeaderContext.displayName = 'UIKitHeaderContext';
 
 type HeaderProps = React.PropsWithChildren<
   Pick<HeaderContextType, 'defaultStatusBarTranslucent' | 'defaultTitleAlign'>
@@ -41,6 +41,6 @@ export const HeaderStyleProvider = ({
 
 export function useHeaderContext(): HeaderContextType {
   const header = React.useContext(HeaderContext);
-  if (!header) throw Error('HeaderContext is not provided');
+  if (!header) throw Error(`${HeaderContext.displayName} is not provided`);
   return header;
 }

@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import type { StringSetContextType } from '../types';
+import type { StringSetContextType } from './types';
 
 const StringSetContext = React.createContext<StringSetContextType | undefined>(
   undefined
 );
-StringSetContext.displayName = 'StringSetContext';
+StringSetContext.displayName = 'UIKitStringSetContext';
 
-type I18nProps = React.PropsWithChildren<{ i18n: StringSetContextType }>;
+type I18nContextProps = React.PropsWithChildren<{ i18n: StringSetContextType }>;
 
-export function I18nContextProvider({ i18n, children }: I18nProps) {
+export function I18nContextProvider({ i18n, children }: I18nContextProps) {
   return (
     <StringSetContext.Provider value={i18n}>
       {children}
@@ -19,6 +19,6 @@ export function I18nContextProvider({ i18n, children }: I18nProps) {
 
 export function useI18nContext(): StringSetContextType {
   const i18n = React.useContext(StringSetContext);
-  if (!i18n) throw Error('StringSetContext is not provided');
+  if (!i18n) throw Error(`${StringSetContext.displayName} is not provided`);
   return i18n;
 }

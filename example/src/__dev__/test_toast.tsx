@@ -32,12 +32,15 @@ export default function TestLoading() {
             flex: 1,
             position: 'absolute',
             width: width,
-            height: height,
+            height: height - 100,
             opacity: opacity ? 1 : 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
           },
         ]}
       >
-        <Toast visible={icon} type="normal" children="test" bottom={200} />
+        <Toast visible={icon} type="normal" children="test" />
       </View>
     </View>
   );

@@ -1,5 +1,5 @@
+import type { ThemeContextType } from '../contexts';
 import { defaultScaleFactor } from '../styles/createScaleFactor';
-import type { ThemeContextType } from '../types';
 
 const BaseTheme: Partial<ThemeContextType> = {
   fonts: {

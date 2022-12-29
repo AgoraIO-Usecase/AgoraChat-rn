@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleProp,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 import { useHeaderContext } from '../contexts/HeaderContext';
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -22,6 +28,7 @@ type ActionMenuProps = {
   onHide: () => void;
   onError?: (error: unknown) => void | undefined;
   onDismiss?: () => void | undefined;
+  style?: StyleProp<ViewStyle> | undefined;
 } & ActionMenuItem;
 
 export default function ActionMenu({
@@ -29,6 +36,7 @@ export default function ActionMenu({
   onHide,
   onError,
   onDismiss,
+  style,
   title,
   menuItems,
 }: ActionMenuProps): JSX.Element {
@@ -47,7 +55,10 @@ export default function ActionMenu({
       onDismiss={onDismiss}
       statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}
-      backgroundStyle={{ alignItems: 'center', justifyContent: 'center' }}
+      backgroundStyle={[
+        { alignItems: 'center', justifyContent: 'center' },
+        style,
+      ]}
       transparent={transparent}
       // backdropColor="rgba(100, 10, 200, 0.5)"
     >

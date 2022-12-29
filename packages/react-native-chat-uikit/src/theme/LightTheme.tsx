@@ -1,4 +1,4 @@
-import type { ThemeContextType } from '../types';
+import type { ThemeContextType } from '../contexts';
 import { lightPalette } from '../utils/defaultColorPalette';
 import BaseTheme from './BaseTheme';
 

@@ -1,6 +1,9 @@
 import type { TextStyle } from 'react-native';
-import type { ChatClient } from 'react-native-chat-sdk';
 
+import type { ActionMenuItem } from './components/ActionMenu';
+import type { AlertItem } from './components/Alert';
+import type { BottomSheetItem } from './components/BottomSheet';
+import type { PromptItem } from './components/Prompt';
 import type { darkPalette, lightPalette } from './utils/defaultColorPalette';
 
 export type Keyof<T extends {}> = Extract<keyof T, string>;
@@ -52,55 +55,6 @@ export type ButtonColor = {
 };
 
 export type ToastType = 'normal' | 'error' | 'success';
-export type ToastContextType = { show(text: string, type?: ToastType): void };
-
-export type ThemeContextType = {
-  scheme: 'light' | 'dark' | string;
-  paperColors: ColorPaletteType;
-  colors: {
-    primary: string;
-    background: string;
-    text: string;
-    border: string;
-    backdrop: string;
-    button: ButtonColor;
-    input: {
-      enabled: InputColor;
-      disabled: InputColor;
-    };
-    error: string;
-    badge: ItemColor;
-    avatar: string;
-    transparent: 'transparent';
-    card: {
-      background: string;
-      title: string;
-      body: string;
-      button: string;
-    };
-    divider: string;
-  };
-  fonts: {
-    primary: FontAttributes;
-    button: FontAttributes;
-    input: FontAttributes;
-    title: FontAttributes;
-    subtitle: FontAttributes;
-    body: FontAttributes;
-    caption: FontAttributes;
-  };
-};
-
-export interface ChatSdkContextType {
-  client: ChatClient;
-}
-
-export type HeaderContextType = {
-  defaultHeight: number;
-  defaultStatusBarTranslucent: boolean;
-  defaultTitleAlign: 'left' | 'center';
-  defaultTopInset: number;
-};
 
 export type UIKitStringSet = {
   xxx: {
@@ -120,12 +74,25 @@ export type ExtensionStringSet<T extends {} | undefined> = Omit<
 export type StringSet<T extends {} | undefined> = UIKitStringSet &
   ExtensionStringSet<T>;
 
-export interface StringSetContextType {
-  xxx: {
-    yyy: string;
-    zzz: (a: Date) => string;
-  };
-  ttt: {
-    yyy: string;
-  };
-}
+export type DialogTask =
+  | {
+      type: 'ActionMenu';
+      props: ActionMenuItem;
+    }
+  | {
+      type: 'Alert';
+      props: AlertItem;
+    }
+  | {
+      type: 'Prompt';
+      props: PromptItem;
+    }
+  | {
+      type: 'BottomSheet';
+      props: BottomSheetItem;
+    };
+
+export type DialogPropsT<
+  T extends DialogTask['type'],
+  U extends DialogTask = DialogTask
+> = U extends { type: T; props: infer P } ? P : never;

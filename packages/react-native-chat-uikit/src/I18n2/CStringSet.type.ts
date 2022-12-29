@@ -1,6 +1,6 @@
 import type { Locale } from 'date-fns';
 
-import type { StringSetContextType } from '../types';
+import type { StringSetContextType } from '../contexts';
 
 export type StringSetOptions = {
   locate: Locale;

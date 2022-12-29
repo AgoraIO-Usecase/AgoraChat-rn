@@ -54,18 +54,7 @@ export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';
 export { Container, ContainerProps } from './containers';
-export {
-  HeaderStyleProvider,
-  useHeaderContext,
-} from './contexts/HeaderContext';
-export { I18nContextProvider, useI18nContext } from './contexts/I18nContext';
-export {
-  ChatSdkContextProvider,
-  UIKitChatSdkContext,
-  useChatSdkContext,
-} from './contexts/ImSdkContext';
-export { ThemeProvider, useThemeContext } from './contexts/ThemeContext';
-export { ToastProvider, useToastContext } from './contexts/ToastContext';
+export * from './contexts';
 export { useUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ChatClient } from 'react-native-chat-sdk';
 
-import type { ChatSdkContextType } from '../types';
+import type { ChatSdkContextType } from './types';
 
 export class UIKitChatSdkContext implements ChatSdkContextType {
   client: ChatClient;
@@ -10,14 +10,14 @@ export class UIKitChatSdkContext implements ChatSdkContextType {
   }
 }
 
-type ImSdkProps = React.PropsWithChildren<{ sdk: ChatSdkContextType }>;
+type ImSdkContextProps = React.PropsWithChildren<{ sdk: ChatSdkContextType }>;
 
 const ChatSdkContext = React.createContext<ChatSdkContextType | undefined>(
   undefined
 );
-ChatSdkContext.displayName = 'ChatSdkContext';
+ChatSdkContext.displayName = 'UIKitChatSdkContext';
 
-export function ChatSdkContextProvider({ sdk, children }: ImSdkProps) {
+export function ChatSdkContextProvider({ sdk, children }: ImSdkContextProps) {
   return (
     <ChatSdkContext.Provider value={sdk}>{children}</ChatSdkContext.Provider>
   );
@@ -25,6 +25,6 @@ export function ChatSdkContextProvider({ sdk, children }: ImSdkProps) {
 
 export function useChatSdkContext(): ChatSdkContextType {
   const sdk = React.useContext(ChatSdkContext);
-  if (!sdk) throw Error('IMSDKContext is not provided');
+  if (!sdk) throw Error(`${ChatSdkContext.displayName} is not provided`);
   return sdk;
 }

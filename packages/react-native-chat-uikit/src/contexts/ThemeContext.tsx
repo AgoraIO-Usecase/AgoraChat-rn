@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import LightTheme from '../theme/LightTheme';
-import type { ThemeContextType } from '../types';
+import type { ThemeContextType } from './types';
 
 const ThemeContext = React.createContext<ThemeContextType>(LightTheme);
 ThemeContext.displayName = 'IMUIKitThemeContext';
@@ -10,9 +10,9 @@ type ThemeType = {
   value: ThemeContextType;
 };
 
-type ThemeProps = React.PropsWithChildren<ThemeType>;
+type ThemeContextProps = React.PropsWithChildren<ThemeType>;
 
-export function ThemeProvider({ value, children }: ThemeProps) {
+export function ThemeContextProvider({ value, children }: ThemeContextProps) {
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
@@ -20,6 +20,6 @@ export function ThemeProvider({ value, children }: ThemeProps) {
 
 export function useThemeContext(): ThemeContextType {
   const theme = React.useContext(ThemeContext);
-  if (!theme) throw Error('IMUIKitThemeContext is not provided');
+  if (!theme) throw Error(`${ThemeContext.displayName} is not provided`);
   return theme;
 }

@@ -64,7 +64,7 @@ export default function Toast({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.toast, { opacity, top, bottom, backgroundColor }]}
+      style={[styles.container, { opacity, top, bottom, backgroundColor }]}
     >
       {type !== 'normal' && (
         <LocalIcon
@@ -84,7 +84,7 @@ export default function Toast({
 }
 
 const styles = createStyleSheet({
-  toast: {
+  container: {
     position: 'absolute',
     height: 48,
     paddingHorizontal: 12,
@@ -100,8 +100,5 @@ const styles = createStyleSheet({
   text: {
     maxWidth: 240,
     paddingHorizontal: 4,
-  },
-  toastPosition: {
-    bottom: 60,
   },
 });

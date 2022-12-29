@@ -2,10 +2,18 @@ import * as React from 'react';
 import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import {
+  ChatSdkContextType,
+  DialogContextProvider,
+  HeaderContextType,
+  StringSetContextType,
+  ThemeContextType,
+  ToastContextProvider,
+} from '../contexts';
 import { HeaderStyleProvider } from '../contexts/HeaderContext';
 import { I18nContextProvider } from '../contexts/I18nContext';
 import { ChatSdkContextProvider } from '../contexts/ImSdkContext';
-import { ThemeProvider } from '../contexts/ThemeContext';
+import { ThemeContextProvider } from '../contexts/ThemeContext';
 import type {
   ClipboardService,
   LocalStorageService,
@@ -13,12 +21,6 @@ import type {
   NotificationService,
   PermissionService,
 } from '../services';
-import type {
-  ChatSdkContextType,
-  HeaderContextType,
-  StringSetContextType,
-  ThemeContextType,
-} from '../types';
 
 export type ContainerProps = React.PropsWithChildren<{
   option: {
@@ -91,24 +93,28 @@ export function Container({
 
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={theme}>
+      <ThemeContextProvider value={theme}>
         <I18nContextProvider i18n={localization}>
-          <HeaderStyleProvider
-            defaultStatusBarTranslucent={header.defaultStatusBarTranslucent}
-            defaultTitleAlign={header.defaultTitleAlign}
-          >
-            <ChatSdkContextProvider sdk={sdk}>
-              {children ? (
-                children
-              ) : (
-                <Text style={{ backgroundColor: theme.colors.error }}>
-                  children node is empty.
-                </Text>
-              )}
-            </ChatSdkContextProvider>
-          </HeaderStyleProvider>
+          <ChatSdkContextProvider sdk={sdk}>
+            <HeaderStyleProvider
+              defaultStatusBarTranslucent={header.defaultStatusBarTranslucent}
+              defaultTitleAlign={header.defaultTitleAlign}
+            >
+              <DialogContextProvider>
+                <ToastContextProvider>
+                  {children ? (
+                    children
+                  ) : (
+                    <Text style={{ backgroundColor: theme.colors.error }}>
+                      children node is empty.
+                    </Text>
+                  )}
+                </ToastContextProvider>
+              </DialogContextProvider>
+            </HeaderStyleProvider>
+          </ChatSdkContextProvider>
         </I18nContextProvider>
-      </ThemeProvider>
+      </ThemeContextProvider>
     </SafeAreaProvider>
   );
 }

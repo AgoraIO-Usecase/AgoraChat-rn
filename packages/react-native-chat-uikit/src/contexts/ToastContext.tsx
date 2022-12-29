@@ -2,15 +2,19 @@ import * as React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Toast from '../components/Toast';
-import type { ToastContextType, ToastType } from '../types';
+import type { ToastType } from '../types';
+import type { ToastContextType } from './types';
 
 const ToastContext = React.createContext<ToastContextType | null>(null);
+ToastContext.displayName = 'IMUIKitToastContext';
 
-const VISIBLE_MS = 3000;
-export function ToastProvider({
+type ToastContextProps = React.PropsWithChildren<{ dismissTimeout?: number }>;
+
+const TIMEOUT = 3000;
+export function ToastContextProvider({
   children,
-  dismissTimeout = VISIBLE_MS,
-}: React.PropsWithChildren<{ dismissTimeout?: number }>) {
+  dismissTimeout = TIMEOUT,
+}: ToastContextProps) {
   const [state, setState] = React.useState({
     visible: false,
     type: 'error' as ToastType,
@@ -44,9 +48,6 @@ export function ToastProvider({
 
 export function useToastContext(): ToastContextType {
   const context = React.useContext(ToastContext);
-  if (!context)
-    throw new Error(
-      'ToastContext is not provided, wrap your app with ToastProvider'
-    );
+  if (!context) throw new Error(`${ToastContext.displayName} is not provided`);
   return context;
 }
