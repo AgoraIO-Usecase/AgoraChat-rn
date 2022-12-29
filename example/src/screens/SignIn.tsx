@@ -12,7 +12,7 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getLogo2 } from '../components/Logo';
+import { getAppIcon } from '../components/AppIcons';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { ScreenParamsList } from '../routes';
 
@@ -61,7 +61,7 @@ export default function SignInScreen({
             pointerEvents="box-none"
           >
             <View style={styles.logo}>
-              {getLogo2({ size: 250, radius: 0 })}
+              {getAppIcon({ name: 'login_icon', size: 250, radius: 0 })}
             </View>
             <TextInput
               autoFocus={AUTO_FOCUS}

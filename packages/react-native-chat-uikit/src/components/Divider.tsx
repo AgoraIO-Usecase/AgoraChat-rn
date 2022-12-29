@@ -1,19 +1,27 @@
-import React from 'react';
-import { StyleProp, View, ViewStyle } from 'react-native';
+import * as React from 'react';
+import { ColorValue, StyleProp, View, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
 
 type DividerProps = {
-  style?: StyleProp<ViewStyle>;
-  space?: number;
+  style?: StyleProp<ViewStyle> | undefined;
+  space?: number | undefined;
+  color?: ColorValue | undefined;
 };
 
-export default function Divider({ style, space }: DividerProps) {
+export default function Divider({ style, space, color }: DividerProps) {
   const { colors } = useThemeContext();
   return (
     <View style={[style, styles.divider, { paddingHorizontal: space }]}>
-      <View style={[styles.inner, { backgroundColor: colors.background }]} />
+      <View
+        style={[
+          styles.inner,
+          {
+            backgroundColor: color ?? colors.divider,
+          },
+        ]}
+      />
     </View>
   );
 }

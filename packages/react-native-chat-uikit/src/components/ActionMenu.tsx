@@ -51,7 +51,7 @@ export default function ActionMenu({
       transparent={transparent}
       // backdropColor="rgba(100, 10, 200, 0.5)"
     >
-      <DialogBox style={{ backgroundColor: colors.card }}>
+      <DialogBox style={{ backgroundColor: colors.card.background }}>
         <View style={styles.title}>
           <Text
             numberOfLines={1}

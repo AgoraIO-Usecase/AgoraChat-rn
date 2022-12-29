@@ -21,7 +21,7 @@ const BaseTheme: Partial<ThemeContextType> = {
     },
     title: {
       fontWeight: '500',
-      fontSize: defaultScaleFactor(16),
+      fontSize: defaultScaleFactor(22),
       lineHeight: defaultScaleFactor(22),
       letterSpacing: defaultScaleFactor(-0.2),
     },

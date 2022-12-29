@@ -4,7 +4,7 @@ import { Alert } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
 export default function TestIcon() {
-  const [icon, setIcon] = React.useState(true);
+  const [icon, setIcon] = React.useState(false);
 
   React.useEffect(() => {}, []);
 
@@ -24,12 +24,25 @@ export default function TestIcon() {
       </View>
       <Alert
         title="haha"
-        message="message"
         visible={icon}
         onHide={function (): void {
           console.log('test:onHide:', icon);
           setIcon(false);
         }}
+        buttons={[
+          {
+            text: 'hh',
+            onPress: () => {
+              setIcon(false);
+            },
+          },
+          {
+            text: 'nn',
+            onPress: () => {
+              setIcon(false);
+            },
+          },
+        ]}
       />
     </View>
   );

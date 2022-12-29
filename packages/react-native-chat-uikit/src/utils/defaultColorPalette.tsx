@@ -40,7 +40,7 @@ export const lightPalette = {
   },
   surfaceDisabled: 'rgba(27, 27, 31, 0.12)',
   onSurfaceDisabled: 'rgba(27, 27, 31, 0.38)',
-  backdrop: 'rgba(48, 48, 56, 0.4)',
+  backdrop: 'rgba(0, 0, 0, 0.4)',
   input: {
     background: 'rgba(242, 242, 242, 1)',
     text: 'rgba(0, 0, 0, 1)',
@@ -61,6 +61,13 @@ export const lightPalette = {
       content: 'rgba(255, 255, 255, 1)',
     },
   },
+  card: {
+    background: 'rgba(242, 242, 242, 1)',
+    title: 'rgba(0, 0, 0, 1)',
+    body: 'rgba(0, 0, 0, 1)',
+    button: 'rgba(17, 78, 255, 1)',
+  },
+  divider: 'rgba(60, 60, 67, 0.6)',
 };
 
 export const darkPalette = {
@@ -124,6 +131,13 @@ export const darkPalette = {
       content: 'rgba(255, 255, 255, 1)',
     },
   },
+  card: {
+    background: 'rgba(242, 242, 242, 1)',
+    title: 'rgba(0, 0, 0, 1)',
+    body: 'rgba(0, 0, 0, 1)',
+    button: 'rgba(17, 78, 255, 1)',
+  },
+  divider: 'rgba(60, 60, 67, 1)',
 };
 
 export const defaultColorPalette = {

@@ -10,7 +10,6 @@ const DarkTheme: ThemeContextType = {
     background: darkPalette.background,
     text: darkPalette.primary,
     border: darkPalette.secondary,
-    card: darkPalette.primaryContainer,
     backdrop: darkPalette.backdrop,
     button: {
       enabled: {
@@ -47,6 +46,13 @@ const DarkTheme: ThemeContextType = {
     },
     avatar: darkPalette.onBackground,
     transparent: 'transparent',
+    card: {
+      background: darkPalette.card.background,
+      title: darkPalette.card.title,
+      body: darkPalette.card.body,
+      button: darkPalette.card.button,
+    },
+    divider: darkPalette.divider,
   },
   fonts: BaseTheme.fonts!,
 };

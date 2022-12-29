@@ -47,10 +47,10 @@ export default function Toast({
       return colors.error;
     }
     if (type === 'success') {
-      return colors.card;
+      return colors.card.background;
     }
     return 'transparent';
-  }, [colors.card, colors.error, type]);
+  }, [colors.card.background, colors.error, type]);
 
   const backgroundColor = React.useMemo(() => {
     return colors.background;

@@ -14,7 +14,13 @@ const DialogSheet: ((props: DialogSheetProps) => JSX.Element) & {
 } = ({ style, children }) => {
   const { colors } = useThemeContext();
   return (
-    <View style={[styles.container, { backgroundColor: colors.card }, style]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card.background },
+        style,
+      ]}
+    >
       {children}
     </View>
   );
@@ -29,7 +35,12 @@ export type SheetItemProps = {
 const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
   const { colors, fonts } = useThemeContext();
   return (
-    <View style={[styles.sheetItemContainer, { backgroundColor: colors.card }]}>
+    <View
+      style={[
+        styles.sheetItemContainer,
+        { backgroundColor: colors.card.background },
+      ]}
+    >
       {icon && (
         <LocalIcon
           name={icon}

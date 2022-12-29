@@ -111,7 +111,13 @@ const LoginScreen = ({
         }}
         component={SignIn}
       />
-      <Root.Screen name="SignUp" component={SignUp} />
+      <Root.Screen
+        name="SignUp"
+        options={{
+          headerShown: false,
+        }}
+        component={SignUp}
+      />
     </Login.Navigator>
   );
 };

@@ -10,7 +10,9 @@ type DialogBoxProps = React.PropsWithChildren<{
 const DialogBox = ({ style, children }: DialogBoxProps) => {
   const { colors } = useThemeContext();
   return (
-    <View style={[styles.container, { backgroundColor: colors.card }, style]}>
+    <View
+      style={[styles.container, { backgroundColor: colors.background }, style]}
+    >
       {children}
     </View>
   );
@@ -18,8 +20,8 @@ const DialogBox = ({ style, children }: DialogBoxProps) => {
 
 const styles = createStyleSheet({
   container: {
-    width: 280,
-    borderRadius: 4,
+    width: 270,
+    borderRadius: 14,
   },
 });
 

@@ -45,6 +45,12 @@ export type InputColor = {
   placeholder: string;
 };
 
+export type ButtonColor = {
+  disabled: ItemColor;
+  enabled: ItemColor;
+  pressed: ItemColor;
+};
+
 export type ToastType = 'normal' | 'error' | 'success';
 export type ToastContextType = { show(text: string, type?: ToastType): void };
 
@@ -56,13 +62,8 @@ export type ThemeContextType = {
     background: string;
     text: string;
     border: string;
-    card: string;
     backdrop: string;
-    button: {
-      disabled: ItemColor;
-      enabled: ItemColor;
-      pressed: ItemColor;
-    };
+    button: ButtonColor;
     input: {
       enabled: InputColor;
       disabled: InputColor;
@@ -71,6 +72,13 @@ export type ThemeContextType = {
     badge: ItemColor;
     avatar: string;
     transparent: 'transparent';
+    card: {
+      background: string;
+      title: string;
+      body: string;
+      button: string;
+    };
+    divider: string;
   };
   fonts: {
     primary: FontAttributes;

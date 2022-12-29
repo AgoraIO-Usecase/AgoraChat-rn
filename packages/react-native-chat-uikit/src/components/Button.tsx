@@ -3,7 +3,7 @@ import { Pressable, StyleProp, Text, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import type { ItemColor } from '../types';
+import type { ButtonColor } from '../types';
 import type { LocalIconName } from './Icon';
 import { LocalIcon } from './Icon';
 
@@ -12,7 +12,7 @@ type ButtonProps = React.PropsWithChildren<{
   disabled?: boolean | undefined;
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
-  color?: Partial<ItemColor> | undefined;
+  color?: Partial<ButtonColor> | undefined;
 }>;
 export default function Button({
   icon,
@@ -25,8 +25,21 @@ export default function Button({
   const { colors, fonts } = useThemeContext();
 
   const getStateColor = (pressed: boolean, disabled?: boolean) => {
-    if (disabled) return colors.button.disabled;
-    if (pressed) return colors.button.pressed;
+    if (disabled) {
+      if (color?.disabled !== undefined) {
+        return color.disabled;
+      }
+      return colors.button.disabled;
+    }
+    if (pressed) {
+      if (color?.pressed !== undefined) {
+        return color.pressed;
+      }
+      return colors.button.pressed;
+    }
+    if (color?.enabled !== undefined) {
+      return color.enabled;
+    }
     return colors.button.enabled;
   };
 
@@ -36,11 +49,7 @@ export default function Button({
       onPress={onPress}
       style={({ pressed }) => {
         const s = getStateColor(pressed, disabled);
-        return [
-          { backgroundColor: color?.background ?? s.background },
-          styles.container,
-          style,
-        ];
+        return [{ backgroundColor: s.background }, styles.container, style];
       }}
     >
       {({ pressed }) => {
@@ -52,17 +61,11 @@ export default function Button({
               <LocalIcon
                 size={24}
                 name={icon}
-                color={color?.content ?? s.content}
+                color={s.content}
                 containerStyle={styles.icon}
               />
             )}
-            <Text
-              style={[
-                styles.text,
-                { color: color?.content ?? s.content },
-                fonts.button,
-              ]}
-            >
+            <Text style={[styles.text, { color: s.content }, fonts.button]}>
               {children}
             </Text>
           </>

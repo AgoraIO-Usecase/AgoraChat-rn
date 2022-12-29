@@ -10,7 +10,6 @@ const LightTheme: ThemeContextType = {
     background: lightPalette.onPrimary,
     text: lightPalette.primary,
     border: lightPalette.secondary,
-    card: lightPalette.primaryContainer,
     backdrop: lightPalette.backdrop,
     button: {
       enabled: {
@@ -47,6 +46,13 @@ const LightTheme: ThemeContextType = {
     },
     avatar: lightPalette.onBackground,
     transparent: 'transparent',
+    card: {
+      background: lightPalette.card.background,
+      title: lightPalette.card.title,
+      body: lightPalette.card.body,
+      button: lightPalette.card.button,
+    },
+    divider: lightPalette.divider,
   },
   fonts: BaseTheme.fonts!,
 };
