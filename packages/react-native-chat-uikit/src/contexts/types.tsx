@@ -68,7 +68,9 @@ export interface StringSetContextType {
   };
 }
 
-export type ToastContextType = { show(text: string, type?: ToastType): void };
+export type ToastContextType = {
+  showToast(text: string, type?: ToastType): void;
+};
 
 export type DialogContextType = {
   openMenu: (props: DialogPropsT<'ActionMenu'>) => void;

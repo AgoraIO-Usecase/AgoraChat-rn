@@ -1,8 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import {
-  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  View,
+} from 'react-native';
+import {
   Button,
   createStyleSheet,
   createStyleSheetP,
@@ -10,6 +15,7 @@ import {
   LocalIcon,
   TextInput,
   ThemeContextType,
+  useAlert,
   useHeaderContext,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -28,15 +34,17 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
     default: false,
   });
   const enableKeyboardAvoid = true;
+
   const { defaultStatusBarTranslucent: statusBarTranslucent } =
     useHeaderContext();
   const { register, login } = useAppI18nContext();
+  const { openAlert } = useAlert();
+
   const [id, setId] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirm, setConfirm] = React.useState('');
   const [disabled, setDisabled] = React.useState(true);
   const [tip, setTip] = React.useState('');
-  const [success, setSuccess] = React.useState(false);
 
   React.useEffect(() => {
     if (id.length > 0 && password.length > 0 && confirm.length > 0) {
@@ -90,7 +98,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
-              placeholder={register.pass2}
+              placeholder={register.confirm}
               textContentType="password"
               visible-password={false}
               secureTextEntry
@@ -106,7 +114,18 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
                   setTip(register.comment(1));
                 } else if (password === '1') {
                   console.log('test: success');
-                  setSuccess(true);
+                  Keyboard.dismiss();
+                  openAlert({
+                    title: register.comment(5),
+                    buttons: [
+                      {
+                        text: login.button,
+                        onPress: () => {
+                          navigation.goBack();
+                        },
+                      },
+                    ],
+                  });
                 }
               }}
             >
@@ -125,21 +144,6 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
           </KeyboardAvoidingView>
         </View>
       </View>
-      <Alert
-        visible={success}
-        onHide={function (): void {
-          console.log('test:Alert:');
-        }}
-        title={register.comment(5)}
-        buttons={[
-          {
-            text: login.button,
-            onPress: () => {
-              navigation.goBack();
-            },
-          },
-        ]}
-      />
     </SafeAreaView>
   );
 }

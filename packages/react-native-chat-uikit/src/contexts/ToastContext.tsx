@@ -34,7 +34,7 @@ export function ToastContextProvider({
   return (
     <ToastContext.Provider
       value={{
-        show: (text, type = 'normal') =>
+        showToast: (text, type = 'normal') =>
           text && setState({ text, type, visible: true }),
       }}
     >

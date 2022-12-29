@@ -14,7 +14,7 @@ export class AppStringSet extends UIKitStringSet2 {
   register: {
     id: string;
     pass: string;
-    pass2: string;
+    confirm: string;
     button: string;
     back: string;
     comment: (code: number) => string;
@@ -32,7 +32,7 @@ export class AppStringSet extends UIKitStringSet2 {
     this.register = {
       id: 'Enter a AgoraId',
       pass: 'Enter a Password',
-      pass2: 'Confirm Password',
+      confirm: 'Confirm Password',
       button: 'Sign Up',
       back: 'Back to Login',
       comment: (code) => {
