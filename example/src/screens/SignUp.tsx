@@ -21,7 +21,6 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getAppIcon } from '../components/AppIcons';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { ScreenParamsList } from '../routes';
 
@@ -71,7 +70,11 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
             pointerEvents="box-none"
           >
             <View style={styles.logo}>
-              {getAppIcon({ name: 'register_icon', size: 250, radius: 0 })}
+              <LocalIcon
+                name="register_icon"
+                size={250}
+                style={{ borderRadius: 0 }}
+              />
             </View>
             <View style={[styles.tip, { opacity: tip.length > 0 ? 1 : 0 }]}>
               <LocalIcon name="loginFail" size={scaleFactor(14)} />

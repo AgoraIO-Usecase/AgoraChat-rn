@@ -40,7 +40,7 @@ const localLocalIcon = <T extends IconName>(
   return ICON_ASSETS[name](params);
 };
 
-type Props = {
+type LocalIconProps = {
   name: IconName;
   color?: ColorValue | undefined;
   size?: number | undefined;
@@ -54,7 +54,7 @@ export default function LocalIcon({
   size = 24,
   style,
   containerStyle,
-}: Props): JSX.Element {
+}: LocalIconProps): JSX.Element {
   const sizeStyle = sizeStyles[size as SizeList] ?? {
     width: size,
     height: size,

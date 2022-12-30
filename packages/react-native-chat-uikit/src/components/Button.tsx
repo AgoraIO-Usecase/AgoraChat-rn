@@ -56,7 +56,7 @@ export default function Button({
         const s = getStateColor(pressed, disabled);
 
         return (
-          <>
+          <React.Fragment>
             {icon && (
               <LocalIcon
                 size={24}
@@ -68,7 +68,7 @@ export default function Button({
             <Text style={[styles.text, { color: s.content }, fonts.button]}>
               {children}
             </Text>
-          </>
+          </React.Fragment>
         );
       }}
     </Pressable>

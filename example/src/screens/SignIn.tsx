@@ -5,6 +5,7 @@ import {
   Button,
   createStyleSheet,
   createStyleSheetP,
+  LocalIcon,
   TextInput,
   ThemeContextType,
   useHeaderContext,
@@ -12,7 +13,6 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getAppIcon } from '../components/AppIcons';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { ScreenParamsList } from '../routes';
 
@@ -57,7 +57,11 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
             pointerEvents="box-none"
           >
             <View style={styles.logo}>
-              {getAppIcon({ name: 'login_icon', size: 250, radius: 0 })}
+              <LocalIcon
+                name="login_icon"
+                size={250}
+                style={{ borderRadius: 0 }}
+              />
             </View>
             <TextInput
               autoFocus={AUTO_FOCUS}

@@ -1,9 +1,27 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Avatar, Image, timestamp } from 'react-native-chat-uikit';
+import {
+  Avatar,
+  ICON_ASSETS,
+  Image,
+  LocalIconName,
+  timestamp,
+} from 'react-native-chat-uikit';
 
-// import { Avatar } from 'react-native-paper';
-import { AVATAR_ASSETS } from '../assets/images';
+const AVATAR_ASSETS = [
+  'agora_avatar_1',
+  'agora_avatar_2',
+  'agora_avatar_3',
+  'agora_avatar_4',
+  'agora_avatar_5',
+  'agora_avatar_6',
+  'agora_avatar_7',
+  'agora_avatar_8',
+  'agora_avatar_9',
+  'agora_avatar_10',
+  'agora_avatar_11',
+  'agora_avatar_12',
+];
 
 type AvatarProps = {
   size: number;
@@ -11,11 +29,12 @@ type AvatarProps = {
 };
 
 export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
-  const mod = ((timestamp('second') % 12) + 1) as keyof typeof AVATAR_ASSETS;
+  const index: number = timestamp('second') % AVATAR_ASSETS.length;
+  const key = AVATAR_ASSETS[index] as LocalIconName;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image
-        source={AVATAR_ASSETS[mod]()}
+        source={ICON_ASSETS[key]('')}
         resizeMode="cover"
         style={{ height: size, width: size, borderRadius: radius }}
         onLoad={(e) => {
@@ -30,10 +49,11 @@ export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
 }
 
 export function getDefaultAvatar2({ size, radius }: AvatarProps): JSX.Element {
-  const mod = ((timestamp('second') % 12) + 1) as keyof typeof AVATAR_ASSETS;
+  const index: number = timestamp('second') % AVATAR_ASSETS.length;
+  const key = AVATAR_ASSETS[index] as LocalIconName;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Avatar uri={AVATAR_ASSETS[mod]()} size={size} radius={radius} />
+      <Avatar uri={ICON_ASSETS[key]('')} size={size} radius={radius} />
     </View>
   );
 }

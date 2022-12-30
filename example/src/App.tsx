@@ -25,7 +25,7 @@ import {
 import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/typescript/src/types';
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { Linking, Platform, Pressable, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
@@ -35,17 +35,19 @@ import {
   DarkTheme,
   LightTheme,
   Loading,
+  LocalIcon,
   Services,
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
 import * as DocumentPicker from 'react-native-document-picker';
 import FileAccess from 'react-native-file-access';
 import ImagePicker from 'react-native-image-picker';
-import { Button } from 'react-native-paper';
 import Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
+import HeaderTitle from './components/HeaderTitle';
+import TabBarIcon from './components/TabBarIcon';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
 import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList, ScreenParamsList } from './routes';
@@ -89,11 +91,46 @@ const HomeScreen = ({
   route,
 }: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element => {
   console.log('test:HomeScreen:', route, navigation);
+  const shifting = true;
   return (
-    <Home.Navigator>
-      <Home.Screen name="ConversationList" component={ConversationList} />
-      <Home.Screen name="Contact" component={ContactScreen} />
-      <Home.Screen name="MySetting" component={MySetting} />
+    <Home.Navigator
+      shifting={shifting}
+      labeled={false}
+      activeColor="blue"
+      inactiveColor="black"
+      barStyle={{ backgroundColor: 'white' }}
+    >
+      <Home.Screen
+        name="ConversationList"
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIcon
+              focused={focused}
+              color={color}
+              type="ConversationList"
+            />
+          ),
+        }}
+        component={ConversationList}
+      />
+      <Home.Screen
+        name="Contact"
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIcon focused={focused} color={color} type="Contact" />
+          ),
+        }}
+        component={ContactScreen}
+      />
+      <Home.Screen
+        name="MySetting"
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <TabBarIcon focused={focused} color={color} type="MySetting" />
+          ),
+        }}
+        component={MySetting}
+      />
     </Home.Navigator>
   );
 };
@@ -127,15 +164,15 @@ const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
   console.log('test:HomeHeaderRight:', props);
   const navigation = useNavigation<NavigationProp<ScreenParamsList>>();
   return (
-    <Button
-      mode="text"
-      uppercase={false}
+    <Pressable
       onPress={() => {
         navigation.navigate('Add', { params: { value: 'test' } });
       }}
     >
-      Add
-    </Button>
+      <View style={{ padding: 10, marginRight: -10 }}>
+        <LocalIcon name="chat_nav_add" style={{ padding: 0 }} size={20} />
+      </View>
+    </Pressable>
   );
 };
 
@@ -268,7 +305,9 @@ export default function App() {
               name="Home"
               options={() => {
                 return {
+                  headerBackVisible: true,
                   headerRight: HomeHeaderRight,
+                  headerTitle: () => <HeaderTitle name="Chats" />,
                 };
               }}
               component={HomeScreen}

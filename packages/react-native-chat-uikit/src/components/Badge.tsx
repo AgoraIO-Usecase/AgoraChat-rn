@@ -48,14 +48,14 @@ export default function Badge({
 const styles = createStyleSheet({
   badgeDefault: {
     paddingTop: Platform.select({ ios: 2, android: 2 }),
-    minWidth: 20,
-    minHeight: 20,
+    minWidth: 19,
+    minHeight: 19,
     borderRadius: 99,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeDefaultPadding: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
   },
   badgeSmall: {
     paddingTop: Platform.select({ ios: 3, android: 2 }),
