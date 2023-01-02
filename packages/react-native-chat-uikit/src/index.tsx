@@ -51,6 +51,7 @@ export { default as Loading } from './components/Loading';
 export { default as MenuBar } from './components/MenuBar';
 export { default as Modal } from './components/Modal';
 export { default as Prompt } from './components/Prompt';
+export { default as SearchBar, SearchBarProps } from './components/SearchBar';
 export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';

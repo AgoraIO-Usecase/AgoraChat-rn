@@ -3,7 +3,7 @@ import { Pressable, StyleProp, Text, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
-import type { ButtonColor } from '../types';
+import type { ButtonStateColor } from '../types';
 import type { LocalIconName } from './Icon';
 import { LocalIcon } from './Icon';
 
@@ -12,7 +12,7 @@ type ButtonProps = React.PropsWithChildren<{
   disabled?: boolean | undefined;
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
-  color?: Partial<ButtonColor> | undefined;
+  color?: Partial<ButtonStateColor> | undefined;
 }>;
 export default function Button({
   icon,

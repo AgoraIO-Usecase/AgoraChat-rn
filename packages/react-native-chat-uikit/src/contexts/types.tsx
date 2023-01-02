@@ -1,11 +1,11 @@
 import type { ChatClient } from 'react-native-chat-sdk';
 
 import type {
-  ButtonColor,
+  ButtonStateColor,
   ColorPaletteType,
   DialogPropsT,
   FontAttributes,
-  InputColor,
+  InputStateColor,
   ItemColor,
   ToastType,
 } from '../types';
@@ -19,11 +19,8 @@ export type ThemeContextType = {
     text: string;
     border: string;
     backdrop: string;
-    button: ButtonColor;
-    input: {
-      enabled: InputColor;
-      disabled: InputColor;
-    };
+    button: ButtonStateColor;
+    input: InputStateColor;
     error: string;
     badge: ItemColor;
     avatar: string;

@@ -177,7 +177,7 @@ const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
 };
 
 const __KEY__ = '__KEY__';
-const __TEST__ = false;
+const __TEST__ = true;
 
 console.log('DEV:', __DEV__);
 console.log('TEST:', __TEST__);

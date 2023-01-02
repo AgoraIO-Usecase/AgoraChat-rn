@@ -48,10 +48,15 @@ export type InputColor = {
   placeholder: string;
 };
 
-export type ButtonColor = {
+export type ButtonStateColor = {
   disabled: ItemColor;
   enabled: ItemColor;
   pressed: ItemColor;
+};
+
+export type InputStateColor = {
+  enabled: InputColor;
+  disabled: InputColor;
 };
 
 export type ToastType = 'normal' | 'error' | 'success';

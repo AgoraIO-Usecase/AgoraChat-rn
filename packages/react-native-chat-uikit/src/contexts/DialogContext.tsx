@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef } from 'react';
+import React from 'react';
 
 import ActionMenu from '../components/ActionMenu';
 import Alert from '../components/Alert';
@@ -43,15 +43,15 @@ export const DialogContextProvider = ({
   defaultLabels,
   children,
 }: DialogContextProps) => {
-  const waitDismissT = useRef<NodeJS.Timeout>();
-  const waitDismissP = useRef<() => void>();
-  const completeDismiss = useCallback(() => {
+  const waitDismissT = React.useRef<NodeJS.Timeout>();
+  const waitDismissP = React.useRef<() => void>();
+  const completeDismiss = React.useCallback(() => {
     if (waitDismissT.current) clearTimeout(waitDismissT.current);
     if (waitDismissP.current) waitDismissP.current();
     waitDismissT.current = undefined;
     waitDismissP.current = undefined;
   }, []);
-  const waitDismiss = useCallback(
+  const waitDismiss = React.useCallback(
     (resolver: () => void) => {
       waitDismissP.current = resolver;
       waitDismissT.current = setTimeout(completeDismiss, TIMEOUT);
@@ -61,18 +61,18 @@ export const DialogContextProvider = ({
 
   const update = useUpdate();
 
-  const taskQueue = useRef<DialogTask[]>([]);
-  const workingTask = useRef<DialogTask>();
-  const visibleState = useRef(false);
+  const taskQueue = React.useRef<DialogTask[]>([]);
+  const workingTask = React.useRef<DialogTask>();
+  const visibleState = React.useRef(false);
 
   const isWorking = () => Boolean(workingTask.current);
 
-  const updateToShow = useCallback(() => {
+  const updateToShow = React.useCallback(() => {
     visibleState.current = true;
     update();
   }, [update]);
 
-  const updateToHide = useCallback((): Promise<void> => {
+  const updateToHide = React.useCallback((): Promise<void> => {
     return new Promise((resolve) => {
       visibleState.current = false;
       update();
@@ -80,7 +80,7 @@ export const DialogContextProvider = ({
     });
   }, [update, waitDismiss]);
 
-  const shiftTask = useCallback(() => {
+  const shiftTask = React.useCallback(() => {
     completeDismiss();
     const job = taskQueue.current.shift();
     if (job) {
@@ -103,19 +103,22 @@ export const DialogContextProvider = ({
     };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openAlert = useCallback(createTask('Alert'), [isWorking, updateToShow]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openMenu = useCallback(createTask('ActionMenu'), [
+  const openAlert = React.useCallback(createTask('Alert'), [
     isWorking,
     updateToShow,
   ]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openPrompt = useCallback(createTask('Prompt'), [
+  const openMenu = React.useCallback(createTask('ActionMenu'), [
     isWorking,
     updateToShow,
   ]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const openSheet = useCallback(createTask('BottomSheet'), [
+  const openPrompt = React.useCallback(createTask('Prompt'), [
+    isWorking,
+    updateToShow,
+  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const openSheet = React.useCallback(createTask('BottomSheet'), [
     isWorking,
     updateToShow,
   ]);
@@ -187,23 +190,23 @@ export const DialogContextProvider = ({
 };
 
 export const useActionMenu = () => {
-  const context = useContext(ActionMenuContext);
+  const context = React.useContext(ActionMenuContext);
   if (!context)
     throw new Error(`${ActionMenuContext.displayName} is not provided`);
   return context;
 };
 export const useAlert = () => {
-  const context = useContext(AlertContext);
+  const context = React.useContext(AlertContext);
   if (!context) throw new Error(`${AlertContext.displayName} is not provided`);
   return context;
 };
 export const usePrompt = () => {
-  const context = useContext(PromptContext);
+  const context = React.useContext(PromptContext);
   if (!context) throw new Error(`${PromptContext.displayName} is not provided`);
   return context;
 };
 export const useBottomSheet = () => {
-  const context = useContext(BottomSheetContext);
+  const context = React.useContext(BottomSheetContext);
   if (!context)
     throw new Error(`${BottomSheetContext.displayName} is not provided`);
   return context;

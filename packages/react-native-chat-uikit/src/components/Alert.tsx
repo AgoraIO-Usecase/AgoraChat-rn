@@ -6,7 +6,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet, {
   createStyleSheetP,
 } from '../styles/createStyleSheet';
-import type { ButtonColor } from '../types';
+import type { ButtonStateColor } from '../types';
 import Button from './Button';
 import DialogBox from './DialogBox';
 import Modal from './Modal';
@@ -75,7 +75,7 @@ export default function Alert({
   const buttonStyle1 = useStyleSheet(0, buttons.length).button;
   const buttonStyle2 = useStyleSheet(1, buttons.length).button;
 
-  const buttonColor1: Partial<ButtonColor> = {
+  const buttonColor1: Partial<ButtonStateColor> = {
     enabled: {
       background: 'rgba(242, 242, 242, 1)',
       content: 'rgba(0, 0, 0, 1)',
