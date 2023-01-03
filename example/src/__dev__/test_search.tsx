@@ -5,6 +5,7 @@ import { Button } from 'react-native-paper';
 
 export default function TestSearch() {
   const [icon, setIcon] = React.useState(false);
+  const enableClear = true;
 
   React.useEffect(() => {}, []);
   let input = React.useRef<TextInput>(null);
@@ -28,7 +29,7 @@ export default function TestSearch() {
         <SearchBar
           ref={input}
           enableCancel={false}
-          enableClear={true}
+          enableClear={enableClear}
           inputContainerStyle={{
             backgroundColor: 'rgba(242, 242, 242, 1)',
             borderRadius: 24,

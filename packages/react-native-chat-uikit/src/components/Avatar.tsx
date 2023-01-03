@@ -51,7 +51,7 @@ const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
       ]}
     >
       {loadDefault ? (
-        <LocalIcon name={uriOnError ?? 'defatult_avatar_2'} size={size * 1.0} />
+        <LocalIcon name={uriOnError ?? 'default_avatar'} size={size * 1.0} />
       ) : (
         <Image
           onError={() => setLoadDefault(true)}
