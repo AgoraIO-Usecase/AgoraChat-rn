@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
@@ -24,9 +24,9 @@ export default function Loading({
 }
 
 const useLoopAnimated = (duration: number, useNativeDriver = true) => {
-  const animated = useRef(new Animated.Value(0)).current;
+  const animated = React.useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
+  React.useEffect(() => {
     Animated.loop(
       Animated.timing(animated, {
         toValue: 1,

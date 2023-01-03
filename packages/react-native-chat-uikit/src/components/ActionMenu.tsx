@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   StyleProp,
   Text,
@@ -42,7 +42,7 @@ export default function ActionMenu({
 }: ActionMenuProps): JSX.Element {
   const { colors, fonts } = useThemeContext();
   const { defaultStatusBarTranslucent } = useHeaderContext();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = React.useState(false);
   const transparent = true;
   const _onHide = () => {
     if (!pending) onHide();

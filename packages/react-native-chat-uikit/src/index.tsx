@@ -48,6 +48,7 @@ export { default as Divider } from './components/Divider';
 export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
 export { default as Loading } from './components/Loading';
+export { default as LoadingRN } from './components/LoadingRN';
 export { default as MenuBar } from './components/MenuBar';
 export { default as Modal } from './components/Modal';
 export { default as Prompt } from './components/Prompt';
