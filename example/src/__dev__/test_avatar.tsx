@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Avatar } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestIcon() {
+export default function TestAvatar() {
   const [icon, setIcon] = React.useState(true);
   const url = 'http://pic1.16xx8.com/allimg/170303/jc09967_021.jpg';
 

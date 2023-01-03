@@ -4,7 +4,7 @@ import { DevDebug } from 'react-native-chat-uikit';
 
 import TestColor from './test_color';
 
-export default function test_layout(): JSX.Element {
+export default function TestLayout(): JSX.Element {
   const s = true;
   if (s) {
     return default_2();

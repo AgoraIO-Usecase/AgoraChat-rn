@@ -3,7 +3,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { Toast } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestLoading() {
+export default function TestToast() {
   const [icon, setIcon] = React.useState(false);
   const [opacity, setOpacity] = React.useState(false);
   const { width, height } = useWindowDimensions();

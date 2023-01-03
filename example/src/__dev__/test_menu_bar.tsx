@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { MenuBar } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestLoading() {
+export default function TestMenuBar() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);

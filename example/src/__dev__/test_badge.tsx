@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Badge } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestIcon() {
+export default function TestBadge() {
   const [icon, setIcon] = React.useState(90);
 
   React.useEffect(() => {}, []);

@@ -3,7 +3,7 @@ import { Button as RNButton, View } from 'react-native';
 import { ActionMenu } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestBox() {
+export default function TestMenu() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);

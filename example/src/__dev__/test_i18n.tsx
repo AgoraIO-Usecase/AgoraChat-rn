@@ -39,7 +39,7 @@ class s2 extends UIKitStringSet2 {
   }
 }
 
-export default function TestLoading() {
+export default function TestI18n() {
   React.useEffect(() => {}, []);
 
   return (

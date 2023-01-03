@@ -4,7 +4,7 @@ import { BottomSheet } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-export default function TestBox() {
+export default function TestSheet() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);

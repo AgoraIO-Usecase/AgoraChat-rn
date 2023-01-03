@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Prompt } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestIcon() {
+export default function TestPrompt() {
   const [icon, setIcon] = React.useState(false);
 
   React.useEffect(() => {}, []);

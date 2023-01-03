@@ -3,7 +3,7 @@ import { Button as RNButton, View } from 'react-native';
 import { DialogBox } from 'react-native-chat-uikit';
 import { Button, Text } from 'react-native-paper';
 
-export default function TestLoading() {
+export default function TestBox() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);

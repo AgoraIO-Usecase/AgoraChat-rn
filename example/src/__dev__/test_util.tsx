@@ -12,7 +12,7 @@ import {
 } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestLoading() {
+export default function TestUtil() {
   React.useEffect(() => {}, []);
 
   return (

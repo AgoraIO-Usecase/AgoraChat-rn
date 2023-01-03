@@ -3,7 +3,7 @@ import { Button as RNButton, View } from 'react-native';
 import { Switch } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-export default function TestIcon() {
+export default function TestSwitch() {
   const [icon, setIcon] = React.useState(true);
 
   React.useEffect(() => {}, []);

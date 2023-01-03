@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text } from 'react-native';
 
-export default function test_color(_params: any): JSX.Element {
+export default function TestColor(_params: any): JSX.Element {
   test_1();
   return <Text>hello</Text>;
 }
