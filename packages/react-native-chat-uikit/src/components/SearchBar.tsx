@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Animated,
   LayoutAnimation,
   Pressable,
   StyleProp,
@@ -99,21 +100,7 @@ function SearchBar(
   // const ss = inputStyle as TextStyle;
   // console.log(ss);
 
-  const getStateColor = (disabled?: boolean) => {
-    if (disabled && disabled === true) {
-      if (inputStateColor?.disabled) {
-        return inputStateColor.disabled;
-      }
-      return colors.input.disabled;
-    }
-    if (inputStateColor?.enabled) {
-      return inputStateColor.enabled;
-    }
-    return colors.input.enabled;
-  };
-
   const _onFocus = (e: any) => {
-    console.log('test:', enableCancel, hasFocus, cancelButtonWidth);
     setHasFocus(true);
     if (enableCancel) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -150,7 +137,7 @@ function SearchBar(
     <View
       style={StyleSheet.flatten([
         styles.container,
-        { backgroundColor: getStateColor(disabled).background },
+        { backgroundColor: colors.background },
         containerStyle,
       ])}
     >
@@ -193,7 +180,7 @@ function SearchBar(
       />
 
       {enableCancel ? (
-        <View
+        <Animated.View
           style={StyleSheet.flatten([
             styles.cancelButtonContainer,
             {
@@ -221,7 +208,7 @@ function SearchBar(
               </Text>
             </View>
           </Pressable>
-        </View>
+        </Animated.View>
       ) : null}
     </View>
   );
@@ -229,8 +216,8 @@ function SearchBar(
 
 const styles = createStyleSheet({
   container: {
-    paddingBottom: 13,
-    paddingTop: 13,
+    paddingBottom: 2,
+    paddingTop: 2,
     flexDirection: 'row',
     overflow: 'hidden',
     alignItems: 'center',
@@ -245,6 +232,7 @@ const styles = createStyleSheet({
     minHeight: 36,
     marginLeft: 8,
     marginRight: 8,
+    overflow: 'hidden',
   },
   rightIconContainerStyle: {
     marginRight: 8,

@@ -186,7 +186,7 @@ function TextInputEx(
             flexDirection: 'row',
             borderBottomWidth: 1,
             alignItems: 'center',
-            borderColor: getStateColor(disabled).background,
+            // borderColor: getStateColor(disabled).background,
           },
           inputContainerStyle,
         ])}
@@ -254,6 +254,7 @@ const styles = createStyleSheet({
     justifyContent: 'center',
     alignItems: 'center',
     paddingRight: 4,
+    paddingLeft: 4,
     marginVertical: 4,
   },
 });

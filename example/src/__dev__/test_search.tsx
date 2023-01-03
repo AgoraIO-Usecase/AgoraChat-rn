@@ -24,12 +24,18 @@ export default function TestSearch() {
           change icon
         </Button>
       </View>
-      <SearchBar
-        ref={input}
-        enableCancel={true}
-        enableClear={true}
-        cancel={{ buttonName: 'cancel' }}
-      />
+      <View style={{ margin: 8 }}>
+        <SearchBar
+          ref={input}
+          enableCancel={false}
+          enableClear={true}
+          inputContainerStyle={{
+            backgroundColor: 'rgba(242, 242, 242, 1)',
+            borderRadius: 24,
+          }}
+          cancel={{ buttonName: 'cancel' }}
+        />
+      </View>
     </View>
   );
 }
