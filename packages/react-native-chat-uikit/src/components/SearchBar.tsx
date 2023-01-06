@@ -14,6 +14,7 @@ import {
 
 import { useThemeContext } from '../contexts';
 import createStyleSheet from '../styles/createStyleSheet';
+import { asyncTask } from '../utils/function';
 import type { TextInputProps } from './TextInputEx';
 import { default as TextInput } from './TextInputEx';
 
@@ -105,7 +106,7 @@ function SearchBar(
     if (enableCancel) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    if (onFocus) process.nextTick(onFocus, e);
+    if (onFocus) asyncTask(onFocus, e);
   };
 
   const _onBlur = (e: any) => {
@@ -113,7 +114,7 @@ function SearchBar(
     if (enableCancel) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    if (onBlur) process.nextTick(onBlur, e);
+    if (onBlur) asyncTask(onBlur, e);
   };
 
   const _onChangeText = (text: string) => {
@@ -124,13 +125,13 @@ function SearchBar(
   const _onCancel = (e: any) => {
     _onClear();
     _onBlur(e);
-    if (cancel?.onCancel) process.nextTick(cancel?.onCancel);
+    if (cancel?.onCancel) asyncTask(cancel?.onCancel);
   };
 
   const _onClear = () => {
     setValue('');
     setIsEmpty(true);
-    if (onClear) process.nextTick(onClear);
+    if (onClear) asyncTask(onClear);
   };
 
   return (

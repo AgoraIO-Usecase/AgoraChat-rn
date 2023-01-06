@@ -45,6 +45,11 @@ export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
 export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
+export {
+  default as EqualHeightList,
+  ItemComponent,
+  ItemData,
+} from './components/EqualHeightList';
 export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
 export { default as Loading } from './components/Loading';
@@ -74,9 +79,12 @@ export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
 export * from './services';
 export {
-  createScaleFactor,
+  defaultRatio,
   defaultScaleFactor,
   defaultScaleFactorS,
+  getScaleFactor,
+  getScaleFactorS,
+  updateScaleFactor,
 } from './styles/createScaleFactor';
 export {
   default as createStyleSheet,
@@ -92,6 +100,7 @@ export {
   truncateContent,
   truncatedBadgeCount,
 } from './utils/format';
+export { arraySort, asyncTask, wait } from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
 
 // declare module 'example/src/common' {

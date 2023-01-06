@@ -30,13 +30,13 @@ import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
   Container as UIKitContainer,
-  createScaleFactor,
   createStringSetEn2,
   DarkTheme,
   LightTheme,
   Loading,
   LocalIcon,
   Services,
+  updateScaleFactor,
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
 import * as DocumentPicker from 'react-native-document-picker';
@@ -177,13 +177,20 @@ const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
 };
 
 const __KEY__ = '__KEY__';
-const __TEST__ = true;
+let __TEST__ = true;
+
+try {
+  const env = require('./env');
+  __TEST__ = env.test ?? false;
+} catch (e) {
+  console.warn('test:', e);
+}
 
 console.log('DEV:', __DEV__);
 console.log('TEST:', __TEST__);
 
 export default function App() {
-  createScaleFactor.updateScaleFactor(createAppScaleFactor());
+  updateScaleFactor(createAppScaleFactor());
 
   const isLightTheme = LightTheme.scheme === 'light';
 
@@ -222,13 +229,10 @@ export default function App() {
       restoreState();
     }
   }, [isReady, storage]);
+  console.log('test:App:isReady:', isReady);
 
   if (!isReady) {
     return null;
-  }
-
-  if (__TEST__) {
-    return Dev();
   }
 
   return (
@@ -271,57 +275,61 @@ export default function App() {
           storage: storage,
         }}
       >
-        <NavigationContainer
-          initialState={initialState}
-          theme={isLightTheme ? NDefaultTheme : NDarkTheme}
-          onStateChange={(state: NavigationState | undefined) => {
-            console.log('test:onStateChange:', state);
-            storage.setItem(__KEY__, JSON.stringify(state));
-          }}
-          onUnhandledAction={(action: NavigationAction) => {
-            console.log('test:onUnhandledAction:', action);
-          }}
-          fallback={
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                flex: 1,
-              }}
-            >
-              <Loading color="rgba(15, 70, 230, 1)" size={45} />
-            </View>
-          }
-        >
-          <Root.Navigator initialRouteName="SignIn">
-            <Root.Screen
-              name="Login"
-              options={{
-                headerShown: false,
-              }}
-              component={LoginScreen}
-            />
-            <Root.Screen
-              name="Home"
-              options={() => {
-                return {
-                  headerBackVisible: true,
-                  headerRight: HomeHeaderRight,
-                  headerTitle: () => <HeaderTitle name="Chats" />,
-                };
-              }}
-              component={HomeScreen}
-            />
-            <Root.Group>
+        {__TEST__ === true ? (
+          Dev()
+        ) : (
+          <NavigationContainer
+            initialState={initialState}
+            theme={isLightTheme ? NDefaultTheme : NDarkTheme}
+            onStateChange={(state: NavigationState | undefined) => {
+              console.log('test:onStateChange:', state);
+              storage.setItem(__KEY__, JSON.stringify(state));
+            }}
+            onUnhandledAction={(action: NavigationAction) => {
+              console.log('test:onUnhandledAction:', action);
+            }}
+            fallback={
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                }}
+              >
+                <Loading color="rgba(15, 70, 230, 1)" size={45} />
+              </View>
+            }
+          >
+            <Root.Navigator initialRouteName="SignIn">
               <Root.Screen
-                name="Add"
-                options={{ headerShown: true, presentation: 'modal' }}
-                component={Add}
+                name="Login"
+                options={{
+                  headerShown: false,
+                }}
+                component={LoginScreen}
               />
-              <Root.Screen name="AddContact" component={AddContact} />
-            </Root.Group>
-          </Root.Navigator>
-        </NavigationContainer>
+              <Root.Screen
+                name="Home"
+                options={() => {
+                  return {
+                    headerBackVisible: true,
+                    headerRight: HomeHeaderRight,
+                    headerTitle: () => <HeaderTitle name="Chats" />,
+                  };
+                }}
+                component={HomeScreen}
+              />
+              <Root.Group>
+                <Root.Screen
+                  name="Add"
+                  options={{ headerShown: true, presentation: 'modal' }}
+                  component={Add}
+                />
+                <Root.Screen name="AddContact" component={AddContact} />
+              </Root.Group>
+            </Root.Navigator>
+          </NavigationContainer>
+        )}
       </UIKitContainer>
     </React.StrictMode>
   );

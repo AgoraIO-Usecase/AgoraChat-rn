@@ -1,34 +1,37 @@
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
-import { getScaleFactor, getScaleFactorS } from './createScaleFactor';
+import {
+  defaultScaleFactor as scaleFactor,
+  defaultScaleFactorS as scaleFactorS,
+} from './createScaleFactor';
 
 type NamedStyle = ViewStyle | TextStyle | ImageStyle;
 type StylePreprocessor<T extends NamedStyle = NamedStyle> = {
-  [key in keyof T]: string;
+  [key in keyof T]: (val: NonNullable<T[key]>) => typeof val;
 };
 
 const preProcessor: Partial<StylePreprocessor> = {
-  fontSize: 'getScaleFactor',
-  lineHeight: 'getScaleFactor',
-  borderRadius: 'getScaleFactor',
-  minWidth: 'getScaleFactorS',
-  minHeight: 'getScaleFactorS',
-  height: 'getScaleFactorS',
-  width: 'getScaleFactorS',
-  padding: 'getScaleFactorS',
-  paddingTop: 'getScaleFactorS',
-  paddingBottom: 'getScaleFactorS',
-  paddingLeft: 'getScaleFactorS',
-  paddingRight: 'getScaleFactorS',
-  margin: 'getScaleFactorS',
-  marginTop: 'getScaleFactorS',
-  marginBottom: 'getScaleFactorS',
-  marginLeft: 'getScaleFactorS',
-  marginRight: 'getScaleFactorS',
-  left: 'getScaleFactorS',
-  right: 'getScaleFactorS',
-  top: 'getScaleFactorS',
-  bottom: 'getScaleFactorS',
+  fontSize: scaleFactor,
+  lineHeight: scaleFactor,
+  borderRadius: scaleFactor,
+  minWidth: scaleFactorS,
+  minHeight: scaleFactorS,
+  height: scaleFactorS,
+  width: scaleFactorS,
+  padding: scaleFactorS,
+  paddingTop: scaleFactorS,
+  paddingBottom: scaleFactorS,
+  paddingLeft: scaleFactorS,
+  paddingRight: scaleFactorS,
+  margin: scaleFactorS,
+  marginTop: scaleFactorS,
+  marginBottom: scaleFactorS,
+  marginLeft: scaleFactorS,
+  marginRight: scaleFactorS,
+  left: scaleFactorS,
+  right: scaleFactorS,
+  top: scaleFactorS,
+  bottom: scaleFactorS,
 };
 
 const preProcessorKeys = Object.keys(
@@ -45,48 +48,26 @@ const preProcessorLength = preProcessorKeys.length;
 export default function createStyleSheet<
   T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>
 >(styles: T | StyleSheet.NamedStyles<T>): T {
-  // console.log('test:createStyleSheet:');
   Object.values(styles).forEach((style) => {
     const styleKeys = Object.keys(style) as (keyof NamedStyle)[];
     const styleLength = styleKeys.length;
     const keys =
       styleLength < preProcessorLength ? styleKeys : preProcessorKeys;
     keys.forEach((key) => {
-      // console.log('test:createStyleSheet:', key);
       if (preProcessor.hasOwnProperty(key) && style.hasOwnProperty(key)) {
-        if (
-          key === 'fontSize' ||
-          key === 'lineHeight' ||
-          key === 'borderRadius'
-        ) {
+        const f = preProcessor[key as keyof typeof preProcessor];
+        if (typeof f === typeof scaleFactor) {
+          const c = f as typeof scaleFactor;
           const d = Object.getOwnPropertyDescriptor(style, key);
           if (d) {
-            d.value = getScaleFactor()(d.value as number);
+            d.value = c(d.value as number);
             Object.defineProperty(style, key, d);
           }
-        } else if (
-          key === 'minWidth' ||
-          key === 'minHeight' ||
-          key === 'height' ||
-          key === 'width' ||
-          key === 'padding' ||
-          key === 'paddingTop' ||
-          key === 'paddingBottom' ||
-          key === 'paddingLeft' ||
-          key === 'paddingRight' ||
-          key === 'margin' ||
-          key === 'marginTop' ||
-          key === 'marginBottom' ||
-          key === 'marginLeft' ||
-          key === 'marginRight' ||
-          key === 'left' ||
-          key === 'right' ||
-          key === 'top' ||
-          key === 'bottom'
-        ) {
+        } else if (typeof f === typeof scaleFactorS) {
+          const c = f as typeof scaleFactorS;
           const d = Object.getOwnPropertyDescriptor(style, key);
           if (d) {
-            d.value = getScaleFactorS()(d.value as string | number);
+            d.value = c(d.value as string | number);
             Object.defineProperty(style, key, d);
           }
         }

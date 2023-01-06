@@ -19,7 +19,7 @@ const Item = (item: ItemType): JSX.Element => {
     <View
       style={[styles.item]}
       onLayout={(e) => {
-        console.log('test:item:target:', e.nativeEvent.target);
+        // console.log('test:item:target:', e.nativeEvent.target);
         // callback?.(Math.round(e.nativeEvent.layout.height));
         item.height = Math.round(e.nativeEvent.layout.height);
       }}
@@ -27,6 +27,19 @@ const Item = (item: ItemType): JSX.Element => {
       <Text style={styles.title}>{item.en}</Text>
       <Text style={styles.title}>{item.ch}</Text>
     </View>
+  );
+};
+
+const renderItem = ({ item }: { item: ItemType }) => {
+  console.log('test:renderItem:', item.en);
+  return (
+    <Item
+      en={item.en}
+      ch={item.ch}
+      id={item.id}
+      first={item.first}
+      callback={item.callback}
+    />
   );
 };
 
@@ -49,18 +62,6 @@ export default function TestListPrototype() {
     wait(2000).then(() => setRefreshing(false));
     return <LoadingRN size="large" />;
   }, []);
-
-  const renderItem = ({ item }: { item: ItemType }) => {
-    return (
-      <Item
-        en={item.en}
-        ch={item.ch}
-        id={item.id}
-        first={item.first}
-        callback={item.callback}
-      />
-    );
-  };
 
   const initData = (): ItemType[] => {
     const obj = {} as any;
@@ -120,7 +121,7 @@ export default function TestListPrototype() {
   const padding = 100;
   const calculateIndex = (y0: number): number => {
     const AZH = height - 2 * padding;
-    const unitH = AZH / AZ.length;
+    const unitH = AZH / (AZ.length - 1);
     const index = Math.round((y0 - padding) / unitH);
     return index;
   };

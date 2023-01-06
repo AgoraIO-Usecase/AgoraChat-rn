@@ -29,6 +29,9 @@ export type RequiredDeep<T> = T extends object
       }
   : T;
 
+export type ScaleFactor = (dp: number) => number;
+export type ScaleFactorS = (dp: string | number) => string | number;
+
 export type ColorPaletteType = typeof lightPalette | typeof darkPalette;
 
 export type FontAttributes = Pick<
