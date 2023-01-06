@@ -22,12 +22,14 @@ export interface ItemData {
   key: string;
 }
 
-export interface ItemProps {
-  data: ItemData;
+export interface ItemProps<ItemT extends ItemData = ItemData> {
+  data: ItemT;
   style?: StyleProp<ViewStyle>;
 }
 
-export type ItemComponent = (props: ItemProps) => JSX.Element;
+export type ItemComponent<ItemT extends ItemData = ItemData> = (
+  props: ItemProps<ItemT>
+) => JSX.Element;
 
 export type ItemContainerProps = React.PropsWithChildren<{
   index: number;
@@ -39,9 +41,9 @@ export type ItemContainerProps = React.PropsWithChildren<{
 
 export type ItemContainerComponent = (props: ItemContainerProps) => JSX.Element;
 
-type RenderItemProps = {
-  itemProps: ItemProps;
-  Item: ItemComponent;
+type RenderItemProps<ItemT extends ItemData = ItemData> = {
+  itemProps: ItemProps<ItemT>;
+  Item: ItemComponent<ItemT>;
   itemContainerProps: ItemContainerProps;
   ItemContainer: ItemContainerComponent;
 };
@@ -50,7 +52,9 @@ type RenderItemProps = {
 export interface RefreshProps {}
 export type RefreshComponent = (props: RefreshProps) => JSX.Element;
 
-const DefaultItem: ItemComponent = (props: ItemProps): JSX.Element => {
+const DefaultItem: ItemComponent<ItemData> = (
+  props: ItemProps<ItemData>
+): JSX.Element => {
   return <Text style={[styles.item, props.style]}>{props.data.key}</Text>;
 };
 
@@ -75,7 +79,9 @@ const DefaultItemContainer: ItemContainerComponent = (
 
 // let RenderItemInternalCount = 0;
 const RenderItemInternal = React.memo(
-  (info: ListRenderItemInfo<RenderItemProps>) => {
+  <ItemT extends ItemData = ItemData>(
+    info: ListRenderItemInfo<RenderItemProps<ItemT>>
+  ) => {
     // console.log('test:RenderItemM:', ++RenderItemInternalCount);
     const { ItemContainer, itemContainerProps, itemProps, Item } = info.item;
     return (
@@ -100,16 +106,16 @@ const RenderItemInternal = React.memo(
 );
 
 // let RenderItemCount = 0;
-const RenderItem = ({
+const RenderItem = <ItemT extends ItemData = ItemData>({
   item,
-}: ListRenderItemInfo<RenderItemProps>): JSX.Element => {
+}: ListRenderItemInfo<RenderItemProps<ItemT>>): JSX.Element => {
   // console.log('test:RenderItem:', ++RenderItemCount);
   const { ItemContainer, itemContainerProps, itemProps, Item } = item;
   return (
     <RenderItemInternal
       item={{
         itemProps: itemProps,
-        Item: Item,
+        Item: Item as any,
         itemContainerProps: itemContainerProps,
         ItemContainer: ItemContainer,
       }}
@@ -136,7 +142,7 @@ type RefreshComponentType = {
   props: RefreshProps;
 };
 
-type EqualHeightListProps = Omit<
+type EqualHeightListProps<ItemT extends ItemData = ItemData> = Omit<
   RNFlatListProps<RenderItemProps>,
   | 'data'
   | 'renderItem'
@@ -145,29 +151,29 @@ type EqualHeightListProps = Omit<
   | 'refreshing'
   | 'onRefresh'
 > & {
-  items: ItemData[];
+  items: ItemT[];
   itemStyle?: StyleProp<ViewStyle>;
   ItemFC: ItemComponent;
   itemContainerStyle?: StyleProp<ViewStyle>;
   enableAlphabet: boolean;
   enableRefresh: boolean;
   enableSort?: boolean;
-  onScroll?: (item: ItemData) => void;
+  onScroll?: (item: ItemT) => void;
   onRefresh?: (state: 'started' | 'ended') => void;
   RefreshComponent?: RefreshComponentType;
   alphabet?: AlphabetType;
 };
 
-export type EqualHeightListRef = {
-  test: (data: any) => void;
+export type EqualHeightListRef<ItemT extends ItemData = ItemData> = {
+  test: (data: ItemT) => void;
 };
 
-export const EqualHeightList: (
+export const EqualHeightList: <ItemT extends ItemData = ItemData>(
   props: EqualHeightListProps,
-  ref?: React.ForwardedRef<EqualHeightListRef>
+  ref?: React.ForwardedRef<EqualHeightListRef<ItemT>>
 ) => JSX.Element = (
   props: EqualHeightListProps,
-  ref?: React.ForwardedRef<EqualHeightListRef>
+  ref?: React.ForwardedRef<EqualHeightListRef<any>>
 ): JSX.Element => {
   React.useImperativeHandle(
     ref,

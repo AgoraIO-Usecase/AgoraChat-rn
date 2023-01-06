@@ -1,3 +1,4 @@
+import type { EqualHeightListRef } from 'packages/react-native-chat-uikit/src/components/EqualHeightList';
 import * as React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import {
@@ -6,7 +7,6 @@ import {
   ItemComponent,
   ItemData,
 } from 'react-native-chat-uikit';
-import type { FlatList } from 'react-native-gesture-handler';
 
 type ItemDataType = ItemData & {
   en: string;
@@ -24,7 +24,7 @@ const Item: ItemComponent = (props) => {
 };
 
 export default function TestList2() {
-  const ref = React.useRef<FlatList>(null);
+  const ref = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
   const enableAlphabet = true;
   const data: ItemDataType[] = [];
@@ -43,7 +43,8 @@ export default function TestList2() {
     <SafeAreaView style={styles.container}>
       <Button
         onPress={() => {
-          ref.current?.scrollToEnd();
+          // ref.current?.scrollToEnd();
+          ref.current?.test({ key: 'ok' });
         }}
       >
         test
