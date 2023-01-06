@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import {
+  Button,
   EqualHeightList,
   ItemComponent,
   ItemData,
 } from 'react-native-chat-uikit';
+import type { FlatList } from 'react-native-gesture-handler';
 
 type ItemDataType = ItemData & {
   en: string;
@@ -22,6 +24,7 @@ const Item: ItemComponent = (props) => {
 };
 
 export default function TestList2() {
+  const ref = React.useRef<FlatList>(null);
   const enableRefresh = true;
   const enableAlphabet = true;
   const data: ItemDataType[] = [];
@@ -38,7 +41,15 @@ export default function TestList2() {
   data.push(...r);
   return (
     <SafeAreaView style={styles.container}>
+      <Button
+        onPress={() => {
+          ref.current?.scrollToEnd();
+        }}
+      >
+        test
+      </Button>
       <EqualHeightList
+        ref={ref}
         items={data}
         ItemFC={Item}
         enableAlphabet={enableAlphabet}

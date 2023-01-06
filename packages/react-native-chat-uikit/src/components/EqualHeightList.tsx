@@ -10,12 +10,10 @@ import {
   StyleProp,
   Text,
   TextStyle,
-  useWindowDimensions,
   View,
   ViewStyle,
 } from 'react-native';
 
-import { useHeaderContext } from '../contexts';
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
 import LoadingRN from './LoadingRN';
@@ -272,9 +270,11 @@ export const EqualHeightList: (
   const data = React.useMemo<RenderItemProps[]>(() => [], []);
   const AZ = '*ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
   const REFRESH_TIMEOUT = 1500;
-  const { defaultTopInset } = useHeaderContext();
   const listRef = React.useRef<RNFlatList>(null);
-  const heightRef = React.useRef(0);
+  const listItemHeightRef = React.useRef(0);
+  const listHeightRef = React.useRef(0);
+  const listYRef = React.useRef(0);
+  const alphabetListRef = React.useRef<View>(null);
   const responderRef = React.useRef(
     PanResponder.create({
       onMoveShouldSetPanResponderCapture: () => true,
@@ -297,7 +297,6 @@ export const EqualHeightList: (
       },
     })
   ).current;
-  const { height } = useWindowDimensions();
   const {
     alphabet,
     items,
@@ -352,7 +351,7 @@ export const EqualHeightList: (
           alphabet: alphabet,
           isFirst: isFirst,
           style: itemContainerStyle,
-          height: once === false ? heightRef : undefined,
+          height: once === false ? listItemHeightRef : undefined,
         },
       } as RenderItemProps;
     });
@@ -394,50 +393,129 @@ export const EqualHeightList: (
     return r;
   }, [RefreshComponent, enableRefresh, onRefresh]);
 
-  const _calculateAlphabetTop = React.useCallback(
-    (alphabet: AlphabetType | undefined, topInset: number) => {
-      let top = topInset;
-      if (alphabet?.alphabetContainer) {
-        const out =
-          alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-        if (out.top && typeof out.top === 'number') top += out.top;
-      } else {
-        const out =
-          styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-        if (out.top && typeof out.top === 'number') top += out.top;
-      }
-      return top;
-    },
-    []
-  );
+  // const _calculateAlphabetTop = React.useCallback(
+  //   (alphabet: AlphabetType | undefined) => {
+  //     let top = 0;
+  //     if (alphabet?.alphabetContainer) {
+  //       const out =
+  //         alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+  //       if (out.top && typeof out.top === 'number') top += out.top;
+  //     } else {
+  //       const out =
+  //         styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+  //       if (out.top && typeof out.top === 'number') top += out.top;
+  //     }
+  //     return top;
+  //   },
+  //   []
+  // );
 
-  const _calculateAlphabetHeight = React.useCallback(
-    (alphabet: AlphabetType | undefined, topInset: number, height: number) => {
-      let h = height;
-      if (alphabet?.alphabetContainer) {
-        const out =
-          alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-        if (out.top && typeof out.top === 'number') h -= out.top;
-        if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+  // const _calculateAlphabetHeight = React.useCallback(
+  //   (
+  //     alphabet: AlphabetType | undefined,
+  //     topInset: number,
+  //     screenHeight: number,
+  //     listHeight: number,
+  //     y: number
+  //   ) => {
+  //     let h2 = screenHeight - y;
+  //     let h = listHeight;
+  //     console.log('test:_calculateAlphabetHeight:', h, h2, topInset);
+  //     if (alphabet?.alphabetContainer) {
+  //       const out =
+  //         alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+  //       if (out.top && typeof out.top === 'number') h -= out.top;
+  //       if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+  //     } else {
+  //       const out =
+  //         styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+  //       // console.log('test:out:', out.top, out.bottom, defaultRatio);
+  //       if (out.top && typeof out.top === 'number') h -= out.top;
+  //       if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+  //     }
+  //     // h -= topInset;
+  //     return h;
+  //   },
+  //   []
+  // );
+
+  const callbackToAsyncSample = () => {
+    const r = new Promise((success, fail) => {
+      if (alphabetListRef?.current) {
+        alphabetListRef.current.measure(
+          (
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            pageX: number,
+            pageY: number
+          ) => {
+            console.log('test:measure:', x, y, width, height, pageX, pageY);
+            listYRef.current = pageY;
+            success(0);
+          }
+        );
       } else {
-        const out =
-          styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-        // console.log('test:out:', out.top, out.bottom, defaultRatio);
-        if (out.top && typeof out.top === 'number') h -= out.top;
-        if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+        fail();
       }
-      h -= topInset;
-      return h;
-    },
-    []
-  );
+    });
+    return r;
+  };
+
+  // type Callback = (...args: any[]) => any;
+
+  // const callbackToAsync = (callback: Callback, ...args: any[]) => {
+  //   const r = new Promise((success, fail) => {
+  //     try {
+  //       success(callback(...args));
+  //     } catch (e: any) {
+  //       fail(e);
+  //     }
+  //   });
+  //   return r;
+  // };
+
+  // why ???
+  // const _asyncSetAlphabetListPageY = () => {
+  //   if (alphabetListRef?.current) {
+  //     const nf = alphabetListRef.current.measure;
+  //     callbackToAsync(
+  //       nf,
+  //       (
+  //         x: number,
+  //         y: number,
+  //         width: number,
+  //         height: number,
+  //         pageX: number,
+  //         pageY: number
+  //       ) => {
+  //         console.log('test:measure:', x, y, width, height, pageX, pageY);
+  //         listYRef.current = pageY;
+  //       }
+  //     )
+  //       .then(() => {
+  //         console.log('test:1:');
+  //       })
+  //       .catch((error) => {
+  //         console.log('test:2:', error);
+  //       });
+  //   }
+  // };
 
   const _calculateAlphabetIndex = (y: number): number => {
-    const AZH = _calculateAlphabetHeight(alphabet, defaultTopInset, height);
-    const top = _calculateAlphabetTop(alphabet, defaultTopInset);
-    const unitH = AZH / (AZ.length + 1);
-    const index = Math.round((y - top) / unitH);
-    // console.log('test:AZH:', AZH, y, top, index);
+    const AZH = listHeightRef.current;
+    const unitH = AZH / (AZ.length + 0);
+    const index = Math.round((y - listYRef.current) / unitH);
+    console.log(
+      'test:AZH:',
+      AZH,
+      unitH,
+      y,
+      index,
+      listHeightRef.current,
+      listYRef.current
+    );
     return index;
   };
 
@@ -493,7 +571,7 @@ export const EqualHeightList: (
     const height = _calculateItemHeight(
       itemStyle,
       itemContainerStyle,
-      heightRef.current
+      listItemHeightRef.current
     );
     console.log('test:_calculateItemH:', height);
     const space = _calculateItemSpace();
@@ -505,7 +583,7 @@ export const EqualHeightList: (
     _calculateItemSpace,
     itemContainerStyle,
     itemStyle,
-    heightRef.current,
+    listItemHeightRef.current,
   ]);
 
   // too dangerous !!!
@@ -531,7 +609,7 @@ export const EqualHeightList: (
           // console.log('test:list:height:', e.nativeEvent.layout.height);
         }}
         getItemLayout={(_: any, index: number) => {
-          // console.log('test:getItemLayout:height:', heightRef.current);
+          // console.log('test:getItemLayout:height:', listItemHeightRef.current);
           // const height = _calculateItemHeight();
           // const space = _calculateItemSpace();
           // const h = height + space;
@@ -566,8 +644,18 @@ export const EqualHeightList: (
       {enableAlphabet === true ? (
         <React.Fragment>
           <Animated.View
+            ref={alphabetListRef}
             style={[styles.alphabetContainer, alphabet?.alphabetContainer]}
             pointerEvents="box-none"
+            onLayout={(event) => {
+              const h = event.nativeEvent.layout.height;
+              const y = event.nativeEvent.layout.y;
+              console.log('test:list:height:2', h, y);
+              listHeightRef.current = h;
+              // listYRef.current = y;
+              callbackToAsyncSample();
+              // _asyncSetAlphabetListPageY();
+            }}
             {...responderRef.panHandlers}
           >
             <Pressable

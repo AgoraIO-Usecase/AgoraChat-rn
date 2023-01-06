@@ -100,7 +100,7 @@ export {
   truncateContent,
   truncatedBadgeCount,
 } from './utils/format';
-export { arraySort, asyncTask, wait } from './utils/function';
+export { arraySort, asyncTask, callbackToAsync, wait } from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
 
 // declare module 'example/src/common' {
