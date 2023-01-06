@@ -43,6 +43,12 @@ export default function TestList2() {
         ItemFC={Item}
         enableAlphabet={enableAlphabet}
         enableRefresh={enableRefresh}
+        alphabet={{
+          alphabetCurrent: {
+            backgroundColor: 'orange',
+            color: 'white',
+          },
+        }}
       />
     </SafeAreaView>
   );

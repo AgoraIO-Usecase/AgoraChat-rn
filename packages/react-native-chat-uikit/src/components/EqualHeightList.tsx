@@ -15,7 +15,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { defaultRatio } from '../styles/createScaleFactor';
+import { useHeaderContext } from '../contexts';
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
 import LoadingRN from './LoadingRN';
@@ -155,6 +155,19 @@ const RenderItem = ({
   // );
 };
 
+type AlphabetType = {
+  alphabetItem?: StyleProp<TextStyle>;
+  alphabetContainer?: StyleProp<ViewStyle>;
+  alphabetCurrent?: StyleProp<TextStyle>;
+  enableToast?: boolean;
+  alphabetToast?: StyleProp<ViewStyle>;
+};
+
+type RefreshComponentType = {
+  Component: RefreshComponent;
+  props: RefreshProps;
+};
+
 type EqualHeightListProps = Omit<
   RNFlatListProps<RenderItemProps>,
   | 'data'
@@ -170,16 +183,11 @@ type EqualHeightListProps = Omit<
   itemContainerStyle?: StyleProp<ViewStyle>;
   enableAlphabet: boolean;
   enableRefresh: boolean;
+  enableSort?: boolean;
   onScroll?: (item: ItemData) => void;
   onRefresh?: (state: 'started' | 'ended') => void;
-  RefreshComponent?: {
-    Component: RefreshComponent;
-    props: RefreshProps;
-  };
-  alphabet?: {
-    alphabetItem?: StyleProp<TextStyle>;
-    alphabetContainer?: StyleProp<ViewStyle>;
-  };
+  RefreshComponent?: RefreshComponentType;
+  alphabet?: AlphabetType;
 };
 
 // export type ItemType<Params extends {}> = Params &
@@ -264,6 +272,7 @@ export const EqualHeightList: (
   const data = React.useMemo<RenderItemProps[]>(() => [], []);
   const AZ = '*ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
   const REFRESH_TIMEOUT = 1500;
+  const { defaultTopInset } = useHeaderContext();
   const listRef = React.useRef<RNFlatList>(null);
   const heightRef = React.useRef(0);
   const responderRef = React.useRef(
@@ -297,6 +306,7 @@ export const EqualHeightList: (
     itemContainerStyle,
     enableAlphabet,
     enableRefresh,
+    enableSort,
     onRefresh,
     RefreshComponent,
     ...others
@@ -305,6 +315,7 @@ export const EqualHeightList: (
   const [refreshing, setRefreshing] = React.useState(false);
   const [isMoving, setIsMoving] = React.useState(false);
   const [lastChar, setLastChar] = React.useState('');
+  const [loading, setLoading] = React.useState(true);
 
   // const useRenderItemW = React.useCallback(
   //   ({ item }: ListRenderItemInfo<RenderItemProps>): JSX.Element => {
@@ -351,15 +362,18 @@ export const EqualHeightList: (
   React.useEffect(() => {
     // data.length = 0;
     // data.splice(0, data.length);
-    // arraySort(items);
+    // if (enableSort === true) arraySort(items);
     // _onInit();
     // listRef.current?.scrollToIndex({ index: 0, animated: true });
     // listRef.current?.scrollToEnd();
-  }, [_onInit, items, data]);
+  }, []);
 
-  data.splice(0, data.length);
-  arraySort(items);
-  _onInit();
+  if (loading) {
+    data.splice(0, data.length);
+    if (enableSort === true) arraySort(items);
+    _onInit();
+    setLoading(false);
+  }
 
   const _onRefresh = React.useCallback(() => {
     if (enableRefresh === undefined || enableRefresh === false) {
@@ -380,47 +394,59 @@ export const EqualHeightList: (
     return r;
   }, [RefreshComponent, enableRefresh, onRefresh]);
 
-  const _calculateAlphabetTop = React.useCallback(() => {
-    let top = 44;
-    if (alphabet?.alphabetContainer) {
-      const out =
-        alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-      if (out.top && typeof out.top === 'number') top += out.top;
-    } else {
-      const out = styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-      if (out.top && typeof out.top === 'number') top += out.top;
-    }
-    return top;
-  }, [alphabet?.alphabetContainer]);
+  const _calculateAlphabetTop = React.useCallback(
+    (alphabet: AlphabetType | undefined, topInset: number) => {
+      let top = topInset;
+      if (alphabet?.alphabetContainer) {
+        const out =
+          alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+        if (out.top && typeof out.top === 'number') top += out.top;
+      } else {
+        const out =
+          styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+        if (out.top && typeof out.top === 'number') top += out.top;
+      }
+      return top;
+    },
+    []
+  );
 
-  const _calculateAlphabetHeight = React.useCallback(() => {
-    let h = height;
-    if (alphabet?.alphabetContainer) {
-      const out =
-        alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-      if (out.top && typeof out.top === 'number') h -= out.top;
-      if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
-    } else {
-      const out = styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
-      console.log('test:out:', out.top, out.bottom, defaultRatio);
-      if (out.top && typeof out.top === 'number') h -= out.top;
-      if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
-    }
-    h -= 44;
-    return h;
-  }, [alphabet?.alphabetContainer, height]);
+  const _calculateAlphabetHeight = React.useCallback(
+    (alphabet: AlphabetType | undefined, topInset: number, height: number) => {
+      let h = height;
+      if (alphabet?.alphabetContainer) {
+        const out =
+          alphabet.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+        if (out.top && typeof out.top === 'number') h -= out.top;
+        if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+      } else {
+        const out =
+          styles.alphabetContainer as StyleProp<ViewStyle> as ViewStyle;
+        // console.log('test:out:', out.top, out.bottom, defaultRatio);
+        if (out.top && typeof out.top === 'number') h -= out.top;
+        if (out.bottom && typeof out.bottom === 'number') h -= out.bottom;
+      }
+      h -= topInset;
+      return h;
+    },
+    []
+  );
 
-  const _calculateAlphabetIndex = (y0: number): number => {
-    const AZH = _calculateAlphabetHeight();
-    const top = _calculateAlphabetTop();
+  const _calculateAlphabetIndex = (y: number): number => {
+    const AZH = _calculateAlphabetHeight(alphabet, defaultTopInset, height);
+    const top = _calculateAlphabetTop(alphabet, defaultTopInset);
     const unitH = AZH / (AZ.length + 1);
-    const index = Math.round((y0 - top) / unitH);
-    console.log('test:AZH:', AZH, y0, top, index);
+    const index = Math.round((y - top) / unitH);
+    // console.log('test:AZH:', AZH, y, top, index);
     return index;
   };
 
   const _calculateItemHeight = React.useCallback(
-    (itemStyle, itemContainerStyle, height) => {
+    (
+      itemStyle: StyleProp<ViewStyle> | undefined,
+      itemContainerStyle: StyleProp<ViewStyle> | undefined,
+      height: number
+    ) => {
       let h = 0;
       if (itemStyle) {
         const out = itemStyle as StyleProp<ViewStyle> as ViewStyle;
@@ -431,6 +457,7 @@ export const EqualHeightList: (
         if (out.height && typeof out.height === 'number') h += out.height;
       }
       if (itemStyle === undefined && itemContainerStyle === undefined) {
+        // If you need to dynamically calculate the height, the positioning may be delayed. Specifically, clicking on a letter to locate will fail the first time.
         h = height;
       }
       // console.log('test:_calculateItemHeight:', h);
@@ -547,27 +574,42 @@ export const EqualHeightList: (
               pointerEvents="box-only"
               style={{
                 flex: 1,
-                width: 25,
+                width: 18,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: 'blue',
+                // borderRadius: 10,
+                backgroundColor: 'white',
               }}
             >
               {AZ.split('').map((char) => {
                 return (
-                  <Text
-                    style={[styles.alphabetItem, alphabet?.alphabetItem]}
-                    key={char}
-                  >
-                    {char}
-                  </Text>
+                  <View key={char} style={styles.alphabetView}>
+                    <Text
+                      style={[
+                        styles.alphabetItem,
+                        alphabet?.alphabetItem,
+                        lastChar === char
+                          ? alphabet?.alphabetCurrent
+                          : undefined,
+                      ]}
+                    >
+                      {char}
+                    </Text>
+                  </View>
                 );
               })}
             </Pressable>
           </Animated.View>
           {isMoving && (
-            <View style={styles.char}>
-              <Text>{lastChar}</Text>
+            <View
+              style={[
+                styles.char,
+                alphabet?.enableToast === true
+                  ? alphabet?.alphabetToast
+                  : undefined,
+              ]}
+            >
+              <Text style={styles.chatText}>{lastChar}</Text>
             </View>
           )}
         </React.Fragment>
@@ -617,25 +659,36 @@ const styles = createStyleSheet({
     width: 40,
     // height: '100%',
     margin: 0,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',
     alignContent: 'center',
     direction: 'rtl',
   },
   alphabetItem: {
-    width: 10,
+    width: 18,
     flex: 1,
     display: 'flex',
     fontSize: 14,
-    backgroundColor: 'green',
+    textAlign: 'center',
+    backgroundColor: 'white',
+  },
+  alphabetView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 18,
+    flex: 1,
+    display: 'flex',
+    borderRadius: 9,
+    overflow: 'hidden',
+    backgroundColor: 'red',
   },
   char: {
     flex: 1,
     position: 'absolute',
     width: 50,
     height: 50,
-    backgroundColor: 'gray',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     borderRadius: 6,
     color: '#fff',
     fontSize: 24,
@@ -645,6 +698,9 @@ const styles = createStyleSheet({
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
+  },
+  chatText: {
+    color: 'white',
   },
 });
 
