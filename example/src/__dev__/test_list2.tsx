@@ -1,12 +1,23 @@
 import type { EqualHeightListRef } from 'packages/react-native-chat-uikit/src/components/EqualHeightList';
 import * as React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import {
+  AppRegistry,
+  RefreshControlProps,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {
   Button,
   EqualHeightList,
   ItemComponent,
   ItemData,
+  LocalIcon,
+  SearchBar,
 } from 'react-native-chat-uikit';
+import { RefreshControl } from 'react-native-gesture-handler';
 
 type ItemDataType = ItemData & {
   en: string;
@@ -23,10 +34,33 @@ const Item: ItemComponent = (props) => {
   );
 };
 
+const CustomRefreshComponent = (props: RefreshControlProps) => {
+  const { refreshing } = props;
+  return (
+    <RefreshControl
+      refreshing={refreshing}
+      style={{ justifyContent: 'center', alignItems: 'center' }}
+    >
+      <View
+        style={{
+          width: 50,
+          height: 50,
+          backgroundColor: 'red',
+          marginTop: 50,
+        }}
+      />
+    </RefreshControl>
+  );
+};
+
 export default function TestList2() {
   const ref = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
   const enableAlphabet = true;
+  const enableHeader = true;
+  const useCustomRefresh = false;
+  const enableCancel = false;
+  const enableClear = true;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -39,6 +73,89 @@ export default function TestList2() {
     } as ItemDataType;
   });
   data.push(...r);
+
+  const s = {
+    type: (props: RefreshControlProps) => {
+      const { onRefresh, refreshing, progressViewOffset, ...others } = props;
+      console.log('test:', onRefresh, progressViewOffset);
+      return (
+        <View
+          style={{
+            height: 30,
+            width: 30,
+            backgroundColor: '#f9c2ff',
+            opacity: refreshing ? 0 : 1,
+          }}
+          {...others}
+        >
+          <LocalIcon name="loading" size={20} />
+        </View>
+      );
+    },
+    props: {
+      refreshing: true,
+      progressViewOffset: 100,
+    },
+    key: 'CustomRefreshComponent',
+  };
+
+  const s3 = {
+    // Component: {
+    //   type: (props: RefreshControlProps) => {
+    //     const { onRefresh, refreshing, progressViewOffset, ...others } =
+    //       props;
+    //     console.log('test:', onRefresh, progressViewOffset);
+    //     return (
+    //       <View
+    //         style={{
+    //           height: 30,
+    //           width: 30,
+    //           backgroundColor: '#f9c2ff',
+    //           opacity: refreshing ? 0 : 1,
+    //         }}
+    //         {...others}
+    //       >
+    //         <LocalIcon name="loading" size={20} />
+    //       </View>
+    //     );
+    //   },
+    //   props: {
+    //     refreshing: true,
+    //     progressViewOffset: 100,
+    //   },
+    //   key: 'CustomRefreshComponent',
+    // },
+    Component: <CustomRefreshComponent refreshing />,
+    props: {
+      refreshing: true,
+    },
+  };
+
+  AppRegistry.registerComponent(s.key, () => s.type);
+  console.log('test:AppRegistry:', AppRegistry.getAppKeys());
+
+  // const s2 = {
+  //   Component: (props: any) => (
+  //     <View {...props}>
+  //       <Text>h</Text>
+  //     </View>
+  //   ),
+  //   props: {
+  //     backgroundColor: 'red',
+  //   },
+  // };
+
+  const s4 = {
+    Component: (props: any) => (
+      <View {...props}>
+        <SearchBar enableCancel={enableCancel} enableClear={enableClear} />
+      </View>
+    ),
+    props: {
+      backgroundColor: 'red',
+    },
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Button
@@ -55,12 +172,15 @@ export default function TestList2() {
         ItemFC={Item}
         enableAlphabet={enableAlphabet}
         enableRefresh={enableRefresh}
+        enableHeader={enableHeader}
         alphabet={{
           alphabetCurrent: {
             backgroundColor: 'orange',
             color: 'white',
           },
         }}
+        RefreshComponent={useCustomRefresh ? s3 : undefined}
+        HeaderComponent={enableHeader === true ? s4 : undefined}
       />
     </SafeAreaView>
   );

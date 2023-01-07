@@ -7,6 +7,7 @@ import {
   ListRenderItemInfo,
   PanResponder,
   Pressable,
+  RefreshControlProps,
   StyleProp,
   Text,
   TextStyle,
@@ -16,7 +17,6 @@ import {
 
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
-import LoadingRN from './LoadingRN';
 
 export interface ItemData {
   key: string;
@@ -47,8 +47,8 @@ type RenderItemProps = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface RefreshProps {}
-export type RefreshComponent = (props: RefreshProps) => JSX.Element;
+export interface ListHeaderProps {}
+export type ListHeaderComponent = (props: ListHeaderProps) => JSX.Element;
 
 const DefaultItem: ItemComponent = (props: ItemProps): JSX.Element => {
   return <Text style={[styles.item, props.style]}>{props.data.key}</Text>;
@@ -131,9 +131,14 @@ type AlphabetType = {
   alphabetToast?: StyleProp<ViewStyle>;
 };
 
-type RefreshComponentType = {
-  Component: RefreshComponent;
-  props: RefreshProps;
+type ListHeaderComponentType = {
+  Component: React.ComponentType<ListHeaderProps>;
+  props: ListHeaderProps;
+};
+
+type ListRefreshComponentType = {
+  Component: React.ReactElement<RefreshControlProps>;
+  props: RefreshControlProps;
 };
 
 type EqualHeightListProps = Omit<
@@ -151,10 +156,12 @@ type EqualHeightListProps = Omit<
   itemContainerStyle?: StyleProp<ViewStyle>;
   enableAlphabet: boolean;
   enableRefresh: boolean;
+  enableHeader: boolean;
   enableSort?: boolean;
   onScroll?: (item: ItemData) => void;
   onRefresh?: (state: 'started' | 'ended') => void;
-  RefreshComponent?: RefreshComponentType;
+  RefreshComponent?: ListRefreshComponentType;
+  HeaderComponent?: ListHeaderComponentType;
   alphabet?: AlphabetType;
 };
 
@@ -217,9 +224,11 @@ export const EqualHeightList: (
     itemContainerStyle,
     enableAlphabet,
     enableRefresh,
+    enableHeader,
     enableSort,
     onRefresh,
     RefreshComponent,
+    HeaderComponent,
     ...others
   } = props;
 
@@ -269,10 +278,11 @@ export const EqualHeightList: (
     setLoading(false);
   }
 
-  const _onRefresh = React.useCallback(() => {
+  const _onRefresh = React.useCallback((): void => {
+    console.log('test:_onRefresh:', enableRefresh);
     if (enableRefresh === undefined || enableRefresh === false) {
       setRefreshing(false);
-      return null;
+      return;
     }
     setRefreshing(true);
     onRefresh?.('started');
@@ -280,13 +290,21 @@ export const EqualHeightList: (
       setRefreshing(false);
       onRefresh?.('ended');
     });
-    const r = React.memo(() => {
-      if (RefreshComponent)
-        return <RefreshComponent.Component {...RefreshComponent.props} />;
-      return <LoadingRN size="large" />;
-    });
-    return r;
-  }, [RefreshComponent, enableRefresh, onRefresh]);
+    // const r = React.memo(() => {
+    //   if (RefreshComponent) {
+    //     return <RefreshComponent.Component {...RefreshComponent.props} />;
+    //   }
+    //   return <LoadingRN size="large" />;
+    // });
+    // return r;
+  }, [enableRefresh, onRefresh]);
+
+  // const RefreshComponentInternal = React.memo(() => {
+  //   if (RefreshComponent) {
+  //     return <RefreshComponent.Component {...RefreshComponent.props} />;
+  //   }
+  //   return <LoadingRN size="large" />;
+  // });
 
   const _asyncSetAlphabetListPageY = () => {
     const r = new Promise((success, fail) => {
@@ -420,9 +438,23 @@ export const EqualHeightList: (
         }}
         refreshing={enableRefresh === true ? refreshing : undefined}
         onRefresh={enableRefresh === true ? _onRefresh : undefined}
+        refreshControl={
+          enableRefresh === true
+            ? RefreshComponent
+              ? RefreshComponent.Component
+              : undefined
+            : undefined
+        }
         onEndReached={(info) => {
           console.log('test:info:', info.distanceFromEnd);
         }}
+        ListHeaderComponent={
+          enableHeader === true
+            ? HeaderComponent
+              ? () => <HeaderComponent.Component {...HeaderComponent.props} />
+              : undefined
+            : undefined
+        }
         // stickyHeaderIndices={[0]}
         {...others}
       />

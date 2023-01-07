@@ -228,8 +228,9 @@ const styles = createStyleSheet({
     overflow: 'hidden',
   },
   inputContainer: {
+    backgroundColor: 'rgba(242, 242, 242, 1)',
+    borderRadius: 24,
     borderBottomWidth: 0,
-    borderRadius: 9,
     minHeight: 36,
     marginLeft: 8,
     marginRight: 8,
