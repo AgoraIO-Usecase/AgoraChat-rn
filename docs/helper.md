@@ -11,3 +11,7 @@
 [color names](https://reactnative.cn/docs/next/colors#%E9%A2%9C%E8%89%B2%E5%90%8D%E7%A7%B0)
 [color names](https://reactnative.dev/docs/colors#named-colors)
 [react native examples](https://reactnativeexample.com/)
+[uikit references](https://github.com/react-native-elements/react-native-elements)
+[uikit references](https://github.com/xotahal/react-native-material-ui)
+[uikit references](https://github.com/wix/react-native-ui-lib)
+[callkit or callkeep](https://github.com/react-native-webrtc/react-native-callkeep)
