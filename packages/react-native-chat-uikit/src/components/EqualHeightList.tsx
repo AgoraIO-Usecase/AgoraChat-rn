@@ -1,4 +1,5 @@
 /* eslint-disable react/no-unused-prop-types */
+
 import * as React from 'react';
 import {
   Animated,
@@ -83,20 +84,20 @@ const RenderItemInternal = React.memo(
         <Item {...itemProps} />
       </ItemContainer>
     );
-  },
-  (a, b) => {
-    if (
-      a.item.itemProps.data === b.item.itemProps.data &&
-      a.item.itemContainerProps.alphabet ===
-        b.item.itemContainerProps.alphabet &&
-      a.item.itemContainerProps.height === b.item.itemContainerProps.height &&
-      a.item.itemContainerProps.index === b.item.itemContainerProps.index &&
-      a.item.itemContainerProps.isFirst === b.item.itemContainerProps.isFirst
-    ) {
-      return true;
-    }
-    return false;
   }
+  // (a, b) => {
+  //   if (
+  //     a.item.itemProps.data === b.item.itemProps.data &&
+  //     a.item.itemContainerProps.alphabet ===
+  //       b.item.itemContainerProps.alphabet &&
+  //     a.item.itemContainerProps.height === b.item.itemContainerProps.height &&
+  //     a.item.itemContainerProps.index === b.item.itemContainerProps.index &&
+  //     a.item.itemContainerProps.isFirst === b.item.itemContainerProps.isFirst
+  //   ) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
 );
 
 // let RenderItemCount = 0;
@@ -165,8 +166,15 @@ type EqualHeightListProps = Omit<
   alphabet?: AlphabetType;
 };
 
+export type ListItemUpdateType = {
+  type: 'add' | 'del' | 'update' | 'clear';
+  data?: ItemData[];
+  enableSort?: boolean;
+};
+
 export type EqualHeightListRef = {
   test: (data: any) => void;
+  manualRefresh: (updateItems: ListItemUpdateType[]) => void;
 };
 
 export const EqualHeightList: (
@@ -182,11 +190,17 @@ export const EqualHeightList: (
       test: <ItemT extends ItemData = ItemData>(value: ItemT) => {
         console.log('test:ref:', value);
       },
+      manualRefresh: (updateItems: ListItemUpdateType[]) => {
+        console.log('test:manualRefresh:', updateItems);
+        _handleManualRefresh(updateItems);
+      },
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
-  const data = React.useMemo<RenderItemProps[]>(() => [], []);
+  // const data = React.useMemo<RenderItemProps[]>(() => [], []);
+  const [data, setData] = React.useState<RenderItemProps[]>([]);
   const AZ = '*ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
   const REFRESH_TIMEOUT = 1500;
   const listRef = React.useRef<RNFlatList>(null);
@@ -237,44 +251,49 @@ export const EqualHeightList: (
   const [lastChar, setLastChar] = React.useState('');
   const [loading, setLoading] = React.useState(true);
 
-  const _onInit = React.useCallback(() => {
-    console.log('test:_onInit:');
-    const obj = {} as any;
-    let once = false;
-    const r = items.map((item, index) => {
-      let isFirst = false;
-      const alphabet = item.key[0] ? item.key[0] : '#';
-      if (obj[alphabet]) {
-        isFirst = false;
-      } else {
-        isFirst = true;
-        obj[alphabet] = true;
-      }
-      return {
-        Item: ItemFC ?? DefaultItem,
-        itemProps: {
-          data: item,
-          style: itemStyle,
-        },
-        ItemContainer: DefaultItemContainer,
-        itemContainerProps: {
-          index: index,
-          alphabet: alphabet,
-          isFirst: isFirst,
-          style: itemContainerStyle,
-          height: once === false ? listItemHeightRef : undefined,
-        },
-      } as RenderItemProps;
-    });
-    data.push(...r);
-  }, [ItemFC, data, itemContainerStyle, itemStyle, items]);
+  const _prepareData = React.useCallback(
+    (items: ItemData[]) => {
+      console.log('test:_prepareData:', items.length);
+      const obj = {} as any;
+      let once = false;
+      const r = items.map((item, index) => {
+        let isFirst = false;
+        const alphabet = item.key[0] ? item.key[0] : '#';
+        if (obj[alphabet]) {
+          isFirst = false;
+        } else {
+          isFirst = true;
+          obj[alphabet] = true;
+        }
+        return {
+          Item: ItemFC ?? DefaultItem,
+          itemProps: {
+            data: item,
+            style: itemStyle,
+          },
+          ItemContainer: DefaultItemContainer,
+          itemContainerProps: {
+            index: index,
+            alphabet: alphabet,
+            isFirst: isFirst,
+            style: itemContainerStyle,
+            height: once === false ? listItemHeightRef : undefined,
+          },
+        } as RenderItemProps;
+      });
+      data.push(...r);
+      console.log('test:data:length:', data.length);
+      // setData(data);
+    },
+    [ItemFC, data, itemContainerStyle, itemStyle]
+  );
 
   React.useEffect(() => {}, []);
 
   if (loading) {
     data.splice(0, data.length);
     if (enableSort === true) arraySort(items);
-    _onInit();
+    _prepareData(items);
     setLoading(false);
   }
 
@@ -290,21 +309,7 @@ export const EqualHeightList: (
       setRefreshing(false);
       onRefresh?.('ended');
     });
-    // const r = React.memo(() => {
-    //   if (RefreshComponent) {
-    //     return <RefreshComponent.Component {...RefreshComponent.props} />;
-    //   }
-    //   return <LoadingRN size="large" />;
-    // });
-    // return r;
   }, [enableRefresh, onRefresh]);
-
-  // const RefreshComponentInternal = React.memo(() => {
-  //   if (RefreshComponent) {
-  //     return <RefreshComponent.Component {...RefreshComponent.props} />;
-  //   }
-  //   return <LoadingRN size="large" />;
-  // });
 
   const _asyncSetAlphabetListPageY = () => {
     const r = new Promise((success, fail) => {
@@ -394,6 +399,50 @@ export const EqualHeightList: (
     }
   };
 
+  const _handleManualRefresh = (updateItems: ListItemUpdateType[]) => {
+    for (const item of updateItems) {
+      switch (item.type) {
+        case 'add':
+          if (item.data) {
+            _prepareData(item.data);
+          }
+          if (item.enableSort === true) {
+            data.sort((a, b) => {
+              if (a.itemProps.data.key > b.itemProps.data.key) {
+                return 1;
+              } else if (a.itemProps.data.key < b.itemProps.data.key) {
+                return -1;
+              } else {
+                return 0;
+              }
+            });
+          }
+          break;
+        case 'update':
+          if (item.data) {
+            for (const d of item.data) {
+              for (const dd of data) {
+                if (dd.itemProps.data.key === d.key) {
+                  console.log('test:key:', d.key, dd.itemProps.data, d);
+                  dd.itemProps.data = d;
+                  break;
+                }
+              }
+            }
+          }
+          break;
+        case 'del':
+          throw new Error('Array deletion is expensive.');
+        case 'clear':
+          data.splice(0, data.length);
+          break;
+        default:
+          throw new Error(`This type ${item.type} is not supported.`);
+      }
+    }
+    setData([...data]);
+  };
+
   const _calculateItemH = React.useMemo(() => {
     const height = _calculateItemHeight(
       itemStyle,
@@ -413,7 +462,7 @@ export const EqualHeightList: (
     listItemHeightRef.current,
   ]);
 
-  const r: any = (
+  const r = (
     <View style={styles.container}>
       <RNFlatList
         ref={(value) => {
@@ -423,6 +472,7 @@ export const EqualHeightList: (
           }
         }}
         data={data}
+        extraData={data}
         renderItem={RenderItem}
         getItemLayout={(_: any, index: number) => {
           const h = _calculateItemH;
@@ -434,7 +484,8 @@ export const EqualHeightList: (
           return r;
         }}
         keyExtractor={(item: RenderItemProps) => {
-          return item.itemContainerProps.index.toString();
+          // console.log('test:keyExtractor:', item.itemProps.data.key);
+          return item.itemProps.data.key;
         }}
         refreshing={enableRefresh === true ? refreshing : undefined}
         onRefresh={enableRefresh === true ? _onRefresh : undefined}

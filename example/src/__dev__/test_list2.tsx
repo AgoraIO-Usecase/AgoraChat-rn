@@ -54,6 +54,7 @@ const CustomRefreshComponent = (props: RefreshControlProps) => {
 };
 
 export default function TestList2() {
+  let count = 0;
   const ref = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
   const enableAlphabet = true;
@@ -160,11 +161,77 @@ export default function TestList2() {
     <SafeAreaView style={styles.container}>
       <Button
         onPress={() => {
-          // ref.current?.scrollToEnd();
-          ref.current?.test({ key: 'ok' });
+          const en = 'aaa';
+          const v = en + count++;
+          ref.current?.manualRefresh([
+            {
+              type: 'add',
+              data: [
+                {
+                  en: v,
+                  ch: v,
+                  key: v,
+                } as ItemData,
+              ],
+              enableSort: true,
+            },
+          ]);
         }}
       >
-        test
+        sort add data
+      </Button>
+      <Button
+        onPress={() => {
+          const en = 'eee';
+          const v = en + count++;
+          ref.current?.manualRefresh([
+            {
+              type: 'add',
+              data: [
+                {
+                  en: v,
+                  ch: v,
+                  key: v,
+                } as ItemData,
+              ],
+              enableSort: false,
+            },
+          ]);
+        }}
+      >
+        add data
+      </Button>
+      <Button
+        onPress={() => {
+          ref.current?.manualRefresh([
+            {
+              type: 'clear',
+            },
+          ]);
+        }}
+      >
+        clear data
+      </Button>
+      <Button
+        onPress={() => {
+          const en = 'Angola';
+          const v = en + count++;
+          ref.current?.manualRefresh([
+            {
+              type: 'update',
+              data: [
+                {
+                  en: en,
+                  ch: v,
+                  key: en,
+                } as ItemData,
+              ],
+              enableSort: false,
+            },
+          ]);
+        }}
+      >
+        update data
       </Button>
       <EqualHeightList
         ref={ref}
@@ -181,6 +248,25 @@ export default function TestList2() {
         }}
         RefreshComponent={useCustomRefresh ? s3 : undefined}
         HeaderComponent={enableHeader === true ? s4 : undefined}
+        onRefresh={(type) => {
+          if (type === 'started') {
+            const en = 'aaa';
+            const v = en + count++;
+            ref.current?.manualRefresh([
+              {
+                type: 'add',
+                data: [
+                  {
+                    en: v,
+                    ch: v,
+                    key: v,
+                  } as ItemData,
+                ],
+                enableSort: true,
+              },
+            ]);
+          }
+        }}
       />
     </SafeAreaView>
   );

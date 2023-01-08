@@ -11,7 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { LoadingRN } from 'react-native-chat-uikit';
+import { Button, LoadingRN } from 'react-native-chat-uikit';
 
 const Item = (item: ItemType): JSX.Element => {
   // console.log('test:', id, first);
@@ -47,7 +47,9 @@ const wait = (timeout: number) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
+let count = 0;
 export default function TestListPrototype() {
+  const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [isMoving, setIsMoving] = React.useState(false);
   const initY = React.useRef(new Animated.Value(0)).current;
@@ -129,8 +131,14 @@ export default function TestListPrototype() {
     return AZ[index];
   };
 
-  const data = initData();
+  const [data, setData] = React.useState<ItemType[]>([]);
   const panResponder = usePanResponder(initY);
+
+  if (loading) {
+    const d = initData();
+    setData(d);
+    setLoading(false);
+  }
 
   // const refff = React.useRef<View>();
 
@@ -154,9 +162,47 @@ export default function TestListPrototype() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Button
+        onPress={() => {
+          if (data.length > 0) {
+            const last = data[data.length - 1] as ItemType;
+            const v = last.en + (count++).toString();
+            const d = {
+              id: last.id + 1,
+              en: v,
+              ch: v,
+              height: 79.666,
+            };
+            data.push(d as ItemType);
+            setData([...data]);
+          } else {
+            const id = count;
+            const v = 'zuoyu' + (count++).toString();
+            const d = {
+              id: id,
+              en: v,
+              ch: v,
+              height: 79.666,
+            };
+            setData([d as ItemType]);
+          }
+        }}
+      >
+        add item
+      </Button>
+      <Button
+        onPress={() => {
+          if (data.length > 0) {
+            setData([]);
+          }
+        }}
+      >
+        clear
+      </Button>
       <FlatList
         ref={ref}
         data={data}
+        extraData={data}
         renderItem={renderItem}
         onLayout={(e) => {
           console.log('test:list:height:', e.nativeEvent.layout.height);
