@@ -41,8 +41,9 @@ export type SearchBarProps = Omit<
 
 function SearchBar(
   props: SearchBarProps,
-  ref: React.Ref<RNTextInput>
+  ref?: React.Ref<RNTextInput>
 ): JSX.Element {
+  // console.log('test:SearchBar:');
   const { colors } = useThemeContext();
   const {
     containerStyle,
@@ -60,53 +61,28 @@ function SearchBar(
     onClear,
     onBlur,
     onFocus,
+    onChangeText,
+    value,
     clearButtonMode,
+    placeholder,
     ...others
   } = props;
 
-  const [value, setValue] = React.useState('');
+  // const inputRef = React.useRef<RNTextInput>(null);
+  // const [_value, setValue] = React.useState('');
   const [hasFocus, setHasFocus] = React.useState(false);
   const [cancelButtonWidth, setCancelButtonWidth] = React.useState(0);
-  const [isEmpty, setIsEmpty] = React.useState(true);
-
-  // let inputRef = React.useRef(null);
-
-  // React.useEffect(() => {
-  //   return () => {
-  //     const f = ref as React.RefObject<RNTextInput>;
-  //     f.current?.blur();
-  //   };
-  // }, [ref]);
-
-  // let s1 = React.useRef<RNTextInput>(null);
-  // s1.current?.blur();
-  // let s2 = React.useRef<typeof RNTextInput>(null);
-  // s2.current?.arguments();
-  // // let s3 = React.useRef<TextInput>(null);
-  // let s4 = React.useRef<typeof TextInput>(null);
-  // s4.current?.arguments();
-
-  // const sdf = ref as React.RefObject<RNTextInput> | undefined;
-  // sdf?.current?.blur();
-  //   sdf?.current?.blur();
-
-  // const ssss = (ref: React.Ref<RNTextInput>) => {
-  //   const sdf = ref as React.RefObject<RNTextInput> | undefined;
-  //   sdf?.current?.blur();
-  // }
-  // const sss = React.RefObject<RNTextInput>;
-  // let s = React.useRef<RNTextInput>(null);
-  // s.current?.blur();
-  // const ref2 = React.useRef<ScrollView>(null);
-  // const ss = inputStyle as TextStyle;
-  // console.log(ss);
+  const [isEmpty, setIsEmpty] = React.useState(
+    value?.length === 0 ? true : false
+  );
 
   const _onFocus = (e: any) => {
     setHasFocus(true);
     if (enableCancel) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    if (onFocus) asyncTask(onFocus, e);
+    // if (onFocus) asyncTask(onFocus, e);
+    onFocus?.(e);
   };
 
   const _onBlur = (e: any) => {
@@ -114,11 +90,13 @@ function SearchBar(
     if (enableCancel) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
-    if (onBlur) asyncTask(onBlur, e);
+    onBlur?.(e);
+    // if (onBlur) asyncTask(onBlur, e);
   };
 
   const _onChangeText = (text: string) => {
-    setValue(text);
+    // console.log('test:_onChangeText:', text);
+    onChangeText?.(text);
     setIsEmpty(text.length === 0);
   };
 
@@ -129,9 +107,12 @@ function SearchBar(
   };
 
   const _onClear = () => {
-    setValue('');
+    onChangeText?.('');
     setIsEmpty(true);
-    if (onClear) asyncTask(onClear);
+    onClear?.();
+    // if (onClear) asyncTask(onClear);
+    // if (onClear) process.nextTick(onClear);
+    // inputRef.current?.blur();
   };
 
   return (
@@ -143,7 +124,18 @@ function SearchBar(
       ])}
     >
       <TextInput
-        ref={ref}
+        ref={(instance) => {
+          if (instance) {
+            if (ref) {
+              const s = ref as React.MutableRefObject<RNTextInput>;
+              s.current = instance;
+            }
+            // const s = inputRef as React.MutableRefObject<RNTextInput>;
+            // s.current = instance;
+          }
+        }}
+        multiline={false}
+        placeholder={placeholder}
         clearButtonMode={clearButtonMode}
         editable={!disabled}
         onFocus={_onFocus}
@@ -224,23 +216,23 @@ const styles = createStyleSheet({
     alignItems: 'center',
   },
   input: {
-    marginLeft: 6,
+    marginLeft: 0,
     overflow: 'hidden',
   },
   inputContainer: {
     backgroundColor: 'rgba(242, 242, 242, 1)',
-    borderRadius: 24,
+    borderRadius: 18,
     borderBottomWidth: 0,
     minHeight: 36,
-    marginLeft: 8,
-    marginRight: 8,
+    marginLeft: 0,
+    marginRight: 0,
     overflow: 'hidden',
   },
   rightIconContainerStyle: {
-    marginRight: 8,
+    marginRight: 0,
   },
   leftIconContainerStyle: {
-    marginLeft: 8,
+    marginLeft: 4,
   },
   buttonTextStyle: {
     color: '#007aff',
@@ -253,4 +245,8 @@ const styles = createStyleSheet({
   },
 });
 
-export default React.forwardRef<RNTextInput, SearchBarProps>(SearchBar);
+export const SearchBarRef = React.forwardRef<RNTextInput, SearchBarProps>(
+  SearchBar
+);
+
+export default React.memo(SearchBarRef);

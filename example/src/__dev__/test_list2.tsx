@@ -12,19 +12,19 @@ import {
 import {
   Button,
   EqualHeightList,
-  ItemComponent,
-  ItemData,
+  EqualHeightListItemComponent,
+  EqualHeightListItemData,
   LocalIcon,
   SearchBar,
 } from 'react-native-chat-uikit';
 import { RefreshControl } from 'react-native-gesture-handler';
 
-type ItemDataType = ItemData & {
+type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
 };
 
-const Item: ItemComponent = (props) => {
+const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
   return (
     <View style={styles.item}>
@@ -77,8 +77,9 @@ export default function TestList2() {
 
   const s = {
     type: (props: RefreshControlProps) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { onRefresh, refreshing, progressViewOffset, ...others } = props;
-      console.log('test:', onRefresh, progressViewOffset);
+      // console.log('test:', onRefresh, progressViewOffset);
       return (
         <View
           style={{
@@ -171,7 +172,7 @@ export default function TestList2() {
                   en: v,
                   ch: v,
                   key: v,
-                } as ItemData,
+                } as EqualHeightListItemData,
               ],
               enableSort: true,
             },
@@ -192,7 +193,7 @@ export default function TestList2() {
                   en: v,
                   ch: v,
                   key: v,
-                } as ItemData,
+                } as EqualHeightListItemData,
               ],
               enableSort: false,
             },
@@ -224,7 +225,7 @@ export default function TestList2() {
                   en: en,
                   ch: v,
                   key: en,
-                } as ItemData,
+                } as EqualHeightListItemData,
               ],
               enableSort: false,
             },
@@ -260,7 +261,7 @@ export default function TestList2() {
                     en: v,
                     ch: v,
                     key: v,
-                  } as ItemData,
+                  } as EqualHeightListItemData,
                 ],
                 enableSort: true,
               },

@@ -198,7 +198,7 @@ function TextInputEx(
               leftIconContainerStyle,
             ])}
           >
-            <LocalIcon name={leftIconName} color="#999999" />
+            <LocalIcon name={leftIconName} color="#999999" size={36} />
           </View>
         )}
 
@@ -215,7 +215,7 @@ function TextInputEx(
               backgroundColor: getStateColor(disabled).background,
               fontSize: 18,
               flex: 1,
-              minHeight: 40,
+              minHeight: 36,
             },
             inputStyle,
             disabled && styles.disabledInput,
@@ -233,7 +233,7 @@ function TextInputEx(
             ])}
             onPress={rightIconOnPress}
           >
-            <LocalIcon name={rightIconName} color="#999999" />
+            <LocalIcon name={rightIconName} color="#999999" size={36} />
           </Pressable>
         )}
       </Animated.View>
@@ -250,11 +250,11 @@ const styles = createStyleSheet({
     opacity: 0.5,
   },
   iconContainer: {
-    height: 40,
+    height: 0,
     justifyContent: 'center',
     alignItems: 'center',
     paddingRight: 4,
-    paddingLeft: 4,
+    paddingLeft: 0,
     marginVertical: 4,
   },
 });

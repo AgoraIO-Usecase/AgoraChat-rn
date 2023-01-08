@@ -19,6 +19,9 @@ export class AppStringSet extends UIKitStringSet2 {
     back: string;
     comment: (code: number) => string;
   };
+  search: {
+    placeholder: string;
+  };
   constructor(locate: Locale = en) {
     super(locate);
     this.login = {
@@ -51,6 +54,9 @@ export class AppStringSet extends UIKitStringSet2 {
             return '';
         }
       },
+    };
+    this.search = {
+      placeholder: 'Search',
     };
   }
 }

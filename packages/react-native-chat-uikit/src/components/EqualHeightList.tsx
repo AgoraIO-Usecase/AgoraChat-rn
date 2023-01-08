@@ -126,6 +126,7 @@ const RenderItem = ({
 
 type AlphabetType = {
   alphabetItem?: StyleProp<TextStyle>;
+  alphabetItemContainer?: StyleProp<TextStyle>;
   alphabetContainer?: StyleProp<ViewStyle>;
   alphabetCurrent?: StyleProp<TextStyle>;
   enableToast?: boolean;
@@ -191,7 +192,7 @@ export const EqualHeightList: (
         console.log('test:ref:', value);
       },
       manualRefresh: (updateItems: ListItemUpdateType[]) => {
-        console.log('test:manualRefresh:', updateItems);
+        // console.log('test:manualRefresh:', updateItems);
         _handleManualRefresh(updateItems);
       },
     }),
@@ -201,7 +202,7 @@ export const EqualHeightList: (
 
   // const data = React.useMemo<RenderItemProps[]>(() => [], []);
   const [data, setData] = React.useState<RenderItemProps[]>([]);
-  const AZ = '*ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
+  const AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
   const REFRESH_TIMEOUT = 1500;
   const listRef = React.useRef<RNFlatList>(null);
   const listItemHeightRef = React.useRef(0);
@@ -243,6 +244,7 @@ export const EqualHeightList: (
     onRefresh,
     RefreshComponent,
     HeaderComponent,
+    ItemSeparatorComponent,
     ...others
   } = props;
 
@@ -253,7 +255,7 @@ export const EqualHeightList: (
 
   const _prepareData = React.useCallback(
     (items: ItemData[]) => {
-      console.log('test:_prepareData:', items.length);
+      // console.log('test:_prepareData:', items.length);
       const obj = {} as any;
       let once = false;
       const r = items.map((item, index) => {
@@ -282,7 +284,7 @@ export const EqualHeightList: (
         } as RenderItemProps;
       });
       data.push(...r);
-      console.log('test:data:length:', data.length);
+      // console.log('test:data:length:', data.length);
       // setData(data);
     },
     [ItemFC, data, itemContainerStyle, itemStyle]
@@ -298,7 +300,7 @@ export const EqualHeightList: (
   }
 
   const _onRefresh = React.useCallback((): void => {
-    console.log('test:_onRefresh:', enableRefresh);
+    // console.log('test:_onRefresh:', enableRefresh);
     if (enableRefresh === undefined || enableRefresh === false) {
       setRefreshing(false);
       return;
@@ -423,7 +425,7 @@ export const EqualHeightList: (
             for (const d of item.data) {
               for (const dd of data) {
                 if (dd.itemProps.data.key === d.key) {
-                  console.log('test:key:', d.key, dd.itemProps.data, d);
+                  // console.log('test:key:', d.key, dd.itemProps.data, d);
                   dd.itemProps.data = d;
                   break;
                 }
@@ -475,7 +477,9 @@ export const EqualHeightList: (
         extraData={data}
         renderItem={RenderItem}
         getItemLayout={(_: any, index: number) => {
-          const h = _calculateItemH;
+          let h = _calculateItemH;
+          const s = ItemSeparatorComponent ? 0.333 : 0; // ???
+          h += s;
           const r = {
             length: h,
             offset: h * index,
@@ -506,6 +510,7 @@ export const EqualHeightList: (
               : undefined
             : undefined
         }
+        ItemSeparatorComponent={ItemSeparatorComponent}
         // stickyHeaderIndices={[0]}
         {...others}
       />
@@ -526,17 +531,28 @@ export const EqualHeightList: (
           >
             <Pressable
               pointerEvents="box-only"
-              style={{
-                flex: 1,
-                width: 18,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: 'white',
+              onFocus={(e) => {
+                e.preventDefault();
               }}
+              style={[
+                {
+                  flex: 1,
+                  width: 18,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: 'white',
+                },
+              ]}
             >
               {AZ.split('').map((char) => {
                 return (
-                  <View key={char} style={styles.alphabetView}>
+                  <View
+                    key={char}
+                    style={[
+                      styles.alphabetView,
+                      alphabet?.alphabetItemContainer,
+                    ]}
+                  >
                     <Text
                       style={[
                         styles.alphabetItem,
@@ -590,10 +606,10 @@ const styles = createStyleSheet({
   alphabetContainer: {
     position: 'absolute',
     right: 0,
-    top: 100,
-    bottom: 100,
+    // top: 100,
+    // bottom: 100,
     width: 40,
-    // height: '100%',
+    height: '80%',
     margin: 0,
     // backgroundColor: 'red',
     alignItems: 'center',

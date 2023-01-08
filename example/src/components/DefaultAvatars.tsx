@@ -37,18 +37,18 @@ export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
         source={ICON_ASSETS[key]('')}
         resizeMode="cover"
         style={{ height: size, width: size, borderRadius: radius }}
-        onLoad={(e) => {
-          console.log('test:getDefaultAvatar:', e);
+        onLoad={(_) => {
+          // console.log('test:getDefaultAvatar:', e);
         }}
         onError={(e) => {
-          console.log('test:getDefaultAvatar:', e);
+          console.warn('test:getDefaultAvatar:', e);
         }}
       />
     </View>
   );
 }
 
-export function getDefaultAvatar2({ size, radius }: AvatarProps): JSX.Element {
+export function DefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
   const index: number = timestamp('second') % AVATAR_ASSETS.length;
   const key = AVATAR_ASSETS[index] as LocalIconName;
   return (

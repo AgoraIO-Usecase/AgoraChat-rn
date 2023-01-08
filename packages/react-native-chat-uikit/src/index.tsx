@@ -47,8 +47,9 @@ export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
 export {
   default as EqualHeightList,
-  ItemComponent,
-  ItemData,
+  ItemComponent as EqualHeightListItemComponent,
+  ItemData as EqualHeightListItemData,
+  EqualHeightListRef,
 } from './components/EqualHeightList';
 export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
 export { default as Image } from './components/Image';
