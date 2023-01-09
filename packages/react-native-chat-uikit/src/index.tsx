@@ -64,7 +64,7 @@ export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';
 export { Container, ContainerProps } from './containers';
 export * from './contexts';
-export { useUpdate } from './hooks';
+export { useAsyncTask, useUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
 export {
@@ -101,7 +101,13 @@ export {
   truncateContent,
   truncatedBadgeCount,
 } from './utils/format';
-export { arraySort, asyncTask, callbackToAsync, wait } from './utils/function';
+export {
+  arraySort,
+  asyncTask,
+  callbackToAsync,
+  queueTask,
+  wait,
+} from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
 
 // declare module 'example/src/common' {

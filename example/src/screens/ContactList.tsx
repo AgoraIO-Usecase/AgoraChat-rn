@@ -8,9 +8,9 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  queueTask,
   SearchBar,
   useThemeContext,
-  wait,
 } from 'react-native-chat-uikit';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -54,22 +54,88 @@ const ItemSeparator = () => {
   );
 };
 
+interface SearchHeader3Props {
+  autoFocus: boolean;
+  onChangeText?: (text: string) => void;
+}
+const SearchHeader3 = (props: SearchHeader3Props) => {
+  const { search } = useAppI18nContext();
+  // const listRef = React.useRef<EqualHeightListRef>(null);
+  const searchRef = React.useRef<RNTextInput>(null);
+  const [searchValue, setSearchValue] = React.useState('');
+  // const [autoFocus, setAutoFocus] = React.useState(true);
+  // const [enableValue, setEnableValue] = React.useState(true);
+  // const enableRefresh = true;
+  // const enableAlphabet = true;
+  // const enableHeader = true;
+  const enableCancel = false;
+  const enableClear = true;
+  // const enableKeyboardAvoid = true;
+  // const autoFocus = true;
+  const autoFocus = props.autoFocus;
+  return (
+    <View
+      style={{
+        backgroundColor: 'red',
+        height: 36,
+        marginBottom: 20,
+        marginTop: 10,
+        marginLeft: 20,
+        marginRight: 20,
+      }}
+    >
+      <SearchBar
+        ref={searchRef}
+        autoFocus={autoFocus}
+        enableCancel={enableCancel}
+        enableClear={enableClear}
+        placeholder={search.placeholder}
+        onChangeText={(text) => {
+          console.log('test:onChangeText:1:', text);
+          setSearchValue(text);
+          props.onChangeText?.(text);
+          // setEnableValue(true);
+          // filter(text);
+        }}
+        value={searchValue}
+        onClear={() => {
+          console.log('test:onClear');
+          // setEnableValue(true);
+          setSearchValue('');
+          // setAutoFocus(true);
+          // if (searchRef.current?.blur) {
+          //   asyncTask(searchRef.current.blur);
+          // }
+          // searchRef.current?.blur();
+          // wait(500).then(() => {
+          //   // console.log('test:500:');
+          //   searchRef.current?.blur();
+          // });
+        }}
+        onBlur={() => {
+          // console.log('test:onBlur:', autoFocus);
+          // setAutoFocus(false);
+        }}
+      />
+    </View>
+  );
+};
+
 let count = 0;
 export default function ContactListScreen(_: Props): JSX.Element {
   // console.log('test:ContactListScreen:', route, navigation);
   const theme = useThemeContext();
-  const { search } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
-  const searchRef = React.useRef<RNTextInput>(null);
-  const [searchValue, setSearchValue] = React.useState('');
-  const [autoFocus, setAutoFocus] = React.useState(false);
+  // const searchRef = React.useRef<RNTextInput>(null);
+  // const [searchValue, setSearchValue] = React.useState('');
+  // const [autoFocus, setAutoFocus] = React.useState(false);
   const enableRefresh = true;
   const enableAlphabet = true;
   const enableHeader = true;
-  const enableCancel = false;
-  const enableClear = true;
-  // const autoFocus = true;
+  // const enableCancel = false;
+  // const enableClear = true;
+  const autoFocus = false;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -83,76 +149,16 @@ export default function ContactListScreen(_: Props): JSX.Element {
   });
   data.push(...r);
 
-  const filter = (text: string) => {
-    // console.log('test:filter:', text);
-    setAutoFocus(true);
-    setSearchValue(text);
-    const r: ItemDataType[] = [];
-    for (const item of data) {
-      if (item.key.includes(text)) {
-        r.push(item);
-      }
-    }
-    listRef.current?.manualRefresh([
-      {
-        type: 'clear',
-      },
-      {
-        type: 'add',
-        data: r,
-        enableSort: true,
-      },
-    ]);
-  };
-
-  const SearchHeader = {
-    Component: (props: any) => (
-      <View {...props}>
-        <SearchBar
-          ref={searchRef}
-          autoFocus={autoFocus}
-          enableCancel={enableCancel}
-          enableClear={enableClear}
-          placeholder={search.placeholder}
-          onChangeText={filter}
-          value={searchValue}
-          onClear={() => {
-            // console.log('test:onClear');
-            filter('');
-            // setAutoFocus(true);
-            // if (searchRef.current?.blur) {
-            //   asyncTask(searchRef.current.blur);
-            // }
-            // searchRef.current?.blur();
-            wait(500).then(() => {
-              // console.log('test:500:');
-              searchRef.current?.blur();
-            });
-          }}
-          onBlur={() => {
-            // console.log('test:onBlur:', autoFocus);
-            setAutoFocus(false);
-          }}
-        />
-      </View>
-    ),
-    props: {
-      backgroundColor: 'red',
-      height: 36,
-      marginBottom: 20,
-      marginTop: 10,
-      marginLeft: 20,
-      marginRight: 20,
-    },
-  };
-
   return (
     <SafeAreaView
       mode="padding"
       style={{ flex: 1, backgroundColor: theme.colors.background }}
-      edges={['right', 'left', 'bottom']}
+      edges={['right', 'left']}
     >
       <EqualHeightList
+        onLayout={(event) => {
+          console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
+        }}
         ref={listRef}
         items={data}
         ItemFC={Item}
@@ -169,7 +175,33 @@ export default function ContactListScreen(_: Props): JSX.Element {
             borderRadius: 8,
           },
         }}
-        HeaderComponent={enableHeader === true ? SearchHeader : undefined}
+        Header={(props) => (
+          <SearchHeader3
+            autoFocus={autoFocus}
+            onChangeText={(text) => {
+              console.log('test:SearchHeader3:onChangeText:', Text);
+              queueTask(() => {
+                const r: ItemDataType[] = [];
+                for (const item of data) {
+                  if (item.key.includes(text)) {
+                    r.push(item);
+                  }
+                }
+                listRef.current?.manualRefresh([
+                  {
+                    type: 'clear',
+                  },
+                  {
+                    type: 'add',
+                    data: r,
+                    enableSort: true,
+                  },
+                ]);
+              });
+            }}
+            {...props}
+          />
+        )}
         ItemSeparatorComponent={ItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {

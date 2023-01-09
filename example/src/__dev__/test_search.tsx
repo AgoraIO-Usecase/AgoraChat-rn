@@ -5,6 +5,8 @@ import { Button } from 'react-native-paper';
 
 export default function TestSearch() {
   const [icon, setIcon] = React.useState(false);
+  const [value, setValue] = React.useState('');
+  const [enableValue, setEnableValue] = React.useState(false);
   const enableClear = true;
 
   React.useEffect(() => {}, []);
@@ -28,6 +30,11 @@ export default function TestSearch() {
       <View style={{ margin: 8 }}>
         <SearchBar
           ref={input}
+          onChangeText={(text) => {
+            console.log('test:onChangeText:', text);
+            setEnableValue(false);
+            setValue(text);
+          }}
           enableCancel={false}
           enableClear={enableClear}
           inputContainerStyle={{
@@ -35,6 +42,12 @@ export default function TestSearch() {
             borderRadius: 24,
           }}
           cancel={{ buttonName: 'cancel' }}
+          onClear={() => {
+            console.log('test:onClear:');
+            setEnableValue(true);
+            setValue('');
+          }}
+          value={enableValue ? value : undefined}
         />
       </View>
     </View>

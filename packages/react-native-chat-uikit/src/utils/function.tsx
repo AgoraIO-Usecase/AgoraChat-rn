@@ -2,8 +2,35 @@ export const wait = (timeout: number) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
 
-export const asyncTask = (callback: Function, ...args: any[]) =>
-  process.nextTick(callback, args);
+// type Function = (...args: any[]) => any;
+
+export const asyncTask = (f: Function, ...args: any[]) => {
+  try {
+    setImmediate(f, args);
+  } catch (error) {
+    console.warn('test:asyncTask:', error);
+  }
+};
+
+// export const useAsyncTask = (
+//   immediate: React.MutableRefObject<NodeJS.Immediate>,
+//   f: Function,
+//   ...args: any[]
+// ) => {
+//   try {
+//     immediate.current = setImmediate(f, args);
+//   } catch (error) {
+//     console.warn('test:useAsyncTask:', error);
+//   }
+// };
+
+export const queueTask = (f: Function, ...args: any[]) => {
+  try {
+    queueMicrotask(() => f(args));
+  } catch (error) {
+    console.warn('test:queueTask:', error);
+  }
+};
 
 export const arraySort = <T extends { key: string }>(list: T[]) => {
   list.sort((a, b) => {

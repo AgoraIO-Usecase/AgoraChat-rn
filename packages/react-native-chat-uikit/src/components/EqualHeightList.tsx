@@ -164,6 +164,7 @@ type EqualHeightListProps = Omit<
   onRefresh?: (state: 'started' | 'ended') => void;
   RefreshComponent?: ListRefreshComponentType;
   HeaderComponent?: ListHeaderComponentType;
+  Header?: ListHeaderComponent;
   alphabet?: AlphabetType;
 };
 
@@ -192,7 +193,7 @@ export const EqualHeightList: (
         console.log('test:ref:', value);
       },
       manualRefresh: (updateItems: ListItemUpdateType[]) => {
-        // console.log('test:manualRefresh:', updateItems);
+        console.log('test:manualRefresh:', updateItems);
         _handleManualRefresh(updateItems);
       },
     }),
@@ -227,6 +228,7 @@ export const EqualHeightList: (
       },
       onPanResponderRelease: (e) => {
         setIsMoving(false);
+        setLastChar('');
         e.preventDefault();
       },
     })
@@ -244,6 +246,7 @@ export const EqualHeightList: (
     onRefresh,
     RefreshComponent,
     HeaderComponent,
+    Header,
     ItemSeparatorComponent,
     ...others
   } = props;
@@ -465,7 +468,12 @@ export const EqualHeightList: (
   ]);
 
   const r = (
-    <View style={styles.container}>
+    <View
+      onLayout={(event) => {
+        console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
+      }}
+      style={[styles.container]}
+    >
       <RNFlatList
         ref={(value) => {
           if (value) {
@@ -506,11 +514,18 @@ export const EqualHeightList: (
         ListHeaderComponent={
           enableHeader === true
             ? HeaderComponent
-              ? () => <HeaderComponent.Component {...HeaderComponent.props} />
+              ? React.memo(() => (
+                  <HeaderComponent.Component {...HeaderComponent.props} />
+                ))
+              : Header
+              ? Header
               : undefined
             : undefined
         }
+        // ListHeaderComponent={enableHeader === true ? Header : undefined}
         ItemSeparatorComponent={ItemSeparatorComponent}
+        // keyboardShouldPersistTaps={'never'}
+        // keyboardDismissMode={'none'}
         // stickyHeaderIndices={[0]}
         {...others}
       />
@@ -595,7 +610,7 @@ const styles = createStyleSheet({
     // marginTop: StatusBar.currentHeight || 0,
   },
   item: {
-    backgroundColor: '#f9c2ff',
+    // backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 10,
     marginHorizontal: 16,
@@ -606,10 +621,11 @@ const styles = createStyleSheet({
   alphabetContainer: {
     position: 'absolute',
     right: 0,
-    // top: 100,
+    top: 70,
     // bottom: 100,
     width: 40,
-    height: '80%',
+    // height: '80%',
+    height: 450,
     margin: 0,
     // backgroundColor: 'red',
     alignItems: 'center',
