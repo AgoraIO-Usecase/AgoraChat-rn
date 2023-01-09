@@ -54,24 +54,16 @@ const ItemSeparator = () => {
   );
 };
 
-interface SearchHeader3Props {
+interface SearchHeaderProps {
   autoFocus: boolean;
   onChangeText?: (text: string) => void;
 }
-const SearchHeader3 = (props: SearchHeader3Props) => {
+const SearchHeader = (props: SearchHeaderProps) => {
   const { search } = useAppI18nContext();
-  // const listRef = React.useRef<EqualHeightListRef>(null);
   const searchRef = React.useRef<RNTextInput>(null);
   const [searchValue, setSearchValue] = React.useState('');
-  // const [autoFocus, setAutoFocus] = React.useState(true);
-  // const [enableValue, setEnableValue] = React.useState(true);
-  // const enableRefresh = true;
-  // const enableAlphabet = true;
-  // const enableHeader = true;
   const enableCancel = false;
   const enableClear = true;
-  // const enableKeyboardAvoid = true;
-  // const autoFocus = true;
   const autoFocus = props.autoFocus;
   return (
     <View
@@ -91,30 +83,12 @@ const SearchHeader3 = (props: SearchHeader3Props) => {
         enableClear={enableClear}
         placeholder={search.placeholder}
         onChangeText={(text) => {
-          console.log('test:onChangeText:1:', text);
           setSearchValue(text);
           props.onChangeText?.(text);
-          // setEnableValue(true);
-          // filter(text);
         }}
         value={searchValue}
         onClear={() => {
-          console.log('test:onClear');
-          // setEnableValue(true);
           setSearchValue('');
-          // setAutoFocus(true);
-          // if (searchRef.current?.blur) {
-          //   asyncTask(searchRef.current.blur);
-          // }
-          // searchRef.current?.blur();
-          // wait(500).then(() => {
-          //   // console.log('test:500:');
-          //   searchRef.current?.blur();
-          // });
-        }}
-        onBlur={() => {
-          // console.log('test:onBlur:', autoFocus);
-          // setAutoFocus(false);
         }}
       />
     </View>
@@ -127,14 +101,9 @@ export default function ContactListScreen(_: Props): JSX.Element {
   const theme = useThemeContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
-  // const searchRef = React.useRef<RNTextInput>(null);
-  // const [searchValue, setSearchValue] = React.useState('');
-  // const [autoFocus, setAutoFocus] = React.useState(false);
   const enableRefresh = true;
   const enableAlphabet = true;
   const enableHeader = true;
-  // const enableCancel = false;
-  // const enableClear = true;
   const autoFocus = false;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
@@ -176,10 +145,10 @@ export default function ContactListScreen(_: Props): JSX.Element {
           },
         }}
         Header={(props) => (
-          <SearchHeader3
+          <SearchHeader
             autoFocus={autoFocus}
             onChangeText={(text) => {
-              console.log('test:SearchHeader3:onChangeText:', Text);
+              console.log('test:SearchHeader:onChangeText:', Text);
               queueTask(() => {
                 const r: ItemDataType[] = [];
                 for (const item of data) {
