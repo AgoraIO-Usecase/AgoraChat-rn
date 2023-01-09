@@ -21,6 +21,8 @@ import { arraySort, wait } from '../utils/function';
 
 export interface ItemData {
   key: string;
+  onLongPress?: (data?: ItemData) => void;
+  onPress?: (data?: ItemData) => void;
 }
 
 export interface ItemProps {
@@ -36,6 +38,7 @@ export type ItemContainerProps = React.PropsWithChildren<{
   isFirst?: boolean;
   height?: React.Ref<number>;
   style?: StyleProp<ViewStyle>;
+  data?: ItemData;
 }>;
 
 export type ItemContainerComponent = (props: ItemContainerProps) => JSX.Element;
@@ -59,7 +62,7 @@ const DefaultItemContainer: ItemContainerComponent = (
   props: ItemContainerProps
 ): JSX.Element => {
   return (
-    <View
+    <Pressable
       style={[props.style]}
       onLayout={(e) => {
         if (props.height) {
@@ -68,9 +71,12 @@ const DefaultItemContainer: ItemContainerComponent = (
           // console.log('test:onLayout:height:', ref.current);
         }
       }}
+      onLongPress={() => {
+        props.data?.onLongPress?.(props.data);
+      }}
     >
       {props.children}
-    </View>
+    </Pressable>
   );
 };
 
@@ -283,6 +289,7 @@ export const EqualHeightList: (
             isFirst: isFirst,
             style: itemContainerStyle,
             height: once === false ? listItemHeightRef : undefined,
+            data: item,
           },
         } as RenderItemProps;
       });

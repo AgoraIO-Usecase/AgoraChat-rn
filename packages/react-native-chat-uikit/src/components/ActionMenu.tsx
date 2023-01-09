@@ -63,28 +63,30 @@ export default function ActionMenu({
       // backdropColor="rgba(100, 10, 200, 0.5)"
     >
       <DialogBox style={{ backgroundColor: colors.card.background }}>
-        <View style={styles.title}>
-          <Text
-            numberOfLines={1}
-            // style={{ flex: 1 }}
-            style={[
-              {
-                maxWidth: pending ? '86%' : '100%',
-                color: colors.primary,
-              },
-              fonts.title,
-            ]}
-          >
-            {title}
-          </Text>
-          {pending && (
-            <Loading
-              size={20}
-              color={colors.primary}
-              style={{ width: '10%', marginLeft: '4%' }}
-            />
-          )}
-        </View>
+        {title && (
+          <View style={styles.title}>
+            <Text
+              numberOfLines={1}
+              // style={{ flex: 1 }}
+              style={[
+                {
+                  maxWidth: pending ? '86%' : '100%',
+                  color: colors.primary,
+                },
+                fonts.title,
+              ]}
+            >
+              {title}
+            </Text>
+            {pending && (
+              <Loading
+                size={20}
+                color={colors.primary}
+                style={{ width: '10%', marginLeft: '4%' }}
+              />
+            )}
+          </View>
+        )}
         <View style={styles.buttonContainer}>
           {menuItems.map((item, index) => {
             return (

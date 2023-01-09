@@ -40,6 +40,11 @@ const BaseTheme: Partial<ThemeContextType> = {
       fontSize: defaultScaleFactor(12),
       lineHeight: defaultScaleFactor(12),
     },
+    sheet: {
+      fontWeight: '600',
+      fontSize: defaultScaleFactor(16),
+      lineHeight: defaultScaleFactor(22),
+    },
   },
 };
 export default BaseTheme;

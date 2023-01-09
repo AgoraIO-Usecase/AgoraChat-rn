@@ -10,6 +10,7 @@ import {
   EqualHeightListRef,
   queueTask,
   SearchBar,
+  useBottomSheet,
   useThemeContext,
 } from 'react-native-chat-uikit';
 import { Text } from 'react-native-paper';
@@ -99,6 +100,8 @@ let count = 0;
 export default function ContactListScreen(_: Props): JSX.Element {
   // console.log('test:ContactListScreen:', route, navigation);
   const theme = useThemeContext();
+  // const menu = useActionMenu();
+  const sheet = useBottomSheet();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -114,6 +117,51 @@ export default function ContactListScreen(_: Props): JSX.Element {
       key: en,
       en: en,
       ch: ch,
+      onLongPress: (data) => {
+        console.log('test:onLongPress:data:', data);
+        // menu.openMenu({
+        //   // title: 'test',
+        //   menuItems: [
+        //     {
+        //       title: '1',
+        //       onPress: () => {
+        //         console.log('test:1:');
+        //       },
+        //     },
+        //     {
+        //       title: '2',
+        //       onPress: () => {
+        //         console.log('test:2:');
+        //       },
+        //     },
+        //   ],
+        // });
+        sheet.openSheet({
+          sheetItems: [
+            {
+              icon: 'loading',
+              iconColor: theme.colors.primary,
+              title: '1',
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:', data);
+              },
+            },
+            {
+              icon: 'loading',
+              iconColor: theme.colors.primary,
+              title: '2',
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:', data);
+              },
+            },
+          ],
+        });
+      },
+      onPress: (data) => {
+        console.log('test:onPress:data:', data);
+      },
     } as ItemDataType;
   });
   data.push(...r);

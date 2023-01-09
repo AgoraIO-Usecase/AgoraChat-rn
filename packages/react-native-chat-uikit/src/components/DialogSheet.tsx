@@ -38,7 +38,7 @@ const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
     <View
       style={[
         styles.sheetItemContainer,
-        { backgroundColor: colors.card.background },
+        { backgroundColor: 'rgba(250, 250, 250, 1)' },
       ]}
     >
       {icon && (
@@ -53,7 +53,7 @@ const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
         style={[
           styles.sheetItemText,
           { color: titleColor ?? colors.text },
-          fonts.subtitle,
+          fonts.sheet,
         ]}
       >
         {title}
@@ -69,17 +69,21 @@ const styles = createStyleSheet({
     width: '100%',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+    alignItems: 'center',
   },
   sheetItemContainer: {
+    marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     height: 48,
+    minWidth: '90%',
+    borderRadius: 24,
   },
   sheetItemIcon: {
     marginLeft: 16,
   },
   sheetItemText: {
-    flex: 1,
     marginHorizontal: 24,
   },
 });

@@ -41,6 +41,7 @@ export type ThemeContextType = {
     subtitle: FontAttributes;
     body: FontAttributes;
     caption: FontAttributes;
+    sheet: FontAttributes;
   };
 };
 
