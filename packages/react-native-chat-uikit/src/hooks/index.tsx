@@ -144,10 +144,10 @@ export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
   const _create = React.useCallback(
     (
       defer: number,
+      timeout: React.MutableRefObject<TimeoutType | undefined>,
       dispatch: React.Dispatch<React.SetStateAction<T>>,
       value: T,
-      preValue: React.MutableRefObject<T>,
-      timeout: React.MutableRefObject<TimeoutType | undefined>
+      preValue: React.MutableRefObject<T>
     ) => {
       console.log('test:useDeferredValue:_create:');
       if (timeout.current === undefined) {
@@ -193,8 +193,12 @@ export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
     []
   );
 
+  if (preValue.current === value) {
+    return _value;
+  }
+
   _cancel(defer, timeout);
-  _create(defer, setValue, value, preValue, timeout);
+  _create(defer, timeout, setValue, value, preValue);
 
   return _value;
 };
