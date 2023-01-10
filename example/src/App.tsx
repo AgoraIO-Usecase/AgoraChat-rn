@@ -29,13 +29,13 @@ import { Linking, Platform, Pressable, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
-  Container as UIKitContainer,
   createStringSetEn2,
   DarkTheme,
   LightTheme,
   Loading,
   LocalIcon,
   Services,
+  UIKitContainer,
   updateScaleFactor,
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';

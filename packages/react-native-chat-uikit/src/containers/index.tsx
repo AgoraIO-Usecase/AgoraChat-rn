@@ -22,6 +22,8 @@ import type {
   PermissionService,
 } from '../services';
 
+const TIMEOUT = 3000;
+
 export type ContainerProps = React.PropsWithChildren<{
   option: {
     appKey: string;
@@ -101,7 +103,7 @@ export function Container({
               defaultTitleAlign={header.defaultTitleAlign}
             >
               <DialogContextProvider>
-                <ToastContextProvider>
+                <ToastContextProvider dismissTimeout={TIMEOUT}>
                   {children ? (
                     children
                   ) : (

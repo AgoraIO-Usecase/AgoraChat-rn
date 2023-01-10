@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image } from 'react-native';
+import { Image as RNImage } from 'react-native';
 
 import type { ImageComponent } from './index';
 
@@ -11,7 +11,7 @@ const ImageWrapper: ImageComponent = ({
   ...props
 }) => {
   return (
-    <Image
+    <RNImage
       {...props}
       style={[style, { tintColor }]}
       onError={onError && ((e) => onError(e.nativeEvent))}

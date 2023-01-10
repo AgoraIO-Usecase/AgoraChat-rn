@@ -29,7 +29,7 @@
     "test": "jest --no-watchman",
     "typescript": "tsc --noEmit",
     "lint": "yarn run eslint \"src/**/*.{js,ts,tsx}\"",
-    "prepare": "",
+    "prepare": "yarn run gl",
     "release": "release-it",
     "bootstrap": "yarn install",
     "gl": "bob build",

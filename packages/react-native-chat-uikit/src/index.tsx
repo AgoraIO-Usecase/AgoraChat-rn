@@ -62,9 +62,9 @@ export { default as SearchBar, SearchBarProps } from './components/SearchBar';
 export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';
-export { Container, ContainerProps } from './containers';
+export { ContainerProps, Container as UIKitContainer } from './containers';
 export * from './contexts';
-export { useAsyncTask, useUpdate } from './hooks';
+export { useAsyncTask, useDeferredValue, useUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
 export {
@@ -106,6 +106,7 @@ export {
   asyncTask,
   callbackToAsync,
   queueTask,
+  versionToArray,
   wait,
 } from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
