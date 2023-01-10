@@ -81,6 +81,6 @@ export const callbackToAsync = (f: Function, cb: Callback, ...args: any[]) => {
   return r;
 };
 
-export const versionToArray = (v: string): number[] => {
-  return v.split('.').map((_v) => parseInt(_v));
+export const versionToArray = (version: string): number[] => {
+  return version.split('.').map((v) => parseInt(v));
 };
