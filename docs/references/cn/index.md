@@ -6,6 +6,7 @@
 
 ## 工程主要结构
 
+```text
 react-native-chat-library
 ├── CONTRIBUTING.md ———— 贡献者
 ├── LICENSE ———— 许可证
@@ -20,6 +21,7 @@ react-native-chat-library
 ├── templates ———— 配置模版文件
 ├── tsconfig.json ———— typescript 配置文件
 └── yarn.lock ———— 版本控制文件
+```
 
 [工程详细说明](./workspace.md)
 
@@ -27,6 +29,7 @@ packages 主要包括开发的 `UIKIT` 等包。
 
 ### `react-native-chat-uikit` 项目 主要结构
 
+```text
 react-native-chat-uikit
 ├── LICENSE ———— 许可证
 ├── README.md ———— 简要说明
@@ -39,11 +42,13 @@ react-native-chat-uikit
 ├── scripts ———— 自定义脚本工具
 ├── src ———— 源码
 └── tsconfig.json ———— typescript 配置文件
+```
 
 [uikit 详细说明](./uikit.md)
 
 ### `example` 项目 主要结构
 
+```text
 example
 ├── android ———— Android
 ├── app.json ———— `expo`的配置文件
@@ -57,9 +62,9 @@ example
 ├── scripts ———— 自定义脚本工具
 ├── src ———— 源码
 └── tsconfig.json ———— typescript 配置文件
+```
 
 [example 详细说明](./example.md)
-
 
 ### 开发者使用说明
 
