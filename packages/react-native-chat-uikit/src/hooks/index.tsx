@@ -116,6 +116,11 @@ export const useDeferredValue2 = <T,>(value: T, defer: number = DEFER) => {
   return _value;
 };
 
+type TimeoutType = {
+  timeoutId: NodeJS.Timeout;
+  cur: number;
+};
+
 export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
   const v = versionToArray(React.version);
   console.warn('test:version:', v);
@@ -124,15 +129,15 @@ export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
   }
 
   const _preValue = React.useRef(value);
-  const [_value, setValue] = React.useState(_preValue.current);
+  const preValue = React.useMemo(() => {
+    console.log('test:useDeferredValue:useMemo:preValue:', _preValue.current);
+    return _preValue;
+  }, []);
+  const [_value, setValue] = React.useState(preValue.current);
 
-  const _timeout = React.useRef<{
-    timeoutId: NodeJS.Timeout;
-    cur: number;
-  }>();
-
+  const _timeout = React.useRef<TimeoutType>();
   const timeout = React.useMemo(() => {
-    console.log('test:useDeferredValue:useMemo:');
+    console.log('test:useDeferredValue:useMemo:timeout:', _timeout.current);
     return _timeout;
   }, []);
 
@@ -140,27 +145,41 @@ export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
     (
       defer: number,
       dispatch: React.Dispatch<React.SetStateAction<T>>,
-      value: T
+      value: T,
+      preValue: React.MutableRefObject<T>,
+      timeout: React.MutableRefObject<TimeoutType | undefined>
     ) => {
+      console.log('test:useDeferredValue:_create:');
       if (timeout.current === undefined) {
+        console.log('test:useDeferredValue:_create:1:');
         timeout.current = {
           timeoutId: setTimeout(() => {
-            _preValue.current = value;
+            console.log('test:useDeferredValue:_create:2:', value);
+            preValue.current = value;
+            timeout.current = undefined;
             dispatch(value);
           }, defer),
           cur: new Date().getTime(),
         };
+        console.log('test:useDeferredValue:_create:3:', timeout.current.cur);
       }
     },
-    [timeout]
+    []
   );
   const _cancel = React.useCallback(
-    (defer: number) => {
+    (
+      defer: number,
+      timeout: React.MutableRefObject<TimeoutType | undefined>
+    ) => {
       console.log('test:useDeferredValue:_cancel:');
       if (timeout.current) {
-        console.log('test:useDeferredValue:_cancel:1:');
         const cur = new Date().getTime();
-        if (timeout.current.cur + defer < cur) {
+        console.log(
+          'test:useDeferredValue:_cancel:1:',
+          timeout.current.cur,
+          cur
+        );
+        if (cur <= timeout.current.cur + defer) {
           console.log(
             'test:useDeferredValue:_cancel:2:',
             timeout.current.cur + defer,
@@ -171,11 +190,11 @@ export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
         }
       }
     },
-    [timeout]
+    []
   );
 
-  _cancel(defer);
-  _create(defer, setValue, value);
+  _cancel(defer, timeout);
+  _create(defer, setValue, value, preValue, timeout);
 
   return _value;
 };
