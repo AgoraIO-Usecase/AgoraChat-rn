@@ -28,6 +28,14 @@ type TimeoutType = {
   cur: number;
 };
 
+/**
+ * ref: https://juejin.cn/post/7083466010505773093#3
+ * !!! This function does not exist before react 18.
+ *
+ * @param value any type value
+ * @param defer timeout (ms)
+ * @returns deferred timeout value
+ */
 export const useDeferredValue = <T,>(value: T, defer: number = DEFER) => {
   const v = versionToArray(React.version);
   if (v[0] && v[0] >= 18) {
