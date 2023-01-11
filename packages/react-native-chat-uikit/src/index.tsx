@@ -46,9 +46,15 @@ export { default as Button } from './components/Button';
 export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
 export {
+  default as DynamicHeightList,
+  DynamicHeightListProps,
+  DynamicHeightListRef,
+} from './components/DynamicHeightList';
+export {
   default as EqualHeightList,
   ItemComponent as EqualHeightListItemComponent,
   ItemData as EqualHeightListItemData,
+  EqualHeightListProps,
   EqualHeightListRef,
 } from './components/EqualHeightList';
 export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';

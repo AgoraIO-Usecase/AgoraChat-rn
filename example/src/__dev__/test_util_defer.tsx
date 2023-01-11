@@ -3,7 +3,7 @@ import { Button as RNButton, Text, View } from 'react-native';
 import { useDeferredValue } from 'react-native-chat-uikit';
 
 let count = 0;
-export default function TestUtil() {
+export default function TestUtilDefer() {
   React.useEffect(() => {}, []);
 
   const [value, setValue] = React.useState(0);

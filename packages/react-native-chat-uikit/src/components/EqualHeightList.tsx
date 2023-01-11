@@ -149,7 +149,7 @@ type ListRefreshComponentType = {
   props: RefreshControlProps;
 };
 
-type EqualHeightListProps = Omit<
+export type EqualHeightListProps = Omit<
   RNFlatListProps<RenderItemProps>,
   | 'data'
   | 'renderItem'
@@ -192,6 +192,7 @@ export const EqualHeightList: (
   props: EqualHeightListProps,
   ref?: React.ForwardedRef<EqualHeightListRef>
 ): JSX.Element => {
+  console.log('test:EqualHeightList:');
   React.useImperativeHandle(
     ref,
     () => ({
