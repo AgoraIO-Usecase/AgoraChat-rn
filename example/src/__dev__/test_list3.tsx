@@ -1,7 +1,3 @@
-import type {
-  EqualHeightListRef,
-  ListHeaderProps,
-} from 'packages/react-native-chat-uikit/src/components/EqualHeightList';
 import * as React from 'react';
 import {
   KeyboardAvoidingView,
@@ -18,6 +14,8 @@ import {
   EqualHeightList,
   EqualHeightListItemComponent,
   EqualHeightListItemData,
+  EqualHeightListRef,
+  ListHeaderProps,
   queueTask,
   SearchBar,
   useThemeContext,

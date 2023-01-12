@@ -1,11 +1,11 @@
 import type { ImageProps as RNImageProps } from 'react-native';
 import { NativeModules } from 'react-native';
 
-export interface ImageProps extends Omit<RNImageProps, 'onLoad' | 'onError'> {
+export type ImageProps = Omit<RNImageProps, 'onLoad' | 'onError'> & {
   onLoad?: (event: { width: number; height: number }) => void;
   onError?: (event: { error?: unknown }) => void;
   tintColor?: string;
-}
+};
 
 export type ImageComponent = (props: ImageProps) => JSX.Element;
 

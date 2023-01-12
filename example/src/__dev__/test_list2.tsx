@@ -1,4 +1,3 @@
-import type { EqualHeightListRef } from 'packages/react-native-chat-uikit/src/components/EqualHeightList';
 import * as React from 'react';
 import {
   AppRegistry,
@@ -14,6 +13,7 @@ import {
   EqualHeightList,
   EqualHeightListItemComponent,
   EqualHeightListItemData,
+  EqualHeightListRef,
   LocalIcon,
   SearchBar,
 } from 'react-native-chat-uikit';

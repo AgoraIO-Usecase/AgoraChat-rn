@@ -161,11 +161,11 @@ export type MessageListRef = {
   addMessage: (msg: MessageItemType[]) => void;
 };
 type Props = {};
-const MessageList = (
+const MessageBubbleList = (
   _: Props,
   ref?: React.Ref<MessageListRef>
 ): JSX.Element => {
-  console.log('test:MessageList:');
+  console.log('test:MessageBubbleList:');
   const enableRefresh = true;
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -184,7 +184,7 @@ const MessageList = (
     setLoading(false);
   }
 
-  console.log('test:MessageList:length:', items.length);
+  console.log('test:MessageBubbleList:length:', items.length);
 
   const _add = React.useCallback(
     (msgs: MessageItemType[]) => {
@@ -266,4 +266,4 @@ const MessageList = (
   );
 };
 
-export default React.forwardRef<MessageListRef, Props>(MessageList);
+export default React.forwardRef<MessageListRef, Props>(MessageBubbleList);

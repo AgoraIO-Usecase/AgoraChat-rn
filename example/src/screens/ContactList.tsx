@@ -1,15 +1,13 @@
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import * as React from 'react';
-import { TextInput as RNTextInput, View } from 'react-native';
+import { View } from 'react-native';
 import {
   createStyleSheet,
-  Divider,
   EqualHeightList,
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
   queueTask,
-  SearchBar,
   useBottomSheet,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -17,7 +15,8 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DefaultAvatar } from '../components/DefaultAvatars';
-import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { ListItemSeparator } from '../components/ListItemSeparator';
+import { ListSearchHeader } from '../components/ListSearchHeader';
 import type { RootParamsList } from '../routes';
 
 type Props = MaterialTopTabScreenProps<RootParamsList>;
@@ -40,58 +39,6 @@ const Item: EqualHeightListItemComponent = (props) => {
         <Text>{item.en}</Text>
         <Text>{item.ch}</Text>
       </View>
-    </View>
-  );
-};
-const ItemSeparator = () => {
-  return (
-    <View
-      onLayout={(_) => {
-        // console.log('test:event:', event.nativeEvent.layout.height);
-      }}
-    >
-      <Divider color={styles.divider.color} height={styles.divider.height} />
-    </View>
-  );
-};
-
-interface SearchHeaderProps {
-  autoFocus: boolean;
-  onChangeText?: (text: string) => void;
-}
-const SearchHeader = (props: SearchHeaderProps) => {
-  const { search } = useAppI18nContext();
-  const searchRef = React.useRef<RNTextInput>(null);
-  const [searchValue, setSearchValue] = React.useState('');
-  const enableCancel = false;
-  const enableClear = true;
-  const autoFocus = props.autoFocus;
-  return (
-    <View
-      style={{
-        backgroundColor: 'red',
-        height: 36,
-        marginBottom: 20,
-        marginTop: 10,
-        marginLeft: 20,
-        marginRight: 20,
-      }}
-    >
-      <SearchBar
-        ref={searchRef}
-        autoFocus={autoFocus}
-        enableCancel={enableCancel}
-        enableClear={enableClear}
-        placeholder={search.placeholder}
-        onChangeText={(text) => {
-          setSearchValue(text);
-          props.onChangeText?.(text);
-        }}
-        value={searchValue}
-        onClear={() => {
-          setSearchValue('');
-        }}
-      />
     </View>
   );
 };
@@ -193,10 +140,10 @@ export default function ContactListScreen(_: Props): JSX.Element {
           },
         }}
         Header={(props) => (
-          <SearchHeader
+          <ListSearchHeader
             autoFocus={autoFocus}
             onChangeText={(text) => {
-              console.log('test:SearchHeader:onChangeText:', Text);
+              console.log('test:ListSearchHeader:onChangeText:', Text);
               queueTask(() => {
                 const r: ItemDataType[] = [];
                 for (const item of data) {
@@ -219,7 +166,7 @@ export default function ContactListScreen(_: Props): JSX.Element {
             {...props}
           />
         )}
-        ItemSeparatorComponent={ItemSeparator}
+        ItemSeparatorComponent={ListItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {
             const en = 'aaa';
@@ -257,11 +204,6 @@ const styles = createStyleSheet({
   },
   itemText: {
     marginLeft: 10,
-  },
-  divider: {
-    color: 'rgba(153, 153, 153, 1)',
-    height: 0.25,
-    marginLeft: 100,
   },
 });
 const COUNTRY = [

@@ -4,16 +4,16 @@ import { seqId, timestamp } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
 import {
-  default as MessageList,
+  default as MessageBubbleList,
   MessageListRef,
   TextMessageItemType,
-} from '../components/MessageList';
+} from '../components/MessageBubbleList';
 
 export default function TestMessageList() {
   React.useEffect(() => {}, []);
   const ref = React.useRef<MessageListRef>(null);
 
-  const MessageListM = React.memo(MessageList);
+  const MessageListM = React.memo(MessageBubbleList);
 
   return (
     <View

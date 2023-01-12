@@ -1,11 +1,17 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Badge, LocalIcon } from 'react-native-chat-uikit';
 
 type TabBarIconProps = {
   focused?: boolean | undefined;
   color: string;
-  type: 'ConversationList' | 'Contact' | 'MySetting';
+  type:
+    | 'ConversationList'
+    | 'Contact'
+    | 'MySetting'
+    | 'TopRequestList'
+    | 'TopContacts'
+    | 'TopGroups';
 };
 
 export default function TabBarIcon({
@@ -58,6 +64,71 @@ export default function TabBarIcon({
       </React.Fragment>
     );
   };
+  const TopBarRequestList = (): JSX.Element => {
+    return (
+      <React.Fragment>
+        <View style={{ width: 70 }}>
+          <Text
+            style={{
+              top: 5,
+              fontSize: 16,
+              fontWeight: '600',
+              color: color,
+            }}
+          >
+            Requests
+          </Text>
+        </View>
+        <LocalIcon
+          name="contact_request_hint"
+          size={16}
+          style={{
+            position: 'absolute',
+            right: -15,
+            top: -10,
+            borderColor: 'white',
+            borderWidth: 1,
+          }}
+        />
+      </React.Fragment>
+    );
+  };
+  const TopBarContacts = (): JSX.Element => {
+    return (
+      <React.Fragment>
+        <View style={{ width: 70 }}>
+          <Text
+            style={{
+              top: 5,
+              fontSize: 16,
+              fontWeight: '600',
+              color: color,
+            }}
+          >
+            Contacts
+          </Text>
+        </View>
+      </React.Fragment>
+    );
+  };
+  const TopBarGroups = (): JSX.Element => {
+    return (
+      <React.Fragment>
+        <View style={{ width: 70 }}>
+          <Text
+            style={{
+              top: 5,
+              fontSize: 16,
+              fontWeight: '600',
+              color: color,
+            }}
+          >
+            Groups
+          </Text>
+        </View>
+      </React.Fragment>
+    );
+  };
   return (
     <View
       style={{
@@ -70,6 +141,12 @@ export default function TabBarIcon({
         ? ConversationList()
         : type === 'Contact'
         ? Contact()
+        : type === 'TopRequestList'
+        ? TopBarRequestList()
+        : type === 'TopContacts'
+        ? TopBarContacts()
+        : type === 'TopGroups'
+        ? TopBarGroups()
         : MySetting()}
     </View>
   );

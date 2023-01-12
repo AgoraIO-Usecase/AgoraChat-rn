@@ -65,9 +65,15 @@ export default function Button({
                 containerStyle={styles.icon}
               />
             )}
-            <Text style={[styles.text, { color: s.content }, fonts.button]}>
-              {children}
-            </Text>
+            {typeof children === 'string' ? (
+              children.length === 0 ? (
+                <Text style={[styles.text, { color: s.content }, fonts.button]}>
+                  {children}
+                </Text>
+              ) : null
+            ) : (
+              children
+            )}
           </React.Fragment>
         );
       }}
@@ -78,7 +84,8 @@ export default function Button({
 const styles = createStyleSheet({
   container: {
     flexDirection: 'row',
-    padding: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',

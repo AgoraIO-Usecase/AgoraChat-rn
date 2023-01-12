@@ -694,6 +694,15 @@ export const ICON_ASSETS = {
       return require('./icons/ChatDetails/message.png');
     }
   },
+  'xmark_thick': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/ChatDetails/xmark_thick_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/ChatDetails/xmark_thick_2x.png');
+    } else {
+      return require('./icons/ChatDetails/xmark_thick.png');
+    }
+  },
   'Button_Record active': (size: string) => {
     if (size === '3x') {
       return require('./icons/FooterTypeBar/Button_Record active_3x.png');
@@ -2051,6 +2060,15 @@ export const ICON_ASSETS = {
       return require('./icons/logo/register_icon_2x.png');
     } else {
       return require('./icons/logo/register_icon.png');
+    }
+  },
+  'empty': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/placeholder/empty_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/placeholder/empty_2x.png');
+    } else {
+      return require('./icons/placeholder/empty.png');
     }
   },
 };
