@@ -44,7 +44,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 };
 
 let count = 0;
-export default function GroupListScreen(_props: Props): JSX.Element {
+export default function GroupListScreen({ navigation }: Props): JSX.Element {
   // console.log('test:GroupListScreen:', route, navigation);
   const theme = useThemeContext();
   // const menu = useActionMenu();
@@ -108,6 +108,7 @@ export default function GroupListScreen(_props: Props): JSX.Element {
       },
       onPress: (data) => {
         console.log('test:onPress:data:', data);
+        navigation.navigate({ name: 'GroupInfo', params: {} });
       },
     } as ItemDataType;
   });

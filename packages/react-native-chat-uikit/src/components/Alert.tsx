@@ -47,12 +47,12 @@ export default function Alert({
         <View style={styles.titleContainer1}>
           <Text
             numberOfLines={1}
-            style={[{ flex: 1, color: colors.card.title }, fonts.title]}
+            style={[{ color: colors.card.title }, fonts.title]}
           >
             {title}
           </Text>
           <View style={styles.messageContainer}>
-            <Text style={[{ color: colors.card.body }, fonts.subtitle]}>
+            <Text style={[{ color: 'rgba(108, 113, 146, 1)' }, fonts.subtitle]}>
               {message}
             </Text>
           </View>
@@ -63,7 +63,12 @@ export default function Alert({
         <View style={styles.titleContainer2}>
           <Text
             numberOfLines={1}
-            style={[{ flex: 1, color: colors.card.title }, fonts.title]}
+            style={[
+              {
+                color: colors.card.title,
+              },
+              fonts.title,
+            ]}
           >
             {title}
           </Text>
@@ -146,24 +151,24 @@ const styles = createStyleSheet({
     paddingTop: 20,
   },
   titleContainer1: {
-    height: 50,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 30,
+    paddingHorizontal: 30,
   },
   titleContainer2: {
-    height: 40,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 30,
   },
   messageContainer: {
-    paddingHorizontal: 0,
+    paddingTop: 16,
     marginBottom: 0,
   },
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    padding: 12,
+    paddingVertical: 20,
   },
 });
 
@@ -174,6 +179,7 @@ const useStyleSheet = (index: number, count: number) => {
         button: {
           width: params.count === 1 ? '90%' : '40%',
           borderRadius: 22,
+          height: 36,
         },
       };
     },

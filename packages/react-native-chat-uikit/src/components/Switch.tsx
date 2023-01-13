@@ -41,8 +41,8 @@ export default function Switch({
         },
         thumb: {
           ...styles.thumb,
-          width: OFFSET.W - (OFFSET.W * 0.1 > 1 ? OFFSET.W * 0.1 : 1),
-          height: OFFSET.W - (OFFSET.H * 0.1 > 1 ? OFFSET.H * 0.1 : 1),
+          width: OFFSET.W - (OFFSET.W * 0.2 > 1 ? OFFSET.W * 0.2 : 1),
+          height: OFFSET.W - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
           borderRadius: OFFSET.W / 2,
         },
         thumbOn: {
@@ -126,8 +126,8 @@ const styles = createStyleSheet({
     position: 'absolute',
   },
   thumb: {
-    width: OFFSET.W - (OFFSET.W * 0.1 > 1 ? OFFSET.W * 0.1 : 1),
-    height: OFFSET.W - (OFFSET.H * 0.1 > 1 ? OFFSET.H * 0.1 : 1),
+    width: OFFSET.W - (OFFSET.W * 0.2 > 1 ? OFFSET.W * 0.2 : 1),
+    height: OFFSET.W - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
     borderRadius: OFFSET.W / 2,
     ...Platform.select({
       android: {
@@ -137,7 +137,7 @@ const styles = createStyleSheet({
         shadowColor: 'black',
         shadowRadius: 1,
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.4,
+        shadowOpacity: 0.2,
       },
     }),
   },
@@ -178,8 +178,8 @@ const styles = createStyleSheet({
 //     }
 //     return {
 //       ...styles.thumb,
-//       width: OFFSET.W - (OFFSET.W * 0.1 > 1 ? OFFSET.W * 0.1 : 1),
-//       height: OFFSET.W - (OFFSET.H * 0.1 > 1 ? OFFSET.H * 0.1 : 1),
+//       width: OFFSET.W - (OFFSET.W * 0.2 > 1 ? OFFSET.W * 0.2 : 1),
+//       height: OFFSET.W - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
 //       borderRadius: OFFSET.W / 2,
 //     };
 //   } else if (name === 'thumbOn') {

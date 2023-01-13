@@ -1,4 +1,5 @@
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
+// import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { View } from 'react-native';
 import {
@@ -17,9 +18,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
-import type { RootParamsList } from '../routes';
+import type { ScreenParamsList } from '../routes';
 
-type Props = MaterialTopTabScreenProps<RootParamsList>;
+type Props = MaterialTopTabScreenProps<ScreenParamsList>;
+// type Props = NativeStackScreenProps<ScreenParamsList>;
 
 type ItemDataType = EqualHeightListItemData & {
   en: string;
@@ -44,7 +46,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 };
 
 let count = 0;
-export default function ContactListScreen(_: Props): JSX.Element {
+export default function ContactListScreen({ navigation }: Props): JSX.Element {
   // console.log('test:ContactListScreen:', route, navigation);
   const theme = useThemeContext();
   // const menu = useActionMenu();
@@ -108,6 +110,10 @@ export default function ContactListScreen(_: Props): JSX.Element {
       },
       onPress: (data) => {
         console.log('test:onPress:data:', data);
+        // navigation.push('ContactInfo', { params: { test: 'haha' } });
+        // navigation.jumpTo('GroupList', { params: {} });
+        // navigation.jumpTo('ContactInfo', { params: { test: 'haha' } });
+        navigation.navigate({ name: 'ContactInfo', params: {} });
       },
     } as ItemDataType;
   });

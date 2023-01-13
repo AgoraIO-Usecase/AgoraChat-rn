@@ -66,7 +66,7 @@ export default function Button({
               />
             )}
             {typeof children === 'string' ? (
-              children.length === 0 ? (
+              children.length !== 0 ? (
                 <Text style={[styles.text, { color: s.content }, fonts.button]}>
                   {children}
                 </Text>

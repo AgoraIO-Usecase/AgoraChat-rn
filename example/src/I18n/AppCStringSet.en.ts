@@ -22,6 +22,63 @@ export class AppStringSet extends UIKitStringSet2 {
   search: {
     placeholder: string;
   };
+  contactInfo: {
+    name: (name: string) => string;
+    chat: string;
+    mute: string;
+    block: string;
+    blockAlert: {
+      title: string;
+      message: string;
+      cancelButton: string;
+      confirmButton: string;
+    };
+    delete: string;
+    deleteAlert: {
+      title: string;
+      message: string;
+      cancelButton: string;
+      confirmButton: string;
+    };
+  };
+  groupInfo: {
+    name: (name: string) => string;
+    groupDescription: string;
+    chat: string;
+    invite: string;
+    members: string;
+    members_1: {
+      owner: string;
+      admin: string;
+    };
+    actionToast: {
+      enum: (code: number) => string;
+    };
+    mute: string;
+    leave: string;
+    leaveAlert: {
+      title: string;
+      message: string;
+      cancelButton: string;
+      confirmButton: string;
+    };
+    modify: {
+      name: string;
+      namePrompt: {
+        placeholder: string;
+        cancel: string;
+        confirm: string;
+      };
+      description: string;
+      descriptionPrompt: {
+        placeholder: string;
+        cancel: string;
+        confirm: string;
+      };
+      groupId: string;
+    };
+  };
+
   constructor(locate: Locale = en) {
     super(locate);
     this.login = {
@@ -57,6 +114,64 @@ export class AppStringSet extends UIKitStringSet2 {
     };
     this.search = {
       placeholder: 'Search',
+    };
+    this.contactInfo = {
+      name: (n: string) => n,
+      chat: 'Chat',
+      mute: 'Mute Notification',
+      block: 'Block Contact',
+      delete: 'Delete Contact',
+      blockAlert: {
+        title: 'Block NickName',
+        message:
+          'When you block this contact, you will not receive any messages from them.',
+        cancelButton: 'Cancel',
+        confirmButton: 'Confirm',
+      },
+      deleteAlert: {
+        title: 'Delete NickName',
+        message: 'Delte this contact and associated chat.',
+        cancelButton: 'Cancel',
+        confirmButton: 'Confirm',
+      },
+    };
+    this.groupInfo = {
+      name: (n: string) => n,
+      groupDescription: 'Group description',
+      chat: 'Chat',
+      invite: 'Invite',
+      members: 'Members',
+      members_1: {
+        owner: 'Group Owner',
+        admin: 'Group Admin',
+      },
+      actionToast: {
+        enum: (code: number) => code.toString(),
+      },
+      mute: 'Mute Notification',
+      leave: 'Leave Group',
+      leaveAlert: {
+        title: 'Leave Group',
+        message:
+          'No prompt for other members and no group messages after you quit this group.',
+        cancelButton: 'Cancel',
+        confirmButton: 'Confirm',
+      },
+      modify: {
+        name: 'Change group name',
+        namePrompt: {
+          placeholder: 'Group name',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+        },
+        description: 'Change group description',
+        descriptionPrompt: {
+          placeholder: 'Group description',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+        },
+        groupId: 'Copy Group ID',
+      },
     };
   }
 }

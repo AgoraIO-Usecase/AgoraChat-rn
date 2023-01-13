@@ -236,7 +236,7 @@ const styles = createStyleSheet({
     flex: 1,
     // backgroundColor: 'green',
     padding: 20,
-    paddingBottom: 10,
+    paddingVertical: 10,
     marginVertical: 0,
     marginHorizontal: 0,
     height: 138,

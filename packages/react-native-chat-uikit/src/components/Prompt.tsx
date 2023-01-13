@@ -46,7 +46,7 @@ export default function Prompt({
   cancelLabel = 'Cancel',
 }: PromptProps): JSX.Element {
   const { defaultStatusBarTranslucent } = useHeaderContext();
-  const { colors, fonts } = useThemeContext();
+  const { fonts } = useThemeContext();
   const inputRef = React.useRef<RNTextInput>(null);
   const { width, height } = useWindowDimensions();
 
@@ -56,6 +56,7 @@ export default function Prompt({
   ];
 
   const [text, setText] = React.useState(defaultValue);
+  const clearButtonMode = 'while-editing';
 
   // FIXME: autoFocus trick with modal
   // Android
@@ -89,10 +90,7 @@ export default function Prompt({
       <DialogBox style={styles.container}>
         {Boolean(title) && (
           <View style={styles.titleContainer}>
-            <Text
-              numberOfLines={1}
-              style={[{ flex: 1, color: colors.text }, fonts.title]}
-            >
+            <Text numberOfLines={1} style={[{ color: 'black' }, fonts.title]}>
               {title}
             </Text>
           </View>
@@ -105,7 +103,12 @@ export default function Prompt({
             placeholder={placeholder}
             value={text}
             onChangeText={setText}
-            style={{ paddingHorizontal: 0, paddingVertical: 10 }}
+            clearButtonMode={clearButtonMode}
+            style={{
+              paddingHorizontal: 15,
+              paddingVertical: 10,
+              borderRadius: 20,
+            }}
           />
         </View>
 
@@ -115,6 +118,20 @@ export default function Prompt({
               <Button
                 key={text + index.toString()}
                 style={[styles.button, {}]}
+                color={
+                  index === 0
+                    ? {
+                        enabled: {
+                          content: 'black',
+                          background: 'rgba(242, 242, 242, 1)',
+                        },
+                        pressed: {
+                          content: 'black',
+                          background: 'rgba(242, 242, 242, 1)',
+                        },
+                      }
+                    : undefined
+                }
                 onPress={() => {
                   Keyboard.dismiss();
                   try {
@@ -139,11 +156,14 @@ const styles = createStyleSheet({
     paddingTop: 8,
   },
   titleContainer: {
+    // backgroundColor: 'red',
+    width: '100%',
     marginBottom: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   inputContainer: {
     paddingHorizontal: 24,
@@ -152,10 +172,12 @@ const styles = createStyleSheet({
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-evenly',
     padding: 12,
   },
   button: {
-    marginLeft: 8,
+    borderRadius: 18,
+    paddingHorizontal: 20,
+    height: 36,
   },
 });

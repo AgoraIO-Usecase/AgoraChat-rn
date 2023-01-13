@@ -20,9 +20,9 @@ const BaseTheme: Partial<ThemeContextType> = {
       lineHeight: defaultScaleFactor(20),
     },
     title: {
-      fontWeight: '500',
-      fontSize: defaultScaleFactor(22),
-      lineHeight: defaultScaleFactor(22),
+      fontWeight: '600',
+      fontSize: defaultScaleFactor(16),
+      lineHeight: defaultScaleFactor(20),
       letterSpacing: defaultScaleFactor(-0.2),
     },
     subtitle: {

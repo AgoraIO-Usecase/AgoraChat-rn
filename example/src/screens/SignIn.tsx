@@ -95,6 +95,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               <Text
                 style={styles.register}
                 onPress={() => {
+                  setDisabled(true);
                   navigation.push('SignUp', { params: undefined });
                 }}
               >

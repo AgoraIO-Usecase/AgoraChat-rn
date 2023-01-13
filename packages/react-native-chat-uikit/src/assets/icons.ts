@@ -874,6 +874,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/gray_goBack_2x.png');
     }
   },
+  'group_invite': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/group_invite_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/group_invite_2x.png');
+    } else {
+      return require('./icons/Global/group_invite.png');
+    }
+  },
   'loading': (size: string) => {
     if (size === '3x') {
       return require('./icons/Login/loading_3x.png');

@@ -56,6 +56,8 @@ import AddContact from './screens/add/AddContact';
 import ContactList from './screens/ContactList';
 import ConversationList from './screens/ConversationList';
 import GroupList from './screens/GroupList';
+import ContactInfo from './screens/info/ContactInfo';
+import GroupInfo from './screens/info/GroupInfo';
 import MySetting from './screens/MySetting';
 import RequestList from './screens/RequestList';
 import SignIn from './screens/SignIn';
@@ -357,6 +359,8 @@ export default function App() {
                   component={Add}
                 />
                 <Root.Screen name="AddContact" component={AddContact} />
+                <Root.Screen name="ContactInfo" component={ContactInfo} />
+                <Root.Screen name="GroupInfo" component={GroupInfo} />
               </Root.Group>
             </Root.Navigator>
           </NavigationContainer>

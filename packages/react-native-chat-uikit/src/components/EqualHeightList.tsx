@@ -74,6 +74,9 @@ const DefaultItemContainer: ItemContainerComponent = (
       onLongPress={() => {
         props.data?.onLongPress?.(props.data);
       }}
+      onPress={() => {
+        props.data?.onPress?.(props.data);
+      }}
     >
       {props.children}
     </Pressable>
