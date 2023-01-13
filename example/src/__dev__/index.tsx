@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DevApp from './test_auto_height';
+import DevApp from './test_radio_button';
 
 export default function dev(): JSX.Element {
   return (

@@ -66,6 +66,7 @@ export { default as LoadingRN } from './components/LoadingRN';
 export { default as MenuBar } from './components/MenuBar';
 export { default as Modal } from './components/Modal';
 export { default as Prompt } from './components/Prompt';
+export { default as RadioButton } from './components/RadioButton';
 export { default as SearchBar, SearchBarProps } from './components/SearchBar';
 export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';

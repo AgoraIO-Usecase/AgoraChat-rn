@@ -2,9 +2,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { Button, View } from 'react-native';
 
-import type { ScreenParamsList } from '../routes';
+import type { RootScreenParamsList } from '../routes';
 
-type Props = NativeStackScreenProps<ScreenParamsList>;
+type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function AddScreen({ navigation }: Props): JSX.Element {
   return (

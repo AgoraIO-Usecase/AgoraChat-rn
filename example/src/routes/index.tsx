@@ -12,7 +12,7 @@
  *
  * type RootParamsName = Extract<keyof RootParamsList, string>;
  * type RootParamsNameList = RootParamsName[];
- * type ScreenParamsList<
+ * type RootScreenParamsList<
  *   T extends {} = RootParamsList,
  *   U extends string = 'option'
  * > = {
@@ -24,7 +24,7 @@
  * const s2: RootParamsNameList = ['SignIn', 'SignUp', 'xxx'];
  * console.log(s1);
  *
- * const s2: ScreenParamsList = {
+ * const s2: RootScreenParamsList = {
  *   SignIn: {
  *     params: {
  *       name: 'zs',
@@ -35,9 +35,13 @@
  * console.log(s2);
  */
 export type {
+  BottomTabParamsList,
+  BottomTabScreenParamsList,
   RootParamsList,
   RootParamsName,
   RootParamsNameList,
-  ScreenParamsList,
+  RootScreenParamsList,
+  TopTabParamsList,
+  TopTabScreenParamsList,
 } from './list';
 export { SCREEN_LIST, SCREEN_NAME_LIST } from './list';

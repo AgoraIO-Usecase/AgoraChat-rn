@@ -22,9 +22,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
-import type { ScreenParamsList } from '../routes';
+import type { RootScreenParamsList } from '../routes';
 
-type Props = NativeStackScreenProps<ScreenParamsList>;
+type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function SignUpScreen({ navigation }: Props): JSX.Element {
   const AUTO_FOCUS = Platform.select({

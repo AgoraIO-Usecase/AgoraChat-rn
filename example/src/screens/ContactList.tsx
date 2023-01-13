@@ -1,7 +1,9 @@
+import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
-// import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import {
   createStyleSheet,
   EqualHeightList,
@@ -9,6 +11,7 @@ import {
   EqualHeightListItemData,
   EqualHeightListRef,
   queueTask,
+  RadioButton,
   useBottomSheet,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -18,14 +21,107 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
-import type { ScreenParamsList } from '../routes';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+import type {
+  BottomTabScreenParamsList,
+  RootScreenParamsList,
+  TopTabScreenParamsList,
+} from '../routes';
 
-type Props = MaterialTopTabScreenProps<ScreenParamsList>;
-// type Props = NativeStackScreenProps<ScreenParamsList>;
+// type TopTabScreenParamsList = Omit<
+//   RootScreenParamsList,
+//   | 'SignIn'
+//   | 'SignUp'
+//   | 'MySetting'
+//   | 'ConversationList'
+//   | 'AddOperation'
+//   | 'Privacy'
+//   | 'Notification'
+//   | 'General'
+//   | 'About'
+//   | 'GroupInfo'
+//   | 'ContactInfo'
+//   | 'Chat'
+//   | 'JoinGroup'
+//   | 'CreateGroup'
+//   | 'AddContact'
+//   | 'Home'
+//   | 'Contact'
+//   | 'Login'
+//   | 'Add'
+// >;
+// type StackScreenParamsList = Omit<
+//   RootScreenParamsList,
+//   | 'ContactList'
+//   | 'GroupList'
+//   | 'RequestList'
+//   | 'ConversationList'
+//   | 'Contact'
+//   | 'MySetting'
+// >;
+// type BottomTabScreenParamsList = Omit<
+//   RootScreenParamsList,
+//   | 'ContactList'
+//   | 'GroupList'
+//   | 'RequestList'
+//   | 'SignIn'
+//   | 'SignUp'
+//   | 'AddOperation'
+//   | 'Privacy'
+//   | 'Notification'
+//   | 'General'
+//   | 'About'
+//   | 'GroupInfo'
+//   | 'ContactInfo'
+//   | 'Chat'
+//   | 'JoinGroup'
+//   | 'CreateGroup'
+//   | 'AddContact'
+//   | 'Home'
+//   | 'Login'
+//   | 'Add'
+// >;
+// type TopTabScreenParamsList = Omit<
+//   RootScreenParamsList,
+//   keyof StackScreenParamsList
+// >;
+
+// type Props = MaterialTopTabScreenProps<RootScreenParamsList, 'ContactList'>;
+// type Props = NativeStackScreenProps<RootScreenParamsList>;
+// type Props = CompositeNavigationProp<
+//   MaterialTopTabScreenProps<TopTabScreenParamsList, 'ContactList', any>,
+//   NativeStackScreenProps<StackScreenParamsList>
+// >; // error
+// type Props = CompositeScreenProps<
+//   MaterialTopTabScreenProps<TopTabScreenParamsList, 'ContactList'>,
+//   CompositeScreenProps<BottomTabParamsListE, RootScreenParamsListOnly>
+// >;
+
+type BottomTabScreenParamsListOnly = Omit<
+  BottomTabScreenParamsList,
+  keyof TopTabScreenParamsList
+>;
+type RootScreenParamsListOnly = Omit<
+  RootScreenParamsList,
+  keyof BottomTabScreenParamsList
+>;
+type Props = CompositeScreenProps<
+  MaterialTopTabScreenProps<TopTabScreenParamsList, 'ContactList'>,
+  CompositeScreenProps<
+    MaterialBottomTabScreenProps<BottomTabScreenParamsListOnly>,
+    NativeStackScreenProps<RootScreenParamsListOnly>
+  >
+>;
 
 type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
+  type?: 'group_invite' | undefined;
+  action?: {
+    isActionEnabled: boolean;
+    isInvited: boolean;
+    onAction?: () => void;
+  };
 };
 
 const DefaultAvatarMemo = React.memo(() => {
@@ -41,16 +137,38 @@ const Item: EqualHeightListItemComponent = (props) => {
         <Text>{item.en}</Text>
         <Text>{item.ch}</Text>
       </View>
+      {item.type === 'group_invite' ? (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            flexGrow: 1,
+            paddingRight: 5,
+          }}
+        >
+          <RadioButton
+            checked={item.action?.isInvited}
+            onChecked={item.action?.onAction}
+          />
+        </View>
+      ) : null}
     </View>
   );
 };
 
 let count = 0;
-export default function ContactListScreen({ navigation }: Props): JSX.Element {
-  // console.log('test:ContactListScreen:', route, navigation);
+export default function ContactListScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
+  const rp = route.params as any;
+  const params = rp?.params as any;
+  const type = params?.type === 'group_invite' ? 'group_invite' : undefined;
+  console.log('test:ContactListScreen:', params, type);
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
+  const { header } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -58,7 +176,7 @@ export default function ContactListScreen({ navigation }: Props): JSX.Element {
   const enableHeader = true;
   const autoFocus = false;
   const data: ItemDataType[] = [];
-  const r = COUNTRY.map((value) => {
+  const r = COUNTRY.map((value, index) => {
     const i = value.lastIndexOf(' ');
     const en = value.slice(0, i);
     const ch = value.slice(i + 1);
@@ -115,9 +233,40 @@ export default function ContactListScreen({ navigation }: Props): JSX.Element {
         // navigation.jumpTo('ContactInfo', { params: { test: 'haha' } });
         navigation.navigate({ name: 'ContactInfo', params: {} });
       },
+      type: type,
+      action: {
+        isActionEnabled: true,
+        isInvited: index % 2 === 0 ? true : false,
+        onAction: () => {
+          console.log('test:onAction:');
+        },
+      },
     } as ItemDataType;
   });
   data.push(...r);
+
+  const Header = React.useCallback(() => {
+    const right = `${header.groupInvite}(${0})`;
+    return (
+      <Pressable
+        onPress={() => {
+          navigation.navigate('Add', { params: { value: 'test' } });
+        }}
+      >
+        <View style={{ padding: 10, marginRight: -10 }}>
+          <Text>{right}</Text>
+        </View>
+      </Pressable>
+    );
+  }, [header.groupInvite, navigation]);
+
+  React.useEffect(() => {
+    if (type === 'group_invite') {
+      navigation.setOptions({
+        headerRight: Header,
+      });
+    }
+  }, [Header, header.groupInvite, navigation, type]);
 
   return (
     <SafeAreaView

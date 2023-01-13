@@ -4,28 +4,16 @@ import { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-rol
 import Clipboard from '@react-native-clipboard/clipboard';
 import FirebaseMessage from '@react-native-firebase/messaging';
 import {
-  createMaterialBottomTabNavigator,
-  MaterialBottomTabScreenProps,
-} from '@react-navigation/material-bottom-tabs';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import {
   DarkTheme as NDarkTheme,
   DefaultTheme as NDefaultTheme,
   NavigationAction,
   NavigationContainer,
-  NavigationProp,
   NavigationState,
-  ParamListBase,
-  useNavigation,
 } from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/typescript/src/types';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerRootComponent } from 'expo';
 import * as React from 'react';
-import { Linking, Platform, Pressable, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
@@ -33,7 +21,6 @@ import {
   DarkTheme,
   LightTheme,
   Loading,
-  LocalIcon,
   Services,
   UIKitContainer,
   updateScaleFactor,
@@ -46,22 +33,19 @@ import Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
+import { GroupInviteHeader } from './components/GroupInviteHeader';
 import HeaderTitle from './components/HeaderTitle';
-import TabBarIcon from './components/TabBarIcon';
+import HomeHeaderRight from './components/HomeHeaderRight';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
 import { AppStringSet } from './I18n/AppCStringSet.en';
-import type { RootParamsList, ScreenParamsList } from './routes';
+import type { RootParamsList } from './routes';
 import Add from './screens/Add';
 import AddContact from './screens/add/AddContact';
 import ContactList from './screens/ContactList';
-import ConversationList from './screens/ConversationList';
-import GroupList from './screens/GroupList';
+import HomeScreen from './screens/Home';
 import ContactInfo from './screens/info/ContactInfo';
 import GroupInfo from './screens/info/GroupInfo';
-import MySetting from './screens/MySetting';
-import RequestList from './screens/RequestList';
-import SignIn from './screens/SignIn';
-import SignUp from './screens/SignUp';
+import LoginScreen from './screens/Login';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
 
 if (Platform.OS === 'web') {
@@ -69,145 +53,6 @@ if (Platform.OS === 'web') {
 }
 
 const Root = createNativeStackNavigator<RootParamsList>();
-
-const Contact = createMaterialTopTabNavigator<RootParamsList>();
-
-const ContactScreen = ({
-  navigation,
-  route,
-}: MaterialBottomTabScreenProps<ParamListBase, 'Contact'>): JSX.Element => {
-  console.log('test:ContactScreen:', route, navigation);
-  return (
-    <Contact.Navigator
-      screenOptions={{
-        tabBarShowLabel: false,
-        // tabBarLabelStyle: { fontSize: 12 },
-        // tabBarItemStyle: { height: 40 },
-        // tabBarStyle: { backgroundColor: 'powderblue' },
-      }}
-    >
-      <Contact.Screen
-        name="ContactList"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} type="TopContacts" />
-          ),
-        }}
-        component={ContactList}
-      />
-      <Contact.Screen
-        name="GroupList"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} type="TopGroups" />
-          ),
-        }}
-        component={GroupList}
-      />
-      <Contact.Screen
-        name="RequestList"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} type="TopRequestList" />
-          ),
-        }}
-        component={RequestList}
-      />
-    </Contact.Navigator>
-  );
-};
-
-const Home = createMaterialBottomTabNavigator<RootParamsList>();
-
-const HomeScreen = ({
-  navigation,
-  route,
-}: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element => {
-  console.log('test:HomeScreen:', route, navigation);
-  const shifting = true;
-  return (
-    <Home.Navigator
-      shifting={shifting}
-      labeled={false}
-      activeColor="blue"
-      inactiveColor="black"
-      barStyle={{ backgroundColor: 'white' }}
-    >
-      <Home.Screen
-        name="ConversationList"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon
-              focused={focused}
-              color={color}
-              type="ConversationList"
-            />
-          ),
-        }}
-        component={ConversationList}
-      />
-      <Home.Screen
-        name="Contact"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} type="Contact" />
-          ),
-        }}
-        component={ContactScreen}
-      />
-      <Home.Screen
-        name="MySetting"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon focused={focused} color={color} type="MySetting" />
-          ),
-        }}
-        component={MySetting}
-      />
-    </Home.Navigator>
-  );
-};
-
-const Login = createNativeStackNavigator<RootParamsList>();
-
-const LoginScreen = (
-  _props: NativeStackScreenProps<ParamListBase, 'Login'>
-): JSX.Element => {
-  return (
-    <Login.Navigator>
-      <Root.Screen
-        name="SignIn"
-        options={{
-          headerShown: false,
-        }}
-        component={SignIn}
-      />
-      <Root.Screen
-        name="SignUp"
-        options={{
-          headerShown: false,
-        }}
-        component={SignUp}
-      />
-    </Login.Navigator>
-  );
-};
-
-const HomeHeaderRight = (props: HeaderButtonProps): JSX.Element => {
-  console.log('test:HomeHeaderRight:', props);
-  const navigation = useNavigation<NavigationProp<ScreenParamsList>>();
-  return (
-    <Pressable
-      onPress={() => {
-        navigation.navigate('Add', { params: { value: 'test' } });
-      }}
-    >
-      <View style={{ padding: 10, marginRight: -10 }}>
-        <LocalIcon name="chat_nav_add" style={{ padding: 0 }} size={20} />
-      </View>
-    </Pressable>
-  );
-};
 
 const __KEY__ = '__KEY__';
 let __TEST__ = true;
@@ -361,6 +206,17 @@ export default function App() {
                 <Root.Screen name="AddContact" component={AddContact} />
                 <Root.Screen name="ContactInfo" component={ContactInfo} />
                 <Root.Screen name="GroupInfo" component={GroupInfo} />
+                <Root.Screen
+                  name="ContactList"
+                  options={({ route }) => {
+                    return {
+                      headerBackVisible: true,
+                      headerRight: GroupInviteHeader,
+                      headerTitle: route.name,
+                    };
+                  }}
+                  component={ContactList}
+                />
               </Root.Group>
             </Root.Navigator>
           </NavigationContainer>

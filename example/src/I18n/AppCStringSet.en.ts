@@ -3,6 +3,9 @@ import en from 'date-fns/locale/en-US';
 import { UIKitStringSet2 } from 'react-native-chat-uikit';
 
 export class AppStringSet extends UIKitStringSet2 {
+  header: {
+    groupInvite: string;
+  };
   login: {
     logo: string;
     id: string;
@@ -81,6 +84,9 @@ export class AppStringSet extends UIKitStringSet2 {
 
   constructor(locate: Locale = en) {
     super(locate);
+    this.header = {
+      groupInvite: 'Invite',
+    };
     this.login = {
       logo: 'AgoraChat',
       id: 'AgoraId',

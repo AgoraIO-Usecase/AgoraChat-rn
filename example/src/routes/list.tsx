@@ -1,9 +1,9 @@
-export type RootParamsList = {
-  SignIn: {
+export type TopTabParamsList = {
+  ContactList: {
     option?: {} | undefined;
-    params?: {} | undefined;
+    params?: { type?: 'group_invite' } | undefined;
   };
-  SignUp: {
+  GroupList: {
     option?: {} | undefined;
     params?: {} | undefined;
   };
@@ -11,19 +11,27 @@ export type RootParamsList = {
     option?: {} | undefined;
     params?: {} | undefined;
   };
-  MySetting: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  GroupList: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
+};
+export type BottomTabParamsList = TopTabParamsList & {
   ConversationList: {
     option?: {} | undefined;
     params?: {} | undefined;
   };
-  ContactList: {
+  Contact: {
+    option?: {} | undefined;
+    params?: {} | undefined;
+  };
+  MySetting: {
+    option?: {} | undefined;
+    params?: {} | undefined;
+  };
+};
+export type RootParamsList = BottomTabParamsList & {
+  SignIn: {
+    option?: {} | undefined;
+    params?: {} | undefined;
+  };
+  SignUp: {
     option?: {} | undefined;
     params?: {} | undefined;
   };
@@ -75,10 +83,6 @@ export type RootParamsList = {
     option?: {} | undefined;
     params?: {} | undefined;
   };
-  Contact: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
   Login: {
     option?: {} | undefined;
     params?: {} | undefined;
@@ -90,7 +94,19 @@ export type RootParamsList = {
 };
 export type RootParamsName = Extract<keyof RootParamsList, string>;
 export type RootParamsNameList = RootParamsName[];
-export type ScreenParamsList<
+export type TopTabScreenParamsList<
+  T extends {} = TopTabParamsList,
+  U extends string = 'option'
+> = {
+  [K in keyof T]: Omit<T[K], U>;
+};
+export type BottomTabScreenParamsList<
+  T extends {} = BottomTabParamsList,
+  U extends string = 'option'
+> = {
+  [K in keyof T]: Omit<T[K], U>;
+};
+export type RootScreenParamsList<
   T extends {} = RootParamsList,
   U extends string = 'option'
 > = {

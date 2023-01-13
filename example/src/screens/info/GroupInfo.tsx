@@ -18,13 +18,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../../contexts/AppI18nContext';
-import type { ScreenParamsList } from '../../routes';
+import type { RootScreenParamsList } from '../../routes';
 
-type Props = NativeStackScreenProps<ScreenParamsList>;
+type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export default function GroupInfoScreen(_: Props): JSX.Element {
+export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
   //   console.log('test:ConversationListScreen:', route.params, navigation);
   //   return <Placeholder content={`${GroupInfoScreen.name}`} />;
   const { groupInfo } = useAppI18nContext();
@@ -37,6 +37,76 @@ export default function GroupInfoScreen(_: Props): JSX.Element {
   const memberCount = 5;
   const groupName = 'GroupName';
 
+  const onTapGroupName = () => {
+    console.log('test:GroupName:', groupName);
+    sheet.openSheet({
+      sheetItems: [
+        {
+          title: groupInfo.modify.name,
+          titleColor: 'black',
+          onPress: () => {
+            console.log('test:openSheet:');
+            prompt.openPrompt({
+              title: groupInfo.modify.name,
+              placeholder: groupInfo.modify.namePrompt.placeholder,
+              submitLabel: groupInfo.modify.namePrompt.confirm,
+              cancelLabel: groupInfo.modify.namePrompt.cancel,
+              onSubmit: (text: string) => {
+                console.log('test:onSubmit:', text);
+              },
+              onCancel() {
+                console.log('test:onCancel:');
+              },
+            });
+          },
+        },
+        {
+          title: groupInfo.modify.description,
+          titleColor: 'black',
+          onPress: () => {
+            console.log('test:openSheet:');
+            prompt.openPrompt({
+              title: groupInfo.modify.description,
+              placeholder: groupInfo.modify.descriptionPrompt.placeholder,
+              submitLabel: groupInfo.modify.descriptionPrompt.confirm,
+              cancelLabel: groupInfo.modify.descriptionPrompt.cancel,
+              onSubmit: (text: string) => {
+                console.log('test:onSubmit:', text);
+              },
+              onCancel() {
+                console.log('test:onCancel:');
+              },
+            });
+          },
+        },
+        {
+          title: groupInfo.modify.groupId,
+          titleColor: 'black',
+          onPress: () => {
+            cbs.setString(groupInfo.modify.groupId);
+            cbs.getString().then((text) => {
+              console.log('test:openSheet:', text);
+            });
+          },
+        },
+      ],
+    });
+  };
+
+  const onInvite = () => {
+    console.log('test:onInvite:');
+    // navigation.navigate('ContactList', {
+    //   params: {
+    //     type: 'group_invite',
+    //   },
+    // });
+    navigation.push('ContactList', {
+      params: {
+        type: 'group_invite',
+      },
+    });
+  };
+
   return (
     <SafeAreaView
       mode="padding"
@@ -47,65 +117,7 @@ export default function GroupInfoScreen(_: Props): JSX.Element {
         <View style={styles.top}>
           <Avatar uri="" size={sf(100)} radius={sf(50)} />
         </View>
-        <Pressable
-          style={styles.top}
-          onPress={() => {
-            console.log('test:GroupName:', groupName);
-            sheet.openSheet({
-              sheetItems: [
-                {
-                  title: groupInfo.modify.name,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:openSheet:');
-                    prompt.openPrompt({
-                      title: groupInfo.modify.name,
-                      placeholder: groupInfo.modify.namePrompt.placeholder,
-                      submitLabel: groupInfo.modify.namePrompt.confirm,
-                      cancelLabel: groupInfo.modify.namePrompt.cancel,
-                      onSubmit: (text: string) => {
-                        console.log('test:onSubmit:', text);
-                      },
-                      onCancel() {
-                        console.log('test:onCancel:');
-                      },
-                    });
-                  },
-                },
-                {
-                  title: groupInfo.modify.description,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:openSheet:');
-                    prompt.openPrompt({
-                      title: groupInfo.modify.description,
-                      placeholder:
-                        groupInfo.modify.descriptionPrompt.placeholder,
-                      submitLabel: groupInfo.modify.descriptionPrompt.confirm,
-                      cancelLabel: groupInfo.modify.descriptionPrompt.cancel,
-                      onSubmit: (text: string) => {
-                        console.log('test:onSubmit:', text);
-                      },
-                      onCancel() {
-                        console.log('test:onCancel:');
-                      },
-                    });
-                  },
-                },
-                {
-                  title: groupInfo.modify.groupId,
-                  titleColor: 'black',
-                  onPress: () => {
-                    cbs.setString(groupInfo.modify.groupId);
-                    cbs.getString().then((text) => {
-                      console.log('test:openSheet:', text);
-                    });
-                  },
-                },
-              ],
-            });
-          }}
-        >
+        <Pressable style={styles.top} onPress={onTapGroupName}>
           <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
         </Pressable>
         <View style={{ marginTop: sf(10) }}>
@@ -121,14 +133,14 @@ export default function GroupInfoScreen(_: Props): JSX.Element {
             width: 130,
           }}
         >
-          <View>
+          <Pressable onPress={onInvite}>
             <View style={styles.chatButton}>
               <LocalIcon name="group_invite" size={sf(30)} />
             </View>
             <Text style={[styles.chat, { marginTop: 5 }]}>
               {groupInfo.invite}
             </Text>
-          </View>
+          </Pressable>
           <View>
             <View style={styles.chatButton}>
               <LocalIcon name="tabbar_chats" size={sf(30)} />
