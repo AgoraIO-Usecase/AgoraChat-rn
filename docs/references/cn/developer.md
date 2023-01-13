@@ -35,6 +35,22 @@
 
 请遵守代码提交尊则。具体参考：`@commitlint/config-conventional/README.md`
 
+```text
+  [
+    'build',
+    'chore',
+    'ci',
+    'docs',
+    'feat',
+    'fix',
+    'perf',
+    'refactor',
+    'revert',
+    'style',
+    'test'
+  ];
+```
+
 ---
 
 [返回父文档](./index.md)
