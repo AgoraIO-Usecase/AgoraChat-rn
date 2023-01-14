@@ -80,6 +80,12 @@ export class AppStringSet extends UIKitStringSet2 {
       };
       groupId: string;
     };
+    inviteAlert: {
+      title: string;
+      message: string;
+      cancelButton: string;
+      confirmButton: string;
+    };
   };
 
   constructor(locate: Locale = en) {
@@ -177,6 +183,13 @@ export class AppStringSet extends UIKitStringSet2 {
           confirm: 'Confirm',
         },
         groupId: 'Copy Group ID',
+      },
+      inviteAlert: {
+        title: 'Send group invitation',
+        message:
+          'You are about to invite nickname, nickname, nickname to the group that.',
+        cancelButton: 'Cancel',
+        confirmButton: 'Confirm',
       },
     };
   }

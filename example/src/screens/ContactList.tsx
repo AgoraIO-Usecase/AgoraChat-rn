@@ -2,6 +2,7 @@ import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bo
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
 import { Pressable, View } from 'react-native';
 import {
@@ -10,8 +11,10 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  LocalIcon,
   queueTask,
   RadioButton,
+  useAlert,
   useBottomSheet,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -27,75 +30,7 @@ import type {
   RootScreenParamsList,
   TopTabScreenParamsList,
 } from '../routes';
-
-// type TopTabScreenParamsList = Omit<
-//   RootScreenParamsList,
-//   | 'SignIn'
-//   | 'SignUp'
-//   | 'MySetting'
-//   | 'ConversationList'
-//   | 'AddOperation'
-//   | 'Privacy'
-//   | 'Notification'
-//   | 'General'
-//   | 'About'
-//   | 'GroupInfo'
-//   | 'ContactInfo'
-//   | 'Chat'
-//   | 'JoinGroup'
-//   | 'CreateGroup'
-//   | 'AddContact'
-//   | 'Home'
-//   | 'Contact'
-//   | 'Login'
-//   | 'Add'
-// >;
-// type StackScreenParamsList = Omit<
-//   RootScreenParamsList,
-//   | 'ContactList'
-//   | 'GroupList'
-//   | 'RequestList'
-//   | 'ConversationList'
-//   | 'Contact'
-//   | 'MySetting'
-// >;
-// type BottomTabScreenParamsList = Omit<
-//   RootScreenParamsList,
-//   | 'ContactList'
-//   | 'GroupList'
-//   | 'RequestList'
-//   | 'SignIn'
-//   | 'SignUp'
-//   | 'AddOperation'
-//   | 'Privacy'
-//   | 'Notification'
-//   | 'General'
-//   | 'About'
-//   | 'GroupInfo'
-//   | 'ContactInfo'
-//   | 'Chat'
-//   | 'JoinGroup'
-//   | 'CreateGroup'
-//   | 'AddContact'
-//   | 'Home'
-//   | 'Login'
-//   | 'Add'
-// >;
-// type TopTabScreenParamsList = Omit<
-//   RootScreenParamsList,
-//   keyof StackScreenParamsList
-// >;
-
-// type Props = MaterialTopTabScreenProps<RootScreenParamsList, 'ContactList'>;
-// type Props = NativeStackScreenProps<RootScreenParamsList>;
-// type Props = CompositeNavigationProp<
-//   MaterialTopTabScreenProps<TopTabScreenParamsList, 'ContactList', any>,
-//   NativeStackScreenProps<StackScreenParamsList>
-// >; // error
-// type Props = CompositeScreenProps<
-//   MaterialTopTabScreenProps<TopTabScreenParamsList, 'ContactList'>,
-//   CompositeScreenProps<BottomTabParamsListE, RootScreenParamsListOnly>
-// >;
+import type { GroupActionType, Undefinable } from '../types';
 
 type BottomTabScreenParamsListOnly = Omit<
   BottomTabScreenParamsList,
@@ -116,7 +51,7 @@ type Props = CompositeScreenProps<
 type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
-  type?: 'group_invite' | undefined;
+  type?: Undefinable<GroupActionType>;
   action?: {
     isActionEnabled: boolean;
     isInvited: boolean;
@@ -163,12 +98,13 @@ export default function ContactListScreen({
 }: Props): JSX.Element {
   const rp = route.params as any;
   const params = rp?.params as any;
-  const type = params?.type === 'group_invite' ? 'group_invite' : undefined;
+  const type = params?.type as Undefinable<GroupActionType>;
   console.log('test:ContactListScreen:', params, type);
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
-  const { header } = useAppI18nContext();
+  const alert = useAlert();
+  const { header, groupInfo } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -185,24 +121,6 @@ export default function ContactListScreen({
       en: en,
       ch: ch,
       onLongPress: (data) => {
-        console.log('test:onLongPress:data:', data);
-        // menu.openMenu({
-        //   // title: 'test',
-        //   menuItems: [
-        //     {
-        //       title: '1',
-        //       onPress: () => {
-        //         console.log('test:1:');
-        //       },
-        //     },
-        //     {
-        //       title: '2',
-        //       onPress: () => {
-        //         console.log('test:2:');
-        //       },
-        //     },
-        //   ],
-        // });
         sheet.openSheet({
           sheetItems: [
             {
@@ -226,11 +144,7 @@ export default function ContactListScreen({
           ],
         });
       },
-      onPress: (data) => {
-        console.log('test:onPress:data:', data);
-        // navigation.push('ContactInfo', { params: { test: 'haha' } });
-        // navigation.jumpTo('GroupList', { params: {} });
-        // navigation.jumpTo('ContactInfo', { params: { test: 'haha' } });
+      onPress: (_) => {
         navigation.navigate({ name: 'ContactInfo', params: {} });
       },
       type: type,
@@ -245,28 +159,63 @@ export default function ContactListScreen({
   });
   data.push(...r);
 
-  const Header = React.useCallback(() => {
-    const right = `${header.groupInvite}(${0})`;
-    return (
-      <Pressable
-        onPress={() => {
-          navigation.navigate('Add', { params: { value: 'test' } });
-        }}
-      >
-        <View style={{ padding: 10, marginRight: -10 }}>
-          <Text>{right}</Text>
-        </View>
-      </Pressable>
-    );
-  }, [header.groupInvite, navigation]);
+  const NavigationHeaderRight = React.useCallback(
+    (_: HeaderButtonProps) => {
+      const Right = ({ type }: { type: Undefinable<GroupActionType> }) => {
+        if (type === 'group_invite') {
+          const right = `${header.groupInvite}(${0})`;
+          return (
+            <View style={{ padding: 10, marginRight: -10 }}>
+              <Text>{right}</Text>
+            </View>
+          );
+        } else if (type === 'group_member') {
+          return (
+            <View style={{ padding: 10, marginRight: -10 }}>
+              <LocalIcon name="contact_add_contacts" size={28} />
+            </View>
+          );
+        } else {
+          return null;
+        }
+      };
+      return (
+        <Pressable
+          onPress={() => {
+            alert.openAlert({
+              title: groupInfo.inviteAlert.title,
+              message: groupInfo.inviteAlert.message,
+              buttons: [
+                {
+                  text: groupInfo.inviteAlert.cancelButton,
+                  onPress: () => {
+                    navigation.goBack();
+                  },
+                },
+                {
+                  text: groupInfo.inviteAlert.confirmButton,
+                  onPress: () => {
+                    navigation.goBack();
+                  },
+                },
+              ],
+            });
+          }}
+        >
+          <Right type={type} />
+        </Pressable>
+      );
+    },
+    [alert, groupInfo, header.groupInvite, navigation, type]
+  );
 
   React.useEffect(() => {
-    if (type === 'group_invite') {
+    if (type === 'group_invite' || type === 'group_member') {
       navigation.setOptions({
-        headerRight: Header,
+        headerRight: NavigationHeaderRight,
       });
     }
-  }, [Header, header.groupInvite, navigation, type]);
+  }, [NavigationHeaderRight, header.groupInvite, navigation, type]);
 
   return (
     <SafeAreaView
@@ -298,7 +247,6 @@ export default function ContactListScreen({
           <ListSearchHeader
             autoFocus={autoFocus}
             onChangeText={(text) => {
-              console.log('test:ListSearchHeader:onChangeText:', Text);
               queueTask(() => {
                 const r: ItemDataType[] = [];
                 for (const item of data) {

@@ -38,14 +38,12 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
   const groupName = 'GroupName';
 
   const onTapGroupName = () => {
-    console.log('test:GroupName:', groupName);
     sheet.openSheet({
       sheetItems: [
         {
           title: groupInfo.modify.name,
           titleColor: 'black',
           onPress: () => {
-            console.log('test:openSheet:');
             prompt.openPrompt({
               title: groupInfo.modify.name,
               placeholder: groupInfo.modify.namePrompt.placeholder,
@@ -64,7 +62,6 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
           title: groupInfo.modify.description,
           titleColor: 'black',
           onPress: () => {
-            console.log('test:openSheet:');
             prompt.openPrompt({
               title: groupInfo.modify.description,
               placeholder: groupInfo.modify.descriptionPrompt.placeholder,
@@ -94,15 +91,17 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
   };
 
   const onInvite = () => {
-    console.log('test:onInvite:');
-    // navigation.navigate('ContactList', {
-    //   params: {
-    //     type: 'group_invite',
-    //   },
-    // });
     navigation.push('ContactList', {
       params: {
         type: 'group_invite',
+      },
+    });
+  };
+
+  const onMembers = () => {
+    navigation.push('ContactList', {
+      params: {
+        type: 'group_member',
       },
     });
   };
@@ -151,7 +150,7 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
           </View>
         </View>
         <View style={{ height: sf(66) }} />
-        <View style={styles.listItem}>
+        <Pressable onPress={onMembers} style={styles.listItem}>
           <Text style={styles.listItemText1}>{groupInfo.members}</Text>
           <View
             style={{
@@ -164,13 +163,12 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
             <View style={{ width: sf(5) }} />
             <LocalIcon name="go_small_black_mobile" size={sf(14)} />
           </View>
-        </View>
+        </Pressable>
         <View style={styles.listItem}>
           <Text style={styles.listItemText1}>{groupInfo.mute}</Text>
           <Switch
             value={isMute}
             onChangeValue={function (val: boolean): void {
-              console.log('test:Switch:', val);
               setIsMute(val);
             }}
             size={sf(28)}
@@ -182,7 +180,6 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
         <Pressable
           style={styles.listItem}
           onPress={() => {
-            console.log('test:delete:');
             alert.openAlert({
               title: groupInfo.leaveAlert.title,
               message: groupInfo.leaveAlert.message,

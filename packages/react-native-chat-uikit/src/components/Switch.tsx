@@ -28,7 +28,7 @@ export default function Switch({
 
   const changedStyles = React.useMemo(() => {
     if (size) {
-      OFFSET = { H: size, W: size };
+      OFFSET = { H: size, W: size * 0.75 };
       return createStyleSheet({
         container: {
           ...styles.container,
@@ -41,17 +41,17 @@ export default function Switch({
         },
         thumb: {
           ...styles.thumb,
-          width: OFFSET.W - (OFFSET.W * 0.2 > 1 ? OFFSET.W * 0.2 : 1),
-          height: OFFSET.W - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
-          borderRadius: OFFSET.W / 2,
+          width: OFFSET.H - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
+          height: OFFSET.H - (OFFSET.H * 0.2 > 1 ? OFFSET.H * 0.2 : 1),
+          borderRadius: OFFSET.H / 2,
         },
         thumbOn: {
           ...styles.thumbOn,
-          left: OFFSET.H / 2,
+          left: (OFFSET.H * 0.75) / 2,
         },
         thumbOff: {
           ...styles.thumbOff,
-          left: -OFFSET.H / 2,
+          left: (-OFFSET.H * 0.75) / 2,
         },
       });
     }
@@ -110,7 +110,7 @@ export default function Switch({
   );
 }
 
-let OFFSET = { W: 20, H: 20 };
+let OFFSET = { W: 15, H: 20 };
 
 const styles = createStyleSheet({
   container: {

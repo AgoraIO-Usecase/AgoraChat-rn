@@ -1,7 +1,9 @@
+import type { GroupActionType, Undefinable } from '../types';
+
 export type TopTabParamsList = {
   ContactList: {
     option?: {} | undefined;
-    params?: { type?: 'group_invite' } | undefined;
+    params?: { type?: Undefinable<GroupActionType> } | undefined;
   };
   GroupList: {
     option?: {} | undefined;

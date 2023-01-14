@@ -113,6 +113,25 @@ export default function App() {
     return null;
   }
 
+  const formatNavigationState = (
+    state: NavigationState | undefined,
+    result: string[] & string[][]
+  ) => {
+    if (state) {
+      const ret: string[] & string[][] = [];
+      for (const route of state.routes) {
+        ret.push(route.name);
+        if (route.state) {
+          formatNavigationState(
+            route.state as NavigationState | undefined,
+            ret
+          );
+        }
+      }
+      result.push(ret);
+    }
+  };
+
   return (
     <React.StrictMode>
       <UIKitContainer
@@ -160,7 +179,12 @@ export default function App() {
             initialState={initialState}
             theme={isLightTheme ? NDefaultTheme : NDarkTheme}
             onStateChange={(state: NavigationState | undefined) => {
-              console.log('test:onStateChange:', state);
+              const rr: string[] & string[][] = [];
+              formatNavigationState(state, rr);
+              console.log(
+                'test:onStateChange:',
+                JSON.stringify(rr, undefined, '  ')
+              );
               storage.setItem(__KEY__, JSON.stringify(state));
             }}
             onUnhandledAction={(action: NavigationAction) => {

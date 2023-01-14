@@ -7,7 +7,7 @@ import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { RootScreenParamsList } from '../routes';
 
 export const GroupInviteHeader = (props: HeaderButtonProps): JSX.Element => {
-  console.log('test:HomeHeaderRight:', props);
+  console.log('test:GroupInviteHeader:', props);
   const { header } = useAppI18nContext();
   const navigation = useNavigation<NavigationProp<RootScreenParamsList>>();
   let right = header.groupInvite + '(0)';
