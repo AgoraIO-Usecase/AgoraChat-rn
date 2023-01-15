@@ -928,6 +928,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/request_reject_2x.png');
     }
   },
+  'trash': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/trash_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/trash_2x.png');
+    } else {
+      return require('./icons/Global/trash.png');
+    }
+  },
   'white_goBack': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/white_goBack_3x.png');

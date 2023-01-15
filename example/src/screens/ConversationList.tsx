@@ -1,12 +1,14 @@
 import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
 import * as React from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import {
+  Badge as UIBadge,
   createStyleSheet,
   EqualHeightList,
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  LocalIcon,
   queueTask,
   useBottomSheet,
   useThemeContext,
@@ -33,12 +35,54 @@ const DefaultAvatarMemo = React.memo(() => {
 
 const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
+  const { width } = useWindowDimensions();
+  const extraWidth = item.sideslip?.width ?? 100;
+  const screenWidth = width;
+  // console.log('test:width:', screenWidth + extraWidth);
   return (
-    <View style={styles.item}>
-      <DefaultAvatarMemo />
-      <View style={styles.itemText}>
-        <Text>{item.en}</Text>
-        <Text>{item.ch}</Text>
+    <View style={[styles.item, { width: screenWidth + extraWidth }]}>
+      <View
+        style={{
+          // width: screenWidth,
+          flexGrow: 1,
+          flexShrink: 1,
+          flexDirection: 'row',
+        }}
+      >
+        <DefaultAvatarMemo />
+        <View style={[styles.itemText, { justifyContent: 'space-between' }]}>
+          <Text>{item.en}</Text>
+          <Text>{item.ch}</Text>
+        </View>
+        <View
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            flexGrow: 1,
+          }}
+        >
+          <Text>MM:HH:MM</Text>
+          <UIBadge
+            count={10}
+            badgeColor="rgba(255, 20, 204, 1)"
+            size="default"
+          />
+        </View>
+      </View>
+      <View
+        style={{
+          // flexGrow: 1,
+          width: extraWidth, // ??? why
+          height: 60,
+          flexDirection: 'row',
+          // backgroundColor: 'green',
+          justifyContent: 'flex-start',
+        }}
+      >
+        <View style={{ width: 20 }} />
+        <LocalIcon name="trash" size={30} />
+        <View style={{ width: 15 }} />
+        <LocalIcon name="trash" size={30} />
       </View>
     </View>
   );
@@ -61,6 +105,7 @@ export default function ConversationListScreen({
   const enableHeader = true;
   const autoFocus = false;
   const data: ItemDataType[] = [];
+  const width = 100;
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
     const en = value.slice(0, i);
@@ -69,25 +114,12 @@ export default function ConversationListScreen({
       key: en,
       en: en,
       ch: ch,
+      type: 'sideslip',
+      sideslip: {
+        width: width,
+      },
       onLongPress: (data) => {
         console.log('test:onLongPress:data:', data);
-        // menu.openMenu({
-        //   // title: 'test',
-        //   menuItems: [
-        //     {
-        //       title: '1',
-        //       onPress: () => {
-        //         console.log('test:1:');
-        //       },
-        //     },
-        //     {
-        //       title: '2',
-        //       onPress: () => {
-        //         console.log('test:2:');
-        //       },
-        //     },
-        //   ],
-        // });
         sheet.openSheet({
           sheetItems: [
             {
@@ -198,7 +230,7 @@ export default function ConversationListScreen({
 }
 const styles = createStyleSheet({
   item: {
-    flex: 1,
+    // flex: 1,
     // backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 0,

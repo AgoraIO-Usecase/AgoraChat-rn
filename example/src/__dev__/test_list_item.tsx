@@ -6,7 +6,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { EqualHeightListItemData, LocalIcon } from 'react-native-chat-uikit';
+import {
+  EqualHeightListItemData,
+  LocalIcon,
+  timestamp,
+} from 'react-native-chat-uikit';
 import { FlatList } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
 
@@ -25,41 +29,109 @@ const Item = (item: ItemDataType) => {
   // const disableIntervalMomentum = true;
   // const snapToEnd = false;
   const width = 80;
+  const currentX = React.useRef(0);
+  const currentY = React.useRef(0);
+  const startTime = React.useRef(0);
+  const endTime = React.useRef(0);
 
   React.useEffect(() => {
     // console.log('test:Item:useEffect:');
     const subscription = DeviceEventEmitter.addListener(
-      'closeEditable',
-      (data) => {
-        console.log('test:closeEditable:', data);
-        closeEditable();
+      'closeEditableTest',
+      (_) => {
+        // console.log('test:closeEditableTest:', data);
+        closeEditableTest();
       }
     );
     return () => subscription.remove();
   }, []);
 
-  const closeEditable = () => {
+  const closeEditableTest = () => {
     scrollViewRef.current?.scrollTo({ x: 0, animated: true });
   };
 
-  const autoAlign = (moveX: number, width: number) => {
+  const _autoAlign = (moveX: number, width: number) => {
     const w = width / 2;
-    if (0 < moveX && moveX < w) {
+    if (0 <= moveX && moveX < w) {
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
     } else {
       scrollViewRef.current?.scrollTo({ x: width, animated: true });
     }
   };
 
+  const _onClicked = () => {
+    console.log('test:_onClicked:');
+    endTime.current = timestamp();
+    if (endTime.current - startTime.current < 1000) {
+      console.log('onPressed');
+    } else {
+      console.log('onLongPressed');
+    }
+  };
+
+  // const responderRef = React.useRef(
+  //   PanResponder.create({
+  //     onMoveShouldSetPanResponderCapture: () => false,
+  //     onStartShouldSetPanResponderCapture: () => false,
+  //     onPanResponderStart: (e, { moveX, x0, dx, vx }) => {
+  //       console.log('test:onPanResponderStart:', moveX, x0, dx, vx);
+  //       // e.preventDefault();
+  //     },
+  //     onPanResponderMove: (e, { moveX, x0, dx, vx }) => {
+  //       console.log('test:onPanResponderMove:', moveX, x0, dx, vx);
+  //       // e.preventDefault();
+  //     },
+  //     onPanResponderRelease: (e, { moveX, x0, dx, vx }) => {
+  //       console.log('test:onPanResponderRelease:', moveX, x0, dx, vx);
+  //       // e.preventDefault();
+  //     },
+  //     // onStartShouldSetResponderCapture: (event: GestureResponderEvent) => {
+
+  //     // };
+  //   })
+  // ).current;
+
   return (
     <View>
       <ScrollView
         ref={scrollViewRef}
+        onScrollBeginDrag={(event) => {
+          console.log(
+            'test:onScrollBeginDrag:',
+            event.nativeEvent.contentOffset
+          );
+          // currentX.current = event.nativeEvent.contentOffset.x;
+        }}
         onScrollEndDrag={(event) => {
           console.log('test:onScrollEndDrag:', event.nativeEvent.contentOffset);
           const x = event.nativeEvent.contentOffset.x;
-          autoAlign(x, width);
+          _autoAlign(x, width);
         }}
+        onTouchStart={(event) => {
+          console.log('test:onTouchStart:2:', event.nativeEvent.locationX);
+          currentX.current = event.nativeEvent.locationX;
+          currentY.current = event.nativeEvent.locationY;
+          startTime.current = timestamp();
+        }}
+        onTouchEnd={(event) => {
+          console.log('test:onTouchEnd:2:');
+          if (
+            event.nativeEvent.locationX === currentX.current &&
+            event.nativeEvent.locationY === currentY.current
+          ) {
+            _onClicked();
+          }
+        }}
+        // onStartShouldSetResponderCapture={(_) => {
+        //   let r = false;
+        //   if (scrollViewRef.current?.scrollResponderIsAnimating()) {
+        //     r = true;
+        //   } else {
+        //     r = false;
+        //   }
+        //   console.log('test:onStartShouldSetResponderCapture:', r);
+        //   return r;
+        // }}
         bounces={bounces}
         horizontal={horizontal}
         // scrollEventThrottle={scrollEventThrottle}
@@ -78,6 +150,13 @@ const Item = (item: ItemDataType) => {
             borderColor: 'grey',
             borderWidth: 1,
           }}
+          // {...responderRef.panHandlers}
+          // onStartShouldSetResponderCapture={(_) => {
+          //   return false;
+          // }}
+          // onTouchStart={() => {
+          //   console.log('test:onTouchStart:1:');
+          // }}
         >
           <Text>{item.en}</Text>
           <Text>{item.ch}</Text>
@@ -101,10 +180,10 @@ export default function TestListItem() {
   // React.useEffect(() => {
   //   console.log('test:Item:useEffect:2:');
   //   const subscription = DeviceEventEmitter.addListener(
-  //     'closeEditable',
+  //     'closeEditableTest',
   //     (data) => {
-  //       console.log('test:closeEditable:', data);
-  //       // closeEditable();
+  //       console.log('test:closeEditableTest:', data);
+  //       // closeEditableTest();
   //     }
   //   );
   //   return () => subscription.remove();
@@ -177,7 +256,7 @@ export default function TestListItem() {
             'test:onScrollBeginDrag:',
             event.nativeEvent.contentOffset
           );
-          DeviceEventEmitter.emit('closeEditable', {
+          DeviceEventEmitter.emit('closeEditableTest', {
             x: event.nativeEvent.contentOffset.x,
           });
         }}

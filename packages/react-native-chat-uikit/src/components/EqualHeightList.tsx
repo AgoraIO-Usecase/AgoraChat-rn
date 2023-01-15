@@ -3,12 +3,14 @@
 import * as React from 'react';
 import {
   Animated,
+  DeviceEventEmitter,
   FlatList as RNFlatList,
   FlatListProps as RNFlatListProps,
   ListRenderItemInfo,
   PanResponder,
   Pressable,
   RefreshControlProps,
+  ScrollView,
   StyleProp,
   Text,
   TextStyle,
@@ -18,11 +20,18 @@ import {
 
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
+import { timestamp } from '../utils/generator';
+
+export type ListItemType = 'default' | 'sideslip';
 
 export interface ItemData {
   key: string;
+  type?: ListItemType;
   onLongPress?: (data?: ItemData) => void;
   onPress?: (data?: ItemData) => void;
+  sideslip?: {
+    width: number;
+  };
 }
 
 export interface ItemProps {
@@ -62,23 +71,121 @@ const DefaultItemContainer: ItemContainerComponent = (
   props: ItemContainerProps
 ): JSX.Element => {
   return (
+    <Pressable
+      style={[props.style]}
+      onLayout={(e) => {
+        if (props.height) {
+          const ref = props.height as React.MutableRefObject<number>;
+          ref.current = e.nativeEvent.layout.height;
+          // console.log('test:onLayout:height:', e.nativeEvent.layout);
+        }
+      }}
+      onLongPress={() => {
+        props.data?.onLongPress?.(props.data);
+      }}
+      onPress={() => {
+        props.data?.onPress?.(props.data);
+      }}
+    >
+      {props.children}
+    </Pressable>
+  );
+};
+const DefaultItemSideslipContainer: ItemContainerComponent = (
+  props: ItemContainerProps
+): JSX.Element => {
+  const horizontal = true;
+  const bounces = false;
+  const showsHorizontalScrollIndicator = false;
+  const scrollViewRef = React.useRef<ScrollView>(null);
+  const extraWidth = props.data?.sideslip?.width ?? 0;
+  const currentX = React.useRef(0);
+  const currentY = React.useRef(0);
+  const startTime = React.useRef(0);
+  const endTime = React.useRef(0);
+
+  React.useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      'closeEditable',
+      (_) => {
+        _closeEditable();
+      }
+    );
+    return () => subscription.remove();
+  }, []);
+
+  const _closeEditable = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, animated: true });
+  };
+
+  const _autoAlign = (moveX: number, width: number) => {
+    console.log('test:_autoAlign:', moveX, width);
+    const w = width / 2;
+    if (0 <= moveX && moveX < w) {
+      scrollViewRef.current?.scrollTo({ x: 0, animated: true });
+    } else {
+      scrollViewRef.current?.scrollTo({ x: width, animated: true });
+    }
+  };
+
+  const _onClicked = () => {
+    console.log('test:_onClicked:');
+    endTime.current = timestamp();
+    if (endTime.current - startTime.current < 1000) {
+      console.log('onPressed');
+      props.data?.onPress?.(props.data);
+    } else {
+      console.log('onLongPressed');
+      props.data?.onLongPress?.(props.data);
+    }
+  };
+
+  return (
     <View
       style={[props.style]}
       onLayout={(e) => {
         if (props.height) {
           const ref = props.height as React.MutableRefObject<number>;
           ref.current = e.nativeEvent.layout.height;
-          // console.log('test:onLayout:height:', ref.current);
+          // console.log('test:onLayout:height:2:', e.nativeEvent.layout);
         }
       }}
-      // onLongPress={() => {
-      //   props.data?.onLongPress?.(props.data);
-      // }}
-      // onPress={() => {
-      //   props.data?.onPress?.(props.data);
-      // }}
     >
-      {props.children}
+      <ScrollView
+        ref={scrollViewRef}
+        onScrollBeginDrag={(event) => {
+          console.log(
+            'test:onScrollBeginDrag:',
+            event.nativeEvent.contentOffset
+          );
+        }}
+        onScrollEndDrag={(event) => {
+          console.log('test:onScrollEndDrag:', event.nativeEvent.contentOffset);
+          const x = event.nativeEvent.contentOffset.x;
+          _autoAlign(x, extraWidth);
+        }}
+        onTouchStart={(event) => {
+          console.log('test:onTouchStart:2:', event.nativeEvent.locationX);
+          currentX.current = event.nativeEvent.locationX;
+          currentY.current = event.nativeEvent.locationY;
+          startTime.current = timestamp();
+        }}
+        onTouchEnd={(event) => {
+          console.log('test:onTouchEnd:2:');
+          if (
+            event.nativeEvent.locationX === currentX.current &&
+            event.nativeEvent.locationY === currentY.current
+          ) {
+            _onClicked();
+          }
+        }}
+        bounces={bounces}
+        horizontal={horizontal}
+        showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
+        // style={{ width: 300, backgroundColor: 'purple', height: 40 }}
+      >
+        {props.children}
+      </ScrollView>
     </View>
   );
 };
@@ -286,7 +393,12 @@ export const EqualHeightList: (
             data: item,
             style: itemStyle,
           },
-          ItemContainer: DefaultItemContainer,
+          ItemContainer:
+            item.type === 'default'
+              ? DefaultItemContainer
+              : item.type === 'sideslip'
+              ? DefaultItemSideslipContainer
+              : DefaultItemContainer,
           itemContainerProps: {
             index: index,
             alphabet: alphabet,
@@ -538,6 +650,9 @@ export const EqualHeightList: (
         // keyboardShouldPersistTaps={'never'}
         // keyboardDismissMode={'none'}
         // stickyHeaderIndices={[0]}
+        onScrollBeginDrag={(_) => {
+          DeviceEventEmitter.emit('closeEditable', {});
+        }}
         {...others}
       />
       {enableAlphabet === true ? (
@@ -616,7 +731,7 @@ export const EqualHeightList: (
 
 const styles = createStyleSheet({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     // marginTop: StatusBar.currentHeight || 0,
   },
