@@ -27,7 +27,7 @@ type Props = MaterialTopTabScreenProps<RootParamsList>;
 type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
-  onAction: (isAccepted: boolean) => void;
+  onAction?: (isAccepted: boolean) => void;
 };
 
 const DefaultAvatarMemo = React.memo(() => {
@@ -59,11 +59,11 @@ const Item: EqualHeightListItemComponent = (props) => {
         <View style={styles.item3}>
           <Button
             style={{ alignSelf: 'flex-end', height: 28, borderRadius: 14 }}
-            onPress={() => item.onAction(true)}
+            onPress={() => item.onAction?.(true)}
           >
             <Text style={{ color: 'white', marginHorizontal: 8 }}>Accept</Text>
           </Button>
-          <Pressable onPress={() => item.onAction(false)}>
+          <Pressable onPress={() => item.onAction?.(false)}>
             <LocalIcon
               name="xmark_thick"
               color="black"

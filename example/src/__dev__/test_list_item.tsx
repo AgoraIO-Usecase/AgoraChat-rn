@@ -1,65 +1,117 @@
-import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
 import * as React from 'react';
-import { View } from 'react-native';
 import {
-  createStyleSheet,
-  EqualHeightList,
-  EqualHeightListItemComponent,
-  EqualHeightListItemData,
-  EqualHeightListRef,
-  queueTask,
-  useBottomSheet,
-  useThemeContext,
-} from 'react-native-chat-uikit';
-import { Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { DefaultAvatar } from '../components/DefaultAvatars';
-import { ListItemSeparator } from '../components/ListItemSeparator';
-import { ListSearchHeader } from '../components/ListSearchHeader';
-import type { RootParamsList } from '../routes';
-
-type Props = MaterialBottomTabScreenProps<RootParamsList>;
+  DeviceEventEmitter,
+  ListRenderItemInfo,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
+import { EqualHeightListItemData, LocalIcon } from 'react-native-chat-uikit';
+import { FlatList } from 'react-native-gesture-handler';
+import { Button } from 'react-native-paper';
 
 type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
-  timestamp: number;
 };
 
-const DefaultAvatarMemo = React.memo(() => {
-  return <DefaultAvatar size={50} radius={25} />;
-});
+const Item = (item: ItemDataType) => {
+  const horizontal = true;
+  const bounces = false;
+  // const showsVerticalScrollIndicator = false;
+  const showsHorizontalScrollIndicator = false;
+  // const scrollEventThrottle = 10;
+  const scrollViewRef = React.useRef<ScrollView>(null);
+  // const disableIntervalMomentum = true;
+  // const snapToEnd = false;
+  const width = 80;
 
-const Item: EqualHeightListItemComponent = (props) => {
-  const item = props.data as ItemDataType;
+  React.useEffect(() => {
+    // console.log('test:Item:useEffect:');
+    const subscription = DeviceEventEmitter.addListener(
+      'closeEditable',
+      (data) => {
+        console.log('test:closeEditable:', data);
+        closeEditable();
+      }
+    );
+    return () => subscription.remove();
+  }, []);
+
+  const closeEditable = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, animated: true });
+  };
+
+  const autoAlign = (moveX: number, width: number) => {
+    const w = width / 2;
+    if (0 < moveX && moveX < w) {
+      scrollViewRef.current?.scrollTo({ x: 0, animated: true });
+    } else {
+      scrollViewRef.current?.scrollTo({ x: width, animated: true });
+    }
+  };
+
   return (
-    <View style={styles.item}>
-      <DefaultAvatarMemo />
-      <View style={styles.itemText}>
-        <Text>{item.en}</Text>
-        <Text>{item.ch}</Text>
-      </View>
+    <View>
+      <ScrollView
+        ref={scrollViewRef}
+        onScrollEndDrag={(event) => {
+          console.log('test:onScrollEndDrag:', event.nativeEvent.contentOffset);
+          const x = event.nativeEvent.contentOffset.x;
+          autoAlign(x, width);
+        }}
+        bounces={bounces}
+        horizontal={horizontal}
+        // scrollEventThrottle={scrollEventThrottle}
+        // showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+        showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
+        // disableIntervalMomentum={disableIntervalMomentum}
+        // snapToEnd={snapToEnd}
+        // pointerEvents="box-only"
+        style={{ width: 300, backgroundColor: 'purple', height: 40 }}
+      >
+        <View
+          style={{
+            backgroundColor: 'green',
+            width: 300,
+            height: 80,
+            borderColor: 'grey',
+            borderWidth: 1,
+          }}
+        >
+          <Text>{item.en}</Text>
+          <Text>{item.ch}</Text>
+        </View>
+        <View style={{ width: width }}>
+          <LocalIcon name="delete" />
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
-let count = 0;
-export default function ConversationListScreen({
-  navigation,
-}: Props): JSX.Element {
-  // console.log('test:ConversationListScreen:', route, navigation);
-  // return <Placeholder content={`${ConversationListScreen.name}`} />;
-  // console.log('test:GroupListScreen:', route, navigation);
-  const theme = useThemeContext();
-  // const menu = useActionMenu();
-  const sheet = useBottomSheet();
+const RenderItem = (info: ListRenderItemInfo<ItemDataType>) => {
+  const item = info.item as ItemDataType;
+  return <Item {...item} />;
+};
 
-  const listRef = React.useRef<EqualHeightListRef>(null);
-  const enableRefresh = true;
-  const enableAlphabet = false;
-  const enableHeader = true;
-  const autoFocus = false;
+export default function TestListItem() {
+  const [icon, setIcon] = React.useState(false);
+
+  // React.useEffect(() => {
+  //   console.log('test:Item:useEffect:2:');
+  //   const subscription = DeviceEventEmitter.addListener(
+  //     'closeEditable',
+  //     (data) => {
+  //       console.log('test:closeEditable:', data);
+  //       // closeEditable();
+  //     }
+  //   );
+  //   return () => subscription.remove();
+  // }, []);
+
+  const horizontal = true;
+  const bounces = false;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -69,148 +121,75 @@ export default function ConversationListScreen({
       key: en,
       en: en,
       ch: ch,
-      onLongPress: (data) => {
-        console.log('test:onLongPress:data:', data);
-        // menu.openMenu({
-        //   // title: 'test',
-        //   menuItems: [
-        //     {
-        //       title: '1',
-        //       onPress: () => {
-        //         console.log('test:1:');
-        //       },
-        //     },
-        //     {
-        //       title: '2',
-        //       onPress: () => {
-        //         console.log('test:2:');
-        //       },
-        //     },
-        //   ],
-        // });
-        sheet.openSheet({
-          sheetItems: [
-            {
-              icon: 'loading',
-              iconColor: theme.colors.primary,
-              title: '1',
-              titleColor: 'black',
-              onPress: () => {
-                console.log('test:onPress:data:', data);
-              },
-            },
-            {
-              icon: 'loading',
-              iconColor: theme.colors.primary,
-              title: '2',
-              titleColor: 'black',
-              onPress: () => {
-                console.log('test:onPress:data:', data);
-              },
-            },
-          ],
-        });
-      },
-      onPress: (data) => {
-        console.log('test:onPress:data:', data);
-        navigation.navigate({ name: 'GroupInfo', params: {} });
-      },
     } as ItemDataType;
   });
   data.push(...r);
 
   return (
-    <SafeAreaView
-      mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      edges={['right', 'left']}
-    >
-      <EqualHeightList
-        onLayout={(event) => {
-          console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
-        }}
-        ref={listRef}
-        items={data}
-        ItemFC={Item}
-        enableAlphabet={enableAlphabet}
-        enableRefresh={enableRefresh}
-        enableHeader={enableHeader}
-        alphabet={{
-          alphabetCurrent: {
-            backgroundColor: 'orange',
-            color: 'white',
-          },
-          alphabetItemContainer: {
-            width: 15,
-            borderRadius: 8,
-          },
-        }}
-        Header={(props) => (
-          <ListSearchHeader
-            autoFocus={autoFocus}
-            onChangeText={(text) => {
-              console.log('test:ListSearchHeader:onChangeText:', Text);
-              queueTask(() => {
-                const r: ItemDataType[] = [];
-                for (const item of data) {
-                  if (item.key.includes(text)) {
-                    r.push(item);
-                  }
-                }
-                listRef.current?.manualRefresh([
-                  {
-                    type: 'clear',
-                  },
-                  {
-                    type: 'add',
-                    data: r,
-                    enableSort: true,
-                  },
-                ]);
-              });
+    <View style={{ marginTop: 100, flex: 1 }}>
+      <View>
+        <Button
+          mode="contained"
+          uppercase={false}
+          onPress={() => {
+            console.log(icon);
+            setIcon(!icon);
+          }}
+        >
+          change icon
+        </Button>
+      </View>
+      <View>
+        <ScrollView
+          bounces={bounces}
+          horizontal={horizontal}
+          // pointerEvents="box-only"
+          style={{ width: 300, backgroundColor: 'purple', height: 40 }}
+        >
+          <View
+            style={{
+              backgroundColor: 'green',
+              // width: 350,
+              height: 60,
+              borderColor: 'grey',
+              borderWidth: 1,
+              flexDirection: 'row',
             }}
-            {...props}
-          />
-        )}
-        ItemSeparatorComponent={ListItemSeparator}
-        onRefresh={(type) => {
-          if (type === 'started') {
-            const en = 'aaa';
-            const v = en + count++;
-            listRef.current?.manualRefresh([
-              {
-                type: 'add',
-                data: [
-                  {
-                    en: v,
-                    ch: v,
-                    key: v,
-                  } as EqualHeightListItemData,
-                ],
-                enableSort: true,
-              },
-            ]);
-          }
+          >
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+            <Text>item.en</Text>
+            <Text>item.ch</Text>
+          </View>
+        </ScrollView>
+      </View>
+      <FlatList
+        onScrollBeginDrag={(event) => {
+          console.log(
+            'test:onScrollBeginDrag:',
+            event.nativeEvent.contentOffset
+          );
+          DeviceEventEmitter.emit('closeEditable', {
+            x: event.nativeEvent.contentOffset.x,
+          });
         }}
+        // pointerEvents="box-none"
+        style={{ backgroundColor: 'blue' }}
+        data={data}
+        renderItem={RenderItem}
       />
-    </SafeAreaView>
+    </View>
   );
 }
-const styles = createStyleSheet({
-  item: {
-    flex: 1,
-    // backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 0,
-    marginHorizontal: 0,
-    height: 80,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemText: {
-    marginLeft: 10,
-  },
-});
+
 const COUNTRY = [
   'Angola 安哥拉',
   'Afghanistan 阿富汗',

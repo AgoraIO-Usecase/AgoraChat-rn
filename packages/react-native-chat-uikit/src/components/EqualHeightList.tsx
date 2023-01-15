@@ -62,7 +62,7 @@ const DefaultItemContainer: ItemContainerComponent = (
   props: ItemContainerProps
 ): JSX.Element => {
   return (
-    <Pressable
+    <View
       style={[props.style]}
       onLayout={(e) => {
         if (props.height) {
@@ -71,15 +71,15 @@ const DefaultItemContainer: ItemContainerComponent = (
           // console.log('test:onLayout:height:', ref.current);
         }
       }}
-      onLongPress={() => {
-        props.data?.onLongPress?.(props.data);
-      }}
-      onPress={() => {
-        props.data?.onPress?.(props.data);
-      }}
+      // onLongPress={() => {
+      //   props.data?.onLongPress?.(props.data);
+      // }}
+      // onPress={() => {
+      //   props.data?.onPress?.(props.data);
+      // }}
     >
       {props.children}
-    </Pressable>
+    </View>
   );
 };
 
