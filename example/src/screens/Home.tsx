@@ -27,14 +27,16 @@ export default function HomeScreen({
     >
       <Home.Screen
         name="ConversationList"
-        options={{
-          tabBarIcon: ({ focused, color }) => (
-            <TabBarIcon
-              focused={focused}
-              color={color}
-              type="ConversationList"
-            />
-          ),
+        options={() => {
+          return {
+            tabBarIcon: ({ focused, color }) => (
+              <TabBarIcon
+                focused={focused}
+                color={color}
+                type="ConversationList"
+              />
+            ),
+          };
         }}
         component={ConversationList}
       />

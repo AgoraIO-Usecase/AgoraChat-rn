@@ -1,6 +1,11 @@
 import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type {
+  HeaderButtonProps,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Pressable, useWindowDimensions, View } from 'react-native';
 import {
   Badge as UIBadge,
   Blank,
@@ -21,9 +26,20 @@ import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
-import type { RootParamsList } from '../routes';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+import type {
+  BottomTabScreenParamsList,
+  RootScreenParamsList,
+} from '../routes';
 
-type Props = MaterialBottomTabScreenProps<RootParamsList>;
+type RootScreenParamsListOnly = Omit<
+  RootScreenParamsList,
+  keyof BottomTabScreenParamsList
+>;
+type Props = CompositeScreenProps<
+  MaterialBottomTabScreenProps<BottomTabScreenParamsList, 'ConversationList'>,
+  NativeStackScreenProps<RootScreenParamsListOnly>
+>;
 
 type ItemDataType = EqualHeightListItemData & {
   en: string;
@@ -100,6 +116,7 @@ export default function ConversationListScreen({
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
+  const { conversation } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -153,6 +170,69 @@ export default function ConversationListScreen({
     } as ItemDataType;
   });
   data.push(...r);
+
+  const NavigationHeaderRight = React.useCallback(
+    (_: HeaderButtonProps) => {
+      return (
+        <Pressable
+          onPress={() => {
+            console.log('test:NavigationHeaderRight:onPress:');
+            sheet.openSheet({
+              sheetItems: [
+                {
+                  // icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: conversation.createGroup,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:');
+                  },
+                },
+                {
+                  // icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: conversation.searchContact,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:');
+                  },
+                },
+                {
+                  // icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: conversation.searchGroup,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:');
+                  },
+                },
+                {
+                  // icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: conversation.joinPublicGroup,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:');
+                  },
+                },
+              ],
+            });
+          }}
+        >
+          <View style={{ padding: 10, marginRight: -10 }}>
+            <LocalIcon name="chat_nav_add" style={{ padding: 0 }} size={20} />
+          </View>
+        </Pressable>
+      );
+    },
+    [conversation, sheet, theme.colors.primary]
+  );
+
+  React.useEffect(() => {
+    navigation.getParent()?.setOptions({
+      headerRight: NavigationHeaderRight,
+    });
+  }, [NavigationHeaderRight, navigation]);
 
   return (
     <SafeAreaView

@@ -185,6 +185,7 @@ export default function App() {
                 'test:onStateChange:',
                 JSON.stringify(rr, undefined, '  ')
               );
+              // console.log('test:onStateChange:o:', JSON.stringify(state));
               storage.setItem(__KEY__, JSON.stringify(state));
             }}
             onUnhandledAction={(action: NavigationAction) => {

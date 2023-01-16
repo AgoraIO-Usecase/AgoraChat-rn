@@ -87,6 +87,13 @@ export class AppStringSet extends UIKitStringSet2 {
       confirmButton: string;
     };
   };
+  conversation: {
+    new: string;
+    createGroup: string;
+    searchContact: string;
+    searchGroup: string;
+    joinPublicGroup: string;
+  };
 
   constructor(locate: Locale = en) {
     super(locate);
@@ -191,6 +198,13 @@ export class AppStringSet extends UIKitStringSet2 {
         cancelButton: 'Cancel',
         confirmButton: 'Confirm',
       },
+    };
+    this.conversation = {
+      new: 'New Conversation',
+      createGroup: 'Create a group',
+      searchContact: 'Search contacts',
+      searchGroup: 'Search groups',
+      joinPublicGroup: 'Join public groups',
     };
   }
 }
