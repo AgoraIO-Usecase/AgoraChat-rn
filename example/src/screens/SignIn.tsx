@@ -1,6 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {
   Button,
   createStyleSheet,
@@ -44,17 +51,27 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
       style={useStyleSheet().safe}
       edges={['right', 'left', 'bottom']}
     >
-      <View style={styles.container1}>
-        <View style={styles.container2}>
-          <KeyboardAvoidingView
-            enabled={enableKeyboardAvoid}
-            behavior={Platform.select({ ios: 'padding', default: 'height' })}
-            keyboardVerticalOffset={
-              enableKeyboardAvoid && statusBarTranslucent ? 80 : 0
-            }
-            pointerEvents="box-none"
-          >
-            <View style={styles.logo}>
+      <KeyboardAvoidingView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        enabled={enableKeyboardAvoid}
+        behavior={Platform.select({ ios: 'padding', default: 'height' })}
+        keyboardVerticalOffset={
+          enableKeyboardAvoid && statusBarTranslucent ? 80 : 0
+        }
+        pointerEvents="box-none"
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View>
+            <View style={styles.space} />
+            <View>
               <LocalIcon
                 name="login_icon"
                 size={250}
@@ -100,28 +117,18 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
                 {login.register}
               </Text>
             </View>
-          </KeyboardAvoidingView>
-        </View>
-      </View>
+            <View style={styles.space} />
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = createStyleSheet({
-  container1: {
-    flex: 1,
-    alignItems: 'center',
-    // backgroundColor: 'darkcyan',
-  },
-  container2: {
-    flex: 1,
-    width: '87.2%',
-    justifyContent: 'center',
-    // backgroundColor: 'darkorange',
+  space: {
     flexGrow: 1,
-  },
-  logo: {
-    marginBottom: 35,
+    flexShrink: 1,
   },
   item: {
     height: 48,

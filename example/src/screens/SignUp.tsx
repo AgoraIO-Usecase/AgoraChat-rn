@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
@@ -57,16 +58,26 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
       style={useStyleSheet().safe}
       edges={['right', 'left', 'bottom']}
     >
-      <View style={styles.container1}>
-        <View style={styles.container2}>
-          <KeyboardAvoidingView
-            enabled={enableKeyboardAvoid}
-            behavior={Platform.select({ ios: 'padding', default: 'height' })}
-            keyboardVerticalOffset={
-              enableKeyboardAvoid && statusBarTranslucent ? 44 : 0
-            }
-            pointerEvents="box-none"
-          >
+      <KeyboardAvoidingView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        enabled={enableKeyboardAvoid}
+        behavior={Platform.select({ ios: 'padding', default: 'height' })}
+        keyboardVerticalOffset={
+          enableKeyboardAvoid && statusBarTranslucent ? 44 : 0
+        }
+        pointerEvents="box-none"
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View>
+            <View style={styles.space} />
             <View style={styles.logo}>
               <LocalIcon
                 name="register_icon"
@@ -142,23 +153,18 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
                 {register.back}
               </Text>
             </View>
-          </KeyboardAvoidingView>
-        </View>
-      </View>
+            <View style={styles.space} />
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = createStyleSheet({
-  container1: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  container2: {
-    flex: 1,
-    width: '87.2%',
-    justifyContent: 'center',
+  space: {
     flexGrow: 1,
+    flexShrink: 1,
   },
   logo: {
     marginBottom: -8,
