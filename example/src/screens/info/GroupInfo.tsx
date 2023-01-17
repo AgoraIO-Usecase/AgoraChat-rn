@@ -4,20 +4,18 @@ import { Pressable, Text, View } from 'react-native';
 import {
   Avatar,
   createStyleSheet,
-  createStyleSheetP,
   getScaleFactor,
   LocalIcon,
   Services,
   Switch,
-  ThemeContextType,
   useAlert,
   useBottomSheet,
   usePrompt,
-  useThemeContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../../contexts/AppI18nContext';
+import { useStyleSheet } from '../../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
@@ -141,9 +139,14 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
             </Text>
           </Pressable>
           <View>
-            <View style={styles.chatButton}>
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Chat', {});
+              }}
+              style={styles.chatButton}
+            >
               <LocalIcon name="tabbar_chats" size={sf(30)} />
-            </View>
+            </Pressable>
             <Text style={[styles.chat, { marginTop: 5 }]}>
               {groupInfo.chat}
             </Text>
@@ -266,13 +269,3 @@ const styles = createStyleSheet({
     textAlign: 'right',
   },
 });
-
-const useStyleSheet = () => {
-  const styles = createStyleSheetP((theme: ThemeContextType) => {
-    const { colors } = theme;
-    return {
-      safe: { flex: 1, backgroundColor: colors.background },
-    };
-  }, useThemeContext());
-  return styles;
-};

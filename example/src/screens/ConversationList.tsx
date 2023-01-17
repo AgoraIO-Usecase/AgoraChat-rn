@@ -95,12 +95,37 @@ const Item: EqualHeightListItemComponent = (props) => {
           flexDirection: 'row',
           // backgroundColor: 'green',
           justifyContent: 'flex-start',
+          alignItems: 'center',
         }}
       >
         <View style={{ width: 20 }} />
-        <LocalIcon name="trash" size={30} />
+        <View
+          style={{
+            height: 30,
+            width: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#F2F2F2',
+            overflow: 'hidden',
+            borderRadius: 30,
+          }}
+        >
+          <LocalIcon name="bell_slash" size={20} color="#666666" />
+        </View>
         <View style={{ width: 15 }} />
-        <LocalIcon name="trash" size={30} />
+        <View
+          style={{
+            height: 30,
+            width: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 20, 204, 1)',
+            overflow: 'hidden',
+            borderRadius: 30,
+          }}
+        >
+          <LocalIcon name="trash" size={20} color="white" />
+        </View>
       </View>
     </View>
   );
@@ -163,9 +188,8 @@ export default function ConversationListScreen({
           ],
         });
       },
-      onPress: (data) => {
-        console.log('test:onPress:data:', data);
-        navigation.navigate({ name: 'GroupInfo', params: {} });
+      onPress: (_) => {
+        navigation.navigate({ name: 'Chat', params: {} });
       },
     } as ItemDataType;
   });

@@ -1,16 +1,12 @@
 import * as React from 'react';
+import { ListRenderItem, ListRenderItemInfo, Text, View } from 'react-native';
 import {
-  ListRenderItem,
-  ListRenderItemInfo,
-  StyleProp,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
-import {
+  createStyleSheet,
   DynamicHeightList,
+  DynamicHeightListRef,
+  getScaleFactor,
   Image,
+  LocalIcon,
   seqId,
   timestamp,
   wait,
@@ -21,34 +17,23 @@ import { DefaultAvatar } from './DefaultAvatars';
 export interface MessageItemType {
   sender: string;
   timestamp: number;
-  isSender: boolean;
+  isSender?: boolean;
   key: string;
   type: 'text' | 'image';
 }
 
 export interface TextMessageItemType extends MessageItemType {
   text: string;
-  style: StyleProp<TextStyle>;
 }
 
 export interface ImageMessageItemType extends MessageItemType {
   image: string;
-  style: StyleProp<ViewStyle>;
 }
 const text1: TextMessageItemType = {
   sender: 'zs',
   timestamp: timestamp(),
   isSender: false,
   key: seqId('ml').toString(),
-  style: {
-    // backgroundColor: 'yellow',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    width: '66%',
-    // height: 80,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
   text: 'Uffa, ho tanto da raccontare alla mia famiglia, ma quando chiamano loro dagli Stati Uniti io ho lezione e quando posso telefonare io loro dormono!',
   type: 'text',
 };
@@ -57,15 +42,6 @@ const image2: ImageMessageItemType = {
   timestamp: timestamp(),
   isSender: true,
   key: seqId('ml').toString(),
-  style: {
-    // backgroundColor: 'purple',
-    alignSelf: 'flex-end',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    width: '50%',
-    // height: 160,
-    flexDirection: 'row-reverse',
-  },
   image:
     'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
   type: 'image',
@@ -73,31 +49,50 @@ const image2: ImageMessageItemType = {
 const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
+  const sf = getScaleFactor();
   const { item } = info;
   const msg = item as TextMessageItemType;
   return (
-    <View style={[msg.style]}>
-      <View style={{ alignSelf: 'flex-end', marginRight: 5, marginLeft: 10 }}>
-        <DefaultAvatar size={24} radius={12} />
+    <View
+      style={[
+        styles.container,
+        {
+          flexDirection: msg.isSender ? 'row-reverse' : 'row',
+          width: '90%',
+        },
+      ]}
+    >
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? undefined : sf(10),
+            marginLeft: msg.isSender ? sf(10) : undefined,
+          },
+        ]}
+      >
+        <DefaultAvatar size={sf(24)} radius={sf(12)} />
       </View>
       <View
-        style={{
-          flex: 1,
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
-          borderBottomEndRadius: 10,
-          // backgroundColor: 'red',
-          overflow: 'hidden',
-        }}
+        style={[
+          styles.innerContainer,
+          {
+            borderBottomRightRadius: msg.isSender ? undefined : sf(12),
+            borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
+          },
+        ]}
       >
-        <Text
-          style={{
-            backgroundColor: 'rgba(242, 242, 242, 1)',
-            padding: 10,
-          }}
-        >
-          {msg.text}
-        </Text>
+        <Text style={styles.text}>{msg.text}</Text>
+      </View>
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? 10 : undefined,
+            marginLeft: msg.isSender ? undefined : 10,
+            opacity: 1,
+          },
+        ]}
+      >
+        <LocalIcon name="readed" size={sf(12)} />
       </View>
     </View>
   );
@@ -106,33 +101,68 @@ const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
 const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
+  const sf = getScaleFactor();
   const { item } = info;
   const msg = item as ImageMessageItemType;
   return (
-    <View style={msg.style}>
-      <View style={{ alignSelf: 'flex-end', marginRight: 5, marginLeft: 10 }}>
-        <DefaultAvatar size={24} radius={12} />
+    <View
+      style={[
+        styles.container,
+        {
+          flexDirection: 'row-reverse',
+          width: '80%',
+        },
+      ]}
+    >
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? undefined : sf(10),
+            marginLeft: msg.isSender ? sf(10) : undefined,
+          },
+        ]}
+      >
+        <DefaultAvatar size={sf(24)} radius={sf(12)} />
       </View>
-      <Image
-        source={{
-          uri: msg.image,
+      <View
+        style={{
+          height: 200,
+          // flex: 1,
+          flexGrow: 1,
         }}
-        resizeMode="cover"
-        style={{ flex: 1, height: 200, borderRadius: 10 }}
-        onLoad={(e) => {
-          console.log(e);
-        }}
-        onError={(e) => {
-          console.log(e);
-        }}
-      />
+      >
+        <Image
+          source={{
+            uri: msg.image,
+          }}
+          resizeMode="cover"
+          style={{ height: 200, borderRadius: 10 }}
+          onLoad={(_) => {
+            // console.log(e);
+          }}
+          onError={(_) => {
+            // console.log(e);
+          }}
+        />
+      </View>
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? 10 : undefined,
+            marginLeft: msg.isSender ? undefined : 10,
+            opacity: 1,
+          },
+        ]}
+      >
+        <LocalIcon name="readed" size={sf(12)} />
+      </View>
     </View>
   );
 };
 const MessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
-  console.log('test:MessageRenderItem:', info.index);
+  // console.log('test:MessageRenderItem:', info.index);
   const { item } = info;
   let MessageItem: ListRenderItem<MessageItemType>;
   if (item.type === 'text') {
@@ -145,10 +175,13 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
   return (
     <View
       style={{
-        // backgroundColor: 'green',
-        // borderBottomColor: 'blue',
-        // borderWidth: 1,
-        marginVertical: 4,
+        width: '100%',
+        alignItems:
+          item.isSender === undefined
+            ? 'center'
+            : item.isSender === true
+            ? 'flex-end'
+            : 'flex-start',
       }}
     >
       <MessageItem {...info} />
@@ -165,11 +198,12 @@ const MessageBubbleList = (
   _: Props,
   ref?: React.Ref<MessageListRef>
 ): JSX.Element => {
-  console.log('test:MessageBubbleList:');
+  // console.log('test:MessageBubbleList:');
   const enableRefresh = true;
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [items, setItems] = React.useState<MessageItemType[]>([]);
+  const listRef = React.useRef<DynamicHeightListRef>(null);
   // const items = React.useMemo(() => {
   //   return _items;
   // }, [_items]);
@@ -184,7 +218,7 @@ const MessageBubbleList = (
     setLoading(false);
   }
 
-  console.log('test:MessageBubbleList:length:', items.length);
+  // console.log('test:MessageBubbleList:length:', items.length);
 
   const _add = React.useCallback(
     (msgs: MessageItemType[]) => {
@@ -198,28 +232,13 @@ const MessageBubbleList = (
   React.useImperativeHandle(
     ref,
     () => ({
-      scrollToEnd: () => {},
+      scrollToEnd: () => {
+        listRef.current?.scrollToEnd();
+      },
       scrollToTop: () => {},
       addMessage: (msgs: MessageItemType[]) => {
-        console.log('test:addMessage:', msgs.length);
+        // console.log('test:addMessage:', msgs.length);
         _add(msgs);
-        // items.push({
-        //   sender: 'zs',
-        //   timestamp: timestamp(),
-        //   isSender: false,
-        //   key: seqId('ml').toString(),
-        //   style: {
-        //     backgroundColor: 'yellow',
-        //     justifyContent: 'flex-start',
-        //     alignItems: 'center',
-        //     width: '66%',
-        //     // height: 80,
-        //     flexDirection: 'row',
-        //     flexWrap: 'wrap',
-        //   },
-        //   text: 'test',
-        //   type: 'text',
-        // } as TextMessageItemType);
       },
     }),
     [_add]
@@ -227,6 +246,7 @@ const MessageBubbleList = (
 
   return (
     <DynamicHeightList
+      ref={listRef}
       items={items}
       extraData={items}
       RenderItemFC={MessageRenderItem}
@@ -265,5 +285,27 @@ const MessageBubbleList = (
     />
   );
 };
+
+const styles = createStyleSheet({
+  container: {
+    justifyContent: 'flex-start',
+    // backgroundColor: 'yellow',
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    padding: 10,
+  },
+  innerContainer: {
+    flex: 1,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    // backgroundColor: 'red',
+    overflow: 'hidden',
+  },
+  text: {
+    backgroundColor: 'rgba(242, 242, 242, 1)',
+    padding: 10,
+    flexWrap: 'wrap',
+  },
+});
 
 export default React.forwardRef<MessageListRef, Props>(MessageBubbleList);

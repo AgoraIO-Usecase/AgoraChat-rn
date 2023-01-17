@@ -35,8 +35,12 @@ export const DynamicHeightList: <ItemT extends {}>(
   React.useImperativeHandle(
     ref,
     () => ({
-      scrollToEnd: () => {},
-      scrollToTop: () => {},
+      scrollToEnd: () => {
+        listRef.current?.scrollToEnd();
+      },
+      scrollToTop: () => {
+        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      },
     }),
     []
   );

@@ -4,16 +4,14 @@ import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 import {
   Button,
   createStyleSheet,
-  createStyleSheetP,
   LocalIcon,
   TextInput,
-  ThemeContextType,
   useHeaderContext,
-  useThemeContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
@@ -148,13 +146,3 @@ const styles = createStyleSheet({
     fontWeight: '600',
   },
 });
-
-const useStyleSheet = () => {
-  const styles = createStyleSheetP((theme: ThemeContextType) => {
-    const { colors } = theme;
-    return {
-      safe: { flex: 1, backgroundColor: colors.background },
-    };
-  }, useThemeContext());
-  return styles;
-};

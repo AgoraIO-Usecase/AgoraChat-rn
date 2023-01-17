@@ -41,6 +41,7 @@ import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList } from './routes';
 import Add from './screens/Add';
 import AddContact from './screens/add/AddContact';
+import Chat from './screens/chat/Chat';
 import ContactList from './screens/ContactList';
 import HomeScreen from './screens/Home';
 import ContactInfo from './screens/info/ContactInfo';
@@ -242,6 +243,7 @@ export default function App() {
                   }}
                   component={ContactList}
                 />
+                <Root.Screen name="Chat" component={Chat} />
               </Root.Group>
             </Root.Navigator>
           </NavigationContainer>

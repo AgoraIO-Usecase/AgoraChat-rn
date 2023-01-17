@@ -4,24 +4,22 @@ import { Pressable, Text, View } from 'react-native';
 import {
   Avatar,
   createStyleSheet,
-  createStyleSheetP,
   getScaleFactor,
   LocalIcon,
   Switch,
-  ThemeContextType,
   useAlert,
-  useThemeContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../../contexts/AppI18nContext';
+import { useStyleSheet } from '../../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export default function ContactInfoScreen(_: Props): JSX.Element {
+export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
   //   console.log('test:ConversationListScreen:', route.params, navigation);
   //   return <Placeholder content={`${ContactInfoScreen.name}`} />;
   const { contactInfo } = useAppI18nContext();
@@ -45,9 +43,14 @@ export default function ContactInfoScreen(_: Props): JSX.Element {
         <View style={{ marginTop: sf(10) }}>
           <Text style={styles.id}>{id}</Text>
         </View>
-        <View style={styles.chatButton}>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Chat', {});
+          }}
+          style={styles.chatButton}
+        >
           <LocalIcon name="tabbar_chats" size={sf(30)} />
-        </View>
+        </Pressable>
         <View style={{ marginTop: sf(10) }}>
           <Text style={styles.chat}>{contactInfo.chat}</Text>
         </View>
@@ -162,13 +165,3 @@ const styles = createStyleSheet({
     color: 'rgba(255, 20, 204, 1)',
   },
 });
-
-const useStyleSheet = () => {
-  const styles = createStyleSheetP((theme: ThemeContextType) => {
-    const { colors } = theme;
-    return {
-      safe: { flex: 1, backgroundColor: colors.background },
-    };
-  }, useThemeContext());
-  return styles;
-};

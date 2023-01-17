@@ -1,7 +1,8 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootScreenParamsList } from 'example/src/routes';
 import * as React from 'react';
 import { Button, View } from 'react-native';
+
+import type { RootScreenParamsList } from '../../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
