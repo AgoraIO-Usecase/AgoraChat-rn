@@ -69,7 +69,7 @@ export default function TestList() {
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEndReached={(info) => {
-          console.log('test:info:', info);
+          console.log('test:onEndReached:', info);
         }}
         stickyHeaderIndices={[0]}
       />

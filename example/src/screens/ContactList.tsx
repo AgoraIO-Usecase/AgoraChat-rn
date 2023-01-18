@@ -121,6 +121,7 @@ export default function ContactListScreen({
       key: en,
       en: en,
       ch: ch,
+      height: 80,
       onLongPress: (data) => {
         sheet.openSheet({
           sheetItems: [
@@ -225,8 +226,9 @@ export default function ContactListScreen({
       edges={['right', 'left']}
     >
       <EqualHeightList
-        onLayout={(event) => {
-          console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
+        parentName="ContactList"
+        onLayout={(_) => {
+          // console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
         }}
         ref={listRef}
         items={data}

@@ -122,8 +122,9 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
       edges={['right', 'left']}
     >
       <EqualHeightList
-        onLayout={(event) => {
-          console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
+        parentName="GroupList"
+        onLayout={(_) => {
+          // console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
         }}
         ref={listRef}
         items={data}

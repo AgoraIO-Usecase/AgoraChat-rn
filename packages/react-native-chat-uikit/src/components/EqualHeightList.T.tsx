@@ -427,7 +427,7 @@ export const EqualHeightList: <ItemT extends ItemData = ItemData>(
         refreshing={enableRefresh === true ? refreshing : undefined}
         onRefresh={enableRefresh === true ? _onRefresh : undefined}
         onEndReached={(info) => {
-          console.log('test:info:', info.distanceFromEnd);
+          console.log('test:onEndReached:', info.distanceFromEnd);
         }}
         // stickyHeaderIndices={[0]}
         {...others}

@@ -6,6 +6,7 @@ import {
   DeviceEventEmitter,
   FlatList as RNFlatList,
   FlatListProps as RNFlatListProps,
+  LayoutChangeEvent,
   ListRenderItemInfo,
   PanResponder,
   Pressable,
@@ -32,6 +33,7 @@ export interface ItemData {
   sideslip?: {
     width: number;
   };
+  height?: number;
 }
 
 export interface ItemProps {
@@ -48,6 +50,7 @@ export type ItemContainerProps = React.PropsWithChildren<{
   height?: React.Ref<number>;
   style?: StyleProp<ViewStyle>;
   data?: ItemData;
+  onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
 }>;
 
 export type ItemContainerComponent = (props: ItemContainerProps) => JSX.Element;
@@ -74,6 +77,7 @@ const DefaultItemContainer: ItemContainerComponent = (
     <Pressable
       style={[props.style]}
       onLayout={(e) => {
+        props.onLayout?.(e);
         if (props.height) {
           const ref = props.height as React.MutableRefObject<number>;
           ref.current = e.nativeEvent.layout.height;
@@ -119,7 +123,6 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
   };
 
   const _autoAlign = (moveX: number, width: number) => {
-    console.log('test:_autoAlign:', moveX, width);
     const w = width / 2;
     if (0 <= moveX && moveX < w) {
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
@@ -129,13 +132,10 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
   };
 
   const _onClicked = () => {
-    console.log('test:_onClicked:');
     endTime.current = timestamp();
     if (endTime.current - startTime.current < 1000) {
-      console.log('onPressed');
       props.data?.onPress?.(props.data);
     } else {
-      console.log('onLongPressed');
       props.data?.onLongPress?.(props.data);
     }
   };
@@ -144,6 +144,7 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
     <View
       style={[props.style]}
       onLayout={(e) => {
+        props.onLayout?.(e);
         if (props.height) {
           const ref = props.height as React.MutableRefObject<number>;
           ref.current = e.nativeEvent.layout.height;
@@ -153,25 +154,16 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
     >
       <ScrollView
         ref={scrollViewRef}
-        onScrollBeginDrag={(event) => {
-          console.log(
-            'test:onScrollBeginDrag:',
-            event.nativeEvent.contentOffset
-          );
-        }}
         onScrollEndDrag={(event) => {
-          console.log('test:onScrollEndDrag:', event.nativeEvent.contentOffset);
           const x = event.nativeEvent.contentOffset.x;
           _autoAlign(x, extraWidth);
         }}
         onTouchStart={(event) => {
-          console.log('test:onTouchStart:2:', event.nativeEvent.locationX);
           currentX.current = event.nativeEvent.locationX;
           currentY.current = event.nativeEvent.locationY;
           startTime.current = timestamp();
         }}
         onTouchEnd={(event) => {
-          console.log('test:onTouchEnd:2:');
           if (
             event.nativeEvent.locationX === currentX.current &&
             event.nativeEvent.locationY === currentY.current
@@ -282,6 +274,7 @@ export type EqualHeightListProps = Omit<
   HeaderComponent?: ListHeaderComponentType;
   Header?: ListHeaderComponent;
   alphabet?: AlphabetType;
+  parentName?: string;
 };
 
 export type ListItemUpdateType = {
@@ -302,7 +295,6 @@ export const EqualHeightList: (
   props: EqualHeightListProps,
   ref?: React.ForwardedRef<EqualHeightListRef>
 ): JSX.Element => {
-  console.log('test:EqualHeightList:');
   React.useImperativeHandle(
     ref,
     () => ({
@@ -334,13 +326,13 @@ export const EqualHeightList: (
       onPanResponderStart: (e, { y0 }) => {
         setIsMoving(true);
         const c = getChar(_calculateAlphabetIndex(y0));
-        if (c) jumpToItem(c);
+        if (c) jumpToItemByOffset(c, itemHeight.current);
         e.preventDefault();
       },
       onPanResponderMove: (e, { moveY }) => {
         setIsMoving(true);
         const c = getChar(_calculateAlphabetIndex(moveY));
-        if (c) jumpToItem(c);
+        if (c) jumpToItemByOffset(c, itemHeight.current);
         e.preventDefault();
       },
       onPanResponderRelease: (e) => {
@@ -364,7 +356,8 @@ export const EqualHeightList: (
     RefreshComponent,
     HeaderComponent,
     Header,
-    ItemSeparatorComponent,
+    // ItemSeparatorComponent,
+    // parentName,
     ...others
   } = props;
 
@@ -372,10 +365,19 @@ export const EqualHeightList: (
   const [isMoving, setIsMoving] = React.useState(false);
   const [lastChar, setLastChar] = React.useState('');
   const [loading, setLoading] = React.useState(true);
+  // const [itemHeight, setItemHeight] = React.useState(0);
+  const itemHeight = React.useRef(0);
+  // let itemHeight = 0;
+
+  if (items.length > 0) {
+    const item = items[0];
+    if (item?.height !== undefined && typeof item?.height === 'number') {
+      itemHeight.current = item.height!;
+    }
+  }
 
   const _prepareData = React.useCallback(
-    (items: ItemData[]) => {
-      // console.log('test:_prepareData:', items.length);
+    async (items: ItemData[]) => {
       const obj = {} as any;
       let once = false;
       const r = items.map((item, index) => {
@@ -410,7 +412,6 @@ export const EqualHeightList: (
         } as RenderItemProps;
       });
       data.push(...r);
-      // console.log('test:data:length:', data.length);
       // setData(data);
     },
     [ItemFC, data, itemContainerStyle, itemStyle]
@@ -421,12 +422,13 @@ export const EqualHeightList: (
   if (loading) {
     data.splice(0, data.length);
     if (enableSort === true) arraySort(items);
-    _prepareData(items);
+    _prepareData(items).catch((e) => {
+      console.warn('test:_prepareData:', e);
+    });
     setLoading(false);
   }
 
   const _onRefresh = React.useCallback((): void => {
-    // console.log('test:_onRefresh:', enableRefresh);
     if (enableRefresh === undefined || enableRefresh === false) {
       setRefreshing(false);
       return;
@@ -479,60 +481,34 @@ export const EqualHeightList: (
     return index;
   };
 
-  const _calculateItemHeight = React.useCallback(
-    (
-      itemStyle: StyleProp<ViewStyle> | undefined,
-      itemContainerStyle: StyleProp<ViewStyle> | undefined,
-      height: number
-    ) => {
-      let h = 0;
-      if (itemStyle) {
-        const out = itemStyle as StyleProp<ViewStyle> as ViewStyle;
-        if (out.height && typeof out.height === 'number') h += out.height;
-      }
-      if (itemContainerStyle) {
-        const out = itemContainerStyle as StyleProp<ViewStyle> as ViewStyle;
-        if (out.height && typeof out.height === 'number') h += out.height;
-      }
-      if (itemStyle === undefined && itemContainerStyle === undefined) {
-        // If you need to dynamically calculate the height, the positioning may be delayed. Specifically, clicking on a letter to locate will fail the first time.
-        h = height;
-      }
-      // console.log('test:_calculateItemHeight:', h);
-      return h;
-    },
-    []
-  );
-  const _calculateItemSpace = React.useCallback(() => {
-    let h = 0;
-    return h;
-  }, []);
-
   const getChar = (index: number) => {
     return AZ[index];
   };
 
-  const jumpToItem = (char: string) => {
-    if (char) setLastChar(char);
-    for (const item of data) {
-      const isFirst = item.itemContainerProps.isFirst;
-      const c = item.itemContainerProps.alphabet;
-      if (isFirst === true && char === c) {
-        listRef.current?.scrollToIndex({
-          animated: true,
-          index: item.itemContainerProps.index,
-        });
-        break;
+  const jumpToItemByOffset = React.useCallback(
+    (char: string, h: number) => {
+      if (char) setLastChar(char);
+      for (const item of data) {
+        const isFirst = item.itemContainerProps.isFirst;
+        const c = item.itemContainerProps.alphabet;
+        if (isFirst === true && char === c) {
+          const offset = item.itemContainerProps.index * h;
+          listRef.current?.scrollToOffset({ animated: true, offset: offset });
+          break;
+        }
       }
-    }
-  };
+    },
+    [data]
+  );
 
   const _handleManualRefresh = (updateItems: ListItemUpdateType[]) => {
     for (const item of updateItems) {
       switch (item.type) {
         case 'add':
           if (item.data) {
-            _prepareData(item.data);
+            _prepareData(item.data).catch((e) => {
+              console.warn('test:_prepareData:', e);
+            });
           }
           if (item.enableSort === true) {
             data.sort((a, b) => {
@@ -551,7 +527,6 @@ export const EqualHeightList: (
             for (const d of item.data) {
               for (const dd of data) {
                 if (dd.itemProps.data.key === d.key) {
-                  // console.log('test:key:', d.key, dd.itemProps.data, d);
                   dd.itemProps.data = d;
                   break;
                 }
@@ -571,32 +546,8 @@ export const EqualHeightList: (
     setData([...data]);
   };
 
-  const _calculateItemH = React.useMemo(() => {
-    const height = _calculateItemHeight(
-      itemStyle,
-      itemContainerStyle,
-      listItemHeightRef.current
-    );
-    // console.log('test:_calculateItemH:', height);
-    const space = _calculateItemSpace();
-    const h = height + space;
-    return h;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    _calculateItemHeight,
-    _calculateItemSpace,
-    itemContainerStyle,
-    itemStyle,
-    listItemHeightRef.current,
-  ]);
-
   const r = (
-    <View
-      onLayout={(event) => {
-        console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
-      }}
-      style={[styles.container]}
-    >
+    <View style={[styles.container]}>
       <RNFlatList
         ref={(value) => {
           if (value) {
@@ -607,17 +558,26 @@ export const EqualHeightList: (
         data={data}
         extraData={data}
         renderItem={RenderItem}
-        getItemLayout={(_: any, index: number) => {
-          let h = _calculateItemH;
-          const s = ItemSeparatorComponent ? 0.333 : 0; // ???
-          h += s;
-          const r = {
-            length: h,
-            offset: h * index,
-            index: index,
-          };
-          return r;
-        }}
+        // !!! scrollToIndex needs to be used with getItemLayout, but getItemLayout is very expensive, so, scrapped.
+        // getItemLayout={(
+        //   item: RenderItemProps[] | undefined | null,
+        //   index: number
+        // ) => {
+        //   let h = _calculateItemH;
+        //   const s = ItemSeparatorComponent ? 0.333 : 0; // ???
+        //   h += s;
+        //   const r = {
+        //     length: h,
+        //     offset: h * index,
+        //     index: index,
+        //   };
+        //   // let key;
+        //   // if (item) {
+        //   //   key = item[index]?.itemProps.data.key;
+        //   // }
+        //   // console.log('test:getItemLayout:', parentName, h, index, key);
+        //   return r;
+        // }}
         keyExtractor={(item: RenderItemProps) => {
           // console.log('test:keyExtractor:', item.itemProps.data.key);
           return item.itemProps.data.key;
@@ -632,7 +592,7 @@ export const EqualHeightList: (
             : undefined
         }
         onEndReached={(info) => {
-          console.log('test:info:', info.distanceFromEnd);
+          console.log('test:onEndReached:', info.distanceFromEnd);
         }}
         ListHeaderComponent={
           enableHeader === true
@@ -646,7 +606,7 @@ export const EqualHeightList: (
             : undefined
         }
         // ListHeaderComponent={enableHeader === true ? Header : undefined}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        // ItemSeparatorComponent={ItemSeparatorComponent}
         // keyboardShouldPersistTaps={'never'}
         // keyboardDismissMode={'none'}
         // stickyHeaderIndices={[0]}
@@ -663,8 +623,6 @@ export const EqualHeightList: (
             pointerEvents="box-none"
             onLayout={(event) => {
               const h = event.nativeEvent.layout.height;
-              // const y = event.nativeEvent.layout.y;
-              // console.log('test:list:height:2', h, y);
               listHeightRef.current = h;
               _asyncSetAlphabetListPageY();
             }}

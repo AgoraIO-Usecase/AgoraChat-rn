@@ -268,11 +268,12 @@ export default function ConversationListScreen({
         <Blank />
       ) : (
         <EqualHeightList
-          onLayout={(event) => {
-            console.log(
-              'test:EqualHeightList:',
-              event.nativeEvent.layout.height
-            );
+          parentName="ConversationList"
+          onLayout={(_) => {
+            // console.log(
+            //   'test:EqualHeightList:',
+            //   event.nativeEvent.layout.height
+            // );
           }}
           ref={listRef}
           items={data}

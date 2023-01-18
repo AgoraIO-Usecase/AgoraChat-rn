@@ -19,7 +19,9 @@ export default function TabBarIcon({
   color,
   type,
 }: TabBarIconProps): JSX.Element {
-  console.log('test:TabBarIcon:', focused, type);
+  // console.log('test:TabBarIcon:', focused, type);
+  const _ = (_: boolean | undefined) => {};
+  _(focused);
   const ConversationList = (): JSX.Element => {
     return (
       <React.Fragment>

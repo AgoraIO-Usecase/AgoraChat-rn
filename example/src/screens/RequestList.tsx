@@ -158,11 +158,12 @@ export default function RequestListScreen(_props: Props): JSX.Element {
         <Blank />
       ) : (
         <EqualHeightList
-          onLayout={(event) => {
-            console.log(
-              'test:EqualHeightList:',
-              event.nativeEvent.layout.height
-            );
+          parentName="RequestList"
+          onLayout={(_) => {
+            // console.log(
+            //   'test:EqualHeightList:',
+            //   event.nativeEvent.layout.height
+            // );
           }}
           ref={listRef}
           items={data}
