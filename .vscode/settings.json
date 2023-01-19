@@ -5,6 +5,7 @@
         "callkit",
         "IMSDK",
         "IMUI",
+        "Intervallum",
         "lefthook",
         "Pressable",
         "uikit"

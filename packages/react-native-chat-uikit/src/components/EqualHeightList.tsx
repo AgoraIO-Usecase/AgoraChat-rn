@@ -62,8 +62,9 @@ type RenderItemProps = {
   ItemContainer: ItemContainerComponent;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ListHeaderProps {}
+export interface ListHeaderProps {
+  name?: string;
+}
 export type ListHeaderComponent = (props: ListHeaderProps) => JSX.Element;
 
 const DefaultItem: ItemComponent = (props: ItemProps): JSX.Element => {
@@ -606,6 +607,11 @@ export const EqualHeightList: (
             : undefined
         }
         // ListHeaderComponent={enableHeader === true ? Header : undefined}
+        // ListHeaderComponent={
+        //   enableHeader === true && Header
+        //     ? () => <Header name="hh" />
+        //     : undefined
+        // }
         // ItemSeparatorComponent={ItemSeparatorComponent}
         // keyboardShouldPersistTaps={'never'}
         // keyboardDismissMode={'none'}

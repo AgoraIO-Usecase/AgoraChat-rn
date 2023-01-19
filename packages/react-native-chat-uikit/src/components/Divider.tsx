@@ -49,7 +49,7 @@ export default function Divider({
 
 const styles = createStyleSheet({
   divider: {
-    width: '100%',
+    // width: '100%',
     height: 1,
     marginLeft: 0,
     marginRight: 0,

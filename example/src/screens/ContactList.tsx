@@ -6,6 +6,7 @@ import type { HeaderButtonProps } from '@react-navigation/native-stack/lib/types
 import * as React from 'react';
 import { Pressable, View } from 'react-native';
 import {
+  Button,
   createStyleSheet,
   EqualHeightList,
   EqualHeightListItemComponent,
@@ -17,6 +18,7 @@ import {
   useAlert,
   useBottomSheet,
   useThemeContext,
+  useToastContext,
 } from 'react-native-chat-uikit';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,7 +33,7 @@ import type {
   RootScreenParamsList,
   TopTabScreenParamsList,
 } from '../routes';
-import type { GroupActionType, Undefinable } from '../types';
+import type { ContactActionType, Undefinable } from '../types';
 
 type BottomTabScreenParamsListOnly = Omit<
   BottomTabScreenParamsList,
@@ -52,11 +54,17 @@ type Props = CompositeScreenProps<
 type ItemDataType = EqualHeightListItemData & {
   en: string;
   ch: string;
-  type?: Undefinable<GroupActionType>;
+  type?: Undefinable<ContactActionType>;
   action?: {
-    isActionEnabled: boolean;
-    isInvited: boolean;
-    onAction?: () => void;
+    groupInvite?: {
+      isActionEnabled: boolean;
+      isInvited: boolean;
+      onAction?: () => void;
+    };
+    block?: {
+      name: string;
+      onClicked?: () => void;
+    };
   };
 };
 
@@ -66,6 +74,80 @@ const DefaultAvatarMemo = React.memo(() => {
 
 const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
+  const toast = useToastContext();
+  const alert = useAlert();
+
+  const Right = (type: ContactActionType | undefined) => {
+    switch (type) {
+      case 'group_invite':
+        return (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexGrow: 1,
+              paddingRight: 5,
+            }}
+          >
+            <RadioButton
+              checked={item.action?.groupInvite?.isInvited}
+              onChecked={item.action?.groupInvite?.onAction}
+            />
+          </View>
+        );
+      case 'block_contact':
+        return (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexGrow: 1,
+              paddingRight: 5,
+            }}
+          >
+            <Button
+              style={{ height: 30, borderRadius: 24, paddingHorizontal: 10 }}
+              color={{
+                disabled: {
+                  content: 'rgba(102, 102, 102, 1)',
+                  background: '#F2F2F2',
+                },
+                enabled: {
+                  content: 'rgba(102, 102, 102, 1)',
+                  background: '#F2F2F2',
+                },
+                pressed: {
+                  content: 'rgba(102, 102, 102, 1)',
+                  background: '#E6E6E6',
+                },
+              }}
+              onPress={() => {
+                alert.openAlert({
+                  title: 'Unblock NickName?',
+                  buttons: [
+                    {
+                      text: 'Cancel',
+                      onPress: () => {},
+                    },
+                    {
+                      text: 'Confirm',
+                      onPress: () => {
+                        toast.showToast('Unblocked');
+                      },
+                    },
+                  ],
+                });
+              }}
+            >
+              {item.action?.block?.name}
+            </Button>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <View style={styles.item}>
       <DefaultAvatarMemo />
@@ -73,21 +155,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         <Text>{item.en}</Text>
         <Text>{item.ch}</Text>
       </View>
-      {item.type === 'group_invite' ? (
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            flexGrow: 1,
-            paddingRight: 5,
-          }}
-        >
-          <RadioButton
-            checked={item.action?.isInvited}
-            onChecked={item.action?.onAction}
-          />
-        </View>
-      ) : null}
+      {Right(item.type)}
     </View>
   );
 };
@@ -99,7 +167,7 @@ export default function ContactListScreen({
 }: Props): JSX.Element {
   const rp = route.params as any;
   const params = rp?.params as any;
-  const type = params?.type as Undefinable<GroupActionType>;
+  const type = params?.type as Undefinable<ContactActionType>;
   console.log('test:ContactListScreen:', params, type);
   const theme = useThemeContext();
   // const menu = useActionMenu();
@@ -113,10 +181,41 @@ export default function ContactListScreen({
   const enableHeader = true;
   const autoFocus = false;
   const data: ItemDataType[] = [];
+
+  const action = React.useCallback(
+    (type: ContactActionType | undefined, index: number) => {
+      switch (type) {
+        case 'group_invite':
+          return {
+            groupInvite: {
+              isActionEnabled: true,
+              isInvited: index % 2 === 0 ? true : false,
+              onAction: () => {
+                console.log('test:onAction:');
+              },
+            },
+          };
+        case 'block_contact':
+          return {
+            block: {
+              name: 'Unblock',
+              onClicked: () => {
+                console.log('test:onClicked:');
+              },
+            },
+          };
+        default:
+          return undefined;
+      }
+    },
+    []
+  );
+
   const r = COUNTRY.map((value, index) => {
     const i = value.lastIndexOf(' ');
     const en = value.slice(0, i);
     const ch = value.slice(i + 1);
+
     return {
       key: en,
       en: en,
@@ -150,20 +249,14 @@ export default function ContactListScreen({
         navigation.navigate({ name: 'ContactInfo', params: {} });
       },
       type: type,
-      action: {
-        isActionEnabled: true,
-        isInvited: index % 2 === 0 ? true : false,
-        onAction: () => {
-          console.log('test:onAction:');
-        },
-      },
+      action: action(type, index),
     } as ItemDataType;
   });
   data.push(...r);
 
   const NavigationHeaderRight = React.useCallback(
     (_: HeaderButtonProps) => {
-      const Right = ({ type }: { type: Undefinable<GroupActionType> }) => {
+      const Right = ({ type }: { type: Undefinable<ContactActionType> }) => {
         if (type === 'group_invite') {
           const right = `${header.groupInvite}(${0})`;
           return (
@@ -227,9 +320,6 @@ export default function ContactListScreen({
     >
       <EqualHeightList
         parentName="ContactList"
-        onLayout={(_) => {
-          // console.log('test:EqualHeightList:', event.nativeEvent.layout.height);
-        }}
         ref={listRef}
         items={data}
         ItemFC={Item}
@@ -246,32 +336,34 @@ export default function ContactListScreen({
             borderRadius: 8,
           },
         }}
-        Header={(props) => (
-          <ListSearchHeader
-            autoFocus={autoFocus}
-            onChangeText={(text) => {
-              queueTask(() => {
-                const r: ItemDataType[] = [];
-                for (const item of data) {
-                  if (item.key.includes(text)) {
-                    r.push(item);
+        Header={(props) => {
+          return (
+            <ListSearchHeader
+              autoFocus={autoFocus}
+              onChangeText={(text) => {
+                queueTask(() => {
+                  const r: ItemDataType[] = [];
+                  for (const item of data) {
+                    if (item.key.includes(text)) {
+                      r.push(item);
+                    }
                   }
-                }
-                listRef.current?.manualRefresh([
-                  {
-                    type: 'clear',
-                  },
-                  {
-                    type: 'add',
-                    data: r,
-                    enableSort: true,
-                  },
-                ]);
-              });
-            }}
-            {...props}
-          />
-        )}
+                  listRef.current?.manualRefresh([
+                    {
+                      type: 'clear',
+                    },
+                    {
+                      type: 'add',
+                      data: r,
+                      enableSort: true,
+                    },
+                  ]);
+                });
+              }}
+              {...props}
+            />
+          );
+        }}
         ItemSeparatorComponent={ListItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {

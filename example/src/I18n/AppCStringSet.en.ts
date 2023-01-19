@@ -94,6 +94,19 @@ export class AppStringSet extends UIKitStringSet2 {
     searchGroup: string;
     joinPublicGroup: string;
   };
+  settings: {
+    name: string;
+    id: string;
+    privacy: string;
+    blockedList: string;
+    about: string;
+    sdkVersion: string;
+    uiVersion: string;
+    policy: string;
+    more: string;
+    logins: string;
+    logout: string;
+  };
 
   constructor(locate: Locale = en) {
     super(locate);
@@ -205,6 +218,19 @@ export class AppStringSet extends UIKitStringSet2 {
       searchContact: 'Search contacts',
       searchGroup: 'Search groups',
       joinPublicGroup: 'Join public groups',
+    };
+    this.settings = {
+      name: 'NickName',
+      id: 'AgoraId: xxx',
+      privacy: 'Privacy',
+      blockedList: 'Blocked List',
+      about: 'About',
+      sdkVersion: 'SDK version',
+      uiVersion: 'UI Library version',
+      policy: 'Legals Policies',
+      more: 'More',
+      logins: 'Logins',
+      logout: 'Logout',
     };
   }
 }

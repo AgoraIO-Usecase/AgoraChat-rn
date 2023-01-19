@@ -14,6 +14,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  ListHeaderProps,
   LocalIcon,
   SearchBar,
 } from 'react-native-chat-uikit';
@@ -150,13 +151,14 @@ export default function TestList2() {
   // };
 
   const s4 = {
-    Component: (props: any) => (
+    Component: (props: ListHeaderProps) => (
       <View {...props}>
         <SearchBar enableCancel={enableCancel} enableClear={enableClear} />
       </View>
     ),
     props: {
       backgroundColor: 'red',
+      name: 'haha',
     },
   };
 

@@ -12,6 +12,27 @@ import {
 } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
+function test1(): void {
+  const map: Record<string, string> = {
+    'ios.permission.MEDIA_LIBRARY': 'unavailable',
+    'ios.permission.PHOTO_LIBRARY': 'granted',
+  };
+  // Object.values(map).every((value) => {
+  //   console.log('test:1:', value);
+  //   return true;
+  // });
+
+  Object.values(map).every((value, index, arr) => {
+    let r = false;
+    console.log('test:r:', value, map, index, arr);
+    // if (value === 'granted') return true;
+    // if (value === 'limited') {
+    //   r = true;
+    // }
+    return r;
+  });
+}
+
 export default function TestUtil() {
   React.useEffect(() => {}, []);
 
@@ -112,6 +133,17 @@ export default function TestUtil() {
           }}
         >
           uuid
+        </Button>
+      </View>
+      <View>
+        <Button
+          mode="text"
+          uppercase={false}
+          onPress={() => {
+            test1();
+          }}
+        >
+          test1
         </Button>
       </View>
     </View>

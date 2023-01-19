@@ -27,9 +27,9 @@ import {
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
 import * as DocumentPicker from 'react-native-document-picker';
-import FileAccess from 'react-native-file-access';
-import ImagePicker from 'react-native-image-picker';
-import Permissions from 'react-native-permissions';
+import * as FileAccess from 'react-native-file-access';
+import * as ImagePicker from 'react-native-image-picker';
+import * as Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';

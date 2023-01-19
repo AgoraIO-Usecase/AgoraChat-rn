@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Toast from '../components/Toast';
 import type { ToastType } from '../types';
@@ -20,7 +19,7 @@ export function ToastContextProvider({
     type: 'error' as ToastType,
     text: '',
   });
-  const { bottom } = useSafeAreaInsets();
+  const bottom = 166;
 
   React.useEffect(() => {
     if (!state.visible) return;

@@ -9,8 +9,8 @@ type SwitchProps = {
   thumbColor?: string | undefined;
   inactiveThumbColor?: string | undefined;
   inactiveTrackColor?: string | undefined;
-  value: boolean;
-  onChangeValue: (val: boolean) => void;
+  value?: boolean;
+  onChangeValue?: (val: boolean) => void;
   size?: number | undefined;
 };
 
@@ -91,7 +91,7 @@ export default function Switch({
 
   return (
     <Pressable
-      onPress={() => onChangeValue(!value)}
+      onPress={() => onChangeValue?.(!value)}
       style={[changedStyles.container]}
     >
       <Animated.View

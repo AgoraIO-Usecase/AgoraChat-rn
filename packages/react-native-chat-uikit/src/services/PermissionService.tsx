@@ -80,7 +80,7 @@ export class PermissionServiceImplement implements PermissionService {
   ): Promise<boolean> {
     const s = this.option.permissions;
     const locationPermissions: Permission[] = Platform.select({
-      ios: [s.PERMISSIONS.IOS.MEDIA_LIBRARY, s.PERMISSIONS.IOS.PHOTO_LIBRARY],
+      ios: [s.PERMISSIONS.IOS.PHOTO_LIBRARY],
       android: this.getAndroidMediaPermissions(this.option.permissions),
       default: [],
     });

@@ -52,10 +52,6 @@ export default function Toast({
     return 'transparent';
   }, [colors.card.background, colors.error, type]);
 
-  const backgroundColor = React.useMemo(() => {
-    return colors.background;
-  }, [colors.background]);
-
   React.useEffect(() => {
     const isVisible = (visible: boolean) => (visible ? show() : hide());
     isVisible(visible);
@@ -64,7 +60,10 @@ export default function Toast({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.container, { opacity, top, bottom, backgroundColor }]}
+      style={[
+        styles.container,
+        { opacity, top, bottom, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+      ]}
     >
       {type !== 'normal' && (
         <LocalIcon
@@ -75,7 +74,7 @@ export default function Toast({
       )}
       <Text
         numberOfLines={2}
-        style={[styles.text, { color: colors.primary }, fonts.body]}
+        style={[styles.text, { color: 'white' }, fonts.body]}
       >
         {children}
       </Text>
@@ -86,12 +85,12 @@ export default function Toast({
 const styles = createStyleSheet({
   container: {
     position: 'absolute',
-    height: 48,
     paddingHorizontal: 12,
+    paddingVertical: 12,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    borderRadius: 24,
+    borderRadius: 12,
     flexDirection: 'row',
   },
   icon: {

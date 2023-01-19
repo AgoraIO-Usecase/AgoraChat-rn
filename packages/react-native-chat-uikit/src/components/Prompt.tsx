@@ -49,6 +49,7 @@ export default function Prompt({
   const { fonts } = useThemeContext();
   const inputRef = React.useRef<RNTextInput>(null);
   const { width, height } = useWindowDimensions();
+  const { colors } = useThemeContext();
 
   const buttons = [
     { text: cancelLabel, onPress: () => onCancel?.() },
@@ -57,6 +58,7 @@ export default function Prompt({
 
   const [text, setText] = React.useState(defaultValue);
   const clearButtonMode = 'while-editing';
+  const transparent = true;
 
   // FIXME: autoFocus trick with modal
   // Android
@@ -86,6 +88,8 @@ export default function Prompt({
       statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}
       backgroundStyle={{ alignItems: 'center', justifyContent: 'center' }}
+      backdropColor={colors.backdrop}
+      transparent={transparent}
     >
       <DialogBox style={styles.container}>
         {Boolean(title) && (
