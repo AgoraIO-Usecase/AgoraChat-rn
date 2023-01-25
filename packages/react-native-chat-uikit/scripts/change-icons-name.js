@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 
-const ignorePatterns = /@2x|@3x/g;
+const ignorePatterns = /@2x|@3x|U\+/g;
 const iconDir = path.join(root, 'src', 'assets', 'icons');
 
 const changeNames = (iconDir) => {
@@ -24,6 +24,8 @@ const changeNames = (iconDir) => {
             return '_2x';
           } else if (full === '@3x') {
             return '_3x';
+          } else if (full === 'U+') {
+            return 'U_';
           } else {
             return new Error('impossible');
           }

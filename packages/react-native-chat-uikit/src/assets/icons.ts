@@ -622,15 +622,6 @@ export const ICON_ASSETS = {
       return require('./icons/ChatDetails/Button_Delete.png');
     }
   },
-  'Button_Radio Active': (size: string) => {
-    if (size === '3x') {
-      return require('./icons/ChatDetails/Button_Radio Active_3x.png');
-    } else if (size === '2x') {
-      return require('./icons/ChatDetails/Button_Radio Active_2x.png');
-    } else {
-      return require('./icons/ChatDetails/Button_Radio Active.png');
-    }
-  },
   'Button_Radio': (size: string) => {
     if (size === '3x') {
       return require('./icons/ChatDetails/Button_Radio_3x.png');
@@ -638,15 +629,6 @@ export const ICON_ASSETS = {
       return require('./icons/ChatDetails/Button_Radio_2x.png');
     } else {
       return require('./icons/ChatDetails/Button_Radio.png');
-    }
-  },
-  'Button_Upload Photo': (size: string) => {
-    if (size === '3x') {
-      return require('./icons/ChatDetails/Button_Upload Photo_3x.png');
-    } else if (size === '2x') {
-      return require('./icons/ChatDetails/Button_Upload Photo_2x.png');
-    } else {
-      return require('./icons/ChatDetails/Button_Upload Photo.png');
     }
   },
   'chat_setting_mute': (size: string) => {
@@ -919,6 +901,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/group_invite.png');
     }
   },
+  'key': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/key_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/key_2x.png');
+    } else {
+      return require('./icons/Global/key.png');
+    }
+  },
   'loading2': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/loading2_3x.png');
@@ -1027,22 +1018,22 @@ export const ICON_ASSETS = {
       return require('./icons/Global/white_goBack_2x.png');
     }
   },
-  'Unblock': (size: string) => {
+  'Error: impossiblenblock': (size: string) => {
     if (size === '3x') {
-      return require('./icons/Group/Unblock_3x.png');
+      return require('./icons/Group/Error: impossiblenblock_3x.png');
     } else if (size === '2x') {
-      return require('./icons/Group/Unblock_3x.png');
+      return require('./icons/Group/Error: impossiblenblock_3x.png');
     } else {
-      return require('./icons/Group/Unblock_2x.png');
+      return require('./icons/Group/Error: impossiblenblock_2x.png');
     }
   },
-  'Unmute': (size: string) => {
+  'Error: impossiblenmute': (size: string) => {
     if (size === '3x') {
-      return require('./icons/Group/Unmute_3x.png');
+      return require('./icons/Group/Error: impossiblenmute_3x.png');
     } else if (size === '2x') {
-      return require('./icons/Group/Unmute_3x.png');
+      return require('./icons/Group/Error: impossiblenmute_3x.png');
     } else {
-      return require('./icons/Group/Unmute_2x.png');
+      return require('./icons/Group/Error: impossiblenmute_2x.png');
     }
   },
   'add': (size: string) => {
@@ -1684,13 +1675,13 @@ export const ICON_ASSETS = {
       return require('./icons/Presence/set_status_2x.png');
     }
   },
-  'Button_AddUser': (size: string) => {
+  'Button_AddError: impossibleser': (size: string) => {
     if (size === '3x') {
-      return require('./icons/Profile/Button_AddUser_2x.png');
+      return require('./icons/Profile/Button_AddError: impossibleser_2x.png');
     } else if (size === '2x') {
-      return require('./icons/Profile/Button_AddUser_2x.png');
+      return require('./icons/Profile/Button_AddError: impossibleser_2x.png');
     } else {
-      return require('./icons/Profile/Button_AddUser_2x.png');
+      return require('./icons/Profile/Button_AddError: impossibleser_2x.png');
     }
   },
   'Button_Chat': (size: string) => {
@@ -2159,6 +2150,456 @@ export const ICON_ASSETS = {
       return require('./icons/logo/register_icon_2x.png');
     } else {
       return require('./icons/logo/register_icon.png');
+    }
+  },
+  'U_1F308': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F308_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F308_2x.png');
+    } else {
+      return require('./icons/moji/U_1F308.png');
+    }
+  },
+  'U_1F31C': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F31C_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F31C_2x.png');
+    } else {
+      return require('./icons/moji/U_1F31C.png');
+    }
+  },
+  'U_1F31F': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F31F_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F31F_2x.png');
+    } else {
+      return require('./icons/moji/U_1F31F.png');
+    }
+  },
+  'U_1F389': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F389_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F389_2x.png');
+    } else {
+      return require('./icons/moji/U_1F389.png');
+    }
+  },
+  'U_1F44D': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F44D_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F44D_2x.png');
+    } else {
+      return require('./icons/moji/U_1F44D.png');
+    }
+  },
+  'U_1F44E': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F44E_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F44E_2x.png');
+    } else {
+      return require('./icons/moji/U_1F44E.png');
+    }
+  },
+  'U_1F44F': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F44F_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F44F_2x.png');
+    } else {
+      return require('./icons/moji/U_1F44F.png');
+    }
+  },
+  'U_1F47F': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F47F_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F47F_2x.png');
+    } else {
+      return require('./icons/moji/U_1F47F.png');
+    }
+  },
+  'U_1F48B': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F48B_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F48B_2x.png');
+    } else {
+      return require('./icons/moji/U_1F48B.png');
+    }
+  },
+  'U_1F490': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F490_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F490_2x.png');
+    } else {
+      return require('./icons/moji/U_1F490.png');
+    }
+  },
+  'U_1F494': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F494_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F494_2x.png');
+    } else {
+      return require('./icons/moji/U_1F494.png');
+    }
+  },
+  'U_1F495': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F495_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F495_2x.png');
+    } else {
+      return require('./icons/moji/U_1F495.png');
+    }
+  },
+  'U_1F4A9': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F4A9_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F4A9_2x.png');
+    } else {
+      return require('./icons/moji/U_1F4A9.png');
+    }
+  },
+  'U_1F600': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F600_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F600_2x.png');
+    } else {
+      return require('./icons/moji/U_1F600.png');
+    }
+  },
+  'U_1F604': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F604_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F604_2x.png');
+    } else {
+      return require('./icons/moji/U_1F604.png');
+    }
+  },
+  'U_1F607': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F607_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F607_2x.png');
+    } else {
+      return require('./icons/moji/U_1F607.png');
+    }
+  },
+  'U_1F609': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F609_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F609_2x.png');
+    } else {
+      return require('./icons/moji/U_1F609.png');
+    }
+  },
+  'U_1F60D': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F60D_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F60D_2x.png');
+    } else {
+      return require('./icons/moji/U_1F60D.png');
+    }
+  },
+  'U_1F60E': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F60E_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F60E_2x.png');
+    } else {
+      return require('./icons/moji/U_1F60E.png');
+    }
+  },
+  'U_1F610': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F610_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F610_2x.png');
+    } else {
+      return require('./icons/moji/U_1F610.png');
+    }
+  },
+  'U_1F618': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F618_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F618_2x.png');
+    } else {
+      return require('./icons/moji/U_1F618.png');
+    }
+  },
+  'U_1F620': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F620_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F620_2x.png');
+    } else {
+      return require('./icons/moji/U_1F620.png');
+    }
+  },
+  'U_1F621': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F621_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F621_2x.png');
+    } else {
+      return require('./icons/moji/U_1F621.png');
+    }
+  },
+  'U_1F62B': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F62B_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F62B_2x.png');
+    } else {
+      return require('./icons/moji/U_1F62B.png');
+    }
+  },
+  'U_1F62C': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F62C_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F62C_2x.png');
+    } else {
+      return require('./icons/moji/U_1F62C.png');
+    }
+  },
+  'U_1F62D': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F62D_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F62D_2x.png');
+    } else {
+      return require('./icons/moji/U_1F62D.png');
+    }
+  },
+  'U_1F62E': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F62E_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F62E_2x.png');
+    } else {
+      return require('./icons/moji/U_1F62E.png');
+    }
+  },
+  'U_1F631': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F631_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F631_2x.png');
+    } else {
+      return require('./icons/moji/U_1F631.png');
+    }
+  },
+  'U_1F633': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F633_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F633_2x.png');
+    } else {
+      return require('./icons/moji/U_1F633.png');
+    }
+  },
+  'U_1F637': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F637_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F637_2x.png');
+    } else {
+      return require('./icons/moji/U_1F637.png');
+    }
+  },
+  'U_1F641': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F641_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F641_2x.png');
+    } else {
+      return require('./icons/moji/U_1F641.png');
+    }
+  },
+  'U_1F644': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F644_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F644_2x.png');
+    } else {
+      return require('./icons/moji/U_1F644.png');
+    }
+  },
+  'U_1F64C': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F64C_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F64C_2x.png');
+    } else {
+      return require('./icons/moji/U_1F64C.png');
+    }
+  },
+  'U_1F64F': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F64F_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F64F_2x.png');
+    } else {
+      return require('./icons/moji/U_1F64F.png');
+    }
+  },
+  'U_1F910': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F910_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F910_2x.png');
+    } else {
+      return require('./icons/moji/U_1F910.png');
+    }
+  },
+  'U_1F912': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F912_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F912_2x.png');
+    } else {
+      return require('./icons/moji/U_1F912.png');
+    }
+  },
+  'U_1F913': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F913_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F913_2x.png');
+    } else {
+      return require('./icons/moji/U_1F913.png');
+    }
+  },
+  'U_1F91D': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F91D_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F91D_2x.png');
+    } else {
+      return require('./icons/moji/U_1F91D.png');
+    }
+  },
+  'U_1F922': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F922_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F922_2x.png');
+    } else {
+      return require('./icons/moji/U_1F922.png');
+    }
+  },
+  'U_1F928': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F928_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F928_2x.png');
+    } else {
+      return require('./icons/moji/U_1F928.png');
+    }
+  },
+  'U_1F92A': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F92A_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F92A_2x.png');
+    } else {
+      return require('./icons/moji/U_1F92A.png');
+    }
+  },
+  'U_1F92C': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F92C_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F92C_2x.png');
+    } else {
+      return require('./icons/moji/U_1F92C.png');
+    }
+  },
+  'U_1F971': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F971_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F971_2x.png');
+    } else {
+      return require('./icons/moji/U_1F971.png');
+    }
+  },
+  'U_1F973': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F973_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F973_2x.png');
+    } else {
+      return require('./icons/moji/U_1F973.png');
+    }
+  },
+  'U_1F974': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F974_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F974_2x.png');
+    } else {
+      return require('./icons/moji/U_1F974.png');
+    }
+  },
+  'U_1F97A': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_1F97A_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_1F97A_2x.png');
+    } else {
+      return require('./icons/moji/U_1F97A.png');
+    }
+  },
+  'U_2600': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_2600_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_2600_2x.png');
+    } else {
+      return require('./icons/moji/U_2600.png');
+    }
+  },
+  'U_263A': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_263A_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_263A_2x.png');
+    } else {
+      return require('./icons/moji/U_263A.png');
+    }
+  },
+  'U_2764': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_2764_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_2764_2x.png');
+    } else {
+      return require('./icons/moji/U_2764.png');
+    }
+  },
+  'U_2B50': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/moji/U_2B50_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/moji/U_2B50_2x.png');
+    } else {
+      return require('./icons/moji/U_2B50.png');
     }
   },
   'empty': (size: string) => {

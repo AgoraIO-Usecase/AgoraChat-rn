@@ -35,7 +35,8 @@
     "gl": "bob build",
     "cg": "del lib && del src/version.ts",
     "generate-bundle": "node scripts/bundle-icons.js",
-    "change-icon-name": "node scripts/change-icons-name.js"
+    "change-icon-name": "node scripts/change-icons-name.js",
+    "generate-face-name": "node scripts/generate-faces-name.js"
   },
   "keywords": [
     "react-native",
@@ -100,6 +101,7 @@
     "react-native-tab-view": "^3.3.0",
     "react-native-vector-icons": "^9.2.0",
     "react-native-video": "^5.2.1",
+    "twemoji": "^14.0.2",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {
@@ -126,6 +128,7 @@
     "react-native-tab-view": ">=3.3.0",
     "react-native-vector-icons": ">=9.2.0",
     "react-native-video": ">=5.2.0",
+    "twemoji": ">=14.0.0",
     "uuid": ">=9.0.0"
   },
   "peerDependenciesMeta": {

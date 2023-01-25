@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { TextInput } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
 export default function TestInput() {
   const [icon, setIcon] = React.useState(true);
+  const content = '😃😃😃😀😃😚😀😀';
 
   React.useEffect(() => {}, []);
 
@@ -23,6 +24,7 @@ export default function TestInput() {
         </Button>
       </View>
       <TextInput style={{ backgroundColor: 'red' }} />
+      <Text>{content}</Text>
     </View>
   );
 }
