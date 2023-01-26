@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React from 'react';
 import {
+  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -13,11 +14,16 @@ import {
 } from 'react-native';
 import {
   Button,
+  createStyleSheet,
   FACE_ASSETS,
+  getScaleFactor,
   LocalIcon,
   seqId,
+  Services,
   TextInput,
   timestamp,
+  useBottomSheet,
+  useThemeContext,
 } from 'react-native-chat-uikit';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
@@ -38,15 +44,42 @@ type Props = NativeStackScreenProps<RootScreenParamsList>;
 let count = 0;
 export default function ChatScreen(_: Props): JSX.Element {
   console.log('test:ChatScreen:');
+  const sf = getScaleFactor();
+  const theme = useThemeContext();
+  const ms = Services.ms;
   const TextInputRef = React.useRef<RNTextInput>(null);
   const msgListRef = React.useRef<MessageListRef>(null);
   const { bottom } = useSafeAreaInsets();
+  const sheet = useBottomSheet();
   const faces = ['face', 'key'] as ('face' | 'key')[];
   const [face, setFace] = React.useState(faces[0]);
   const [content, setContent] = React.useState('');
   const [isInput, setIsInput] = React.useState(false);
   const { width } = useWindowDimensions();
-  let keyboardVerticalOffset = bottom + 50;
+  const faceHeight = sf(300);
+  const faceHeightRef = React.useRef(new Animated.Value(0)).current;
+  let keyboardVerticalOffset = sf(bottom + 50);
+
+  const createFaceTableAnimated = React.useMemo(() => {
+    return {
+      showFace: () => {
+        Animated.timing(faceHeightRef, {
+          toValue: faceHeight,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      },
+      hideFace: () => {
+        Animated.timing(faceHeightRef, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+      },
+    };
+  }, [faceHeight, faceHeightRef]);
+
+  const { showFace, hideFace } = createFaceTableAnimated;
 
   React.useEffect(() => {
     const subscription1 = Keyboard.addListener('keyboardWillHide', (_) => {
@@ -62,11 +95,10 @@ export default function ChatScreen(_: Props): JSX.Element {
   }, []);
 
   const _calculateInputWidth = (width: number, isInput: boolean) => {
-    return width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28);
+    return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));
   };
 
   const _onPressed = (value: string) => {
-    console.log('test:', value);
     setContent(content + moji.convert.fromCodePoint(value));
     setIsInput(true);
   };
@@ -89,29 +121,33 @@ export default function ChatScreen(_: Props): JSX.Element {
     msgListRef.current?.scrollToEnd();
   };
 
+  const _onFace = (value?: 'face' | 'key') => {
+    setFace(value);
+    if (value === 'key') {
+      showFace();
+    } else if (value === 'face') {
+      hideFace();
+    } else {
+      hideFace();
+    }
+  };
+
   const _showFaces = () => {
     const arr = FACE_ASSETS;
     return (
-      <View style={{ height: 300 }}>
+      <Animated.View style={{ height: faceHeightRef }}>
         <ScrollView>
-          <View
-            style={{
-              flexWrap: 'wrap',
-              flexDirection: 'row',
-              padding: 15,
-              justifyContent: 'space-evenly',
-            }}
-          >
+          <View style={styles.faceContainer}>
             {arr.map((value) => {
               return (
                 <TouchableOpacity
                   key={value}
-                  style={{ padding: 5 }}
+                  style={{ padding: sf(5) }}
                   onPress={() => {
                     _onPressed(value);
                   }}
                 >
-                  <Text style={{ fontSize: 32 }}>
+                  <Text style={{ fontSize: sf(32) }}>
                     {moji.convert.fromCodePoint(value)}
                   </Text>
                 </TouchableOpacity>
@@ -119,7 +155,7 @@ export default function ChatScreen(_: Props): JSX.Element {
             })}
           </View>
         </ScrollView>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -145,9 +181,9 @@ export default function ChatScreen(_: Props): JSX.Element {
         >
           <TouchableWithoutFeedback
             onPress={() => {
-              keyboardVerticalOffset = 0;
+              keyboardVerticalOffset = sf(0);
               Keyboard.dismiss();
-              setFace('face');
+              _onFace('face');
             }}
           >
             <View style={{ flex: 1 }}>
@@ -161,34 +197,14 @@ export default function ChatScreen(_: Props): JSX.Element {
               </View>
 
               <View
-                style={{
-                  height: 60,
-                  flexDirection: 'row',
-                  paddingHorizontal: 15,
-                  alignItems: 'center',
-                }}
+                style={styles.inputContainer}
                 onLayout={(_) => {
                   // console.log('test:event:', event.nativeEvent.layout);
                 }}
               >
                 <LocalIcon name="wave_in_circle" color="A5A7A6" size={28} />
-                <View
-                  style={{
-                    flexGrow: 1,
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      flexGrow: 1,
-                      borderRadius: 24,
-                      overflow: 'hidden',
-                      borderColor: '#A5A7A6',
-                      borderWidth: 1,
-                    }}
-                  >
+                <View style={styles.inputContainer2}>
+                  <View style={styles.inputContainer3}>
                     <TextInput
                       ref={TextInputRef}
                       style={{
@@ -214,34 +230,34 @@ export default function ChatScreen(_: Props): JSX.Element {
                         _sendMessage(c);
                       }}
                       onFocus={() => {
-                        setFace('face');
+                        _onFace('face');
                       }}
                     />
 
                     <TouchableOpacity
                       style={{ justifyContent: 'center' }}
                       onPress={() => {
-                        setFace(face === 'face' ? faces[1] : faces[0]);
+                        _onFace(face === 'face' ? faces[1] : faces[0]);
                         Keyboard.dismiss();
                       }}
                     >
                       <LocalIcon
                         name={face as 'face' | 'key'}
                         color="#A5A7A6"
-                        size={28}
+                        size={sf(28)}
                       />
                     </TouchableOpacity>
 
-                    <View style={{ width: 4 }} />
+                    <View style={{ width: sf(4) }} />
                   </View>
                 </View>
                 {isInput ? (
                   <View style={{ justifyContent: 'center' }}>
                     <Button
                       style={{
-                        height: 36,
-                        width: 66,
-                        borderRadius: 18,
+                        height: sf(36),
+                        width: sf(66),
+                        borderRadius: sf(18),
                       }}
                       onPress={() => {
                         _sendMessage(content);
@@ -251,11 +267,69 @@ export default function ChatScreen(_: Props): JSX.Element {
                     </Button>
                   </View>
                 ) : (
-                  <LocalIcon name="plus_in_circle" color="#A5A7A6" size={28} />
+                  <TouchableOpacity
+                    onPress={() => {
+                      sheet.openSheet({
+                        sheetItems: [
+                          {
+                            iconColor: theme.colors.primary,
+                            title: 'Camera',
+                            titleColor: 'black',
+                            onPress: () => {
+                              console.log('test:onPress:data:');
+                              ms.openCamera({})
+                                .then((result) => {
+                                  console.log('test:result:', result);
+                                })
+                                .catch((error) => {
+                                  console.warn('error:', error);
+                                });
+                            },
+                          },
+                          {
+                            iconColor: theme.colors.primary,
+                            title: 'Album',
+                            titleColor: 'black',
+                            onPress: () => {
+                              console.log('test:onPress:data:');
+                              ms.openMediaLibrary({ selectionLimit: 1 })
+                                .then((result) => {
+                                  console.log('test:result:', result);
+                                })
+                                .catch((error) => {
+                                  console.warn('error:', error);
+                                });
+                            },
+                          },
+                          {
+                            iconColor: theme.colors.primary,
+                            title: 'Files',
+                            titleColor: 'black',
+                            onPress: () => {
+                              console.log('test:onPress:data:');
+                              ms.openDocument({})
+                                .then((result) => {
+                                  console.log('test:result:', result);
+                                })
+                                .catch((error) => {
+                                  console.warn('error:', error);
+                                });
+                            },
+                          },
+                        ],
+                      });
+                    }}
+                  >
+                    <LocalIcon
+                      name="plus_in_circle"
+                      color="#A5A7A6"
+                      size={sf(28)}
+                    />
+                  </TouchableOpacity>
                 )}
               </View>
 
-              {face === 'key' ? _showFaces() : null}
+              {_showFaces()}
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -263,3 +337,31 @@ export default function ChatScreen(_: Props): JSX.Element {
     </SafeAreaView>
   );
 }
+
+const styles = createStyleSheet({
+  faceContainer: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    padding: 15,
+    justifyContent: 'space-evenly',
+  },
+  inputContainer: {
+    height: 60,
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    alignItems: 'center',
+  },
+  inputContainer2: {
+    flexGrow: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  inputContainer3: {
+    flexDirection: 'row',
+    flexGrow: 1,
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderColor: '#A5A7A6',
+    borderWidth: 1,
+  },
+});
