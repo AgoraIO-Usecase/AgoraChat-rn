@@ -8,7 +8,7 @@ import {
   Text,
   TextInput as RNTextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
+  // TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -166,6 +166,219 @@ export default function ChatScreen(_: Props): JSX.Element {
     );
   };
 
+  const _content = () => {
+    return (
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flexGrow: 1,
+            backgroundColor: '#fff8dc',
+          }}
+        >
+          <MessageBubbleList
+            ref={msgListRef}
+            onPressed={() => {
+              keyboardVerticalOffset = sf(0);
+              Keyboard.dismiss();
+              _onFace('face');
+            }}
+          />
+        </View>
+
+        <View
+          style={styles.inputContainer}
+          onLayout={(_) => {
+            // console.log('test:event:', event.nativeEvent.layout);
+          }}
+        >
+          <TouchableOpacity
+            style={{ justifyContent: 'center' }}
+            onPress={() => {
+              setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
+              Keyboard.dismiss();
+            }}
+          >
+            <LocalIcon name={wave as LocalIconName} color="#A5A7A6" size={28} />
+          </TouchableOpacity>
+
+          {wave === 'wave_in_circle' ? (
+            <React.Fragment>
+              <View style={styles.inputContainer2}>
+                <View style={styles.inputContainer3}>
+                  <TextInput
+                    ref={TextInputRef}
+                    style={{
+                      flexGrow: 1,
+                      backgroundColor: 'white',
+                      width: _calculateInputWidth(width, isInput),
+                    }}
+                    onChangeText={(text) => {
+                      setContent(text);
+                    }}
+                    value={content}
+                    returnKeyType="send"
+                    onKeyPress={(_) => {
+                      // console.log(
+                      //   'test:event:event.nativeEvent.key:',
+                      //   event.nativeEvent.key
+                      // );
+                    }}
+                    onSubmitEditing={(event) => {
+                      const c = event.nativeEvent.text;
+                      // Keyboard.dismiss();
+                      event.preventDefault();
+                      _sendMessage(c);
+                    }}
+                    onFocus={() => {
+                      _onFace('face');
+                    }}
+                  />
+
+                  <TouchableOpacity
+                    style={{ justifyContent: 'center' }}
+                    onPress={() => {
+                      _onFace(face === 'face' ? faces[1] : faces[0]);
+                      Keyboard.dismiss();
+                    }}
+                  >
+                    <LocalIcon
+                      name={face as 'face' | 'key'}
+                      color="#A5A7A6"
+                      size={sf(28)}
+                    />
+                  </TouchableOpacity>
+
+                  <View style={{ width: sf(4) }} />
+                </View>
+              </View>
+
+              {isInput ? (
+                <View style={{ justifyContent: 'center' }}>
+                  <Button
+                    style={{
+                      height: sf(36),
+                      width: sf(66),
+                      borderRadius: sf(18),
+                    }}
+                    onPress={() => {
+                      _sendMessage(content);
+                    }}
+                  >
+                    Send
+                  </Button>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    sheet.openSheet({
+                      sheetItems: [
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Camera',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openCamera({})
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Album',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openMediaLibrary({ selectionLimit: 1 })
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Files',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openDocument({})
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                      ],
+                    });
+                  }}
+                >
+                  <LocalIcon
+                    name="plus_in_circle"
+                    color="#A5A7A6"
+                    size={sf(28)}
+                  />
+                </TouchableOpacity>
+              )}
+            </React.Fragment>
+          ) : (
+            <View style={{ flexDirection: 'row' }}>
+              <Button
+                color={{
+                  enabled: {
+                    content: 'black',
+                    background: 'rgba(242, 242, 242, 1)',
+                  },
+                  pressed: {
+                    content: 'black',
+                    background: '#E6E6E6',
+                  },
+                }}
+                style={[styles.talk, { width: sf(width - 24 - 28 - 20) }]}
+                onPressIn={() => {
+                  state.showState({
+                    children: (
+                      <View
+                        style={{
+                          height: sf(100),
+                          width: sf(161),
+                          borderRadius: sf(16),
+                          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <View style={{ flexDirection: 'row' }}>
+                          <LocalIcon name="mic" size={sf(40)} />
+                          <LocalIcon name="volume8" size={sf(40)} />
+                        </View>
+                        <Text style={{ color: 'white' }}>
+                          {chat.voiceState}
+                        </Text>
+                      </View>
+                    ),
+                  });
+                }}
+                onPressOut={() => {
+                  state.hideState();
+                }}
+              >
+                {chat.voiceButton}
+              </Button>
+            </View>
+          )}
+        </View>
+
+        {_showFaces()}
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView
       mode="padding"
@@ -186,219 +399,15 @@ export default function ChatScreen(_: Props): JSX.Element {
             flex: 1,
           }}
         >
-          <TouchableWithoutFeedback
+          {/* <TouchableWithoutFeedback
             onPress={() => {
               keyboardVerticalOffset = sf(0);
               Keyboard.dismiss();
               _onFace('face');
             }}
-          >
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  flexGrow: 1,
-                  backgroundColor: '#fff8dc',
-                }}
-              >
-                <MessageBubbleList ref={msgListRef} />
-              </View>
-
-              <View
-                style={styles.inputContainer}
-                onLayout={(_) => {
-                  // console.log('test:event:', event.nativeEvent.layout);
-                }}
-              >
-                <TouchableOpacity
-                  style={{ justifyContent: 'center' }}
-                  onPress={() => {
-                    setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
-                    Keyboard.dismiss();
-                  }}
-                >
-                  <LocalIcon
-                    name={wave as LocalIconName}
-                    color="A5A7A6"
-                    size={28}
-                  />
-                </TouchableOpacity>
-
-                {wave === 'wave_in_circle' ? (
-                  <React.Fragment>
-                    <View style={styles.inputContainer2}>
-                      <View style={styles.inputContainer3}>
-                        <TextInput
-                          ref={TextInputRef}
-                          style={{
-                            flexGrow: 1,
-                            backgroundColor: 'white',
-                            width: _calculateInputWidth(width, isInput),
-                          }}
-                          onChangeText={(text) => {
-                            setContent(text);
-                          }}
-                          value={content}
-                          returnKeyType="send"
-                          onKeyPress={(_) => {
-                            // console.log(
-                            //   'test:event:event.nativeEvent.key:',
-                            //   event.nativeEvent.key
-                            // );
-                          }}
-                          onSubmitEditing={(event) => {
-                            const c = event.nativeEvent.text;
-                            // Keyboard.dismiss();
-                            event.preventDefault();
-                            _sendMessage(c);
-                          }}
-                          onFocus={() => {
-                            _onFace('face');
-                          }}
-                        />
-
-                        <TouchableOpacity
-                          style={{ justifyContent: 'center' }}
-                          onPress={() => {
-                            _onFace(face === 'face' ? faces[1] : faces[0]);
-                            Keyboard.dismiss();
-                          }}
-                        >
-                          <LocalIcon
-                            name={face as 'face' | 'key'}
-                            color="#A5A7A6"
-                            size={sf(28)}
-                          />
-                        </TouchableOpacity>
-
-                        <View style={{ width: sf(4) }} />
-                      </View>
-                    </View>
-
-                    {isInput ? (
-                      <View style={{ justifyContent: 'center' }}>
-                        <Button
-                          style={{
-                            height: sf(36),
-                            width: sf(66),
-                            borderRadius: sf(18),
-                          }}
-                          onPress={() => {
-                            _sendMessage(content);
-                          }}
-                        >
-                          Send
-                        </Button>
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={() => {
-                          sheet.openSheet({
-                            sheetItems: [
-                              {
-                                iconColor: theme.colors.primary,
-                                title: 'Camera',
-                                titleColor: 'black',
-                                onPress: () => {
-                                  ms.openCamera({})
-                                    .then((result) => {
-                                      console.log('test:result:', result);
-                                    })
-                                    .catch((error) => {
-                                      console.warn('error:', error);
-                                    });
-                                },
-                              },
-                              {
-                                iconColor: theme.colors.primary,
-                                title: 'Album',
-                                titleColor: 'black',
-                                onPress: () => {
-                                  ms.openMediaLibrary({ selectionLimit: 1 })
-                                    .then((result) => {
-                                      console.log('test:result:', result);
-                                    })
-                                    .catch((error) => {
-                                      console.warn('error:', error);
-                                    });
-                                },
-                              },
-                              {
-                                iconColor: theme.colors.primary,
-                                title: 'Files',
-                                titleColor: 'black',
-                                onPress: () => {
-                                  ms.openDocument({})
-                                    .then((result) => {
-                                      console.log('test:result:', result);
-                                    })
-                                    .catch((error) => {
-                                      console.warn('error:', error);
-                                    });
-                                },
-                              },
-                            ],
-                          });
-                        }}
-                      >
-                        <LocalIcon
-                          name="plus_in_circle"
-                          color="#A5A7A6"
-                          size={sf(28)}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <View style={{ flexDirection: 'row' }}>
-                    <Button
-                      color={{
-                        enabled: {
-                          content: 'black',
-                          background: 'rgba(242, 242, 242, 1)',
-                        },
-                        pressed: {
-                          content: 'black',
-                          background: '#E6E6E6',
-                        },
-                      }}
-                      style={[styles.talk, { width: sf(width - 24 - 28 - 20) }]}
-                      onPressIn={() => {
-                        state.showState({
-                          children: (
-                            <View
-                              style={{
-                                height: sf(100),
-                                width: sf(161),
-                                borderRadius: sf(16),
-                                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <View style={{ flexDirection: 'row' }}>
-                                <LocalIcon name="mic" size={sf(40)} />
-                                <LocalIcon name="volume8" size={sf(40)} />
-                              </View>
-                              <Text style={{ color: 'white' }}>
-                                {chat.voiceState}
-                              </Text>
-                            </View>
-                          ),
-                        });
-                      }}
-                      onPressOut={() => {
-                        state.hideState();
-                      }}
-                    >
-                      {chat.voiceButton}
-                    </Button>
-                  </View>
-                )}
-              </View>
-
-              {_showFaces()}
-            </View>
-          </TouchableWithoutFeedback>
+          > */}
+          {_content()}
+          {/* </TouchableWithoutFeedback> */}
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>

@@ -1,11 +1,18 @@
 import * as React from 'react';
-import { ListRenderItem, ListRenderItemInfo, Text, View } from 'react-native';
+import {
+  ListRenderItem,
+  ListRenderItemInfo,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {
   createStyleSheet,
   DynamicHeightList,
   DynamicHeightListRef,
   getScaleFactor,
   Image,
+  Loading,
   LocalIcon,
   seqId,
   timestamp,
@@ -19,7 +26,8 @@ export interface MessageItemType {
   timestamp: number;
   isSender?: boolean;
   key: string;
-  type: 'text' | 'image';
+  type: 'text' | 'image' | 'voice';
+  state?: 'unreaded' | 'readed' | 'arrived' | 'played' | 'sending' | 'failed';
 }
 
 export interface TextMessageItemType extends MessageItemType {
@@ -29,6 +37,9 @@ export interface TextMessageItemType extends MessageItemType {
 export interface ImageMessageItemType extends MessageItemType {
   image: string;
 }
+export interface VoiceMessageItemType extends MessageItemType {
+  length: number;
+}
 const text1: TextMessageItemType = {
   sender: 'zs',
   timestamp: timestamp(),
@@ -36,6 +47,24 @@ const text1: TextMessageItemType = {
   key: seqId('ml').toString(),
   text: 'Uffa, ho tanto da raccontare alla mia famiglia, ma quando chiamano loro dagli Stati Uniti io ho lezione e quando posso telefonare io loro dormono!',
   type: 'text',
+  state: 'sending',
+};
+const text2: TextMessageItemType = {
+  sender: 'zs',
+  timestamp: timestamp(),
+  isSender: true,
+  key: seqId('ml').toString(),
+  text: 'Uffa, ho tanto da raccontare alla mia famiglia, ma quando chiamano loro dagli Stati Uniti io ho lezione e quando posso telefonare io loro dormono!',
+  type: 'text',
+};
+const image1: ImageMessageItemType = {
+  sender: 'self',
+  timestamp: timestamp(),
+  isSender: false,
+  key: seqId('ml').toString(),
+  image:
+    'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
+  type: 'image',
 };
 const image2: ImageMessageItemType = {
   sender: 'self',
@@ -45,6 +74,22 @@ const image2: ImageMessageItemType = {
   image:
     'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
   type: 'image',
+};
+const voice1: VoiceMessageItemType = {
+  sender: 'zs',
+  timestamp: timestamp(),
+  isSender: false,
+  key: seqId('ml').toString(),
+  length: 45,
+  type: 'voice',
+};
+const voice2: VoiceMessageItemType = {
+  sender: 'zs',
+  timestamp: timestamp(),
+  isSender: true,
+  key: seqId('ml').toString(),
+  length: 45,
+  type: 'voice',
 };
 const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
@@ -81,7 +126,17 @@ const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
           },
         ]}
       >
-        <Text style={styles.text}>{msg.text}</Text>
+        <Text
+          style={[
+            styles.text,
+            {
+              backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+              color: msg.isSender ? 'white' : '#333333',
+            },
+          ]}
+        >
+          {msg.text}
+        </Text>
       </View>
       <View
         style={[
@@ -92,7 +147,11 @@ const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
           },
         ]}
       >
-        <LocalIcon name="readed" size={sf(12)} />
+        {msg.state === 'sending' ? (
+          <Loading name="loading2" size={sf(12)} />
+        ) : (
+          <LocalIcon name="readed" size={sf(12)} />
+        )}
       </View>
     </View>
   );
@@ -109,7 +168,7 @@ const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
       style={[
         styles.container,
         {
-          flexDirection: 'row-reverse',
+          flexDirection: msg.isSender ? 'row-reverse' : 'row',
           width: '80%',
         },
       ]}
@@ -159,6 +218,83 @@ const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
     </View>
   );
 };
+const VoiceMessageRenderItem: ListRenderItem<MessageItemType> = (
+  info: ListRenderItemInfo<MessageItemType>
+): React.ReactElement | null => {
+  const sf = getScaleFactor();
+  const { item } = info;
+  const { width } = useWindowDimensions();
+  const msg = item as VoiceMessageItemType;
+  const _width = (length: number) => {
+    if (length < 0) {
+      throw new Error('The voice length cannot be less than 0.');
+    }
+    return width * 0.7 * (1 / 60) * (length > 60 ? 60 : length);
+  };
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          flexDirection: msg.isSender ? 'row-reverse' : 'row',
+          width: _width(msg.length ?? 1),
+        },
+      ]}
+    >
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? undefined : sf(10),
+            marginLeft: msg.isSender ? sf(10) : undefined,
+          },
+        ]}
+      >
+        <DefaultAvatar size={sf(24)} radius={sf(12)} />
+      </View>
+      <View
+        style={[
+          styles.innerContainer,
+          {
+            flexDirection: msg.isSender ? 'row-reverse' : 'row',
+            justifyContent: 'space-between',
+            borderBottomRightRadius: msg.isSender ? undefined : sf(12),
+            borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
+            backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+          },
+        ]}
+      >
+        <LocalIcon
+          name={msg.isSender ? 'wave3_left' : 'wave3_right'}
+          size={sf(22)}
+          color={msg.isSender ? 'white' : '#A9A9A9'}
+          style={{ marginHorizontal: sf(8) }}
+        />
+        <Text
+          style={[
+            styles.text,
+            {
+              color: msg.isSender ? 'white' : 'black',
+              backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+            },
+          ]}
+        >
+          {msg.length.toString() + "'"}
+        </Text>
+      </View>
+      <View
+        style={[
+          {
+            marginRight: msg.isSender ? 10 : undefined,
+            marginLeft: msg.isSender ? undefined : 10,
+            opacity: 1,
+          },
+        ]}
+      >
+        <LocalIcon name="readed" size={sf(12)} />
+      </View>
+    </View>
+  );
+};
 const MessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
@@ -169,6 +305,8 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
     MessageItem = TextMessageRenderItem;
   } else if (item.type === 'image') {
     MessageItem = ImageMessageRenderItem;
+  } else if (item.type === 'voice') {
+    MessageItem = VoiceMessageRenderItem;
   } else {
     throw new Error('error');
   }
@@ -193,12 +331,15 @@ export type MessageListRef = {
   scrollToTop: () => void;
   addMessage: (msg: MessageItemType[]) => void;
 };
-type Props = {};
+type MessageBubbleListProps = {
+  onPressed?: () => void;
+};
 const MessageBubbleList = (
-  _: Props,
+  props: MessageBubbleListProps,
   ref?: React.Ref<MessageListRef>
 ): JSX.Element => {
   // console.log('test:MessageBubbleList:');
+  const { onPressed } = props;
   const enableRefresh = true;
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -214,7 +355,11 @@ const MessageBubbleList = (
   if (loading) {
     items.length = 0;
     items.push(text1);
+    items.push(text2);
+    items.push(image1);
     items.push(image2);
+    items.push(voice1);
+    items.push(voice2);
     setLoading(false);
   }
 
@@ -282,6 +427,7 @@ const MessageBubbleList = (
       keyExtractor={(_: any, index: number) => {
         return index.toString();
       }}
+      onTouchEnd={onPressed}
     />
   );
 };
@@ -308,4 +454,6 @@ const styles = createStyleSheet({
   },
 });
 
-export default React.forwardRef<MessageListRef, Props>(MessageBubbleList);
+export default React.forwardRef<MessageListRef, MessageBubbleListProps>(
+  MessageBubbleList
+);

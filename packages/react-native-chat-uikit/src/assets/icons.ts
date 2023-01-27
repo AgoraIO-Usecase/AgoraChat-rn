@@ -833,9 +833,18 @@ export const ICON_ASSETS = {
     if (size === '3x') {
       return require('./icons/Global/badge_3x.png');
     } else if (size === '2x') {
-      return require('./icons/Global/badge_2x.png');
+      return require('./icons/Global/badge_3x.png');
     } else {
-      return require('./icons/Global/badge.png');
+      return require('./icons/Global/badge_2x.png');
+    }
+  },
+  'badge2': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/badge2_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/badge2_2x.png');
+    } else {
+      return require('./icons/Global/badge2.png');
     }
   },
   'bell_c': (size: string) => {
@@ -872,6 +881,24 @@ export const ICON_ASSETS = {
       return require('./icons/Global/default_avatar_setting_3x.png');
     } else {
       return require('./icons/Global/default_avatar_setting_2x.png');
+    }
+  },
+  'delivered': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/delivered_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/delivered_2x.png');
+    } else {
+      return require('./icons/Global/delivered.png');
+    }
+  },
+  'ex_mark': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/ex_mark_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/ex_mark_2x.png');
+    } else {
+      return require('./icons/Global/ex_mark.png');
     }
   },
   'face': (size: string) => {
@@ -1016,6 +1043,24 @@ export const ICON_ASSETS = {
       return require('./icons/Global/volume8_2x.png');
     } else {
       return require('./icons/Global/volume8.png');
+    }
+  },
+  'wave3_left': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave3_left_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave3_left_2x.png');
+    } else {
+      return require('./icons/Global/wave3_left.png');
+    }
+  },
+  'wave3_right': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave3_right_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave3_right_2x.png');
+    } else {
+      return require('./icons/Global/wave3_right.png');
     }
   },
   'wave_in_circle': (size: string) => {

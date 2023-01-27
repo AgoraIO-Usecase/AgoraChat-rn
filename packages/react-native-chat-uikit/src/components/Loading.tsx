@@ -2,15 +2,17 @@ import React from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
-import { LocalIcon } from './Icon';
+import { LocalIcon, LocalIconName } from './Icon';
 
 type LoadingProps = {
+  name?: LocalIconName;
   size?: number;
   color?: string;
   style?: StyleProp<ViewStyle>;
 };
 
 export default function Loading({
+  name = 'loading',
   size = 24,
   color,
   style,
@@ -18,7 +20,7 @@ export default function Loading({
   const { colors } = useThemeContext();
   return (
     <Rotate style={style}>
-      <LocalIcon name="loading" size={size} color={color ?? colors.primary} />
+      <LocalIcon name={name} size={size} color={color ?? colors.primary} />
     </Rotate>
   );
 }
