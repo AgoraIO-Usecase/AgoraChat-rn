@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
   ChatSdkContextType,
+  ContentStateContextProvider,
   DialogContextProvider,
   HeaderContextType,
   StringSetContextType,
@@ -104,13 +105,29 @@ export function Container({
             >
               <DialogContextProvider>
                 <ToastContextProvider dismissTimeout={TIMEOUT}>
-                  {children ? (
-                    children
-                  ) : (
-                    <Text style={{ backgroundColor: theme.colors.error }}>
-                      children node is empty.
-                    </Text>
-                  )}
+                  <ContentStateContextProvider
+                    content={{
+                      children: (
+                        <Text
+                          style={{
+                            height: 100,
+                            width: 100,
+                            backgroundColor: 'green',
+                          }}
+                        >
+                          hh
+                        </Text>
+                      ),
+                    }}
+                  >
+                    {children ? (
+                      children
+                    ) : (
+                      <Text style={{ backgroundColor: theme.colors.error }}>
+                        children node is empty.
+                      </Text>
+                    )}
+                  </ContentStateContextProvider>
                 </ToastContextProvider>
               </DialogContextProvider>
             </HeaderStyleProvider>

@@ -107,6 +107,10 @@ export class AppStringSet extends UIKitStringSet2 {
     logins: string;
     logout: string;
   };
+  chat: {
+    voiceButton: string;
+    voiceState: string;
+  };
 
   constructor(locate: Locale = en) {
     super(locate);
@@ -231,6 +235,10 @@ export class AppStringSet extends UIKitStringSet2 {
       more: 'More',
       logins: 'Logins',
       logout: 'Logout',
+    };
+    this.chat = {
+      voiceButton: 'Hold to talk',
+      voiceState: 'Swipe up to cancel',
     };
   }
 }

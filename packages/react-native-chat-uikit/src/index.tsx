@@ -45,6 +45,7 @@ export { default as Badge } from './components/Badge';
 export { default as Blank } from './components/Blank';
 export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
+export { default as ContentState } from './components/ContentState';
 export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
 export {

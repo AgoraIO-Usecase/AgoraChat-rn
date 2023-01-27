@@ -1,5 +1,11 @@
 import React from 'react';
-import { Pressable, StyleProp, Text, ViewStyle } from 'react-native';
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleProp,
+  Text,
+  ViewStyle,
+} from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
@@ -13,6 +19,8 @@ type ButtonProps = React.PropsWithChildren<{
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
   color?: Partial<ButtonStateColor> | undefined;
+  onPressIn?: ((event: GestureResponderEvent) => void) | null | undefined;
+  onPressOut?: ((event: GestureResponderEvent) => void) | null | undefined;
 }>;
 export default function Button({
   icon,
@@ -21,6 +29,8 @@ export default function Button({
   style,
   color,
   children,
+  onPressIn,
+  onPressOut,
 }: ButtonProps): JSX.Element {
   const { colors, fonts } = useThemeContext();
 
@@ -47,6 +57,8 @@ export default function Button({
     <Pressable
       disabled={disabled}
       onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
       style={({ pressed }) => {
         const s = getStateColor(pressed, disabled);
         return [{ backgroundColor: s.background }, styles.container, style];

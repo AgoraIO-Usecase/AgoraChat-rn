@@ -3,6 +3,7 @@ import type { ChatClient } from 'react-native-chat-sdk';
 import type {
   ButtonStateColor,
   ColorPaletteType,
+  ContentStateProps,
   DialogPropsT,
   FontAttributes,
   InputStateColor,
@@ -75,4 +76,9 @@ export type DialogContextType = {
   openAlert: (props: DialogPropsT<'Alert'>) => void;
   openPrompt: (props: DialogPropsT<'Prompt'>) => void;
   openSheet: (props: DialogPropsT<'BottomSheet'>) => void;
+};
+
+export type VoiceStateContextType = {
+  showState: (props?: ContentStateProps) => void;
+  hideState: () => void;
 };

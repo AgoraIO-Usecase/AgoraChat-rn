@@ -1,4 +1,4 @@
-import type { TextStyle } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 import type { ActionMenuItem } from './components/ActionMenu';
 import type { AlertItem } from './components/Alert';
@@ -104,3 +104,7 @@ export type DialogPropsT<
   T extends DialogTask['type'],
   U extends DialogTask = DialogTask
 > = U extends { type: T; props: infer P } ? P : never;
+
+export type ContentStateProps = React.PropsWithChildren<{
+  container?: StyleProp<ViewStyle>;
+}>;

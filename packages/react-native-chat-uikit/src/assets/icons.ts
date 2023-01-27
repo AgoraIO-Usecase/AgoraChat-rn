@@ -928,6 +928,15 @@ export const ICON_ASSETS = {
       return require('./icons/Login/loading_2x.png');
     }
   },
+  'mic': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/mic_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/mic_2x.png');
+    } else {
+      return require('./icons/Global/mic.png');
+    }
+  },
   'nav_chat_right_bar': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/nav_chat_right_bar_3x.png');
@@ -998,6 +1007,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/trash_2x.png');
     } else {
       return require('./icons/Global/trash.png');
+    }
+  },
+  'volume8': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/volume8_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/volume8_2x.png');
+    } else {
+      return require('./icons/Global/volume8.png');
     }
   },
   'wave_in_circle': (size: string) => {
