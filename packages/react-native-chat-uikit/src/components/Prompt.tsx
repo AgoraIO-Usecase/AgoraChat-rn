@@ -80,7 +80,7 @@ export default function Prompt({
     <Modal
       enableKeyboardAvoid
       disableBackgroundClose
-      onClose={onHide}
+      onRequestClose={onHide}
       onDismiss={() => {
         setText('');
         onDismiss?.();

@@ -7,6 +7,7 @@ export {
   useActionMenu,
   useAlert,
   useBottomSheet,
+  useManualCloseDialog,
   usePrompt,
 } from './DialogContext';
 export { HeaderStyleProvider, useHeaderContext } from './HeaderContext';

@@ -5,4 +5,6 @@ export type ContactActionType =
   | 'group_invite'
   | 'group_member'
   | 'group_member_modify'
-  | 'block_contact';
+  | 'block_contact'
+  | 'create_conversation'
+  | 'create_group';

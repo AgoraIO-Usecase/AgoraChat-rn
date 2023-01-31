@@ -5,6 +5,8 @@ import { UIKitStringSet2 } from 'react-native-chat-uikit';
 export class AppStringSet extends UIKitStringSet2 {
   header: {
     groupInvite: string;
+    createConversation: string;
+    createGroup: string;
   };
   login: {
     logo: string;
@@ -116,6 +118,8 @@ export class AppStringSet extends UIKitStringSet2 {
     super(locate);
     this.header = {
       groupInvite: 'Invite',
+      createConversation: 'Done',
+      createGroup: 'Done',
     };
     this.login = {
       logo: 'AgoraChat',

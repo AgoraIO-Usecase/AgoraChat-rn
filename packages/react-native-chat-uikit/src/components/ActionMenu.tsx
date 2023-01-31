@@ -51,7 +51,7 @@ export default function ActionMenu({
   return (
     <Modal
       type="fade"
-      onClose={_onHide}
+      onRequestClose={_onHide}
       onDismiss={onDismiss}
       statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}

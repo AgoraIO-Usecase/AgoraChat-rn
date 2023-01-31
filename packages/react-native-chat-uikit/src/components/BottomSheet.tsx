@@ -1,5 +1,5 @@
-import React from 'react';
-import { TouchableOpacity, useWindowDimensions } from 'react-native';
+import * as React from 'react';
+import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useHeaderContext } from '../contexts/HeaderContext';
@@ -8,14 +8,25 @@ import DialogSheet from './DialogSheet';
 import type { LocalIconName } from './Icon';
 import Modal from './Modal';
 
+type ButtonItemType = {
+  icon?: LocalIconName;
+  iconColor?: string;
+  title: string;
+  titleColor?: string;
+  onPress: () => void;
+};
+
+type CustomItemType<Props extends {} = {}> = {
+  key: string;
+  // Custom: React.ComponentType<Props>;
+  // CustomProps: Props;
+  Custom: React.ReactElement<Props>;
+};
+
+type ItemType = ButtonItemType | CustomItemType;
+
 export type BottomSheetItem = {
-  sheetItems: {
-    icon?: LocalIconName;
-    iconColor?: string;
-    title: string;
-    titleColor?: string;
-    onPress: () => void;
-  }[];
+  sheetItems: ItemType[];
 };
 type BottomSheetProps = {
   visible: boolean;
@@ -37,7 +48,7 @@ export default function BottomSheet({
   return (
     <Modal
       type="slide"
-      onClose={onHide}
+      onRequestClose={onHide}
       onDismiss={onDismiss}
       statusBarTranslucent={defaultStatusBarTranslucent}
       visible={visible}
@@ -46,23 +57,41 @@ export default function BottomSheet({
       backdropColor={colors.backdrop}
     >
       <DialogSheet style={{ width, paddingBottom: bottom }}>
-        {sheetItems.map(({ onPress, ...props }, idx) => (
-          <TouchableOpacity
-            activeOpacity={0.75}
-            key={props.title + idx.toString}
-            style={{ paddingLeft: left, paddingRight: right }}
-            onPress={async () => {
-              await onHide();
-              try {
-                onPress();
-              } catch (e) {
-                console.warn(e);
-              }
-            }}
-          >
-            <DialogSheet.Item {...props} />
-          </TouchableOpacity>
-        ))}
+        {sheetItems.map((value, idx) => {
+          if (Object.getOwnPropertyNames(value).includes('title')) {
+            console.log('test:999:');
+            const { onPress, ...props } = value as ButtonItemType;
+            return (
+              <TouchableOpacity
+                activeOpacity={0.75}
+                key={props.title + idx.toString}
+                style={{ paddingLeft: left, paddingRight: right }}
+                onPress={async () => {
+                  await onHide();
+                  try {
+                    onPress();
+                  } catch (e) {
+                    console.warn(e);
+                  }
+                }}
+              >
+                <DialogSheet.ButtonItem {...props} />
+              </TouchableOpacity>
+            );
+          } else if (Object.getOwnPropertyNames(value).includes('key')) {
+            const { Custom, key } = value as CustomItemType;
+            return (
+              <View
+                key={key}
+                style={{ paddingLeft: left, paddingRight: right }}
+              >
+                {Custom}
+              </View>
+            );
+          } else {
+            return null;
+          }
+        })}
       </DialogSheet>
     </Modal>
   );

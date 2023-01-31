@@ -23,7 +23,7 @@ import createStyleSheet from '../styles/createStyleSheet';
 
 type ModalProps = {
   type?: 'slide' | 'fade' | undefined;
-  onClose: () => void;
+  onRequestClose: () => void;
   backgroundStyle?: StyleProp<ViewStyle> | undefined;
   disableBackgroundClose?: boolean | undefined;
   enableKeyboardAvoid?: boolean | undefined;
@@ -127,12 +127,12 @@ const usePrevProp = <T,>(prop: T) => {
  * Modal Open: Triggered by Modal.props.visible state changed to true
  * - visible true -> modalVisible true -> animation start
  *
- * Modal Close: Triggered by Modal.props.onClose() call
- * - Modal.props.onClose() -> visible false -> animation start -> modalVisible false
+ * Modal Close: Triggered by Modal.props.onRequestClose() call
+ * - Modal.props.onRequestClose() -> visible false -> animation start -> modalVisible false
  * */
 export default function Modal({
   children,
-  onClose,
+  onRequestClose,
   backgroundStyle,
   onDismiss,
   type = 'fade',
@@ -154,7 +154,7 @@ export default function Modal({
     type,
     content.translateY,
     showTransition,
-    onClose
+    onRequestClose
   );
 
   React.useEffect(() => {
@@ -169,7 +169,7 @@ export default function Modal({
       transparent={transparent}
       hardwareAccelerated
       visible={modalVisible}
-      onRequestClose={onClose}
+      onRequestClose={onRequestClose}
       onShow={() => showTransition()}
       onDismiss={onDismiss}
       supportedOrientations={[
@@ -183,7 +183,7 @@ export default function Modal({
       {...props}
     >
       <TouchableWithoutFeedback
-        onPress={disableBackgroundClose ? undefined : onClose}
+        onPress={disableBackgroundClose ? undefined : onRequestClose}
       >
         <Animated.View
           style={[

@@ -135,7 +135,7 @@ let count = 0;
 export default function ConversationListScreen({
   navigation,
 }: Props): JSX.Element {
-  // console.log('test:ConversationListScreen:', route, navigation);
+  // console.log('test:ConversationListScreen:', navigation);
   // return <Placeholder content={`${ConversationListScreen.name}`} />;
   // console.log('test:GroupListScreen:', route, navigation);
   const theme = useThemeContext();
@@ -206,10 +206,29 @@ export default function ConversationListScreen({
                 {
                   // icon: 'loading',
                   iconColor: theme.colors.primary,
+                  title: conversation.new,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:');
+                    // navigation.navigate('ContactList', {
+                    //   params: { type: 'create_conversation' },
+                    // });
+                    navigation.navigate({
+                      name: 'ContactList',
+                      params: { params: { type: 'create_conversation' } },
+                    });
+                  },
+                },
+                {
+                  // icon: 'loading',
+                  iconColor: theme.colors.primary,
                   title: conversation.createGroup,
                   titleColor: 'black',
                   onPress: () => {
                     console.log('test:onPress:data:');
+                    navigation.navigate('ContactList', {
+                      params: { type: 'create_group' },
+                    });
                   },
                 },
                 {
@@ -249,7 +268,16 @@ export default function ConversationListScreen({
         </Pressable>
       );
     },
-    [conversation, sheet, theme.colors.primary]
+    [
+      conversation.createGroup,
+      conversation.joinPublicGroup,
+      conversation.new,
+      conversation.searchContact,
+      conversation.searchGroup,
+      navigation,
+      sheet,
+      theme.colors.primary,
+    ]
   );
 
   React.useEffect(() => {

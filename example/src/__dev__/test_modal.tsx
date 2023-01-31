@@ -50,8 +50,8 @@ const App = () => {
           backdropColor="rgba(100, 10, 200, 0.5)"
           visible={modalVisible}
           backgroundStyle={{ alignItems: 'center', justifyContent: 'flex-end' }}
-          onClose={(): Promise<void> => {
-            console.log('test:onClose:');
+          onRequestClose={(): Promise<void> => {
+            console.log('test:onRequestClose:');
             return new Promise((resolve) => {
               console.log('test:setModalVisible:', resolve);
               setModalVisible(false);

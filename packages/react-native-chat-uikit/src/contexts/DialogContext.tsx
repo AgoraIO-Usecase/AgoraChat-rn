@@ -1,4 +1,5 @@
 import React from 'react';
+import { DeviceEventEmitter } from 'react-native';
 
 import ActionMenu from '../components/ActionMenu';
 import Alert from '../components/Alert';
@@ -31,6 +32,11 @@ const BottomSheetContext = React.createContext<Pick<
   'openSheet'
 > | null>(null);
 BottomSheetContext.displayName = 'UIKitBottomSheetContext';
+
+const ManualCloseContext = React.createContext<{
+  manualClose: () => Promise<void>;
+} | null>(null);
+ManualCloseContext.displayName = 'ManualCloseContext';
 
 type DialogContextProps = React.PropsWithChildren<{
   defaultLabels?: {
@@ -122,66 +128,77 @@ export const DialogContextProvider = ({
     isWorking,
     updateToShow,
   ]);
+  const manualClose = updateToHide;
+
+  React.useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      'closeDialog',
+      async (_) => manualClose()
+    );
+    return () => subscription.remove();
+  }, [manualClose]);
 
   return (
     <AlertContext.Provider value={{ openAlert }}>
       <ActionMenuContext.Provider value={{ openMenu }}>
         <PromptContext.Provider value={{ openPrompt }}>
           <BottomSheetContext.Provider value={{ openSheet }}>
-            {children}
-            {workingTask.current?.type === 'ActionMenu' && (
-              <ActionMenu
-                onHide={updateToHide}
-                onDismiss={shiftTask}
-                visible={visibleState.current}
-                title={workingTask.current.props.title}
-                menuItems={workingTask.current.props.menuItems}
-              />
-            )}
-            {workingTask.current?.type === 'Alert' && (
-              <Alert
-                onHide={updateToHide}
-                onDismiss={shiftTask}
-                visible={visibleState.current}
-                title={workingTask.current.props.title}
-                message={workingTask.current.props.message}
-                buttons={
-                  workingTask.current.props.buttons ?? [
-                    { text: defaultLabels?.alert?.ok || 'OK' },
-                  ]
-                }
-              />
-            )}
-            {workingTask.current?.type === 'Prompt' && (
-              <Prompt
-                onHide={updateToHide}
-                onDismiss={shiftTask}
-                visible={visibleState.current}
-                title={workingTask.current.props.title}
-                onSubmit={workingTask.current.props.onSubmit}
-                defaultValue={workingTask.current.props.defaultValue}
-                submitLabel={
-                  workingTask.current.props.submitLabel ??
-                  defaultLabels?.prompt?.ok
-                }
-                cancelLabel={
-                  workingTask.current.props.cancelLabel ??
-                  defaultLabels?.prompt?.cancel
-                }
-                placeholder={
-                  workingTask.current.props.placeholder ??
-                  defaultLabels?.prompt?.placeholder
-                }
-              />
-            )}
-            {workingTask.current?.type === 'BottomSheet' && (
-              <BottomSheet
-                onHide={updateToHide}
-                onDismiss={shiftTask}
-                visible={visibleState.current}
-                sheetItems={workingTask.current.props.sheetItems}
-              />
-            )}
+            <ManualCloseContext.Provider value={{ manualClose }}>
+              {children}
+              {workingTask.current?.type === 'ActionMenu' && (
+                <ActionMenu
+                  onHide={updateToHide}
+                  onDismiss={shiftTask}
+                  visible={visibleState.current}
+                  title={workingTask.current.props.title}
+                  menuItems={workingTask.current.props.menuItems}
+                />
+              )}
+              {workingTask.current?.type === 'Alert' && (
+                <Alert
+                  onHide={updateToHide}
+                  onDismiss={shiftTask}
+                  visible={visibleState.current}
+                  title={workingTask.current.props.title}
+                  message={workingTask.current.props.message}
+                  buttons={
+                    workingTask.current.props.buttons ?? [
+                      { text: defaultLabels?.alert?.ok || 'OK' },
+                    ]
+                  }
+                />
+              )}
+              {workingTask.current?.type === 'Prompt' && (
+                <Prompt
+                  onHide={updateToHide}
+                  onDismiss={shiftTask}
+                  visible={visibleState.current}
+                  title={workingTask.current.props.title}
+                  onSubmit={workingTask.current.props.onSubmit}
+                  defaultValue={workingTask.current.props.defaultValue}
+                  submitLabel={
+                    workingTask.current.props.submitLabel ??
+                    defaultLabels?.prompt?.ok
+                  }
+                  cancelLabel={
+                    workingTask.current.props.cancelLabel ??
+                    defaultLabels?.prompt?.cancel
+                  }
+                  placeholder={
+                    workingTask.current.props.placeholder ??
+                    defaultLabels?.prompt?.placeholder
+                  }
+                />
+              )}
+              {workingTask.current?.type === 'BottomSheet' && (
+                <BottomSheet
+                  onHide={updateToHide}
+                  onDismiss={shiftTask}
+                  visible={visibleState.current}
+                  sheetItems={workingTask.current.props.sheetItems}
+                />
+              )}
+            </ManualCloseContext.Provider>
           </BottomSheetContext.Provider>
         </PromptContext.Provider>
       </ActionMenuContext.Provider>
@@ -209,5 +226,15 @@ export const useBottomSheet = () => {
   const context = React.useContext(BottomSheetContext);
   if (!context)
     throw new Error(`${BottomSheetContext.displayName} is not provided`);
+  return context;
+};
+/**
+ * Typical application scenario: The BottomSheet is defined and you need to manually close the BottomSheet dialog.
+ * @returns context
+ */
+export const useManualCloseDialog = () => {
+  const context = React.useContext(ManualCloseContext);
+  if (!context)
+    throw new Error(`${ManualCloseContext.displayName} is not provided`);
   return context;
 };

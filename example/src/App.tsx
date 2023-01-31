@@ -33,7 +33,7 @@ import * as Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
-import { GroupInviteHeader } from './components/GroupInviteHeader';
+import { ContactListHeader } from './components/ContactListHeader';
 import HeaderTitle from './components/HeaderTitle';
 import HomeHeaderRight from './components/HomeHeaderRight';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
@@ -237,7 +237,7 @@ export default function App() {
                   options={({ route }) => {
                     return {
                       headerBackVisible: true,
-                      headerRight: GroupInviteHeader,
+                      headerRight: ContactListHeader,
                       headerTitle: route.name,
                     };
                   }}

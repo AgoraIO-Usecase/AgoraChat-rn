@@ -10,7 +10,8 @@ type DialogSheetProps = React.PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
 }>;
 const DialogSheet: ((props: DialogSheetProps) => JSX.Element) & {
-  Item: typeof SheetItem;
+  ButtonItem: typeof ButtonSheetItem;
+  CustomItem: typeof CustomSheetItem;
 } = ({ style, children }) => {
   const { colors } = useThemeContext();
   return (
@@ -32,7 +33,47 @@ export type SheetItemProps = {
   title: string;
   titleColor?: string;
 };
-const SheetItem = ({ icon, title, iconColor, titleColor }: SheetItemProps) => {
+const ButtonSheetItem = ({
+  icon,
+  title,
+  iconColor,
+  titleColor,
+}: SheetItemProps) => {
+  const { colors, fonts } = useThemeContext();
+  return (
+    <View
+      style={[
+        styles.sheetItemContainer,
+        { backgroundColor: 'rgba(250, 250, 250, 1)' },
+      ]}
+    >
+      {icon && (
+        <LocalIcon
+          name={icon}
+          color={iconColor ?? colors.primary}
+          containerStyle={styles.sheetItemIcon}
+        />
+      )}
+      <Text
+        numberOfLines={1}
+        style={[
+          styles.sheetItemText,
+          { color: titleColor ?? colors.text },
+          fonts.sheet,
+        ]}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+};
+
+const CustomSheetItem = ({
+  icon,
+  title,
+  iconColor,
+  titleColor,
+}: SheetItemProps) => {
   const { colors, fonts } = useThemeContext();
   return (
     <View
@@ -88,5 +129,6 @@ const styles = createStyleSheet({
   },
 });
 
-DialogSheet.Item = SheetItem;
+DialogSheet.ButtonItem = ButtonSheetItem;
+DialogSheet.CustomItem = CustomSheetItem;
 export default DialogSheet;

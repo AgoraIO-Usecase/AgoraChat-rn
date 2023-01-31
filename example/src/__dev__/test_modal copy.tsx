@@ -47,7 +47,7 @@ const App = () => {
           transparent={transparent}
           visible={modalVisible}
           backgroundStyle={{ alignItems: 'center', justifyContent: 'flex-end' }}
-          onClose={() => {
+          onRequestClose={() => {
             setModalVisible(false);
           }}
         >

@@ -93,7 +93,7 @@ export default function Alert({
 
   return (
     <Modal
-      onClose={onHide}
+      onRequestClose={onHide}
       onDismiss={onDismiss}
       statusBarTranslucent={statusBarTranslucent}
       visible={visible}

@@ -874,6 +874,24 @@ export const ICON_ASSETS = {
       return require('./icons/Global/black_goBack_2x.png');
     }
   },
+  'check_disabled': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/check_disabled_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/check_disabled_2x.png');
+    } else {
+      return require('./icons/Global/check_disabled.png');
+    }
+  },
+  'check_enabled': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/check_enabled_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/check_enabled_2x.png');
+    } else {
+      return require('./icons/Global/check_enabled.png');
+    }
+  },
   'default_avatar_setting': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/default_avatar_setting_3x.png');
