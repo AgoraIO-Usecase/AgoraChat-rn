@@ -27,6 +27,34 @@ const DATA: ItemData[] = [
     id: '58694a0f-3da1-471f-bd96-145571e29d72',
     title: 'Third Item',
   },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d73',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d74',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d76',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d80',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d81',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d82',
+    title: 'Third Item',
+  },
+  {
+    id: '58694a0f-3da1-471f-bd96-145571e29d83',
+    title: 'Third Item',
+  },
 ];
 
 const Item = ({ title, id }: { title: string; id: string }): JSX.Element => (
@@ -60,6 +88,14 @@ export default function TestList() {
     <Item title={item.title} id={item.id} />
   );
 
+  const _add = () => {
+    console.log('test:add:');
+    DATA.push({
+      id: DATA.length.toString(),
+      title: 'Third Item',
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -70,6 +106,7 @@ export default function TestList() {
         onRefresh={onRefresh}
         onEndReached={(info) => {
           console.log('test:onEndReached:', info);
+          _add();
         }}
         stickyHeaderIndices={[0]}
       />

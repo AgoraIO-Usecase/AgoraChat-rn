@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleProp,
   Text,
+  TextStyle,
   ViewStyle,
 } from 'react-native';
 
@@ -19,6 +20,7 @@ type ButtonProps = React.PropsWithChildren<{
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
   color?: Partial<ButtonStateColor> | undefined;
+  font?: StyleProp<TextStyle> | undefined;
   onPressIn?: ((event: GestureResponderEvent) => void) | null | undefined;
   onPressOut?: ((event: GestureResponderEvent) => void) | null | undefined;
 }>;
@@ -28,6 +30,7 @@ export default function Button({
   onPress,
   style,
   color,
+  font,
   children,
   onPressIn,
   onPressOut,
@@ -79,7 +82,14 @@ export default function Button({
             )}
             {typeof children === 'string' ? (
               children.length !== 0 ? (
-                <Text style={[styles.text, { color: s.content }, fonts.button]}>
+                <Text
+                  style={[
+                    styles.text,
+                    { color: s.content },
+                    fonts.button,
+                    font,
+                  ]}
+                >
                   {children}
                 </Text>
               ) : null

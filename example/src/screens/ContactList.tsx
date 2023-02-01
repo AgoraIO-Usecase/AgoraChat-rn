@@ -212,6 +212,7 @@ export default function ContactListScreen({
   const autoFocus = false;
   const data: ItemDataType[] = React.useMemo(() => [], []);
   const [selectedCount] = React.useState(10);
+  console.log('test:data:---------------------------------', data.length);
 
   const action = React.useCallback(
     (type: ContactActionType | undefined, index: number) => {

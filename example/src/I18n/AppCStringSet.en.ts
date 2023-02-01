@@ -27,6 +27,25 @@ export class AppStringSet extends UIKitStringSet2 {
   search: {
     placeholder: string;
   };
+  searchServer: {
+    cancel: string;
+    contact: {
+      placeholder: string;
+      item: {
+        button: (type?: 'noAdded' | 'hadAdded' | 'adding') => string;
+      };
+    };
+    group: {
+      placeholder: string;
+      item: {
+        button: (type?: 'noJoined' | 'hadJoined' | 'applying') => string;
+      };
+    };
+    toast: {
+      contact: string[];
+      group: string[];
+    };
+  };
   contactInfo: {
     name: (name: string) => string;
     chat: string;
@@ -92,7 +111,7 @@ export class AppStringSet extends UIKitStringSet2 {
   conversation: {
     new: string;
     createGroup: string;
-    searchContact: string;
+    addContact: string;
     searchGroup: string;
     joinPublicGroup: string;
   };
@@ -154,6 +173,47 @@ export class AppStringSet extends UIKitStringSet2 {
     };
     this.search = {
       placeholder: 'Search',
+    };
+    this.searchServer = {
+      cancel: 'Cancel',
+      contact: {
+        placeholder: 'Contact ID',
+        item: {
+          button: (type?: 'noAdded' | 'hadAdded' | 'adding') => {
+            switch (type) {
+              case 'noAdded':
+                return 'Add';
+              case 'hadAdded':
+                return 'Added';
+              case 'adding':
+                return 'Adding';
+              default:
+                return '';
+            }
+          },
+        },
+      },
+      group: {
+        placeholder: 'Group ID',
+        item: {
+          button: (type?: 'noJoined' | 'hadJoined' | 'applying') => {
+            switch (type) {
+              case 'noJoined':
+                return 'Apply';
+              case 'hadJoined':
+                return 'Joined';
+              case 'applying':
+                return 'Applying';
+              default:
+                return '';
+            }
+          },
+        },
+      },
+      toast: {
+        contact: ['Application Sent', 'Application Passed'],
+        group: ['Application Sent', 'Application Passed'],
+      },
     };
     this.contactInfo = {
       name: (n: string) => n,
@@ -223,7 +283,7 @@ export class AppStringSet extends UIKitStringSet2 {
     this.conversation = {
       new: 'New Conversation',
       createGroup: 'Create a group',
-      searchContact: 'Search contacts',
+      addContact: 'Search contacts',
       searchGroup: 'Search groups',
       joinPublicGroup: 'Join public groups',
     };

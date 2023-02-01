@@ -59,7 +59,6 @@ export default function BottomSheet({
       <DialogSheet style={{ width, paddingBottom: bottom }}>
         {sheetItems.map((value, idx) => {
           if (Object.getOwnPropertyNames(value).includes('title')) {
-            console.log('test:999:');
             const { onPress, ...props } = value as ButtonItemType;
             return (
               <TouchableOpacity

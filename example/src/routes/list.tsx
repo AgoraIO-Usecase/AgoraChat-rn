@@ -1,4 +1,8 @@
-import type { ContactActionType, Undefinable } from '../types';
+import type {
+  ContactActionType,
+  SearchActionType,
+  Undefinable,
+} from '../types';
 
 export type TopTabParamsList = {
   ContactList: {
@@ -92,6 +96,10 @@ export type RootParamsList = BottomTabParamsList & {
   Add: {
     option?: {} | undefined;
     params?: {} | undefined;
+  };
+  Search: {
+    option?: {} | undefined;
+    params?: { type?: Undefinable<SearchActionType> } | undefined;
   };
 };
 export type RootParamsName = Extract<keyof RootParamsList, string>;
@@ -201,6 +209,10 @@ export const SCREEN_LIST: RootParamsList = {
     params: undefined,
   },
   Add: {
+    option: undefined,
+    params: undefined,
+  },
+  Search: {
     option: undefined,
     params: undefined,
   },

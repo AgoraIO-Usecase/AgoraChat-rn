@@ -8,3 +8,5 @@ export type ContactActionType =
   | 'block_contact'
   | 'create_conversation'
   | 'create_group';
+
+export type SearchActionType = 'add_contact' | 'join_public_group';

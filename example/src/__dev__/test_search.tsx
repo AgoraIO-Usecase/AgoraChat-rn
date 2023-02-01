@@ -11,6 +11,7 @@ export default function TestSearch() {
 
   React.useEffect(() => {}, []);
   let input = React.useRef<TextInput>(null);
+  const enableCancel = true;
 
   return (
     <View style={{ marginTop: 100 }}>
@@ -35,7 +36,7 @@ export default function TestSearch() {
             setEnableValue(false);
             setValue(text);
           }}
-          enableCancel={false}
+          enableCancel={enableCancel}
           enableClear={enableClear}
           inputContainerStyle={{
             backgroundColor: 'rgba(242, 242, 242, 1)',

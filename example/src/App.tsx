@@ -47,6 +47,7 @@ import HomeScreen from './screens/Home';
 import ContactInfo from './screens/info/ContactInfo';
 import GroupInfo from './screens/info/GroupInfo';
 import LoginScreen from './screens/Login';
+import Search from './screens/Search';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
 
 if (Platform.OS === 'web') {
@@ -244,6 +245,7 @@ export default function App() {
                   component={ContactList}
                 />
                 <Root.Screen name="Chat" component={Chat} />
+                <Root.Screen name="Search" component={Search} />
               </Root.Group>
             </Root.Navigator>
           </NavigationContainer>

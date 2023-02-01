@@ -204,8 +204,6 @@ export default function ConversationListScreen({
             sheet.openSheet({
               sheetItems: [
                 {
-                  // icon: 'loading',
-                  iconColor: theme.colors.primary,
                   title: conversation.new,
                   titleColor: 'black',
                   onPress: () => {
@@ -220,8 +218,6 @@ export default function ConversationListScreen({
                   },
                 },
                 {
-                  // icon: 'loading',
-                  iconColor: theme.colors.primary,
                   title: conversation.createGroup,
                   titleColor: 'black',
                   onPress: () => {
@@ -232,30 +228,23 @@ export default function ConversationListScreen({
                   },
                 },
                 {
-                  // icon: 'loading',
-                  iconColor: theme.colors.primary,
-                  title: conversation.searchContact,
+                  title: conversation.addContact,
                   titleColor: 'black',
                   onPress: () => {
                     console.log('test:onPress:data:');
+                    navigation.navigate('Search', {
+                      params: { type: 'add_contact' },
+                    });
                   },
                 },
                 {
-                  // icon: 'loading',
-                  iconColor: theme.colors.primary,
-                  title: conversation.searchGroup,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:');
-                  },
-                },
-                {
-                  // icon: 'loading',
-                  iconColor: theme.colors.primary,
                   title: conversation.joinPublicGroup,
                   titleColor: 'black',
                   onPress: () => {
                     console.log('test:onPress:data:');
+                    navigation.navigate('Search', {
+                      params: { type: 'join_public_group' },
+                    });
                   },
                 },
               ],
@@ -272,11 +261,9 @@ export default function ConversationListScreen({
       conversation.createGroup,
       conversation.joinPublicGroup,
       conversation.new,
-      conversation.searchContact,
-      conversation.searchGroup,
+      conversation.addContact,
       navigation,
       sheet,
-      theme.colors.primary,
     ]
   );
 
