@@ -36,8 +36,8 @@ export const ChatUikitView =
 // import type rn from 'react-native';
 // import type { addons } from 'react-native';
 
-export { FACE_ASSETS } from './assets/faces';
-export { ICON_ASSETS } from './assets/icons';
+export { FACE_ASSETS } from '../assets/faces';
+export { ICON_ASSETS } from '../assets/icons';
 export { default as ActionMenu } from './components/ActionMenu';
 export { default as Alert } from './components/Alert';
 export { default as Avatar } from './components/Avatar';

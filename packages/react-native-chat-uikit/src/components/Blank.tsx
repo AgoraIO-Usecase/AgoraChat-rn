@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View } from 'react-native';
 
-import { ICON_ASSETS } from '../assets/icons';
+import { ICON_ASSETS } from '../../assets/icons';
 import createStyleSheet from '../styles/createStyleSheet';
 import Image from './Image';
 

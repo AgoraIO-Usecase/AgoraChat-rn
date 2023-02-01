@@ -10,8 +10,8 @@ const root = path.resolve(__dirname, '..');
 const pattern1 = /_3x/g;
 const pattern2 = /U_/g;
 const pattern3 = /\.png/g;
-const faceDir = path.join(root, 'src', 'assets', 'icons', 'moji');
-const indexDir = path.join(root, 'src', 'assets');
+const faceDir = path.join(root, 'assets', 'icons', 'moji');
+const indexDir = path.join(root, 'assets');
 
 const generateFaces = (faceDir) => {
   const result = [];

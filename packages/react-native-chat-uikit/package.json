@@ -8,6 +8,7 @@
   "react-native": "src/index.tsx",
   "source": "src/index",
   "files": [
+    "assets",
     "src",
     "lib",
     "android",

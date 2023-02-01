@@ -9,7 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { ICON_ASSETS } from '../../assets/icons';
+import { ICON_ASSETS } from '../../../assets/icons';
 import { useThemeContext } from '../../contexts/ThemeContext';
 import createStyleSheet from '../../styles/createStyleSheet';
 
