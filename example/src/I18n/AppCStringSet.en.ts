@@ -7,6 +7,7 @@ export class AppStringSet extends UIKitStringSet2 {
     groupInvite: string;
     createConversation: string;
     createGroup: string;
+    addMembers: string;
   };
   login: {
     logo: string;
@@ -64,6 +65,7 @@ export class AppStringSet extends UIKitStringSet2 {
       cancelButton: string;
       confirmButton: string;
     };
+    toast: string[];
   };
   groupInfo: {
     name: (name: string) => string;
@@ -107,6 +109,13 @@ export class AppStringSet extends UIKitStringSet2 {
       cancelButton: string;
       confirmButton: string;
     };
+    toast: string[];
+    memberSheet: {
+      title: string;
+      add: string;
+      remove: string;
+      chat: string;
+    };
   };
   conversation: {
     new: string;
@@ -139,6 +148,7 @@ export class AppStringSet extends UIKitStringSet2 {
       groupInvite: 'Invite',
       createConversation: 'Done',
       createGroup: 'Done',
+      addMembers: 'Done',
     };
     this.login = {
       logo: 'AgoraChat',
@@ -234,6 +244,7 @@ export class AppStringSet extends UIKitStringSet2 {
         cancelButton: 'Cancel',
         confirmButton: 'Confirm',
       },
+      toast: ['Contact Blocked', 'Contact Deleted'],
     };
     this.groupInfo = {
       name: (n: string) => n,
@@ -278,6 +289,19 @@ export class AppStringSet extends UIKitStringSet2 {
           'You are about to invite nickname, nickname, nickname to the group that.',
         cancelButton: 'Cancel',
         confirmButton: 'Confirm',
+      },
+      toast: [
+        'Invitation Sent',
+        'Invitation failed',
+        'Setup failed',
+        'ID Copied',
+        'Application Sent',
+      ],
+      memberSheet: {
+        title: '',
+        add: 'Add Contact',
+        remove: 'Remove from Group',
+        chat: 'Chat',
       },
     };
     this.conversation = {

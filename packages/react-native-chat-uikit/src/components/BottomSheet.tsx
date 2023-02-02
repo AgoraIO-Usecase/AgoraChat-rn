@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import {
+  StyleProp,
+  TextStyle,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useHeaderContext } from '../contexts/HeaderContext';
@@ -13,7 +20,9 @@ type ButtonItemType = {
   iconColor?: string;
   title: string;
   titleColor?: string;
-  onPress: () => void;
+  onPress?: () => void;
+  containerStyle?: StyleProp<ViewStyle>;
+  titleStyle?: StyleProp<TextStyle>;
 };
 
 type CustomItemType<Props extends {} = {}> = {
@@ -68,7 +77,7 @@ export default function BottomSheet({
                 onPress={async () => {
                   await onHide();
                   try {
-                    onPress();
+                    onPress?.();
                   } catch (e) {
                     console.warn(e);
                   }

@@ -11,6 +11,7 @@ import {
   useAlert,
   useBottomSheet,
   usePrompt,
+  useToastContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,12 +31,13 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
   const alert = useAlert();
   const sheet = useBottomSheet();
   const prompt = usePrompt();
+  const toast = useToastContext();
   const cbs = Services.cbs;
   const id = 'GroupId: xxx';
   const memberCount = 5;
   const groupName = 'GroupName';
 
-  const onTapGroupName = () => {
+  const onHeader = () => {
     sheet.openSheet({
       sheetItems: [
         {
@@ -81,6 +83,7 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
             cbs.setString(groupInfo.modify.groupId);
             cbs.getString().then((text) => {
               console.log('test:openSheet:', text);
+              toast.showToast(groupInfo.toast[3]!);
             });
           },
         },
@@ -111,18 +114,20 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
       edges={['right', 'left', 'bottom']}
     >
       <View style={styles.container}>
-        <View style={styles.top}>
-          <Avatar uri="" size={sf(100)} radius={sf(50)} />
-        </View>
-        <Pressable style={styles.top} onPress={onTapGroupName}>
-          <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
+        <Pressable style={{ paddingHorizontal: sf(50) }} onPress={onHeader}>
+          <View style={styles.top}>
+            <Avatar uri="" size={sf(100)} radius={sf(50)} />
+          </View>
+          <View style={styles.top}>
+            <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
+          </View>
+          <View style={{ marginTop: sf(10) }}>
+            <Text style={styles.id}>{id}</Text>
+          </View>
+          <View style={{ marginTop: sf(10) }}>
+            <Text style={styles.description}>{groupInfo.groupDescription}</Text>
+          </View>
         </Pressable>
-        <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.id}>{id}</Text>
-        </View>
-        <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.description}>{groupInfo.groupDescription}</Text>
-        </View>
         <View
           style={{
             flexDirection: 'row',

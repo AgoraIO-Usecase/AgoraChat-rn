@@ -15,3 +15,6 @@
 [uikit references](https://github.com/xotahal/react-native-material-ui)
 [uikit references](https://github.com/wix/react-native-ui-lib)
 [callkit or callkeep](https://github.com/react-native-webrtc/react-native-callkeep)
+[custom font helper](https://juejin.cn/post/6844904078703591431)
+[custom font helper](https://juejin.cn/post/7126126363009876004)
+[paper font helper](https://callstack.github.io/react-native-paper/fonts.html)

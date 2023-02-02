@@ -8,6 +8,7 @@ import {
   LocalIcon,
   Switch,
   useAlert,
+  useToastContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,6 +26,7 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
   const { contactInfo } = useAppI18nContext();
   const [isMute, setIsMute] = React.useState(false);
   const alert = useAlert();
+  const toast = useToastContext();
   const id = 'AgoraID: xxx';
 
   return (
@@ -72,7 +74,6 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
         <Pressable
           style={styles.listItem}
           onPress={() => {
-            console.log('test:delete:');
             alert.openAlert({
               title: contactInfo.blockAlert.title,
               message: contactInfo.blockAlert.message,
@@ -80,7 +81,12 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
                 {
                   text: contactInfo.blockAlert.cancelButton,
                 },
-                { text: contactInfo.blockAlert.confirmButton },
+                {
+                  text: contactInfo.blockAlert.confirmButton,
+                  onPress: () => {
+                    toast.showToast(contactInfo.toast[0]!);
+                  },
+                },
               ],
             });
           }}
@@ -90,7 +96,6 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
         <Pressable
           style={styles.listItem}
           onPress={() => {
-            console.log('test:block:');
             alert.openAlert({
               title: contactInfo.deleteAlert.title,
               message: contactInfo.deleteAlert.message,
@@ -98,7 +103,12 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
                 {
                   text: contactInfo.deleteAlert.cancelButton,
                 },
-                { text: contactInfo.deleteAlert.confirmButton },
+                {
+                  text: contactInfo.deleteAlert.confirmButton,
+                  onPress: () => {
+                    toast.showToast(contactInfo.toast[1]!);
+                  },
+                },
               ],
             });
           }}

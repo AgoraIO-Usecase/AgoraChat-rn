@@ -33,7 +33,7 @@ export function updateScaleFactor(params: {
   scaleFactor: (dp: number) => number;
   ratio: number;
 }) {
-  console.warn('test:ratio:', params.ratio);
+  // console.warn('test:ratio:', params.ratio);
   defaultScaleFactor = params.scaleFactor;
   defaultRatio = params.ratio;
 }

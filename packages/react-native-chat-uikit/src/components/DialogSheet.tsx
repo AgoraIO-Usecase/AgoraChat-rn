@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, Text, View, ViewStyle } from 'react-native';
+import { StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
@@ -11,7 +11,6 @@ type DialogSheetProps = React.PropsWithChildren<{
 }>;
 const DialogSheet: ((props: DialogSheetProps) => JSX.Element) & {
   ButtonItem: typeof ButtonSheetItem;
-  CustomItem: typeof CustomSheetItem;
 } = ({ style, children }) => {
   const { colors } = useThemeContext();
   return (
@@ -32,12 +31,16 @@ export type SheetItemProps = {
   iconColor?: string;
   title: string;
   titleColor?: string;
+  containerStyle?: StyleProp<ViewStyle>;
+  titleStyle?: StyleProp<TextStyle>;
 };
 const ButtonSheetItem = ({
   icon,
   title,
   iconColor,
   titleColor,
+  containerStyle,
+  titleStyle,
 }: SheetItemProps) => {
   const { colors, fonts } = useThemeContext();
   return (
@@ -45,6 +48,7 @@ const ButtonSheetItem = ({
       style={[
         styles.sheetItemContainer,
         { backgroundColor: 'rgba(250, 250, 250, 1)' },
+        containerStyle,
       ]}
     >
       {icon && (
@@ -60,41 +64,7 @@ const ButtonSheetItem = ({
           styles.sheetItemText,
           { color: titleColor ?? colors.text },
           fonts.sheet,
-        ]}
-      >
-        {title}
-      </Text>
-    </View>
-  );
-};
-
-const CustomSheetItem = ({
-  icon,
-  title,
-  iconColor,
-  titleColor,
-}: SheetItemProps) => {
-  const { colors, fonts } = useThemeContext();
-  return (
-    <View
-      style={[
-        styles.sheetItemContainer,
-        { backgroundColor: 'rgba(250, 250, 250, 1)' },
-      ]}
-    >
-      {icon && (
-        <LocalIcon
-          name={icon}
-          color={iconColor ?? colors.primary}
-          containerStyle={styles.sheetItemIcon}
-        />
-      )}
-      <Text
-        numberOfLines={1}
-        style={[
-          styles.sheetItemText,
-          { color: titleColor ?? colors.text },
-          fonts.sheet,
+          titleStyle,
         ]}
       >
         {title}
@@ -130,5 +100,4 @@ const styles = createStyleSheet({
 });
 
 DialogSheet.ButtonItem = ButtonSheetItem;
-DialogSheet.CustomItem = CustomSheetItem;
 export default DialogSheet;

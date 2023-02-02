@@ -77,6 +77,11 @@ type ItemDataType = EqualHeightListItemData & {
       isInvited: boolean;
       onAction?: () => void;
     };
+    modifyGroupMember?: {
+      isActionEnabled: boolean;
+      isInvited: boolean;
+      onAction?: () => void;
+    };
   };
 };
 
@@ -171,6 +176,22 @@ const Item: EqualHeightListItemComponent = (props) => {
             </Button>
           </View>
         );
+      case 'group_member_modify':
+        return (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexGrow: 1,
+              paddingRight: 5,
+            }}
+          >
+            <CheckButton
+              checked={item.action?.modifyGroupMember?.isInvited}
+              onChecked={item.action?.modifyGroupMember?.onAction}
+            />
+          </View>
+        );
       default:
         return null;
     }
@@ -200,6 +221,7 @@ export default function ContactListScreen({
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
+  const toast = useToastContext();
   const { manualClose } = useManualCloseDialog();
   const alert = useAlert();
   const { header, groupInfo } = useAppI18nContext();
@@ -210,9 +232,8 @@ export default function ContactListScreen({
   const enableAlphabet = true;
   const enableHeader = true;
   const autoFocus = false;
-  const data: ItemDataType[] = React.useMemo(() => [], []);
+  const data: ItemDataType[] = [];
   const [selectedCount] = React.useState(10);
-  console.log('test:data:---------------------------------', data.length);
 
   const action = React.useCallback(
     (type: ContactActionType | undefined, index: number) => {
@@ -223,7 +244,7 @@ export default function ContactListScreen({
               isActionEnabled: true,
               isInvited: index % 2 === 0 ? true : false,
               onAction: () => {
-                console.log('test:onAction:');
+                console.log('test:onAction:group_invite:');
               },
             },
           };
@@ -233,7 +254,7 @@ export default function ContactListScreen({
               isActionEnabled: true,
               isInvited: index % 2 === 0 ? true : false,
               onAction: () => {
-                console.log('test:onAction:');
+                console.log('test:create_group:');
               },
             },
           };
@@ -242,7 +263,17 @@ export default function ContactListScreen({
             block: {
               name: 'Unblock',
               onClicked: () => {
-                console.log('test:onClicked:');
+                console.log('test:block_contact:');
+              },
+            },
+          };
+        case 'group_member_modify':
+          return {
+            modifyGroupMember: {
+              isActionEnabled: true,
+              isInvited: index % 2 === 0 ? true : false,
+              onAction: () => {
+                console.log('test:onAction:group_member_modify:');
               },
             },
           };
@@ -264,32 +295,100 @@ export default function ContactListScreen({
       ch: ch,
       height: 80,
       onLongPress: (data) => {
-        sheet.openSheet({
-          sheetItems: [
-            {
-              icon: 'loading',
-              iconColor: theme.colors.primary,
-              title: '1',
-              titleColor: 'black',
-              onPress: () => {
-                console.log('test:onPress:data:', data);
+        if (type === 'contact_list') {
+          sheet.openSheet({
+            sheetItems: [
+              {
+                icon: 'loading',
+                iconColor: theme.colors.primary,
+                title: '1',
+                titleColor: 'black',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                },
               },
-            },
-            {
-              icon: 'loading',
-              iconColor: theme.colors.primary,
-              title: '2',
-              titleColor: 'black',
-              onPress: () => {
-                console.log('test:onPress:data:', data);
+              {
+                icon: 'loading',
+                iconColor: theme.colors.primary,
+                title: '2',
+                titleColor: 'black',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                },
               },
-            },
-          ],
-        });
+            ],
+          });
+        }
       },
       onPress: (_) => {
         if (type === 'create_conversation') {
           navigation.navigate('Chat', { params: {} });
+        } else if (type === 'group_member') {
+          sheet.openSheet({
+            sheetItems: [
+              {
+                title: en,
+                titleColor: 'black',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                },
+                containerStyle: {
+                  marginTop: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: undefined,
+                  minWidth: undefined,
+                  backgroundColor: undefined,
+                  borderRadius: undefined,
+                },
+                titleStyle: {
+                  fontWeight: '600',
+                  fontSize: 14,
+                  lineHeight: 16,
+                  color: 'rgba(102, 102, 102, 1)',
+                  marginHorizontal: undefined,
+                },
+              },
+              {
+                title: groupInfo.memberSheet.add,
+                titleColor: 'black',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                  toast.showToast(groupInfo.toast[4]!);
+                },
+              },
+              {
+                title: groupInfo.memberSheet.remove,
+                titleColor: 'rgba(255, 20, 204, 1)',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                  alert.openAlert({
+                    title: 'Remove NickName?',
+                    buttons: [
+                      {
+                        text: 'Cancel',
+                        onPress: () => {},
+                      },
+                      {
+                        text: 'Confirm',
+                        onPress: () => {
+                          toast.showToast('Removed');
+                        },
+                      },
+                    ],
+                  });
+                },
+              },
+              {
+                title: groupInfo.memberSheet.chat,
+                titleColor: 'black',
+                onPress: () => {
+                  console.log('test:onPress:data:', data);
+                },
+              },
+            ],
+          });
         } else {
           navigation.navigate({ name: 'ContactInfo', params: {} });
         }
@@ -436,13 +535,8 @@ export default function ContactListScreen({
               </Text>
             </TouchableOpacity>
           );
-        } else {
-          return null;
-        }
-      };
-      return (
-        <Pressable
-          onPress={() => {
+        } else if (type === 'group_member_modify') {
+          const _addMember = () => {
             alert.openAlert({
               title: groupInfo.inviteAlert.title,
               message: groupInfo.inviteAlert.message,
@@ -457,10 +551,61 @@ export default function ContactListScreen({
                   text: groupInfo.inviteAlert.confirmButton,
                   onPress: () => {
                     navigation.goBack();
+                    toast.showToast(groupInfo.toast[0]!);
                   },
                 },
               ],
             });
+          };
+          const right = `${header.addMembers}(${selectedCount})`;
+          return (
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                marginRight: -10,
+              }}
+              onPress={_addMember}
+            >
+              <Text
+                style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}
+              >
+                {right}
+              </Text>
+            </TouchableOpacity>
+          );
+        } else {
+          return null;
+        }
+      };
+      return (
+        <Pressable
+          onPress={() => {
+            if (type === 'group_member') {
+              console.log('test:111:');
+              navigation.push('ContactList' as any, {
+                params: { type: 'group_member_modify' },
+              });
+            } else {
+              alert.openAlert({
+                title: groupInfo.inviteAlert.title,
+                message: groupInfo.inviteAlert.message,
+                buttons: [
+                  {
+                    text: groupInfo.inviteAlert.cancelButton,
+                    onPress: () => {
+                      navigation.goBack();
+                    },
+                  },
+                  {
+                    text: groupInfo.inviteAlert.confirmButton,
+                    onPress: () => {
+                      navigation.goBack();
+                      toast.showToast(groupInfo.toast[0]!);
+                    },
+                  },
+                ],
+              });
+            }
           }}
         >
           <Right type={type} />
@@ -473,6 +618,8 @@ export default function ContactListScreen({
       groupInfo.inviteAlert.confirmButton,
       groupInfo.inviteAlert.message,
       groupInfo.inviteAlert.title,
+      groupInfo.toast,
+      header.addMembers,
       header.createGroup,
       header.groupInvite,
       manualClose,
@@ -480,6 +627,7 @@ export default function ContactListScreen({
       screenWidth,
       selectedCount,
       sheet,
+      toast,
       type,
     ]
   );
