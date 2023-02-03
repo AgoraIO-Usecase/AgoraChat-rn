@@ -58,7 +58,10 @@ const Rotate = ({
     outputRange: ['0deg', '360deg'],
   });
   return (
-    <Animated.View style={[style, { transform: [{ rotate }] }]}>
+    <Animated.View
+      pointerEvents="none"
+      style={[style, { transform: [{ rotate }] }]}
+    >
       {children}
     </Animated.View>
   );

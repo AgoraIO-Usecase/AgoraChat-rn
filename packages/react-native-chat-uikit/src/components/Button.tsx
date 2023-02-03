@@ -7,6 +7,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
+import type { ImageStyle } from 'react-native-fast-image';
 
 import { useThemeContext } from '../contexts/ThemeContext';
 import createStyleSheet from '../styles/createStyleSheet';
@@ -16,6 +17,7 @@ import { LocalIcon } from './Icon';
 
 type ButtonProps = React.PropsWithChildren<{
   icon?: LocalIconName | undefined;
+  iconStyle?: StyleProp<ImageStyle>;
   disabled?: boolean | undefined;
   onPress?: () => void | undefined;
   style?: StyleProp<ViewStyle> | undefined;
@@ -26,6 +28,7 @@ type ButtonProps = React.PropsWithChildren<{
 }>;
 export default function Button({
   icon,
+  iconStyle,
   disabled,
   onPress,
   style,
@@ -74,10 +77,10 @@ export default function Button({
           <React.Fragment>
             {icon && (
               <LocalIcon
-                size={24}
+                size={28}
                 name={icon}
                 color={s.content}
-                containerStyle={styles.icon}
+                containerStyle={[styles.icon, iconStyle]}
               />
             )}
             {typeof children === 'string' ? (

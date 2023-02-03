@@ -26,15 +26,12 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
     <ContentStateContext.Provider
       value={{
         showState: (props) => {
-          console.log('test:444:');
           setOpacity(1);
           if (props?.children) {
-            console.log('test:333:');
             setContent(props);
           }
         },
         hideState: () => {
-          console.log('test:555:');
           setOpacity(0);
         },
       }}
