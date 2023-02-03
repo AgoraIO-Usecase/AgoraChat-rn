@@ -60,14 +60,12 @@ export default function ActionMenu({
         style,
       ]}
       transparent={transparent}
-      // backdropColor="rgba(100, 10, 200, 0.5)"
     >
       <DialogBox style={{ backgroundColor: colors.card.background }}>
         {title && (
           <View style={styles.title}>
             <Text
               numberOfLines={1}
-              // style={{ flex: 1 }}
               style={[
                 {
                   maxWidth: pending ? '86%' : '100%',

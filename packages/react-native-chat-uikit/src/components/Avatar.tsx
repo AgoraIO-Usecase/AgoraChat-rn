@@ -2,13 +2,16 @@ import * as React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import { LocalIcon, LocalIconName } from './Icon';
 import Image from './Image';
 
 type SubComponents = {};
 
-const AVATAR_SIZE = 56;
+const sf = getScaleFactor();
+
+const AVATAR_SIZE = sf(56);
 
 type AvatarStateProps = {
   stateUri: LocalIconName;

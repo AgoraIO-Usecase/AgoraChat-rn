@@ -9,7 +9,7 @@ export default function Blank(): JSX.Element {
   return (
     <View style={styles.container}>
       <Image
-        style={{ width: 198, height: 115 }}
+        style={styles.image}
         // source={{
         //   uri: 'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
         // }}
@@ -26,6 +26,10 @@ export default function Blank(): JSX.Element {
 }
 
 const styles = createStyleSheet({
+  image: {
+    width: 198,
+    height: 115,
+  },
   container: {
     flex: 1,
     // color: 'rgba(153, 153, 153, 1)',

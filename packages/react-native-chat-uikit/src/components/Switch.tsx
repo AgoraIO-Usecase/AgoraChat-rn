@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated, Platform, Pressable } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 
 type SwitchProps = {
@@ -13,6 +14,8 @@ type SwitchProps = {
   onChangeValue?: (val: boolean) => void;
   size?: number | undefined;
 };
+
+const sf = getScaleFactor();
 
 export default function Switch({
   trackColor,
@@ -110,7 +113,7 @@ export default function Switch({
   );
 }
 
-let OFFSET = { W: 15, H: 20 };
+let OFFSET = { W: sf(15), H: sf(20) };
 
 const styles = createStyleSheet({
   container: {

@@ -41,26 +41,6 @@ export type RootParamsList = BottomTabParamsList & {
     option?: {} | undefined;
     params?: {} | undefined;
   };
-  AddOperation: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  Privacy: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  Notification: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  General: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  About: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
   GroupInfo: {
     option?: {} | undefined;
     params?: {} | undefined;
@@ -73,27 +53,11 @@ export type RootParamsList = BottomTabParamsList & {
     option?: {} | undefined;
     params?: {} | undefined;
   };
-  JoinGroup: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  CreateGroup: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  AddContact: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
   Home: {
     option?: {} | undefined;
     params?: {} | undefined;
   };
   Login: {
-    option?: {} | undefined;
-    params?: {} | undefined;
-  };
-  Add: {
     option?: {} | undefined;
     params?: {} | undefined;
   };
@@ -152,26 +116,6 @@ export const SCREEN_LIST: RootParamsList = {
     option: undefined,
     params: undefined,
   },
-  AddOperation: {
-    option: undefined,
-    params: undefined,
-  },
-  Privacy: {
-    option: undefined,
-    params: undefined,
-  },
-  Notification: {
-    option: undefined,
-    params: undefined,
-  },
-  General: {
-    option: undefined,
-    params: undefined,
-  },
-  About: {
-    option: undefined,
-    params: undefined,
-  },
   GroupInfo: {
     option: undefined,
     params: undefined,
@@ -184,18 +128,6 @@ export const SCREEN_LIST: RootParamsList = {
     option: undefined,
     params: undefined,
   },
-  JoinGroup: {
-    option: undefined,
-    params: undefined,
-  },
-  CreateGroup: {
-    option: undefined,
-    params: undefined,
-  },
-  AddContact: {
-    option: undefined,
-    params: undefined,
-  },
   Home: {
     option: undefined,
     params: undefined,
@@ -205,10 +137,6 @@ export const SCREEN_LIST: RootParamsList = {
     params: undefined,
   },
   Login: {
-    option: undefined,
-    params: undefined,
-  },
-  Add: {
     option: undefined,
     params: undefined,
   },

@@ -11,6 +11,7 @@ import {
 
 import { ICON_ASSETS } from '../../../assets/icons';
 import { useThemeContext } from '../../contexts/ThemeContext';
+import { getScaleFactor } from '../../styles/createScaleFactor';
 import createStyleSheet from '../../styles/createStyleSheet';
 
 export enum IconSize {
@@ -48,10 +49,12 @@ type LocalIconProps = {
   containerStyle?: StyleProp<ViewStyle>;
 };
 
+const sf = getScaleFactor();
+
 export default function LocalIcon({
   name,
   color,
-  size = 24,
+  size = sf(24),
   style,
   containerStyle,
 }: LocalIconProps): JSX.Element {
@@ -65,9 +68,9 @@ export default function LocalIcon({
       <Image
         resizeMode="contain"
         source={
-          size < 24
+          size < sf(24)
             ? localLocalIcon(name)
-            : size < 96
+            : size < sf(96)
             ? localLocalIcon(name, IconSize.ICON_BIGGER)
             : localLocalIcon(name, IconSize.ICON_MAX)
         }

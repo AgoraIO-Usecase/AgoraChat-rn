@@ -108,11 +108,7 @@ export default function Prompt({
             value={text}
             onChangeText={setText}
             clearButtonMode={clearButtonMode}
-            style={{
-              paddingHorizontal: 15,
-              paddingVertical: 10,
-              borderRadius: 20,
-            }}
+            style={styles.input}
           />
         </View>
 
@@ -172,6 +168,11 @@ const styles = createStyleSheet({
   inputContainer: {
     paddingHorizontal: 24,
     marginBottom: 12,
+  },
+  input: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
   buttonContainer: {
     flexDirection: 'row',

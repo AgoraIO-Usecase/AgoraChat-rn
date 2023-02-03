@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import { LocalIcon, LocalIconName } from './Icon';
 
 type LoadingProps = {
@@ -11,9 +12,11 @@ type LoadingProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+const sf = getScaleFactor();
+
 export default function Loading({
   name = 'loading',
-  size = 24,
+  size = sf(24),
   color,
   style,
 }: LoadingProps): JSX.Element {

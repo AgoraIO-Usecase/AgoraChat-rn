@@ -210,12 +210,10 @@ function TextInputEx(
           selectionColor={getStateColor(disabled).highlight}
           placeholderTextColor={getStateColor(disabled).placeholder}
           style={StyleSheet.flatten([
+            styles.input,
             {
               color: getStateColor(disabled).text,
               backgroundColor: getStateColor(disabled).background,
-              fontSize: 18,
-              flex: 1,
-              minHeight: 36,
             },
             inputStyle,
             disabled && styles.disabledInput,
@@ -256,6 +254,11 @@ const styles = createStyleSheet({
     paddingRight: 4,
     paddingLeft: 0,
     marginVertical: 4,
+  },
+  input: {
+    fontSize: 18,
+    flex: 1,
+    minHeight: 36,
   },
 });
 

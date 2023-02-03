@@ -10,6 +10,7 @@ import {
 import type { ImageStyle } from 'react-native-fast-image';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import type { ButtonStateColor } from '../types';
 import type { LocalIconName } from './Icon';
@@ -39,6 +40,7 @@ export default function Button({
   onPressOut,
 }: ButtonProps): JSX.Element {
   const { colors, fonts } = useThemeContext();
+  const sf = getScaleFactor();
 
   const getStateColor = (pressed: boolean, disabled?: boolean) => {
     if (disabled) {
@@ -77,7 +79,7 @@ export default function Button({
           <React.Fragment>
             {icon && (
               <LocalIcon
-                size={28}
+                size={sf(28)}
                 name={icon}
                 color={s.content}
                 containerStyle={[styles.icon, iconStyle]}

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TextInput as RNTextInput, View } from 'react-native';
-import { SearchBar } from 'react-native-chat-uikit';
+import { createStyleSheet, SearchBar } from 'react-native-chat-uikit';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 
@@ -16,16 +16,7 @@ export const ListSearchHeader = (props: ListSearchHeaderProps) => {
   const enableClear = true;
   const autoFocus = props.autoFocus;
   return (
-    <View
-      style={{
-        backgroundColor: 'red',
-        height: 36,
-        marginBottom: 20,
-        marginTop: 10,
-        marginLeft: 20,
-        marginRight: 20,
-      }}
-    >
+    <View style={styles.container}>
       <SearchBar
         ref={searchRef}
         autoFocus={autoFocus}
@@ -44,3 +35,14 @@ export const ListSearchHeader = (props: ListSearchHeaderProps) => {
     </View>
   );
 };
+
+const styles = createStyleSheet({
+  container: {
+    // backgroundColor: 'red',
+    height: 36,
+    marginBottom: 20,
+    marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
+  },
+});

@@ -4,11 +4,7 @@ import { createStyleSheet, Divider } from 'react-native-chat-uikit';
 
 export const ListItemSeparator = () => {
   return (
-    <View
-      onLayout={(_) => {
-        // console.log('test:event:', event.nativeEvent.layout.height);
-      }}
-    >
+    <View>
       <Divider color={styles.divider.color} height={styles.divider.height} />
     </View>
   );

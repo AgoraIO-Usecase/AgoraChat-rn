@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import Divider from './Divider';
 import { LocalIcon, LocalIconName } from './Icon';
@@ -27,13 +28,14 @@ export default function MenuBar({
   onPress,
 }: MenuBarProps) {
   const { colors, fonts } = useThemeContext();
+  const sf = getScaleFactor();
   return (
     <View>
       <Pressable disabled={disabled} onPress={onPress} style={styles.container}>
         {icon && (
           <LocalIcon
             name={icon}
-            size={variant === 'contained' ? 16 : 24}
+            size={variant === 'contained' ? sf(16) : sf(24)}
             color={colors.primary}
             containerStyle={[
               styles.icon,

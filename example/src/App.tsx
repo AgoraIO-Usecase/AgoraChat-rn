@@ -39,8 +39,6 @@ import HomeHeaderRight from './components/HomeHeaderRight';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
 import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList } from './routes';
-import Add from './screens/Add';
-import AddContact from './screens/add/AddContact';
 import Chat from './screens/chat/Chat';
 import ContactList from './screens/ContactList';
 import HomeScreen from './screens/Home';
@@ -225,12 +223,6 @@ export default function App() {
                 component={HomeScreen}
               />
               <Root.Group>
-                <Root.Screen
-                  name="Add"
-                  options={{ headerShown: true, presentation: 'modal' }}
-                  component={Add}
-                />
-                <Root.Screen name="AddContact" component={AddContact} />
                 <Root.Screen name="ContactInfo" component={ContactInfo} />
                 <Root.Screen name="GroupInfo" component={GroupInfo} />
                 <Root.Screen

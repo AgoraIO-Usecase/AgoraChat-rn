@@ -70,9 +70,8 @@ function TextInput(
             <LocalIcon
               name={secureTextEntry === true ? 'eye' : 'eye_slash'}
               style={[
+                styles.icon,
                 {
-                  position: 'absolute',
-                  right: sf(10),
                   top: -(height / 2 + iconSize / 2),
                 },
                 iconStyle,
@@ -98,9 +97,8 @@ function TextInput(
               <LocalIcon
                 name="input_delete"
                 style={[
+                  styles.icon,
                   {
-                    position: 'absolute',
-                    right: sf(10),
                     top: -(height / 2 + iconSize / 2),
                   },
                   iconStyle,
@@ -114,7 +112,7 @@ function TextInput(
         }
       }
     },
-    [_value.length, height, iconSize, iconStyle, sf]
+    [_value.length, height, iconSize, iconStyle]
   );
 
   return (
@@ -146,6 +144,10 @@ const styles = createStyleSheet({
   input: {
     paddingVertical: 0,
     paddingHorizontal: 0,
+  },
+  icon: {
+    position: 'absolute',
+    right: 10,
   },
 });
 

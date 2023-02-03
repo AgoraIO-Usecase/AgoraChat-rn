@@ -141,8 +141,8 @@ const TextMessageRenderItem: ListRenderItem<MessageItemType> = (
       <View
         style={[
           {
-            marginRight: msg.isSender ? 10 : undefined,
-            marginLeft: msg.isSender ? undefined : 10,
+            marginRight: msg.isSender ? sf(10) : undefined,
+            marginLeft: msg.isSender ? undefined : sf(10),
             opacity: 1,
           },
         ]}
@@ -185,7 +185,7 @@ const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
       </View>
       <View
         style={{
-          height: 200,
+          height: sf(200),
           // flex: 1,
           flexGrow: 1,
         }}
@@ -195,7 +195,7 @@ const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
             uri: msg.image,
           }}
           resizeMode="cover"
-          style={{ height: 200, borderRadius: 10 }}
+          style={{ height: sf(200), borderRadius: sf(10) }}
           onLoad={(_) => {
             // console.log(e);
           }}
@@ -207,8 +207,8 @@ const ImageMessageRenderItem: ListRenderItem<MessageItemType> = (
       <View
         style={[
           {
-            marginRight: msg.isSender ? 10 : undefined,
-            marginLeft: msg.isSender ? undefined : 10,
+            marginRight: msg.isSender ? sf(10) : undefined,
+            marginLeft: msg.isSender ? undefined : sf(10),
             opacity: 1,
           },
         ]}
@@ -284,8 +284,8 @@ const VoiceMessageRenderItem: ListRenderItem<MessageItemType> = (
       <View
         style={[
           {
-            marginRight: msg.isSender ? 10 : undefined,
-            marginLeft: msg.isSender ? undefined : 10,
+            marginRight: msg.isSender ? sf(10) : undefined,
+            marginLeft: msg.isSender ? undefined : sf(10),
             opacity: 1,
           },
         ]}
