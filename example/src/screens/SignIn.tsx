@@ -86,6 +86,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setId(text)}
               style={styles.item}
             />
+            <View style={{ height: 18 }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -96,6 +97,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setPassword(text)}
               style={styles.item}
             />
+            <View style={{ height: 18 }} />
             <Button
               disabled={disabled}
               style={styles.button}
@@ -133,7 +135,7 @@ const styles = createStyleSheet({
   item: {
     height: 48,
     borderRadius: 24,
-    marginBottom: 18,
+    paddingHorizontal: 20,
   },
   button: {
     height: 48,

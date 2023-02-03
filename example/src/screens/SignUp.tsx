@@ -15,7 +15,6 @@ import {
   LocalIcon,
   TextInput,
   useAlert,
-  useHeaderContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -32,9 +31,6 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
     default: false,
   });
   const enableKeyboardAvoid = true;
-
-  const { defaultStatusBarTranslucent: statusBarTranslucent } =
-    useHeaderContext();
   const { register, login } = useAppI18nContext();
   const { openAlert } = useAlert();
 
@@ -66,9 +62,6 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
         }}
         enabled={enableKeyboardAvoid}
         behavior={Platform.select({ ios: 'padding', default: 'height' })}
-        keyboardVerticalOffset={
-          enableKeyboardAvoid && statusBarTranslucent ? 44 : 0
-        }
         pointerEvents="box-none"
       >
         <TouchableWithoutFeedback
@@ -97,6 +90,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setId(text)}
               style={styles.item}
             />
+            <View style={{ height: 18 }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -107,6 +101,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setPassword(text)}
               style={styles.item}
             />
+            <View style={{ height: 18 }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -117,6 +112,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setConfirm(text)}
               style={styles.item}
             />
+            <View style={{ height: 18 }} />
             <Button
               disabled={disabled}
               style={styles.button}
@@ -180,7 +176,7 @@ const styles = createStyleSheet({
   item: {
     height: 48,
     borderRadius: 24,
-    marginBottom: 18,
+    paddingHorizontal: 20,
   },
   button: {
     height: 48,

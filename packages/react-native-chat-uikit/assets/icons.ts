@@ -919,6 +919,24 @@ export const ICON_ASSETS = {
       return require('./icons/Global/ex_mark.png');
     }
   },
+  'eye': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/eye_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/eye_2x.png');
+    } else {
+      return require('./icons/Global/eye.png');
+    }
+  },
+  'eye_slash': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/eye_slash_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/eye_slash_2x.png');
+    } else {
+      return require('./icons/Global/eye_slash.png');
+    }
+  },
   'face': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/face_3x.png');
@@ -944,6 +962,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/group_invite_2x.png');
     } else {
       return require('./icons/Global/group_invite.png');
+    }
+  },
+  'input_delete': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/input_delete_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/input_delete_2x.png');
+    } else {
+      return require('./icons/Global/input_delete.png');
     }
   },
   'key': (size: string) => {

@@ -1,43 +1,151 @@
 import React from 'react';
 import {
+  ImageStyle,
+  Pressable,
+  StyleProp,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
+  View,
+  ViewStyle,
 } from 'react-native';
 
 import { useThemeContext } from '../contexts/ThemeContext';
+import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
+import { LocalIcon } from './Icon';
 
-type TextInputProps = {} & RNTextInputProps;
+type TextInputProps = RNTextInputProps & {
+  containerStyle?: StyleProp<ViewStyle>;
+  iconStyle?: StyleProp<ImageStyle>;
+};
 
 function TextInput(
-  { children, style, editable = true, ...props }: TextInputProps,
+  {
+    containerStyle,
+    iconStyle,
+    children,
+    style,
+    editable = true,
+    clearButtonMode,
+    secureTextEntry,
+    onChangeText,
+    ...props
+  }: TextInputProps,
   ref: React.LegacyRef<RNTextInput>
 ) {
   const { colors } = useThemeContext();
+  const sf = getScaleFactor();
   const input = editable ? colors.input.enabled : colors.input.disabled;
+  const [_value, setValue] = React.useState('');
+  const [height, setHeight] = React.useState(0);
+  const _onChangeText = (text: string) => {
+    setValue(text);
+    onChangeText?.(text);
+  };
+  const _clearButtonMode = 'never';
+  const [_secureTextEntry, setSecureTextEntry] =
+    React.useState(secureTextEntry);
+  const iconSize = sf(28);
+
+  const _onClearButtonMode = React.useCallback(
+    (
+      clearButtonMode?:
+        | 'never'
+        | 'while-editing'
+        | 'unless-editing'
+        | 'always'
+        | undefined,
+      secureTextEntry?: boolean | undefined
+    ) => {
+      if (secureTextEntry !== undefined) {
+        return (
+          <Pressable
+            onPress={() => {
+              setSecureTextEntry(!secureTextEntry);
+            }}
+            onLayout={(event) => {
+              setHeight(event.nativeEvent.layout.y);
+            }}
+          >
+            <LocalIcon
+              name={secureTextEntry === true ? 'eye' : 'eye_slash'}
+              style={[
+                {
+                  position: 'absolute',
+                  right: sf(10),
+                  top: -(height / 2 + iconSize / 2),
+                },
+                iconStyle,
+              ]}
+              size={iconSize}
+            />
+          </Pressable>
+        );
+      } else {
+        if (_value.length === 0) {
+          return null;
+        }
+        if (clearButtonMode === 'while-editing') {
+          return (
+            <Pressable
+              onPress={() => {
+                setValue('');
+              }}
+              onLayout={(event) => {
+                setHeight(event.nativeEvent.layout.y);
+              }}
+            >
+              <LocalIcon
+                name="input_delete"
+                style={[
+                  {
+                    position: 'absolute',
+                    right: sf(10),
+                    top: -(height / 2 + iconSize / 2),
+                  },
+                  iconStyle,
+                ]}
+                size={iconSize}
+              />
+            </Pressable>
+          );
+        } else {
+          return null;
+        }
+      }
+    },
+    [_value.length, height, iconSize, iconStyle, sf]
+  );
 
   return (
-    <RNTextInput
-      ref={ref}
-      editable={editable}
-      selectionColor={input.highlight}
-      placeholderTextColor={input.placeholder}
-      style={[
-        styles.input,
-        { color: input.text, backgroundColor: input.background },
-        style,
-      ]}
-      {...props}
-    >
-      {children}
-    </RNTextInput>
+    <View style={[containerStyle]}>
+      <RNTextInput
+        ref={ref}
+        editable={editable}
+        clearButtonMode={_clearButtonMode}
+        secureTextEntry={_secureTextEntry}
+        selectionColor={input.highlight}
+        placeholderTextColor={input.placeholder}
+        onChangeText={_onChangeText}
+        style={[
+          styles.input,
+          { color: input.text, backgroundColor: input.background },
+          style,
+        ]}
+        {...props}
+        value={_value}
+      >
+        {children}
+      </RNTextInput>
+      {_onClearButtonMode(clearButtonMode, _secureTextEntry)}
+    </View>
   );
 }
 
 const styles = createStyleSheet({
   input: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
   },
 });
 
