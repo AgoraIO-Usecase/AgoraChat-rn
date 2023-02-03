@@ -14,6 +14,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  getScaleFactor,
   LocalIcon,
   queueTask,
   useBottomSheet,
@@ -47,14 +48,16 @@ type ItemDataType = EqualHeightListItemData & {
   timestamp: number;
 };
 
+const sf = getScaleFactor();
+
 const DefaultAvatarMemo = React.memo(() => {
-  return <DefaultAvatar size={50} radius={25} />;
+  return <DefaultAvatar size={sf(50)} radius={sf(25)} />;
 });
 
 const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
   const { width } = useWindowDimensions();
-  const extraWidth = item.sideslip?.width ?? 100;
+  const extraWidth = item.sideslip?.width ?? sf(100);
   const screenWidth = width;
   // console.log('test:width:', screenWidth + extraWidth);
   return (
@@ -91,40 +94,40 @@ const Item: EqualHeightListItemComponent = (props) => {
         style={{
           // flexGrow: 1,
           width: extraWidth, // ??? why
-          height: 60,
+          height: sf(60),
           flexDirection: 'row',
           // backgroundColor: 'green',
           justifyContent: 'flex-start',
           alignItems: 'center',
         }}
       >
-        <View style={{ width: 20 }} />
+        <View style={{ width: sf(20) }} />
         <View
           style={{
-            height: 30,
-            width: 30,
+            height: sf(30),
+            width: sf(30),
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#F2F2F2',
             overflow: 'hidden',
-            borderRadius: 30,
+            borderRadius: sf(30),
           }}
         >
           <LocalIcon name="bell_slash" size={20} color="#666666" />
         </View>
-        <View style={{ width: 15 }} />
+        <View style={{ width: sf(15) }} />
         <View
           style={{
-            height: 30,
-            width: 30,
+            height: sf(30),
+            width: sf(30),
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: 'rgba(255, 20, 204, 1)',
             overflow: 'hidden',
-            borderRadius: 30,
+            borderRadius: sf(30),
           }}
         >
-          <LocalIcon name="trash" size={20} color="white" />
+          <LocalIcon name="trash" size={sf(20)} color="white" />
         </View>
       </View>
     </View>
@@ -138,6 +141,7 @@ export default function ConversationListScreen({
   // console.log('test:ConversationListScreen:', navigation);
   // return <Placeholder content={`${ConversationListScreen.name}`} />;
   // console.log('test:GroupListScreen:', route, navigation);
+  const sf = getScaleFactor();
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
@@ -149,7 +153,7 @@ export default function ConversationListScreen({
   const enableHeader = true;
   const autoFocus = false;
   const data: ItemDataType[] = [];
-  const width = 100;
+  const width = sf(100);
   const isEmpty = false;
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -251,19 +255,24 @@ export default function ConversationListScreen({
             });
           }}
         >
-          <View style={{ padding: 10, marginRight: -10 }}>
-            <LocalIcon name="chat_nav_add" style={{ padding: 0 }} size={20} />
+          <View style={{ padding: sf(10), marginRight: -sf(10) }}>
+            <LocalIcon
+              name="chat_nav_add"
+              style={{ padding: 0 }}
+              size={sf(20)}
+            />
           </View>
         </Pressable>
       );
     },
     [
-      conversation.createGroup,
-      conversation.joinPublicGroup,
-      conversation.new,
-      conversation.addContact,
-      navigation,
+      sf,
       sheet,
+      conversation.new,
+      conversation.createGroup,
+      conversation.addContact,
+      conversation.joinPublicGroup,
+      navigation,
     ]
   );
 
@@ -302,8 +311,8 @@ export default function ConversationListScreen({
               color: 'white',
             },
             alphabetItemContainer: {
-              width: 15,
-              borderRadius: 8,
+              width: sf(15),
+              borderRadius: sf(8),
             },
           }}
           Header={(props) => (

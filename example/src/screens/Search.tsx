@@ -9,6 +9,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  getScaleFactor,
   SearchBar,
   useThemeContext,
   useToastContext,
@@ -54,14 +55,7 @@ const Item: EqualHeightListItemComponent = (props) => {
     switch (type) {
       case 'add_contact':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <Button
               disabled={item.action?.addContact?.state !== 'noAdded'}
               onPress={() => {
@@ -69,8 +63,8 @@ const Item: EqualHeightListItemComponent = (props) => {
                 toast.showToast(searchServer.toast.contact[0]!);
               }}
               color={{ disabled: { content: 'black', background: '#F2F2F2' } }}
-              font={{ fontSize: 14, fontWeight: '400', lineHeight: 18 }}
-              style={{ height: 30, borderRadius: 24, paddingHorizontal: 15 }}
+              font={styles.rightItemFont}
+              style={styles.rightItemStyle}
             >
               {searchServer.contact.item.button(item.action?.addContact?.state)}
             </Button>
@@ -78,14 +72,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         );
       case 'join_public_group':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <Button
               disabled={item.action?.searchPublicGroup?.state !== 'noJoined'}
               onPress={() => {
@@ -93,8 +80,8 @@ const Item: EqualHeightListItemComponent = (props) => {
                 toast.showToast(searchServer.toast.group[0]!);
               }}
               color={{ disabled: { content: 'black', background: '#F2F2F2' } }}
-              font={{ fontSize: 14, fontWeight: '400', lineHeight: 18 }}
-              style={{ height: 30, borderRadius: 24, paddingHorizontal: 15 }}
+              font={styles.rightItemFont}
+              style={styles.rightItemStyle}
             >
               {searchServer.group.item.button(
                 item.action?.searchPublicGroup?.state
@@ -129,6 +116,7 @@ export default function SearchScreen({
   const type = params?.type as Undefinable<SearchActionType>;
   console.log('test:SearchScreen:', params, type);
   const theme = useThemeContext();
+  const sf = getScaleFactor();
   // const menu = useActionMenu();
   // const sheet = useBottomSheet();
   // const { manualClose } = useManualCloseDialog();
@@ -230,15 +218,12 @@ export default function SearchScreen({
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       edges={['right', 'left']}
     >
-      <View style={{ paddingHorizontal: 20, paddingTop: 10 }}>
+      <View style={styles.container}>
         <SearchBar
           ref={inputRef}
           enableCancel={enableCancel}
           enableClear={enableClear}
-          inputContainerStyle={{
-            backgroundColor: 'rgba(242, 242, 242, 1)',
-            borderRadius: 24,
-          }}
+          inputContainerStyle={styles.inputContainer}
           cancel={{ buttonName: 'cancel' }}
           onChangeText={(text) => {
             setEnableValue(false);
@@ -277,7 +262,7 @@ export default function SearchScreen({
               color: 'white',
             },
             alphabetItemContainer: {
-              width: 15,
+              width: sf(15),
               borderRadius: 8,
             },
           }}
@@ -320,5 +305,18 @@ const styles = createStyleSheet({
   },
   itemText: {
     marginLeft: 10,
+  },
+  rightItem: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    flexGrow: 1,
+    paddingRight: 5,
+  },
+  rightItemFont: { fontSize: 14, fontWeight: '400', lineHeight: 18 },
+  rightItemStyle: { height: 30, borderRadius: 24, paddingHorizontal: 15 },
+  container: { paddingHorizontal: 20, paddingTop: 10 },
+  inputContainer: {
+    backgroundColor: 'rgba(242, 242, 242, 1)',
+    borderRadius: 24,
   },
 });

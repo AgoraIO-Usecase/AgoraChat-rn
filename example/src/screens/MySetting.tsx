@@ -34,9 +34,8 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootScreenParamsListOnly>
 >;
 
-const sf = getScaleFactor();
-
 export default function MySettingScreen({ navigation }: Props): JSX.Element {
+  const sf = getScaleFactor();
   const theme = useThemeContext();
   const toast = useToastContext();
   const alert = useAlert();
@@ -60,16 +59,16 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
         style={{
           justifyContent: 'center',
           alignItems: 'flex-start',
-          height: 32,
+          height: sf(32),
           backgroundColor: '#FAFAFA',
         }}
       >
         <Text
           style={{
-            paddingLeft: 20,
-            fontSize: 12,
+            paddingLeft: sf(20),
+            fontSize: sf(12),
             fontWeight: '400',
-            lineHeight: 18,
+            lineHeight: sf(18),
             color: 'rgba(153, 153, 153, 1)',
           }}
         >

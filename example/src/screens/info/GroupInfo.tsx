@@ -139,7 +139,7 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
             <View style={styles.chatButton}>
               <LocalIcon name="group_invite" size={sf(30)} />
             </View>
-            <Text style={[styles.chat, { marginTop: 5 }]}>
+            <Text style={[styles.chat, { marginTop: sf(5) }]}>
               {groupInfo.invite}
             </Text>
           </Pressable>
@@ -152,7 +152,7 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
             >
               <LocalIcon name="tabbar_chats" size={sf(30)} />
             </Pressable>
-            <Text style={[styles.chat, { marginTop: 5 }]}>
+            <Text style={[styles.chat, { marginTop: sf(5) }]}>
               {groupInfo.chat}
             </Text>
           </View>
@@ -163,7 +163,7 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
           <View
             style={{
               flexDirection: 'row',
-              width: 20,
+              width: sf(20),
               justifyContent: 'space-between',
             }}
           >

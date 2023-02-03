@@ -12,6 +12,7 @@ import {
   Button,
   createStyleSheet,
   defaultScaleFactor as scaleFactor,
+  getScaleFactor,
   LocalIcon,
   TextInput,
   useAlert,
@@ -25,6 +26,7 @@ import type { RootScreenParamsList } from '../routes';
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function SignUpScreen({ navigation }: Props): JSX.Element {
+  const sf = getScaleFactor();
   const AUTO_FOCUS = Platform.select({
     ios: false,
     android: true,
@@ -74,7 +76,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
             <View style={styles.logo}>
               <LocalIcon
                 name="register_icon"
-                size={250}
+                size={sf(250)}
                 style={{ borderRadius: 0 }}
               />
             </View>
@@ -90,7 +92,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setId(text)}
               style={styles.item}
             />
-            <View style={{ height: 18 }} />
+            <View style={{ height: sf(18) }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -101,7 +103,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setPassword(text)}
               style={styles.item}
             />
-            <View style={{ height: 18 }} />
+            <View style={{ height: sf(18) }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -112,7 +114,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setConfirm(text)}
               style={styles.item}
             />
-            <View style={{ height: 18 }} />
+            <View style={{ height: sf(18) }} />
             <Button
               disabled={disabled}
               style={styles.button}

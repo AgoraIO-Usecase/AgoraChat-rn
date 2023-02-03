@@ -9,6 +9,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  getScaleFactor,
   LocalIcon,
   queueTask,
   useBottomSheet,
@@ -31,8 +32,10 @@ type ItemDataType = EqualHeightListItemData & {
   onAction?: (isAccepted: boolean) => void;
 };
 
+const sf = getScaleFactor();
+
 const DefaultAvatarMemo = React.memo(() => {
-  return <DefaultAvatar size={50} radius={25} />;
+  return <DefaultAvatar size={sf(50)} radius={sf(25)} />;
 });
 
 const Item: EqualHeightListItemComponent = (props) => {
@@ -59,16 +62,22 @@ const Item: EqualHeightListItemComponent = (props) => {
         </View>
         <View style={styles.item3}>
           <Button
-            style={{ alignSelf: 'flex-end', height: 28, borderRadius: 14 }}
+            style={{
+              alignSelf: 'flex-end',
+              height: sf(28),
+              borderRadius: sf(14),
+            }}
             onPress={() => item.onAction?.(true)}
           >
-            <Text style={{ color: 'white', marginHorizontal: 8 }}>Accept</Text>
+            <Text style={{ color: 'white', marginHorizontal: sf(8) }}>
+              Accept
+            </Text>
           </Button>
           <Pressable onPress={() => item.onAction?.(false)}>
             <LocalIcon
               name="xmark_thick"
               color="black"
-              style={{ alignSelf: 'flex-end', marginLeft: 15 }}
+              style={{ alignSelf: 'flex-end', marginLeft: sf(15) }}
             />
           </Pressable>
         </View>
@@ -80,6 +89,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 let count = 0;
 export default function RequestListScreen(_props: Props): JSX.Element {
   // console.log('test:GroupListScreen:', route, navigation);
+  const sf = getScaleFactor();
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
@@ -177,8 +187,8 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               color: 'white',
             },
             alphabetItemContainer: {
-              width: 15,
-              borderRadius: 8,
+              width: sf(15),
+              borderRadius: sf(8),
             },
           }}
           Header={(props) => (

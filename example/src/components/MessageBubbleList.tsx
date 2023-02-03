@@ -368,7 +368,6 @@ const MessageBubbleList = (
   const _add = React.useCallback(
     (msgs: MessageItemType[]) => {
       items.push(...msgs);
-      console.log('test:_add:', items.length);
       setItems([...items]);
     },
     [items]

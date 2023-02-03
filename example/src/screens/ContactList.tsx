@@ -19,6 +19,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  getScaleFactor,
   LocalIcon,
   queueTask,
   useAlert,
@@ -98,14 +99,7 @@ const Item: EqualHeightListItemComponent = (props) => {
     switch (type) {
       case 'group_invite':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <CheckButton
               checked={item.action?.groupInvite?.isInvited}
               onChecked={item.action?.groupInvite?.onAction}
@@ -114,14 +108,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         );
       case 'create_group':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <CheckButton
               checked={item.action?.createGroup?.isInvited}
               onChecked={item.action?.createGroup?.onAction}
@@ -130,14 +117,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         );
       case 'block_contact':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <Button
               style={{ height: 30, borderRadius: 24, paddingHorizontal: 10 }}
               color={{
@@ -178,14 +158,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         );
       case 'group_member_modify':
         return (
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexGrow: 1,
-              paddingRight: 5,
-            }}
-          >
+          <View style={styles.rightItem}>
             <CheckButton
               checked={item.action?.modifyGroupMember?.isInvited}
               onChecked={item.action?.modifyGroupMember?.onAction}
@@ -214,6 +187,7 @@ export default function ContactListScreen({
   route,
   navigation,
 }: Props): JSX.Element {
+  const sf = getScaleFactor();
   const rp = route.params as any;
   const params = rp?.params as any;
   const type = params?.type as Undefinable<ContactActionType>;
@@ -333,7 +307,7 @@ export default function ContactListScreen({
                   console.log('test:onPress:data:', data);
                 },
                 containerStyle: {
-                  marginTop: 10,
+                  marginTop: sf(10),
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -344,8 +318,8 @@ export default function ContactListScreen({
                 },
                 titleStyle: {
                   fontWeight: '600',
-                  fontSize: 14,
-                  lineHeight: 16,
+                  fontSize: sf(14),
+                  lineHeight: sf(16),
                   color: 'rgba(102, 102, 102, 1)',
                   marginHorizontal: undefined,
                 },
@@ -405,14 +379,14 @@ export default function ContactListScreen({
         if (type === 'group_invite') {
           const right = `${header.groupInvite}(${selectedCount})`;
           return (
-            <View style={{ padding: 10, marginRight: -10 }}>
+            <View style={styles.rightButton}>
               <Text>{right}</Text>
             </View>
           );
         } else if (type === 'group_member') {
           return (
-            <View style={{ padding: 10, marginRight: -10 }}>
-              <LocalIcon name="contact_add_contacts" size={28} />
+            <View style={styles.rightButton}>
+              <LocalIcon name="contact_add_contacts" size={sf(28)} />
             </View>
           );
         } else if (type === 'create_group') {
@@ -424,23 +398,23 @@ export default function ContactListScreen({
                   Custom: (
                     <View
                       style={{
-                        width: screenWidth - 40,
+                        width: sf(screenWidth - 40),
                       }}
                     >
                       <View
                         style={{
                           justifyContent: 'center',
                           alignItems: 'center',
-                          paddingVertical: 12,
+                          paddingVertical: sf(12),
                           flexGrow: 1,
                         }}
                       >
                         <Text
                           style={{
                             color: '#666666',
-                            fontSize: 14,
+                            fontSize: sf(14),
                             fontWeight: '600',
-                            lineHeight: 18,
+                            lineHeight: sf(18),
                           }}
                         >
                           Group Settings
@@ -451,50 +425,58 @@ export default function ContactListScreen({
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          paddingVertical: 12,
+                          paddingVertical: sf(12),
                         }}
                       >
                         <Text
                           style={{
                             color: '#333333',
-                            fontSize: 15,
+                            fontSize: sf(15),
                             fontWeight: '600',
-                            lineHeight: 20,
+                            lineHeight: sf(20),
                           }}
                         >
                           Public Group
                         </Text>
                         <Switch />
                       </View>
-                      <Divider height={0.25} marginLeft={1} marginRight={1} />
+                      <Divider
+                        height={sf(0.25)}
+                        marginLeft={1}
+                        marginRight={1}
+                      />
                       <View
                         style={{
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          paddingVertical: 12,
+                          paddingVertical: sf(12),
                         }}
                       >
                         <Text
                           style={{
                             color: '#333333',
-                            fontSize: 15,
+                            fontSize: sf(15),
                             fontWeight: '600',
-                            lineHeight: 20,
+                            lineHeight: sf(20),
                           }}
                         >
                           Allow members to invite
                         </Text>
                         <Switch />
                       </View>
-                      <Divider height={0.25} marginLeft={1} marginRight={1} />
+                      <Divider
+                        height={sf(0.25)}
+                        marginLeft={1}
+                        marginRight={1}
+                      />
                       <View
                         style={{
-                          paddingVertical: 20,
+                          paddingVertical: sf(20),
                         }}
                       >
                         <Button
-                          style={{ height: 48, borderRadius: 24 }}
+                          style={{ height: sf(48), borderRadius: sf(24) }}
                           onPress={() => {
                             manualClose()
                               .then(() => {
@@ -521,13 +503,7 @@ export default function ContactListScreen({
           };
           const right = `${header.createGroup}(${selectedCount})`;
           return (
-            <TouchableOpacity
-              style={{
-                padding: 10,
-                marginRight: -10,
-              }}
-              onPress={_createGroup}
-            >
+            <TouchableOpacity style={styles.rightButton} onPress={_createGroup}>
               <Text
                 style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}
               >
@@ -559,13 +535,7 @@ export default function ContactListScreen({
           };
           const right = `${header.addMembers}(${selectedCount})`;
           return (
-            <TouchableOpacity
-              style={{
-                padding: 10,
-                marginRight: -10,
-              }}
-              onPress={_addMember}
-            >
+            <TouchableOpacity style={styles.rightButton} onPress={_addMember}>
               <Text
                 style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}
               >
@@ -626,6 +596,7 @@ export default function ContactListScreen({
       navigation,
       screenWidth,
       selectedCount,
+      sf,
       sheet,
       toast,
       type,
@@ -729,4 +700,11 @@ const styles = createStyleSheet({
   itemText: {
     marginLeft: 10,
   },
+  rightItem: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    flexGrow: 1,
+    paddingRight: 5,
+  },
+  rightButton: { padding: 10, marginRight: -10 },
 });

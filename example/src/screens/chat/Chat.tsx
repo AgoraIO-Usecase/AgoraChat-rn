@@ -106,7 +106,8 @@ export default function ChatScreen(_: Props): JSX.Element {
   };
 
   const _onPressed = (value: string) => {
-    setContent(content + moji.convert.fromCodePoint(value));
+    const s = content + moji.convert.fromCodePoint(value);
+    setContent(s);
     setIsInput(true);
   };
 

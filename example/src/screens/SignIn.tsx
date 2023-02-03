@@ -11,6 +11,7 @@ import {
 import {
   Button,
   createStyleSheet,
+  getScaleFactor,
   LocalIcon,
   TextInput,
   useHeaderContext,
@@ -24,6 +25,7 @@ import type { RootScreenParamsList } from '../routes';
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function SignInScreen({ navigation }: Props): JSX.Element {
+  const sf = getScaleFactor();
   const AUTO_FOCUS = Platform.select({
     ios: false,
     android: true,
@@ -60,7 +62,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
         enabled={enableKeyboardAvoid}
         behavior={Platform.select({ ios: 'padding', default: 'height' })}
         keyboardVerticalOffset={
-          enableKeyboardAvoid && statusBarTranslucent ? 80 : 0
+          enableKeyboardAvoid && statusBarTranslucent ? sf(80) : 0
         }
         pointerEvents="box-none"
       >
@@ -74,7 +76,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
             <View>
               <LocalIcon
                 name="login_icon"
-                size={250}
+                size={sf(250)}
                 style={{ borderRadius: 0 }}
               />
             </View>
@@ -86,7 +88,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setId(text)}
               style={styles.item}
             />
-            <View style={{ height: 18 }} />
+            <View style={{ height: sf(18) }} />
             <TextInput
               autoFocus={AUTO_FOCUS}
               multiline={false}
@@ -97,7 +99,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               onChangeText={(text) => setPassword(text)}
               style={styles.item}
             />
-            <View style={{ height: 18 }} />
+            <View style={{ height: sf(18) }} />
             <Button
               disabled={disabled}
               style={styles.button}

@@ -7,6 +7,7 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  getScaleFactor,
   queueTask,
   useBottomSheet,
   useThemeContext,
@@ -50,6 +51,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
+  const sf = getScaleFactor();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -138,7 +140,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
             color: 'white',
           },
           alphabetItemContainer: {
-            width: 15,
+            width: sf(15),
             borderRadius: 8,
           },
         }}

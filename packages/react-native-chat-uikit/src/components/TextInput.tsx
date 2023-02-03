@@ -130,8 +130,9 @@ function TextInput(
           { color: input.text, backgroundColor: input.background },
           style,
         ]}
-        {...props}
         value={_value}
+        {...props}
+        // value={_value}
       >
         {children}
       </RNTextInput>
@@ -144,6 +145,7 @@ const styles = createStyleSheet({
   input: {
     paddingVertical: 0,
     paddingHorizontal: 0,
+    paddingLeft: 15,
   },
   icon: {
     position: 'absolute',
