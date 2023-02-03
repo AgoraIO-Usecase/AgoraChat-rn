@@ -118,10 +118,8 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               style={styles.button}
               onPress={() => {
                 if (password !== confirm) {
-                  console.log('test: password not match');
                   setTip(register.comment(1));
                 } else if (password === '1') {
-                  console.log('test: success');
                   Keyboard.dismiss();
                   openAlert({
                     title: register.comment(5),
