@@ -376,6 +376,7 @@ export default function ContactListScreen({
   const NavigationHeaderRight = React.useCallback(
     (_: HeaderButtonProps) => {
       const Right = ({ type }: { type: Undefinable<ContactActionType> }) => {
+        const { contactList } = useAppI18nContext();
         if (type === 'group_invite') {
           const right = `${header.groupInvite}(${selectedCount})`;
           return (
@@ -417,7 +418,7 @@ export default function ContactListScreen({
                             lineHeight: sf(18),
                           }}
                         >
-                          Group Settings
+                          {contactList.groupSetting.groupSetting}
                         </Text>
                       </View>
                       <View
@@ -436,7 +437,7 @@ export default function ContactListScreen({
                             lineHeight: sf(20),
                           }}
                         >
-                          Public Group
+                          {contactList.groupSetting.publicGroup}
                         </Text>
                         <Switch />
                       </View>
@@ -461,7 +462,7 @@ export default function ContactListScreen({
                             lineHeight: sf(20),
                           }}
                         >
-                          Allow members to invite
+                          {contactList.groupSetting.memberInvite}
                         </Text>
                         <Switch />
                       </View>
@@ -492,7 +493,7 @@ export default function ContactListScreen({
                               });
                           }}
                         >
-                          Create
+                          {contactList.groupSetting.createGroup}
                         </Button>
                       </View>
                     </View>

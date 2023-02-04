@@ -141,6 +141,22 @@ export class AppStringSet extends UIKitStringSet2 {
     voiceButton: string;
     voiceState: string;
   };
+  tabbar: {
+    request: string;
+    contact: string;
+    group: string;
+  };
+  contactList: {
+    groupSetting: {
+      groupSetting: string;
+      publicGroup: string;
+      memberInvite: string;
+      createGroup: string;
+    };
+  };
+  requestList: {
+    button: string[];
+  };
 
   constructor(locate: Locale = en) {
     super(locate);
@@ -327,6 +343,22 @@ export class AppStringSet extends UIKitStringSet2 {
     this.chat = {
       voiceButton: 'Hold to talk',
       voiceState: 'Swipe up to cancel',
+    };
+    this.tabbar = {
+      request: 'Requests',
+      contact: 'Contacts',
+      group: 'Groups',
+    };
+    this.contactList = {
+      groupSetting: {
+        groupSetting: 'Group Settings',
+        publicGroup: 'Public Group',
+        memberInvite: 'Allow members to invite',
+        createGroup: 'Group',
+      },
+    };
+    this.requestList = {
+      button: ['Accept'],
     };
   }
 }

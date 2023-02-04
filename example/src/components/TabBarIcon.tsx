@@ -7,6 +7,8 @@ import {
   LocalIcon,
 } from 'react-native-chat-uikit';
 
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+
 type TabBarIconProps = {
   focused?: boolean | undefined;
   color: string;
@@ -24,6 +26,7 @@ export default function TabBarIcon({
   color,
   type,
 }: TabBarIconProps): JSX.Element {
+  const { tabbar } = useAppI18nContext();
   const sf = getScaleFactor();
   // console.log('test:TabBarIcon:', focused, type);
   const _ = (_: boolean | undefined) => {};
@@ -64,7 +67,7 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={styles.request}>Requests</Text>
+          <Text style={styles.request}>{tabbar.request}</Text>
         </View>
         <LocalIcon
           name="contact_request_hint"
@@ -78,7 +81,9 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={[styles.contact2, { color: color }]}>Contacts</Text>
+          <Text style={[styles.contact2, { color: color }]}>
+            {tabbar.contact}
+          </Text>
         </View>
       </React.Fragment>
     );
@@ -87,7 +92,7 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={[styles.group, { color: color }]}>Groups</Text>
+          <Text style={[styles.group, { color: color }]}>{tabbar.group}</Text>
         </View>
       </React.Fragment>
     );

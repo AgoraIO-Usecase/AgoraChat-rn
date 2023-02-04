@@ -22,6 +22,7 @@ import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { RootParamsList } from '../routes';
 
 type Props = MaterialTopTabScreenProps<RootParamsList>;
@@ -39,6 +40,7 @@ const DefaultAvatarMemo = React.memo(() => {
 });
 
 const Item: EqualHeightListItemComponent = (props) => {
+  const { requestList } = useAppI18nContext();
   const item = props.data as ItemDataType;
   return (
     <View style={styles.item}>
@@ -70,7 +72,7 @@ const Item: EqualHeightListItemComponent = (props) => {
             onPress={() => item.onAction?.(true)}
           >
             <Text style={{ color: 'white', marginHorizontal: sf(8) }}>
-              Accept
+              {requestList.button[0]}
             </Text>
           </Button>
           <Pressable onPress={() => item.onAction?.(false)}>

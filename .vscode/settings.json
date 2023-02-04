@@ -9,6 +9,7 @@
         "lefthook",
         "moji",
         "Pressable",
+        "tabbar",
         "uikit"
     ]
 }
