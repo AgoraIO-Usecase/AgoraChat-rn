@@ -1,7 +1,8 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import * as React from 'react';
 import {
   Animated,
+  DeviceEventEmitter,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -43,6 +44,47 @@ import { useStyleSheet } from '../../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
+
+type FaceListProps = {
+  height: Animated.Value;
+  // onPress?: (face: string) => void;
+};
+
+const FaceList = React.memo(
+  (props: FaceListProps) => {
+    console.log('test:111:');
+    const { height } = props;
+    const sf = getScaleFactor();
+    const arr = FACE_ASSETS;
+    return (
+      <Animated.View style={{ height: height }}>
+        <ScrollView>
+          <View style={styles.faceContainer}>
+            {arr.map((face) => {
+              return (
+                <TouchableOpacity
+                  key={face}
+                  style={{ padding: sf(5) }}
+                  onPress={() => {
+                    // onPress?.(face);
+                    DeviceEventEmitter.emit('onFace', face);
+                  }}
+                >
+                  <Text style={{ fontSize: sf(32) }}>
+                    {moji.convert.fromCodePoint(face)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </Animated.View>
+    );
+  },
+  () => {
+    return true;
+  }
+);
 
 let count = 0;
 export default function ChatScreen(_: Props): JSX.Element {
@@ -95,20 +137,20 @@ export default function ChatScreen(_: Props): JSX.Element {
     const subscription2 = Keyboard.addListener('keyboardWillShow', (_) => {
       setIsInput(true);
     });
+    const subscription3 = DeviceEventEmitter.addListener('onFace', (face) => {
+      const s = content + moji.convert.fromCodePoint(face);
+      setContent(s);
+      setIsInput(true);
+    });
     return () => {
       subscription1.remove();
       subscription2.remove();
+      subscription3.remove();
     };
-  }, []);
+  }, [content]);
 
   const _calculateInputWidth = (width: number, isInput: boolean) => {
     return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));
-  };
-
-  const _onPressed = (value: string) => {
-    const s = content + moji.convert.fromCodePoint(value);
-    setContent(s);
-    setIsInput(true);
   };
 
   const _sendMessage = (text: string) => {
@@ -138,33 +180,6 @@ export default function ChatScreen(_: Props): JSX.Element {
     } else {
       hideFace();
     }
-  };
-
-  const _showFaces = () => {
-    const arr = FACE_ASSETS;
-    return (
-      <Animated.View style={{ height: faceHeightRef }}>
-        <ScrollView>
-          <View style={styles.faceContainer}>
-            {arr.map((value) => {
-              return (
-                <TouchableOpacity
-                  key={value}
-                  style={{ padding: sf(5) }}
-                  onPress={() => {
-                    _onPressed(value);
-                  }}
-                >
-                  <Text style={{ fontSize: sf(32) }}>
-                    {moji.convert.fromCodePoint(value)}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-      </Animated.View>
-    );
   };
 
   const _content = () => {
@@ -197,6 +212,7 @@ export default function ChatScreen(_: Props): JSX.Element {
             onPress={() => {
               setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
               Keyboard.dismiss();
+              _onFace('face');
             }}
           >
             <LocalIcon name={wave as LocalIconName} color="#A5A7A6" size={28} />
@@ -374,8 +390,7 @@ export default function ChatScreen(_: Props): JSX.Element {
             </View>
           )}
         </View>
-
-        {_showFaces()}
+        <FaceList height={faceHeightRef} />
       </View>
     );
   };
