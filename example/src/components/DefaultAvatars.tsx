@@ -48,7 +48,7 @@ export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
   );
 }
 
-export function DefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
+export function DefaultAvatarF({ size, radius }: AvatarProps): JSX.Element {
   const index: number = timestamp('second') % AVATAR_ASSETS.length;
   const key = AVATAR_ASSETS[index] as LocalIconName;
   return (
@@ -57,3 +57,5 @@ export function DefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
     </View>
   );
 }
+
+export const DefaultAvatar = React.memo(DefaultAvatarF);
