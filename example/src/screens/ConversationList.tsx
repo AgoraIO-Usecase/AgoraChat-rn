@@ -1,7 +1,15 @@
-import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
-import type { CompositeScreenProps } from '@react-navigation/native';
+import type {
+  MaterialBottomTabNavigationProp,
+  MaterialBottomTabScreenProps,
+} from '@react-navigation/material-bottom-tabs';
+import {
+  CompositeNavigationProp,
+  CompositeScreenProps,
+  useNavigation,
+} from '@react-navigation/native';
 import type {
   HeaderButtonProps,
+  NativeStackNavigationProp,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
@@ -29,7 +37,9 @@ import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type {
+  BottomTabParamsList,
   BottomTabScreenParamsList,
+  RootParamsList,
   RootScreenParamsList,
 } from '../routes';
 
@@ -40,6 +50,19 @@ type RootScreenParamsListOnly = Omit<
 type Props = CompositeScreenProps<
   MaterialBottomTabScreenProps<BottomTabScreenParamsList, 'ConversationList'>,
   NativeStackScreenProps<RootScreenParamsListOnly>
+>;
+
+type NavigationProp = CompositeNavigationProp<
+  MaterialBottomTabNavigationProp<
+    BottomTabScreenParamsList<BottomTabParamsList, 'option'>,
+    any,
+    undefined
+  >,
+  NativeStackNavigationProp<
+    RootScreenParamsList<RootParamsList, 'option'>,
+    any,
+    undefined
+  >
 >;
 
 type ItemDataType = EqualHeightListItemData & {
@@ -134,6 +157,71 @@ const Item: EqualHeightListItemComponent = (props) => {
   );
 };
 
+const NavigationHeaderRight = (_: HeaderButtonProps) => {
+  const navigation = useNavigation<NavigationProp>();
+  const sheet = useBottomSheet();
+  const { conversation } = useAppI18nContext();
+  return (
+    <Pressable
+      onPress={() => {
+        console.log('test:NavigationHeaderRight:onPress:');
+        sheet.openSheet({
+          sheetItems: [
+            {
+              title: conversation.new,
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:');
+                // navigation.navigate('ContactList', {
+                //   params: { type: 'create_conversation' },
+                // });
+                navigation.navigate({
+                  name: 'ContactList',
+                  params: { params: { type: 'create_conversation' } },
+                });
+              },
+            },
+            {
+              title: conversation.createGroup,
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:');
+                navigation.navigate('ContactList', {
+                  params: { type: 'create_group' },
+                });
+              },
+            },
+            {
+              title: conversation.addContact,
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:');
+                navigation.navigate('Search', {
+                  params: { type: 'add_contact' },
+                });
+              },
+            },
+            {
+              title: conversation.joinPublicGroup,
+              titleColor: 'black',
+              onPress: () => {
+                console.log('test:onPress:data:');
+                navigation.navigate('Search', {
+                  params: { type: 'join_public_group' },
+                });
+              },
+            },
+          ],
+        });
+      }}
+    >
+      <View style={{ padding: sf(10), marginRight: -sf(10) }}>
+        <LocalIcon name="chat_nav_add" style={{ padding: 0 }} size={sf(20)} />
+      </View>
+    </Pressable>
+  );
+};
+
 let count = 0;
 export default function ConversationListScreen({
   navigation,
@@ -145,7 +233,6 @@ export default function ConversationListScreen({
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
-  const { conversation } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -199,88 +286,11 @@ export default function ConversationListScreen({
   });
   data.push(...r);
 
-  const NavigationHeaderRight = React.useCallback(
-    (_: HeaderButtonProps) => {
-      return (
-        <Pressable
-          onPress={() => {
-            console.log('test:NavigationHeaderRight:onPress:');
-            sheet.openSheet({
-              sheetItems: [
-                {
-                  title: conversation.new,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:');
-                    // navigation.navigate('ContactList', {
-                    //   params: { type: 'create_conversation' },
-                    // });
-                    navigation.navigate({
-                      name: 'ContactList',
-                      params: { params: { type: 'create_conversation' } },
-                    });
-                  },
-                },
-                {
-                  title: conversation.createGroup,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:');
-                    navigation.navigate('ContactList', {
-                      params: { type: 'create_group' },
-                    });
-                  },
-                },
-                {
-                  title: conversation.addContact,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:');
-                    navigation.navigate('Search', {
-                      params: { type: 'add_contact' },
-                    });
-                  },
-                },
-                {
-                  title: conversation.joinPublicGroup,
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:');
-                    navigation.navigate('Search', {
-                      params: { type: 'join_public_group' },
-                    });
-                  },
-                },
-              ],
-            });
-          }}
-        >
-          <View style={{ padding: sf(10), marginRight: -sf(10) }}>
-            <LocalIcon
-              name="chat_nav_add"
-              style={{ padding: 0 }}
-              size={sf(20)}
-            />
-          </View>
-        </Pressable>
-      );
-    },
-    [
-      sf,
-      sheet,
-      conversation.new,
-      conversation.createGroup,
-      conversation.addContact,
-      conversation.joinPublicGroup,
-      navigation,
-    ]
-  );
-
   React.useEffect(() => {
     navigation.getParent()?.setOptions({
       headerRight: NavigationHeaderRight,
     });
-  }, [NavigationHeaderRight, navigation]);
+  }, [navigation]);
 
   return (
     <SafeAreaView
