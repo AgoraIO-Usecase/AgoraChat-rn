@@ -838,6 +838,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/Chats.png');
     }
   },
+  'Contacts': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/Contacts_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/Contacts_2x.png');
+    } else {
+      return require('./icons/Global/Contacts.png');
+    }
+  },
   'badge': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/badge_3x.png');

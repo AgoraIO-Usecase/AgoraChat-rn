@@ -16,6 +16,14 @@ export default function HomeScreen({
   route,
 }: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element {
   console.log('test:HomeScreen:', route, navigation);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('test:HomeScreen:111:');
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   const shifting = true;
   return (
     <Home.Navigator
