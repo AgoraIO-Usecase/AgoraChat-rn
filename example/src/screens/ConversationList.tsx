@@ -316,78 +316,77 @@ export default function ConversationListScreen({
       {isEmpty ? (
         <Blank />
       ) : (
-        <EqualHeightList
-          parentName="ConversationList"
-          onLayout={(_) => {
-            // console.log(
-            //   'test:EqualHeightList:',
-            //   event.nativeEvent.layout.height
-            // );
-          }}
-          ref={listRef}
-          items={data}
-          ItemFC={Item}
-          enableAlphabet={enableAlphabet}
-          enableRefresh={enableRefresh}
-          enableHeader={enableHeader}
-          alphabet={{
-            alphabetCurrent: {
-              backgroundColor: 'orange',
-              color: 'white',
-            },
-            alphabetItemContainer: {
-              width: sf(15),
-              borderRadius: sf(8),
-            },
-          }}
-          Header={(props) => (
-            <ListSearchHeader
-              autoFocus={autoFocus}
-              onChangeText={(text) => {
-                console.log('test:ListSearchHeader:onChangeText:', Text);
-                queueTask(() => {
-                  const r: ItemDataType[] = [];
-                  for (const item of data) {
-                    if (item.key.includes(text)) {
-                      r.push(item);
-                    }
+        <React.Fragment>
+          <ListSearchHeader
+            autoFocus={autoFocus}
+            onChangeText={(text) => {
+              console.log('test:ListSearchHeader:onChangeText:', Text);
+              queueTask(() => {
+                const r: ItemDataType[] = [];
+                for (const item of data) {
+                  if (item.key.includes(text)) {
+                    r.push(item);
                   }
-                  listRef.current?.manualRefresh([
-                    {
-                      type: 'clear',
-                    },
-                    {
-                      type: 'add',
-                      data: r,
-                      enableSort: true,
-                    },
-                  ]);
-                });
-              }}
-              {...props}
-            />
-          )}
-          ItemSeparatorComponent={ListItemSeparator}
-          onRefresh={(type) => {
-            if (type === 'started') {
-              const en = 'aaa';
-              const v = en + count++;
-              listRef.current?.manualRefresh([
-                {
-                  type: 'add',
-                  data: [
-                    {
-                      en: v,
-                      ch: v,
-                      key: v,
-                    } as EqualHeightListItemData,
-                  ],
-                  enableSort: true,
-                },
-              ]);
-            }
-          }}
-        />
+                }
+                listRef.current?.manualRefresh([
+                  {
+                    type: 'clear',
+                  },
+                  {
+                    type: 'add',
+                    data: r,
+                    enableSort: true,
+                  },
+                ]);
+              });
+            }}
+          />
+          <EqualHeightList
+            parentName="ConversationList"
+            onLayout={(_) => {
+              // console.log(
+              //   'test:EqualHeightList:',
+              //   event.nativeEvent.layout.height
+              // );
+            }}
+            ref={listRef}
+            items={data}
+            ItemFC={Item}
+            enableAlphabet={enableAlphabet}
+            enableRefresh={enableRefresh}
+            enableHeader={enableHeader}
+            alphabet={{
+              alphabetCurrent: {
+                backgroundColor: 'orange',
+                color: 'white',
+              },
+              alphabetItemContainer: {
+                width: sf(15),
+                borderRadius: sf(8),
+              },
+            }}
+            ItemSeparatorComponent={ListItemSeparator}
+            onRefresh={(type) => {
+              if (type === 'started') {
+                const en = 'aaa';
+                const v = en + count++;
+                listRef.current?.manualRefresh([
+                  {
+                    type: 'add',
+                    data: [
+                      {
+                        en: v,
+                        ch: v,
+                        key: v,
+                      } as EqualHeightListItemData,
+                    ],
+                    enableSort: true,
+                  },
+                ]);
+              }
+            }}
+          />
+        </React.Fragment>
       )}
     </SafeAreaView>
   );

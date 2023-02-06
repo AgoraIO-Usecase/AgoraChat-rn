@@ -123,6 +123,30 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
       style={{ flex: 1, backgroundColor: theme.colors.background }}
       edges={['right', 'left']}
     >
+      <ListSearchHeader
+        autoFocus={autoFocus}
+        onChangeText={(text) => {
+          console.log('test:ListSearchHeader:onChangeText:', Text);
+          queueTask(() => {
+            const r: ItemDataType[] = [];
+            for (const item of data) {
+              if (item.key.includes(text)) {
+                r.push(item);
+              }
+            }
+            listRef.current?.manualRefresh([
+              {
+                type: 'clear',
+              },
+              {
+                type: 'add',
+                data: r,
+                enableSort: true,
+              },
+            ]);
+          });
+        }}
+      />
       <EqualHeightList
         parentName="GroupList"
         onLayout={(_) => {
@@ -144,33 +168,6 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
             borderRadius: 8,
           },
         }}
-        Header={(props) => (
-          <ListSearchHeader
-            autoFocus={autoFocus}
-            onChangeText={(text) => {
-              console.log('test:ListSearchHeader:onChangeText:', Text);
-              queueTask(() => {
-                const r: ItemDataType[] = [];
-                for (const item of data) {
-                  if (item.key.includes(text)) {
-                    r.push(item);
-                  }
-                }
-                listRef.current?.manualRefresh([
-                  {
-                    type: 'clear',
-                  },
-                  {
-                    type: 'add',
-                    data: r,
-                    enableSort: true,
-                  },
-                ]);
-              });
-            }}
-            {...props}
-          />
-        )}
         ItemSeparatorComponent={ListItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {

@@ -33,7 +33,6 @@ import * as Permissions from 'react-native-permissions';
 import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
-import { ContactListHeader } from './components/ContactListHeader';
 import HomeHeaderRight from './components/HomeHeaderRight';
 import HomeHeaderTitle from './components/HomeHeaderTitle';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
@@ -228,14 +227,14 @@ export default function App() {
                 <Root.Screen name="GroupInfo" component={GroupInfo} />
                 <Root.Screen
                   name="ContactList"
-                  options={({ route }) => {
-                    return {
-                      headerBackVisible: true,
-                      headerRight: ContactListHeader,
-                      headerTitle: route.name,
-                      headerShadowVisible: false,
-                    };
-                  }}
+                  // options={({ route }) => {
+                  //   return {
+                  //     headerBackVisible: true,
+                  //     headerRight: ContactListHeader,
+                  //     headerTitle: route.name,
+                  //     headerShadowVisible: false,
+                  //   };
+                  // }}
                   component={ContactList}
                 />
                 <Root.Screen name="Chat" component={Chat} />

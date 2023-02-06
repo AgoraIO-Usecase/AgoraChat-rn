@@ -11,7 +11,6 @@ import {
   EqualHeightListRef,
   getScaleFactor,
   LocalIcon,
-  queueTask,
   useBottomSheet,
   useThemeContext,
 } from 'react-native-chat-uikit';
@@ -21,7 +20,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
-import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { RootParamsList } from '../routes';
 
@@ -100,7 +98,6 @@ export default function RequestListScreen(_props: Props): JSX.Element {
   const enableRefresh = true;
   const enableAlphabet = false;
   const enableHeader = false;
-  const autoFocus = false;
   const isEmpty = false;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
@@ -193,33 +190,6 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               borderRadius: sf(8),
             },
           }}
-          Header={(props) => (
-            <ListSearchHeader
-              autoFocus={autoFocus}
-              onChangeText={(text) => {
-                console.log('test:ListSearchHeader:onChangeText:', Text);
-                queueTask(() => {
-                  const r: ItemDataType[] = [];
-                  for (const item of data) {
-                    if (item.key.includes(text)) {
-                      r.push(item);
-                    }
-                  }
-                  listRef.current?.manualRefresh([
-                    {
-                      type: 'clear',
-                    },
-                    {
-                      type: 'add',
-                      data: r,
-                      enableSort: true,
-                    },
-                  ]);
-                });
-              }}
-              {...props}
-            />
-          )}
           ItemSeparatorComponent={ListItemSeparator}
           onRefresh={(type) => {
             if (type === 'started') {

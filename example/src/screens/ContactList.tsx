@@ -463,6 +463,7 @@ export default function ContactListScreen({
   const toast = useToastContext();
   const alert = useAlert();
   const { groupInfo } = useAppI18nContext();
+  const { height: screenHeight } = useWindowDimensions();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = true;
@@ -635,6 +636,11 @@ export default function ContactListScreen({
   });
   data.push(...r);
 
+  const _calculateAlphabetHeight = () => {
+    const r = sf(screenHeight - 450 - 340);
+    return r;
+  };
+
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: NavigationHeaderRight,
@@ -643,8 +649,12 @@ export default function ContactListScreen({
     });
   }, [navigation, type]);
 
-  const Header = (props: any) => {
-    return (
+  return (
+    <SafeAreaView
+      mode="padding"
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      edges={['right', 'left']}
+    >
       <ListSearchHeader
         autoFocus={autoFocus}
         onChangeText={(text) => {
@@ -667,18 +677,7 @@ export default function ContactListScreen({
             ]);
           });
         }}
-        {...props}
       />
-    );
-  };
-
-  return (
-    <SafeAreaView
-      mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      edges={['right', 'left']}
-    >
-      <Header />
       <EqualHeightList
         parentName="ContactList"
         ref={listRef}
@@ -695,6 +694,9 @@ export default function ContactListScreen({
           alphabetItemContainer: {
             width: 15,
             borderRadius: 8,
+          },
+          alphabetContainer: {
+            top: _calculateAlphabetHeight(),
           },
         }}
         ItemSeparatorComponent={ListItemSeparator}
