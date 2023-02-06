@@ -34,8 +34,8 @@ import VideoComponent from 'react-native-video';
 
 import Dev from './__dev__';
 import { ContactListHeader } from './components/ContactListHeader';
-import HeaderTitle from './components/HeaderTitle';
 import HomeHeaderRight from './components/HomeHeaderRight';
+import HomeHeaderTitle from './components/HomeHeaderTitle';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
 import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList } from './routes';
@@ -217,7 +217,8 @@ export default function App() {
                   return {
                     headerBackVisible: true,
                     headerRight: HomeHeaderRight,
-                    headerTitle: () => <HeaderTitle name="Chats" />,
+                    headerTitle: () => <HomeHeaderTitle name="Chats" />,
+                    headerShadowVisible: false,
                   };
                 }}
                 component={HomeScreen}
@@ -232,6 +233,7 @@ export default function App() {
                       headerBackVisible: true,
                       headerRight: ContactListHeader,
                       headerTitle: route.name,
+                      headerShadowVisible: false,
                     };
                   }}
                   component={ContactList}

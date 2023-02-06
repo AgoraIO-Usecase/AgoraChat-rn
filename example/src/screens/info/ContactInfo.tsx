@@ -29,6 +29,19 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
   const toast = useToastContext();
   const id = 'AgoraID: xxx';
 
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('test:HomeScreen:666:');
+      navigation.setOptions({
+        headerBackVisible: true,
+        headerRight: undefined,
+        headerTitle: () => <Text />,
+        headerShadowVisible: false,
+      });
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <SafeAreaView
       mode="padding"

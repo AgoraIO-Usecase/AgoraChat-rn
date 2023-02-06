@@ -2,7 +2,9 @@ import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bo
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import type { ParamListBase } from '@react-navigation/native';
 import * as React from 'react';
+import { View } from 'react-native';
 
+import HomeHeaderTitle from '../components/HomeHeaderTitle';
 import TabBarIcon from '../components/TabBarIcon';
 import type { RootParamsList } from '../routes';
 import ContactList from './ContactList';
@@ -16,13 +18,47 @@ export default function ContactScreen({
   route,
 }: MaterialBottomTabScreenProps<ParamListBase, 'Contact'>): JSX.Element {
   console.log('test:ContactScreen:', route, navigation);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('test:HomeScreen:333:');
+      navigation.getParent()?.setOptions({
+        headerBackVisible: false,
+        headerRight: undefined,
+        headerTitle: () => <HomeHeaderTitle name="Contacts" />,
+        headerShadowVisible: false,
+      });
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <Contact.Navigator
       screenOptions={{
         tabBarShowLabel: false,
-        // tabBarLabelStyle: { fontSize: 12 },
+        // tabBarIndicatorStyle: {backgroundColor: 'red'},
+        // tabBarActiveTintColor: 'red',
+        // tabBarInactiveTintColor: 'blue',
+        // tabBarBounces: false,
+        // tabBarIconStyle: {backgroundColor: 'red', borderColor: 'blue'},
+        // tabBarContentContainerStyle: { borderColor: 'blue'},
+        // tabBarStyle: {shadowColor: 'red'},
+        // tabBarIndicatorContainerStyle: {shadowColor: 'blue'}
+        tabBarBadge: () => (
+          <View style={{ top: 14, right: 20 }}>
+            <View
+              style={{
+                width: 9,
+                height: 9,
+                backgroundColor: '#FF14CC',
+                borderRadius: 9,
+              }}
+            />
+          </View>
+        ),
+        // tabBarLabelStyle: { borderColor: 'red' },
         // tabBarItemStyle: { height: 40 },
-        // tabBarStyle: { backgroundColor: 'powderblue' },
+        // tabBarStyle: { borderColor: 'red', backgroundColor: 'blue' },
       }}
     >
       <Contact.Screen

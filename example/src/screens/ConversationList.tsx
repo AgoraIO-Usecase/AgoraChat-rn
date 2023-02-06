@@ -25,6 +25,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
+import HomeHeaderTitle from '../components/HomeHeaderTitle';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
@@ -294,9 +295,16 @@ export default function ConversationListScreen({
     );
 
   React.useEffect(() => {
-    navigation.getParent()?.setOptions({
-      headerRight: NavigationHeaderRight,
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('test:HomeScreen:222:');
+      navigation.getParent()?.setOptions({
+        headerBackVisible: false,
+        headerRight: NavigationHeaderRight,
+        headerTitle: () => <HomeHeaderTitle name="Chats" />,
+        headerShadowVisible: false,
+      });
     });
+    return unsubscribe;
   }, [NavigationHeaderRight, navigation]);
 
   return (

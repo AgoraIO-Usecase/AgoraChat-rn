@@ -26,6 +26,7 @@ export default function TabBarIcon({
   color,
   type,
 }: TabBarIconProps): JSX.Element {
+  console.log('test:color:', color, type, focused);
   const { tabbar } = useAppI18nContext();
   const sf = getScaleFactor();
   // console.log('test:TabBarIcon:', focused, type);
@@ -67,13 +68,15 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={styles.request}>{tabbar.request}</Text>
+          <Text style={[styles.topbar, { color: color }]}>
+            {tabbar.request}
+          </Text>
         </View>
-        <LocalIcon
+        {/* <LocalIcon
           name="contact_request_hint"
           size={sf(16)}
           style={styles.request2}
-        />
+        /> */}
       </React.Fragment>
     );
   };
@@ -81,7 +84,7 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={[styles.contact2, { color: color }]}>
+          <Text style={[styles.topbar, { color: color }]}>
             {tabbar.contact}
           </Text>
         </View>
@@ -92,7 +95,7 @@ export default function TabBarIcon({
     return (
       <React.Fragment>
         <View style={styles.container}>
-          <Text style={[styles.group, { color: color }]}>{tabbar.group}</Text>
+          <Text style={[styles.topbar, { color: color }]}>{tabbar.group}</Text>
         </View>
       </React.Fragment>
     );
@@ -147,12 +150,7 @@ const styles = createStyleSheet({
     borderColor: 'white',
     borderWidth: 1,
   },
-  contact2: {
-    top: 5,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  group: {
+  topbar: {
     top: 5,
     fontSize: 16,
     fontWeight: '600',

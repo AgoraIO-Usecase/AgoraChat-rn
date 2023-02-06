@@ -639,6 +639,7 @@ export default function ContactListScreen({
     navigation.setOptions({
       headerRight: NavigationHeaderRight,
       headerTitle: NavigationHeaderTitle(type),
+      headerShadowVisible: false,
     });
   }, [navigation, type]);
 
