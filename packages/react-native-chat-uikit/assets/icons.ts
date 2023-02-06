@@ -829,6 +829,15 @@ export const ICON_ASSETS = {
       return require('./icons/FooterTypeBar/icon_emoji_disable.png');
     }
   },
+  'Chats': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/Chats_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/Chats_2x.png');
+    } else {
+      return require('./icons/Global/Chats.png');
+    }
+  },
   'badge': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/badge_3x.png');

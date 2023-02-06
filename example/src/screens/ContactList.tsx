@@ -220,6 +220,17 @@ const Item: EqualHeightListItemComponent = (props) => {
   );
 };
 
+const NavigationHeaderTitle = (type: Undefinable<ContactActionType>) => {
+  switch (type) {
+    case 'group_member_modify':
+      return 'Members';
+    case 'block_contact':
+      return 'Blocked Lists';
+    default:
+      return undefined;
+  }
+};
+
 const NavigationHeaderRight = (_: HeaderButtonProps) => {
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute();
@@ -627,8 +638,9 @@ export default function ContactListScreen({
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: NavigationHeaderRight,
+      headerTitle: NavigationHeaderTitle(type),
     });
-  }, [navigation]);
+  }, [navigation, type]);
 
   const Header = (props: any) => {
     return (

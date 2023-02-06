@@ -1,19 +1,26 @@
 import * as React from 'react';
-import { Text } from 'react-native';
-import { createStyleSheet } from 'react-native-chat-uikit';
+import { View } from 'react-native';
+import { getScaleFactor, ICON_ASSETS, Image } from 'react-native-chat-uikit';
 
 type HeaderTitleProps = {
   name: string;
 };
 
-export default function HeaderTitle({ name }: HeaderTitleProps): JSX.Element {
-  return <Text style={styles.container}>{name}</Text>;
+export default function HeaderTitle(_: HeaderTitleProps): JSX.Element {
+  const sf = getScaleFactor();
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <Image
+        source={ICON_ASSETS['Chats']('2x')}
+        resizeMode="cover"
+        style={{ height: sf(16.3), width: sf(60.65) }}
+        onLoad={(_) => {
+          // console.log('test:getDefaultAvatar:', e);
+        }}
+        onError={(e) => {
+          console.warn('test:HeaderTitle:', e);
+        }}
+      />
+    </View>
+  );
 }
-
-const styles = createStyleSheet({
-  container: {
-    color: 'rgba(0, 95, 255, 1)',
-    fontSize: 22,
-    fontWeight: '900',
-  },
-});

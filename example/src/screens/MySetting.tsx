@@ -100,12 +100,6 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     [toast]
   );
 
-  // React.useEffect(() => {
-  //   navigation.getParent()?.setOptions({
-  //     headerRight: undefined,
-  //   });
-  // }, [navigation]);
-
   return (
     <SafeAreaView
       mode="padding"
