@@ -12,7 +12,6 @@ import {
   useAlert,
   useBottomSheet,
   usePrompt,
-  useThemeContext,
   useToastContext,
 } from 'react-native-chat-uikit';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -20,6 +19,7 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabScreenParamsList,
   RootScreenParamsList,
@@ -36,7 +36,6 @@ type Props = CompositeScreenProps<
 
 export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
-  const theme = useThemeContext();
   const toast = useToastContext();
   const alert = useAlert();
   const sheet = useBottomSheet();
@@ -116,7 +115,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left']}
     >
       <ScrollView bounces={bounces}>

@@ -11,7 +11,6 @@ import {
   EqualHeightListRef,
   getScaleFactor,
   SearchBar,
-  useThemeContext,
   useToastContext,
 } from 'react-native-chat-uikit';
 import { Text } from 'react-native-paper';
@@ -21,6 +20,7 @@ import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 import type { SearchActionType, Undefinable } from '../types';
 
@@ -115,7 +115,7 @@ export default function SearchScreen({
   const params = rp?.params as any;
   const type = params?.type as Undefinable<SearchActionType>;
   console.log('test:SearchScreen:', params, type);
-  const theme = useThemeContext();
+  // const theme = useThemeContext();
   const sf = getScaleFactor();
   // const menu = useActionMenu();
   // const sheet = useBottomSheet();
@@ -215,7 +215,7 @@ export default function SearchScreen({
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['top', 'right', 'left']}
     >
       <View style={styles.container}>

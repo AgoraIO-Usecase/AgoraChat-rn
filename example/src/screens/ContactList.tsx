@@ -52,6 +52,7 @@ import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabParamsList,
   BottomTabScreenParamsList,
@@ -653,7 +654,7 @@ export default function ContactListScreen({
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left']}
     >
       <ListSearchHeader

@@ -21,6 +21,7 @@ import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootParamsList } from '../routes';
 
 type Props = MaterialTopTabScreenProps<RootParamsList>;
@@ -160,7 +161,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left']}
     >
       {isEmpty ? (

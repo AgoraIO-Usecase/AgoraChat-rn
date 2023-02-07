@@ -19,11 +19,11 @@ import {
   ListHeaderProps,
   queueTask,
   SearchBar,
-  useThemeContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DefaultAvatar } from '../components/DefaultAvatars';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import { COUNTRY } from './const';
 
 export default function TestList2() {
@@ -149,7 +149,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 let count = 0;
 export function ContactListScreen(_: Props): JSX.Element {
   // console.log('test:ContactListScreen:', route, navigation);
-  const theme = useThemeContext();
+  // const theme = useThemeContext();
   // const { search } = useAppI18nContext();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
@@ -472,7 +472,7 @@ export function ContactListScreen(_: Props): JSX.Element {
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left', 'bottom']}
     >
       {/* {RenderSearchHeader()} */}

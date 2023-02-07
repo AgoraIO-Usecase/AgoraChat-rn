@@ -30,6 +30,7 @@ import HomeHeaderTitle from '../components/HomeHeaderTitle';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabScreenParamsList,
   RootScreenParamsList,
@@ -311,7 +312,7 @@ export default function ConversationListScreen({
   return (
     <SafeAreaView
       mode="padding"
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={useStyleSheet().safe}
       edges={['right', 'left']}
     >
       {isEmpty ? (
