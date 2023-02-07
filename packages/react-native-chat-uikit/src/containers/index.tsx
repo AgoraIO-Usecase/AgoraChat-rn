@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Text } from 'react-native';
+import { ChatOptions } from 'react-native-chat-sdk';
+import { once } from 'react-native-chat-uikit';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
@@ -93,6 +95,24 @@ export function Container({
   if (services?.storage === undefined) {
     throw new Error('storage is undefined.');
   }
+
+  const init = once(() => {
+    sdk.client
+      .init(
+        new ChatOptions({
+          autoLogin: option.autoLogin,
+          appKey: option.appKey,
+        })
+      )
+      .then(() => {
+        console.log('test:sdk:init:success');
+      })
+      .catch((error) => {
+        throw new Error('chat sdk init failed.', error);
+      });
+  });
+
+  init();
 
   return (
     <SafeAreaProvider>

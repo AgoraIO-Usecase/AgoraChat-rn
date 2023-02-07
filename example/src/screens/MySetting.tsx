@@ -11,6 +11,7 @@ import {
   Services,
   useAlert,
   useBottomSheet,
+  useChatSdkContext,
   usePrompt,
   useToastContext,
 } from 'react-native-chat-uikit';
@@ -34,6 +35,32 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootScreenParamsListOnly>
 >;
 
+const Intervallum = ({ content }: { content: string }) => {
+  const sf = getScaleFactor();
+  return (
+    <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        height: sf(32),
+        backgroundColor: '#FAFAFA',
+      }}
+    >
+      <Text
+        style={{
+          paddingLeft: sf(20),
+          fontSize: sf(12),
+          fontWeight: '400',
+          lineHeight: sf(18),
+          color: 'rgba(153, 153, 153, 1)',
+        }}
+      >
+        {content}
+      </Text>
+    </View>
+  );
+};
+
 export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
   const toast = useToastContext();
@@ -50,32 +77,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const sdkVersion = 'AgoraChat v1.0.0';
   const uiVersion = 'AgoraChat v1.0.0';
   const urlName = 'agora.io';
-  // console.log('test:MySettingScreen:', ms);
-
-  const Intervallum = ({ content }: { content: string }) => {
-    return (
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          height: sf(32),
-          backgroundColor: '#FAFAFA',
-        }}
-      >
-        <Text
-          style={{
-            paddingLeft: sf(20),
-            fontSize: sf(12),
-            fontWeight: '400',
-            lineHeight: sf(18),
-            color: 'rgba(153, 153, 153, 1)',
-          }}
-        >
-          {content}
-        </Text>
-      </View>
-    );
-  };
+  const { client } = useChatSdkContext();
 
   const D = () => (
     <Divider
@@ -111,6 +113,18 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     });
     return unsubscribe;
   }, [navigation]);
+
+  const _logout = () => {
+    client
+      .logout()
+      .then(() => {
+        console.log('test:logout:success');
+        navigation.navigate('SignIn', {});
+      })
+      .catch((error) => {
+        console.log('test:error:', error);
+      });
+  };
 
   return (
     <SafeAreaView
@@ -257,7 +271,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
                   {
                     text: 'Confirm',
                     onPress: () => {
-                      navigation.navigate('SignIn', {});
+                      _logout();
                     },
                   },
                 ],

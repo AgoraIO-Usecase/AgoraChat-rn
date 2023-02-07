@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   GestureResponderEvent,
+  LayoutChangeEvent,
   Pressable,
   StyleProp,
   Text,
@@ -26,6 +27,7 @@ type ButtonProps = React.PropsWithChildren<{
   font?: StyleProp<TextStyle> | undefined;
   onPressIn?: ((event: GestureResponderEvent) => void) | null | undefined;
   onPressOut?: ((event: GestureResponderEvent) => void) | null | undefined;
+  onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
 }>;
 export default function Button({
   icon,
@@ -38,6 +40,7 @@ export default function Button({
   children,
   onPressIn,
   onPressOut,
+  onLayout,
 }: ButtonProps): JSX.Element {
   const { colors, fonts } = useThemeContext();
   const sf = getScaleFactor();
@@ -63,6 +66,7 @@ export default function Button({
 
   return (
     <Pressable
+      onLayout={onLayout}
       disabled={disabled}
       onPress={onPress}
       onPressIn={onPressIn}

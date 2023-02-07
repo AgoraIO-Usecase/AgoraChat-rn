@@ -42,20 +42,24 @@ export default function LoadingButton({
     iconSize = (iconStyle as ImageStyle).height as number;
   }
   return (
-    <View
-      onLayout={(event) => {
-        setHeight(event.nativeEvent.layout.height);
-        setWidth(event.nativeEvent.layout.width);
-      }}
-    >
+    <View>
       <Button
+        onLayout={(event) => {
+          setHeight(sf(event.nativeEvent.layout.height));
+          setWidth(sf(event.nativeEvent.layout.width));
+        }}
         style={style}
         disabled={state === 'loading' ? true : disabled}
         onPress={() => {
           onChangeState?.(state);
-          state = state === 'loading' ? 'stop' : 'loading';
         }}
-        color={{ ...color, disabled: colors.button.enabled }}
+        color={{
+          ...color,
+          disabled:
+            state === 'loading'
+              ? colors.button.enabled
+              : colors.button.disabled,
+        }}
         font={font}
         children={state === 'loading' ? '' : content}
       />

@@ -12,7 +12,8 @@ const pak = JSON.parse(
 const file = path.join(project_root, 'src', 'env.ts');
 console.log(`📝 Generate the ${pak.name}@${pak.version} env file: ${file}`);
 const content = `export const test = true;
-const appKey = '';
-export default appKey;
+export const appKey = '';
+export const id = '';
+export const ps = '';
 `;
 fs.writeFileSync(file, content, 'utf-8');

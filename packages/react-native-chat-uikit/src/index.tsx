@@ -77,6 +77,7 @@ export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';
 export { ContainerProps, Container as UIKitContainer } from './containers';
 export * from './contexts';
+export * from './fragments';
 export { useAsyncTask, useDeferredValue, useUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
@@ -118,6 +119,8 @@ export {
   arraySort,
   asyncTask,
   callbackToAsync,
+  once,
+  onceEx,
   queueTask,
   versionToArray,
   wait,

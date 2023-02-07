@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import {
   autoFocus,
-  Button,
   createStyleSheet,
   getScaleFactor,
+  LoadingButton,
   LocalIcon,
   TextInput,
+  useChatSdkContext,
   useHeaderContext,
+  useToastContext,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,15 +27,31 @@ import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
+let gid: string = '';
+let gps: string = '';
+
+try {
+  const env = require('../env');
+  gid = env.id;
+  gps = env.ps;
+} catch (error) {
+  console.log('test:error', error);
+}
+
 export default function SignInScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
   const enableKeyboardAvoid = true;
   const { defaultStatusBarTranslucent: statusBarTranslucent } =
     useHeaderContext();
   const { login } = useAppI18nContext();
-  const [id, setId] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [id, setId] = React.useState(gid);
+  const [password, setPassword] = React.useState(gps);
   const [disabled, setDisabled] = React.useState(true);
+  const toast = useToastContext();
+  const [buttonState, setButtonState] = React.useState<'loading' | 'stop'>(
+    'stop'
+  );
+  const { client } = useChatSdkContext();
 
   React.useEffect(() => {
     if (id.length > 0 && password.length > 0) {
@@ -41,7 +59,26 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
     } else {
       setDisabled(true);
     }
-  }, [id.length, password.length]);
+  }, [id, password]);
+
+  const _manualLogin = (state: 'loading' | 'stop') => {
+    if (state === 'loading') {
+      return;
+    }
+    setButtonState('loading');
+    client
+      .login(id, password)
+      .then(() => {
+        console.log('test:login:success');
+        setButtonState('stop');
+        navigation.push('Home', { params: undefined });
+      })
+      .catch((error) => {
+        console.log('test:login:fail:', error);
+        setButtonState('stop');
+        toast.showToast('Login Failed');
+      });
+  };
 
   return (
     <SafeAreaView
@@ -83,6 +120,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               clearButtonMode="while-editing"
               onChangeText={(text) => setId(text)}
               style={styles.item}
+              value={id}
             />
             <View style={{ height: sf(18) }} />
             <TextInput
@@ -94,17 +132,19 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               secureTextEntry
               onChangeText={(text) => setPassword(text)}
               style={styles.item}
+              value={password}
             />
             <View style={{ height: sf(18) }} />
-            <Button
+            <LoadingButton
               disabled={disabled}
+              content={login.button}
               style={styles.button}
-              onPress={() => {
-                navigation.push('Home', { params: undefined });
+              state={buttonState}
+              onChangeState={(state) => {
+                console.log('test:state:', state);
+                _manualLogin(state);
               }}
-            >
-              {login.button}
-            </Button>
+            />
             <View style={styles.tr}>
               <Text style={styles.tip}>{login.tip}</Text>
               <Text

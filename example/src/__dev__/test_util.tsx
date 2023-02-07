@@ -4,6 +4,8 @@ import {
   createStringSetEn,
   createStringSetFEn,
   messageTimestamp,
+  once,
+  onceEx,
   seqId,
   timestamp,
   truncateContent,
@@ -31,6 +33,27 @@ function test1(): void {
     // }
     return r;
   });
+}
+
+let count1 = 0;
+const o = once(function (c: number) {
+  console.log('test:once:', c);
+}, ++count1);
+const o3 = onceEx((c: number) => {
+  console.log('test:once:', c);
+});
+let count2 = 0;
+const o2 = (c: number) => {
+  console.log('test:once:', c);
+};
+function test2(): void {
+  o();
+}
+function test3(): void {
+  o2(++count2);
+}
+function test4(): void {
+  o3(++count1);
 }
 
 export default function TestUtil() {
@@ -144,6 +167,39 @@ export default function TestUtil() {
           }}
         >
           test1
+        </Button>
+      </View>
+      <View>
+        <Button
+          mode="text"
+          uppercase={false}
+          onPress={() => {
+            test2();
+          }}
+        >
+          test_once
+        </Button>
+      </View>
+      <View>
+        <Button
+          mode="text"
+          uppercase={false}
+          onPress={() => {
+            test3();
+          }}
+        >
+          test_once
+        </Button>
+      </View>
+      <View>
+        <Button
+          mode="text"
+          uppercase={false}
+          onPress={() => {
+            test4();
+          }}
+        >
+          test_once
         </Button>
       </View>
     </View>

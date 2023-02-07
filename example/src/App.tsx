@@ -56,10 +56,12 @@ const Root = createNativeStackNavigator<RootParamsList>();
 
 const __KEY__ = '__KEY__';
 let __TEST__ = true;
+let appKey = '';
 
 try {
   const env = require('./env');
   __TEST__ = env.test ?? false;
+  appKey = env.appKey;
 } catch (e) {
   console.warn('test:', e);
 }
@@ -136,7 +138,7 @@ export default function App() {
   return (
     <React.StrictMode>
       <UIKitContainer
-        option={{ appKey: '', autoLogin: false }}
+        option={{ appKey: appKey, autoLogin: false }}
         theme={isLightTheme ? LightTheme : DarkTheme}
         localization={createStringSetEn2(new AppStringSet())}
         sdk={
