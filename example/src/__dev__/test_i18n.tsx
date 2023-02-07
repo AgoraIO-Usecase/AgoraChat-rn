@@ -5,30 +5,28 @@ import { View } from 'react-native';
 import {
   createStringSetEn2,
   createStringSetFEn2,
-  messageTimestamp,
-  StringSetContextType,
   UIKitStringSet2,
 } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
-class s implements StringSetContextType {
-  xxx: { yyy: string; zzz: (a: Date) => string; sss: string };
-  ttt: { yyy: string };
-  uuu: { sss: string };
-  constructor(locate: Locale) {
-    this.xxx = {
-      yyy: 'zs',
-      zzz: (a) => messageTimestamp(a, locate),
-      sss: 'hh',
-    };
-    this.ttt = {
-      yyy: 'ls',
-    };
-    this.uuu = {
-      sss: 'll',
-    };
-  }
-}
+// class s implements StringSetContextType {
+//   xxx: { yyy: string; zzz: (a: Date) => string; sss: string };
+//   ttt: { yyy: string };
+//   uuu: { sss: string };
+//   constructor(locate: Locale) {
+//     this.xxx = {
+//       yyy: 'zs',
+//       zzz: (a) => messageTimestamp(a, locate),
+//       sss: 'hh',
+//     };
+//     this.ttt = {
+//       yyy: 'ls',
+//     };
+//     this.uuu = {
+//       sss: 'll',
+//     };
+//   }
+// }
 class s2 extends UIKitStringSet2 {
   uuu: { sss: string };
   constructor(locate: Locale) {
@@ -58,7 +56,7 @@ export default function TestI18n() {
           createStringSetFEn
         </Button>
       </View>
-      <View>
+      {/* <View>
         <Button
           mode="text"
           uppercase={false}
@@ -71,7 +69,7 @@ export default function TestI18n() {
         >
           createStringSetFEn2
         </Button>
-      </View>
+      </View> */}
       <View>
         <Button
           mode="text"
