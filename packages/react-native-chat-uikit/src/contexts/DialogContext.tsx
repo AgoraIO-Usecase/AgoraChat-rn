@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 
 import ActionMenu from '../components/ActionMenu';
 import Alert from '../components/Alert';
@@ -70,6 +70,12 @@ export const DialogContextProvider = ({
   const taskQueue = React.useRef<DialogTask[]>([]);
   const workingTask = React.useRef<DialogTask>();
   const visibleState = React.useRef(false);
+
+  const AUTO_FOCUS = Platform.select({
+    ios: false,
+    android: true,
+    default: false,
+  });
 
   const isWorking = () => Boolean(workingTask.current);
 
@@ -188,6 +194,7 @@ export const DialogContextProvider = ({
                     workingTask.current.props.placeholder ??
                     defaultLabels?.prompt?.placeholder
                   }
+                  autoFocus={AUTO_FOCUS}
                 />
               )}
               {workingTask.current?.type === 'BottomSheet' && (

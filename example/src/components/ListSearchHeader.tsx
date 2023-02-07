@@ -14,7 +14,7 @@ export const ListSearchHeader = (props: ListSearchHeaderProps) => {
   const [searchValue, setSearchValue] = React.useState('');
   const enableCancel = false;
   const enableClear = true;
-  const autoFocus = props.autoFocus;
+  const { autoFocus } = props;
   return (
     <View style={styles.container}>
       <SearchBar

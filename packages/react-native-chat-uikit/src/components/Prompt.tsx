@@ -36,7 +36,7 @@ export default function Prompt({
   onDismiss,
   visible,
   onHide,
-  autoFocus = true,
+  autoFocus,
   title,
   defaultValue = '',
   placeholder = 'Enter',
@@ -102,7 +102,7 @@ export default function Prompt({
 
         <View style={styles.inputContainer}>
           <TextInput
-            autoFocus={autoFocus && Platform.OS === 'android'}
+            autoFocus={autoFocus}
             ref={inputRef}
             placeholder={placeholder}
             value={text}

@@ -2,6 +2,7 @@ import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-t
 import * as React from 'react';
 import { View } from 'react-native';
 import {
+  autoFocus,
   createStyleSheet,
   EqualHeightList,
   EqualHeightListItemComponent,
@@ -57,7 +58,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
   const enableRefresh = true;
   const enableAlphabet = false;
   const enableHeader = true;
-  const autoFocus = false;
+  // const autoFocus = false;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -125,7 +126,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
       edges={['right', 'left']}
     >
       <ListSearchHeader
-        autoFocus={autoFocus}
+        autoFocus={autoFocus()}
         onChangeText={(text) => {
           console.log('test:ListSearchHeader:onChangeText:', Text);
           queueTask(() => {

@@ -26,6 +26,7 @@ import {
   View,
 } from 'react-native';
 import {
+  autoFocus,
   Button,
   CheckButton,
   createStyleSheet,
@@ -468,7 +469,7 @@ export default function ContactListScreen({
   const enableRefresh = true;
   const enableAlphabet = true;
   const enableHeader = false;
-  const autoFocus = false;
+  // const autoFocus = false;
   const data: ItemDataType[] = [];
 
   const action = React.useCallback(
@@ -656,7 +657,7 @@ export default function ContactListScreen({
       edges={['right', 'left']}
     >
       <ListSearchHeader
-        autoFocus={autoFocus}
+        autoFocus={autoFocus()}
         onChangeText={(text) => {
           queueTask(() => {
             const r: ItemDataType[] = [];

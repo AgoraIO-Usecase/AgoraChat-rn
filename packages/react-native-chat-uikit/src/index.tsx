@@ -123,6 +123,7 @@ export {
   wait,
 } from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
+export { autoFocus } from './utils/platform';
 
 // declare module 'example/src/common' {
 //   import type DevDebugInternal from './example/src/common/screens/DevDebug';

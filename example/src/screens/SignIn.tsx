@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {
+  autoFocus,
   Button,
   createStyleSheet,
   getScaleFactor,
@@ -26,11 +27,6 @@ type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function SignInScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
-  const AUTO_FOCUS = Platform.select({
-    ios: false,
-    android: true,
-    default: false,
-  });
   const enableKeyboardAvoid = true;
   const { defaultStatusBarTranslucent: statusBarTranslucent } =
     useHeaderContext();
@@ -81,7 +77,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
               />
             </View>
             <TextInput
-              autoFocus={AUTO_FOCUS}
+              autoFocus={autoFocus()}
               multiline={false}
               placeholder={login.id}
               clearButtonMode="while-editing"
@@ -90,7 +86,7 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
             />
             <View style={{ height: sf(18) }} />
             <TextInput
-              autoFocus={AUTO_FOCUS}
+              autoFocus={autoFocus()}
               multiline={false}
               placeholder={login.pass}
               textContentType="password"

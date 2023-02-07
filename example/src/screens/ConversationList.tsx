@@ -7,6 +7,7 @@ import type {
 import * as React from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 import {
+  autoFocus,
   Badge as UIBadge,
   Blank,
   createStyleSheet,
@@ -165,7 +166,7 @@ export default function ConversationListScreen({
   const enableRefresh = true;
   const enableAlphabet = false;
   const enableHeader = true;
-  const autoFocus = false;
+  // const autoFocus = false;
   const data: ItemDataType[] = [];
   const width = sf(100);
   const isEmpty = false;
@@ -318,7 +319,7 @@ export default function ConversationListScreen({
       ) : (
         <React.Fragment>
           <ListSearchHeader
-            autoFocus={autoFocus}
+            autoFocus={autoFocus()}
             onChangeText={(text) => {
               console.log('test:ListSearchHeader:onChangeText:', Text);
               queueTask(() => {

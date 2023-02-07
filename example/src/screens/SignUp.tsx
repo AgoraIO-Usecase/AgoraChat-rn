@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {
+  autoFocus,
   Button,
   createStyleSheet,
   defaultScaleFactor as scaleFactor,
@@ -27,11 +28,6 @@ type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 export default function SignUpScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
-  const AUTO_FOCUS = Platform.select({
-    ios: false,
-    android: true,
-    default: false,
-  });
   const enableKeyboardAvoid = true;
   const { register, login } = useAppI18nContext();
   const { openAlert } = useAlert();
@@ -85,7 +81,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
               <Text style={styles.comment}>{tip}</Text>
             </View>
             <TextInput
-              autoFocus={AUTO_FOCUS}
+              autoFocus={autoFocus()}
               multiline={false}
               placeholder={register.id}
               clearButtonMode="while-editing"
@@ -94,7 +90,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
             />
             <View style={{ height: sf(18) }} />
             <TextInput
-              autoFocus={AUTO_FOCUS}
+              autoFocus={autoFocus()}
               multiline={false}
               placeholder={register.pass}
               textContentType="password"
@@ -105,7 +101,7 @@ export default function SignUpScreen({ navigation }: Props): JSX.Element {
             />
             <View style={{ height: sf(18) }} />
             <TextInput
-              autoFocus={AUTO_FOCUS}
+              autoFocus={autoFocus()}
               multiline={false}
               placeholder={register.confirm}
               textContentType="password"

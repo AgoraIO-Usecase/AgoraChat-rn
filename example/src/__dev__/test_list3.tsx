@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {
+  autoFocus,
   Button,
   createStyleSheet,
   EqualHeightList,
@@ -162,7 +163,7 @@ export function ContactListScreen(_: Props): JSX.Element {
   // const enableCancel = false;
   // const enableClear = true;
   const enableKeyboardAvoid = true;
-  const autoFocus = true;
+  // const autoFocus = true;
   const data: ItemDataType[] = [];
   const r = COUNTRY.map((value) => {
     const i = value.lastIndexOf(' ');
@@ -350,7 +351,7 @@ export function ContactListScreen(_: Props): JSX.Element {
     const enableClear = true;
     // const enableKeyboardAvoid = true;
     // const autoFocus = true;
-    const autoFocus = props.autoFocus;
+    // const autoFocus = props.autoFocus;
     return (
       <View
         style={{
@@ -364,7 +365,7 @@ export function ContactListScreen(_: Props): JSX.Element {
       >
         <SearchBar
           ref={searchRef}
-          autoFocus={autoFocus}
+          autoFocus={autoFocus()}
           enableCancel={enableCancel}
           enableClear={enableClear}
           placeholder="{search.placeholder3}"
@@ -517,7 +518,7 @@ export function ContactListScreen(_: Props): JSX.Element {
           // Header={SearchHeader2} //ok
           Header={(props: ListHeaderProps) => (
             <SearchHeader3
-              autoFocus={autoFocus}
+              autoFocus={autoFocus()}
               onChangeText={(text) => {
                 console.log('test:SearchHeader3:onChangeText:', Text);
                 queueTask(() => {
