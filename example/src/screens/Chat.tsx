@@ -86,7 +86,7 @@ const FaceList = React.memo(
 );
 
 let count = 0;
-export default function ChatScreen(_: Props): JSX.Element {
+export default function ChatScreen({ navigation }: Props): JSX.Element {
   console.log('test:ChatScreen:');
   const sf = getScaleFactor();
   const theme = useThemeContext();
@@ -147,6 +147,12 @@ export default function ChatScreen(_: Props): JSX.Element {
       subscription3.remove();
     };
   }, [content]);
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: 'xxx',
+    });
+  }, [navigation]);
 
   const _calculateInputWidth = (width: number, isInput: boolean) => {
     return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));

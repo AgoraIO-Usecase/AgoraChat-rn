@@ -639,15 +639,7 @@ export const EqualHeightList: (
               onFocus={(e) => {
                 e.preventDefault();
               }}
-              style={[
-                {
-                  flex: 1,
-                  width: 18,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: 'white',
-                },
-              ]}
+              style={[styles.alphabetPressable]}
             >
               {AZ.split('').map((char) => {
                 return (
@@ -740,6 +732,13 @@ const styles = createStyleSheet({
     borderRadius: 9,
     overflow: 'hidden',
     backgroundColor: 'red',
+  },
+  alphabetPressable: {
+    flex: 1,
+    width: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
   },
   char: {
     flex: 1,
