@@ -30,15 +30,12 @@ type ItemDataType = EqualHeightListItemData & {
   ch: string;
 };
 
-const DefaultAvatarMemo = React.memo(() => {
-  return <DefaultAvatar size={50} radius={25} />;
-});
-
 const Item: EqualHeightListItemComponent = (props) => {
+  const sf = getScaleFactor();
   const item = props.data as ItemDataType;
   return (
     <View style={styles.item}>
-      <DefaultAvatarMemo />
+      <DefaultAvatar size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         <Text>{item.en}</Text>
         <Text>{item.ch}</Text>

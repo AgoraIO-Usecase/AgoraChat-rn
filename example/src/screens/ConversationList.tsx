@@ -64,13 +64,8 @@ type ItemDataType = EqualHeightListItemData & {
   timestamp: number;
 };
 
-const sf = getScaleFactor();
-
-const DefaultAvatarMemo = React.memo(() => {
-  return <DefaultAvatar size={sf(50)} radius={sf(25)} />;
-});
-
 const Item: EqualHeightListItemComponent = (props) => {
+  const sf = getScaleFactor();
   const item = props.data as ItemDataType;
   const { width } = useWindowDimensions();
   const extraWidth = item.sideslip?.width ?? sf(100);
@@ -86,7 +81,7 @@ const Item: EqualHeightListItemComponent = (props) => {
           flexDirection: 'row',
         }}
       >
-        <DefaultAvatarMemo />
+        <DefaultAvatar size={sf(50)} radius={sf(25)} />
         <View style={[styles.itemText, { justifyContent: 'space-between' }]}>
           <Text>{item.en}</Text>
           <Text>{item.ch}</Text>
