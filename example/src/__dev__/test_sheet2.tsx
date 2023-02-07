@@ -38,7 +38,7 @@ export default function TestSheet() {
                       <Button
                         onPress={() => {
                           manualClose();
-                          // DeviceEventEmitter.emit('closeDialog');
+                          // DeviceEventEmitter.emit(CustomEvents.closeDialog.key);
                         }}
                       >
                         click me

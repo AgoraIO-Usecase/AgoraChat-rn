@@ -19,6 +19,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import { CustomEvents } from '../events';
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
 import { timestamp } from '../utils/generator';
@@ -111,7 +112,7 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
 
   React.useEffect(() => {
     const subscription = DeviceEventEmitter.addListener(
-      'closeEditable',
+      CustomEvents.closeEditable.key,
       (_) => {
         _closeEditable();
       }
@@ -617,7 +618,7 @@ export const EqualHeightList: (
         // keyboardDismissMode={'none'}
         // stickyHeaderIndices={[0]}
         onScrollBeginDrag={(_) => {
-          DeviceEventEmitter.emit('closeEditable', {});
+          DeviceEventEmitter.emit(CustomEvents.closeEditable.key, {});
         }}
         {...others}
       />

@@ -5,6 +5,7 @@ import ActionMenu from '../components/ActionMenu';
 import Alert from '../components/Alert';
 import BottomSheet from '../components/BottomSheet';
 import Prompt from '../components/Prompt';
+import { CustomEvents } from '../events';
 import { useUpdate } from '../hooks';
 import type { DialogPropsT, DialogTask } from '../types';
 import type { DialogContextType } from './types';
@@ -138,7 +139,7 @@ export const DialogContextProvider = ({
 
   React.useEffect(() => {
     const subscription = DeviceEventEmitter.addListener(
-      'closeDialog',
+      CustomEvents.closeDialog.key,
       async (_) => manualClose()
     );
     return () => subscription.remove();
