@@ -19,6 +19,7 @@ import { ChatClient } from 'react-native-chat-sdk';
 import {
   createStringSetEn2,
   DarkTheme,
+  getScaleFactor,
   LightTheme,
   Loading,
   Services,
@@ -80,6 +81,7 @@ export default function App() {
 
   const [isReady, setIsReady] = React.useState(__DEV__ ? false : true);
   const [initialState, setInitialState] = React.useState();
+  const sf = getScaleFactor();
 
   React.useEffect(() => {
     const restoreState = async () => {
@@ -146,8 +148,8 @@ export default function App() {
         header={{
           defaultTitleAlign: 'center',
           defaultStatusBarTranslucent: true,
-          defaultHeight: 44,
-          defaultTopInset: 44,
+          defaultHeight: sf(44),
+          defaultTopInset: sf(44),
         }}
         services={{
           clipboard: Services.createClipboardService({
@@ -198,7 +200,7 @@ export default function App() {
                   flex: 1,
                 }}
               >
-                <Loading color="rgba(15, 70, 230, 1)" size={45} />
+                <Loading color="rgba(15, 70, 230, 1)" size={sf(45)} />
               </View>
             }
           >
