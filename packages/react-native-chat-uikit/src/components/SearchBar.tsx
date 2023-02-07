@@ -73,7 +73,7 @@ function SearchBar(
   const [hasFocus, setHasFocus] = React.useState(false);
   const [cancelButtonWidth, setCancelButtonWidth] = React.useState(0);
   const [isEmpty, setIsEmpty] = React.useState(
-    value?.length === 0 ? true : false
+    value === undefined || value.length === 0 ? true : false
   );
 
   const _onFocus = (e: any) => {
@@ -113,6 +113,10 @@ function SearchBar(
     // if (onClear) asyncTask(onClear);
     // if (onClear) process.nextTick(onClear);
     // inputRef.current?.blur();
+  };
+
+  const _rightIcon = () => {
+    return enableClear && isEmpty === false ? 'deleteSearch' : undefined;
   };
 
   return (
@@ -160,9 +164,7 @@ function SearchBar(
           styles.leftIconContainerStyle,
           searchIconStyle,
         ])}
-        rightIconName={
-          enableClear && isEmpty === false ? 'deleteSearch' : undefined
-        }
+        rightIconName={_rightIcon()}
         rightIconContainerStyle={StyleSheet.flatten([
           styles.rightIconContainerStyle,
           clearIconStyle,

@@ -21,12 +21,12 @@ export default function ContactScreen({
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('test:HomeScreen:333:');
       navigation.getParent()?.setOptions({
         headerBackVisible: false,
         headerRight: undefined,
         headerTitle: () => <HomeHeaderTitle name="Contacts" />,
         headerShadowVisible: false,
+        headerBackTitleVisible: false,
       });
     });
     return unsubscribe;

@@ -216,7 +216,7 @@ export default function SearchScreen({
     <SafeAreaView
       mode="padding"
       style={{ flex: 1, backgroundColor: theme.colors.background }}
-      edges={['right', 'left']}
+      edges={['top', 'right', 'left']}
     >
       <View style={styles.container}>
         <SearchBar
@@ -224,7 +224,12 @@ export default function SearchScreen({
           enableCancel={enableCancel}
           enableClear={enableClear}
           inputContainerStyle={styles.inputContainer}
-          cancel={{ buttonName: 'cancel' }}
+          cancel={{
+            buttonName: 'cancel',
+            onCancel: () => {
+              navigation.goBack();
+            },
+          }}
           onChangeText={(text) => {
             setEnableValue(false);
             setValue(text);

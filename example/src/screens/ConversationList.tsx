@@ -296,12 +296,12 @@ export default function ConversationListScreen({
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('test:HomeScreen:222:');
       navigation.getParent()?.setOptions({
         headerBackVisible: false,
         headerRight: NavigationHeaderRight,
         headerTitle: () => <HomeHeaderTitle name="Chats" />,
         headerShadowVisible: false,
+        headerBackTitleVisible: false,
       });
     });
     return unsubscribe;

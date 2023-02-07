@@ -38,10 +38,10 @@ import moji from 'twemoji';
 import MessageBubbleList, {
   MessageListRef,
   TextMessageItemType,
-} from '../../components/MessageBubbleList';
-import { useAppI18nContext } from '../../contexts/AppI18nContext';
-import { useStyleSheet } from '../../hooks/useStyleSheet';
-import type { RootScreenParamsList } from '../../routes';
+} from '../components/MessageBubbleList';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
+import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
@@ -52,7 +52,6 @@ type FaceListProps = {
 
 const FaceList = React.memo(
   (props: FaceListProps) => {
-    console.log('test:111:');
     const { height } = props;
     const sf = getScaleFactor();
     const arr = FACE_ASSETS;

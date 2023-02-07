@@ -15,9 +15,9 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAppI18nContext } from '../../contexts/AppI18nContext';
-import { useStyleSheet } from '../../hooks/useStyleSheet';
-import type { RootScreenParamsList } from '../../routes';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
+import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 

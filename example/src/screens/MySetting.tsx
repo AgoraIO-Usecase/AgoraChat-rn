@@ -102,12 +102,12 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('test:HomeScreen:444:');
       navigation.getParent()?.setOptions({
         headerBackVisible: false,
         headerRight: undefined,
         headerTitle: () => <Text />,
         headerShadowVisible: false,
+        headerBackTitleVisible: false,
       });
     });
     return unsubscribe;

@@ -415,7 +415,6 @@ const NavigationHeaderRight = (_: HeaderButtonProps) => {
     <Pressable
       onPress={() => {
         if (type === 'group_member') {
-          console.log('test:111:');
           navigation.push('ContactList' as any, {
             params: { type: 'group_member_modify' },
           });
@@ -646,6 +645,7 @@ export default function ContactListScreen({
       headerRight: NavigationHeaderRight,
       headerTitle: NavigationHeaderTitle(type),
       headerShadowVisible: false,
+      headerBackTitleVisible: false,
     });
   }, [navigation, type]);
 

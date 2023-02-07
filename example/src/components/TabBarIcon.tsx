@@ -26,7 +26,6 @@ export default function TabBarIcon({
   color,
   type,
 }: TabBarIconProps): JSX.Element {
-  console.log('test:color:', color, type, focused);
   const { tabbar } = useAppI18nContext();
   const sf = getScaleFactor();
   // console.log('test:TabBarIcon:', focused, type);

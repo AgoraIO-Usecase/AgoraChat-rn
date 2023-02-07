@@ -111,7 +111,8 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
       },
       onPress: (data) => {
         console.log('test:onPress:data:', data);
-        navigation.navigate({ name: 'GroupInfo', params: {} });
+        navigation.navigate('GroupInfo', { params: {} });
+        // navigation.navigate({ name: 'GroupInfo', params: {} });
       },
     } as ItemDataType;
   });

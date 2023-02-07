@@ -12,9 +12,9 @@ import {
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAppI18nContext } from '../../contexts/AppI18nContext';
-import { useStyleSheet } from '../../hooks/useStyleSheet';
-import type { RootScreenParamsList } from '../../routes';
+import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useStyleSheet } from '../hooks/useStyleSheet';
+import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
@@ -28,19 +28,6 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
   const alert = useAlert();
   const toast = useToastContext();
   const id = 'AgoraID: xxx';
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('test:HomeScreen:666:');
-      navigation.setOptions({
-        headerBackVisible: true,
-        headerRight: undefined,
-        headerTitle: () => <Text />,
-        headerShadowVisible: false,
-      });
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   return (
     <SafeAreaView

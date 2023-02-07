@@ -38,11 +38,11 @@ import HomeHeaderTitle from './components/HomeHeaderTitle';
 import { AppChatSdkContext } from './contexts/AppImSdkContext';
 import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList } from './routes';
-import Chat from './screens/chat/Chat';
+import Chat from './screens/Chat';
+import ContactInfo from './screens/ContactInfo';
 import ContactList from './screens/ContactList';
+import GroupInfo from './screens/GroupInfo';
 import HomeScreen from './screens/Home';
-import ContactInfo from './screens/info/ContactInfo';
-import GroupInfo from './screens/info/GroupInfo';
 import LoginScreen from './screens/Login';
 import Search from './screens/Search';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
@@ -218,13 +218,34 @@ export default function App() {
                     headerRight: HomeHeaderRight,
                     headerTitle: () => <HomeHeaderTitle name="Chats" />,
                     headerShadowVisible: false,
+                    headerBackTitleVisible: false,
                   };
                 }}
                 component={HomeScreen}
               />
               <Root.Group>
-                <Root.Screen name="ContactInfo" component={ContactInfo} />
-                <Root.Screen name="GroupInfo" component={GroupInfo} />
+                <Root.Screen
+                  name="ContactInfo"
+                  options={() => {
+                    return {
+                      headerTitle: '',
+                      headerShadowVisible: false,
+                      headerBackTitleVisible: false,
+                    };
+                  }}
+                  component={ContactInfo}
+                />
+                <Root.Screen
+                  name="GroupInfo"
+                  options={() => {
+                    return {
+                      headerTitle: '',
+                      headerShadowVisible: false,
+                      headerBackTitleVisible: false,
+                    };
+                  }}
+                  component={GroupInfo}
+                />
                 <Root.Screen
                   name="ContactList"
                   // options={({ route }) => {
@@ -237,8 +258,27 @@ export default function App() {
                   // }}
                   component={ContactList}
                 />
-                <Root.Screen name="Chat" component={Chat} />
-                <Root.Screen name="Search" component={Search} />
+                <Root.Screen
+                  name="Chat"
+                  options={() => {
+                    return {
+                      headerTitle: '',
+                      headerShadowVisible: false,
+                      headerBackTitleVisible: false,
+                    };
+                  }}
+                  component={Chat}
+                />
+                <Root.Screen
+                  name="Search"
+                  options={() => {
+                    return {
+                      headerShown: false,
+                      presentation: 'fullScreenModal',
+                    };
+                  }}
+                  component={Search}
+                />
               </Root.Group>
             </Root.Navigator>
           </NavigationContainer>
