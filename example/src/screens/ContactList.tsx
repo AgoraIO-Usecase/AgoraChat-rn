@@ -40,6 +40,7 @@ import {
   queueTask,
   useAlert,
   useBottomSheet,
+  useChatSdkContext,
   useManualCloseDialog,
   useThemeContext,
   useToastContext,
@@ -47,7 +48,7 @@ import {
 import { Switch, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { COUNTRY } from '../__dev__/const';
+// import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
@@ -100,8 +101,8 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 type ItemDataType = EqualHeightListItemData & {
-  en: string;
-  ch: string;
+  contactID: string;
+  contactName: string;
   type?: Undefinable<ContactActionType>;
   action?: {
     groupInvite?: {
@@ -211,8 +212,10 @@ const Item: EqualHeightListItemComponent = (props) => {
     <View style={styles.item}>
       <DefaultAvatar size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
-        <Text>{item.en}</Text>
-        <Text>{item.ch}</Text>
+        <Text style={{ lineHeight: 20, fontSize: 16, fontWeight: '600' }}>
+          {item.contactID}
+        </Text>
+        {/* <Text>{item.contactName}</Text> */}
       </View>
       {Right(item.type)}
     </View>
@@ -469,171 +472,195 @@ export default function ContactListScreen({
   const enableAlphabet = true;
   const enableHeader = false;
   // const autoFocus = false;
-  const data: ItemDataType[] = [];
+  const data: ItemDataType[] = React.useMemo(() => [], []);
 
-  const action = React.useCallback(
-    (type: ContactActionType | undefined, index: number) => {
-      switch (type) {
-        case 'group_invite':
-          return {
-            groupInvite: {
-              isActionEnabled: true,
-              isInvited: index % 2 === 0 ? true : false,
-              onAction: () => {
-                console.log('test:onAction:group_invite:');
+  const initData = React.useCallback(
+    (list: string[]) => {
+      const action = (type: ContactActionType | undefined, index: number) => {
+        switch (type) {
+          case 'group_invite':
+            return {
+              groupInvite: {
+                isActionEnabled: true,
+                isInvited: index % 2 === 0 ? true : false,
+                onAction: () => {
+                  console.log('test:onAction:group_invite:');
+                },
               },
-            },
-          };
-        case 'create_group':
-          return {
-            createGroup: {
-              isActionEnabled: true,
-              isInvited: index % 2 === 0 ? true : false,
-              onAction: () => {
-                console.log('test:create_group:');
+            };
+          case 'create_group':
+            return {
+              createGroup: {
+                isActionEnabled: true,
+                isInvited: index % 2 === 0 ? true : false,
+                onAction: () => {
+                  console.log('test:create_group:');
+                },
               },
-            },
-          };
-        case 'block_contact':
-          return {
-            block: {
-              name: 'Unblock',
-              onClicked: () => {
-                console.log('test:block_contact:');
+            };
+          case 'block_contact':
+            return {
+              block: {
+                name: 'Unblock',
+                onClicked: () => {
+                  console.log('test:block_contact:');
+                },
               },
-            },
-          };
-        case 'group_member_modify':
-          return {
-            modifyGroupMember: {
-              isActionEnabled: true,
-              isInvited: index % 2 === 0 ? true : false,
-              onAction: () => {
-                console.log('test:onAction:group_member_modify:');
+            };
+          case 'group_member_modify':
+            return {
+              modifyGroupMember: {
+                isActionEnabled: true,
+                isInvited: index % 2 === 0 ? true : false,
+                onAction: () => {
+                  console.log('test:onAction:group_member_modify:');
+                },
               },
-            },
-          };
-        default:
-          return undefined;
-      }
+            };
+          default:
+            return undefined;
+        }
+      };
+
+      const r = list.map((value, index) => {
+        const i = value.lastIndexOf(' ');
+        const contactID = value.slice(0, i);
+        const contactName = value.slice(i + 1);
+
+        return {
+          key: contactID,
+          contactID: contactID,
+          contactName: contactName,
+          height: 80,
+          onLongPress: (data) => {
+            if (type === 'contact_list') {
+              sheet.openSheet({
+                sheetItems: [
+                  {
+                    icon: 'loading',
+                    iconColor: theme.colors.primary,
+                    title: '1',
+                    titleColor: 'black',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                    },
+                  },
+                  {
+                    icon: 'loading',
+                    iconColor: theme.colors.primary,
+                    title: '2',
+                    titleColor: 'black',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                    },
+                  },
+                ],
+              });
+            }
+          },
+          onPress: (data) => {
+            if (type === 'create_conversation') {
+              navigation.navigate('Chat', { params: {} });
+            } else if (type === 'group_member') {
+              sheet.openSheet({
+                sheetItems: [
+                  {
+                    title: contactID,
+                    titleColor: 'black',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                    },
+                    containerStyle: {
+                      marginTop: sf(10),
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: undefined,
+                      minWidth: undefined,
+                      backgroundColor: undefined,
+                      borderRadius: undefined,
+                    },
+                    titleStyle: {
+                      fontWeight: '600',
+                      fontSize: sf(14),
+                      lineHeight: sf(16),
+                      color: 'rgba(102, 102, 102, 1)',
+                      marginHorizontal: undefined,
+                    },
+                  },
+                  {
+                    title: groupInfo.memberSheet.add,
+                    titleColor: 'black',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                      toast.showToast(groupInfo.toast[4]!);
+                    },
+                  },
+                  {
+                    title: groupInfo.memberSheet.remove,
+                    titleColor: 'rgba(255, 20, 204, 1)',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                      alert.openAlert({
+                        title: 'Remove NickName?',
+                        buttons: [
+                          {
+                            text: 'Cancel',
+                            onPress: () => {},
+                          },
+                          {
+                            text: 'Confirm',
+                            onPress: () => {
+                              toast.showToast('Removed');
+                            },
+                          },
+                        ],
+                      });
+                    },
+                  },
+                  {
+                    title: groupInfo.memberSheet.chat,
+                    titleColor: 'black',
+                    onPress: () => {
+                      console.log('test:onPress:data:', data);
+                    },
+                  },
+                ],
+              });
+            } else {
+              navigation.navigate({ name: 'ContactInfo', params: {} });
+            }
+          },
+          type: type,
+          action: action(type, index),
+        } as ItemDataType;
+      });
+      // data.push(...r);
+      listRef.current?.manualRefresh([
+        {
+          type: 'clear',
+        },
+        {
+          type: 'add',
+          data: r,
+          enableSort: true,
+        },
+      ]);
     },
-    []
+    [
+      alert,
+      groupInfo.memberSheet.add,
+      groupInfo.memberSheet.chat,
+      groupInfo.memberSheet.remove,
+      groupInfo.toast,
+      navigation,
+      sf,
+      sheet,
+      theme.colors.primary,
+      toast,
+      type,
+    ]
   );
-
-  const r = COUNTRY.map((value, index) => {
-    const i = value.lastIndexOf(' ');
-    const en = value.slice(0, i);
-    const ch = value.slice(i + 1);
-
-    return {
-      key: en,
-      en: en,
-      ch: ch,
-      height: 80,
-      onLongPress: (data) => {
-        if (type === 'contact_list') {
-          sheet.openSheet({
-            sheetItems: [
-              {
-                icon: 'loading',
-                iconColor: theme.colors.primary,
-                title: '1',
-                titleColor: 'black',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                },
-              },
-              {
-                icon: 'loading',
-                iconColor: theme.colors.primary,
-                title: '2',
-                titleColor: 'black',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                },
-              },
-            ],
-          });
-        }
-      },
-      onPress: (_) => {
-        if (type === 'create_conversation') {
-          navigation.navigate('Chat', { params: {} });
-        } else if (type === 'group_member') {
-          sheet.openSheet({
-            sheetItems: [
-              {
-                title: en,
-                titleColor: 'black',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                },
-                containerStyle: {
-                  marginTop: sf(10),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: undefined,
-                  minWidth: undefined,
-                  backgroundColor: undefined,
-                  borderRadius: undefined,
-                },
-                titleStyle: {
-                  fontWeight: '600',
-                  fontSize: sf(14),
-                  lineHeight: sf(16),
-                  color: 'rgba(102, 102, 102, 1)',
-                  marginHorizontal: undefined,
-                },
-              },
-              {
-                title: groupInfo.memberSheet.add,
-                titleColor: 'black',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                  toast.showToast(groupInfo.toast[4]!);
-                },
-              },
-              {
-                title: groupInfo.memberSheet.remove,
-                titleColor: 'rgba(255, 20, 204, 1)',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                  alert.openAlert({
-                    title: 'Remove NickName?',
-                    buttons: [
-                      {
-                        text: 'Cancel',
-                        onPress: () => {},
-                      },
-                      {
-                        text: 'Confirm',
-                        onPress: () => {
-                          toast.showToast('Removed');
-                        },
-                      },
-                    ],
-                  });
-                },
-              },
-              {
-                title: groupInfo.memberSheet.chat,
-                titleColor: 'black',
-                onPress: () => {
-                  console.log('test:onPress:data:', data);
-                },
-              },
-            ],
-          });
-        } else {
-          navigation.navigate({ name: 'ContactInfo', params: {} });
-        }
-      },
-      type: type,
-      action: action(type, index),
-    } as ItemDataType;
-  });
-  data.push(...r);
 
   const _calculateAlphabetHeight = () => {
     const r = sf(screenHeight - 450 - 340);
@@ -649,11 +676,44 @@ export default function ContactListScreen({
     });
   }, [navigation, type]);
 
+  const { client } = useChatSdkContext();
+  const initList = React.useCallback(() => {
+    client.contactManager
+      .getAllContactsFromServer()
+      .then((result) => {
+        console.log('test:ContactListScreen:success:', result);
+        initData(
+          result.map((item) => {
+            return item + ' ';
+          })
+        ); // for test
+      })
+      .catch((error) => {
+        console.warn('test:error:', error);
+      });
+  }, [client, initData]);
+
+  React.useEffect(() => {
+    const load = () => {
+      console.log('test:load:');
+      initList();
+    };
+    const unload = () => {
+      console.log('test:unload:');
+    };
+
+    load();
+    return () => unload();
+  }, [initList]);
+
   return (
     <SafeAreaView
       mode="padding"
       style={useStyleSheet().safe}
       edges={['right', 'left']}
+      onLayout={(event) => {
+        console.log('test:222:', event.nativeEvent.layout);
+      }}
     >
       <ListSearchHeader
         autoFocus={autoFocus()}
@@ -702,15 +762,15 @@ export default function ContactListScreen({
         ItemSeparatorComponent={ListItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {
-            const en = 'aaa';
-            const v = en + count++;
+            const contactID = 'aaa';
+            const v = contactID + count++;
             listRef.current?.manualRefresh([
               {
                 type: 'add',
                 data: [
                   {
-                    en: v,
-                    ch: v,
+                    contactID: v,
+                    contactName: v,
                     key: v,
                   } as EqualHeightListItemData,
                 ],

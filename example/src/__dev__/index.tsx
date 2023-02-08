@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DevApp from './test_ref';
+import DevApp from './test_useEffect';
 
 export default function dev(): JSX.Element {
   return (

@@ -286,7 +286,6 @@ export type ListItemUpdateType = {
 };
 
 export type EqualHeightListRef = {
-  test: (data: any) => void;
   manualRefresh: (updateItems: ListItemUpdateType[]) => void;
 };
 
@@ -300,11 +299,8 @@ export const EqualHeightList: (
   React.useImperativeHandle(
     ref,
     () => ({
-      test: <ItemT extends ItemData = ItemData>(value: ItemT) => {
-        console.log('test:ref:', value);
-      },
       manualRefresh: (updateItems: ListItemUpdateType[]) => {
-        console.log('test:manualRefresh:', updateItems);
+        // console.log('test:manualRefresh:', updateItems);
         _handleManualRefresh(updateItems);
       },
     }),
@@ -317,7 +313,6 @@ export const EqualHeightList: (
   const AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#';
   const REFRESH_TIMEOUT = 1500;
   const listRef = React.useRef<RNFlatList>(null);
-  const listItemHeightRef = React.useRef(0);
   const listHeightRef = React.useRef(0);
   const listYRef = React.useRef(0);
   const alphabetListRef = React.useRef<View>(null);
@@ -328,13 +323,13 @@ export const EqualHeightList: (
       onPanResponderStart: (e, { y0 }) => {
         setIsMoving(true);
         const c = getChar(_calculateAlphabetIndex(y0));
-        if (c) jumpToItemByOffset(c, itemHeight.current);
+        if (c) jumpToItemByOffset(c, listItemContainerHeightRef.current, false);
         e.preventDefault();
       },
       onPanResponderMove: (e, { moveY }) => {
         setIsMoving(true);
         const c = getChar(_calculateAlphabetIndex(moveY));
-        if (c) jumpToItemByOffset(c, itemHeight.current);
+        if (c) jumpToItemByOffset(c, listItemContainerHeightRef.current, false);
         e.preventDefault();
       },
       onPanResponderRelease: (e) => {
@@ -367,14 +362,15 @@ export const EqualHeightList: (
   const [isMoving, setIsMoving] = React.useState(false);
   const [lastChar, setLastChar] = React.useState('');
   const [loading, setLoading] = React.useState(true);
-  // const [itemHeight, setItemHeight] = React.useState(0);
-  const itemHeight = React.useRef(0);
-  // let itemHeight = 0;
+  // const [listItemHeightRef, setItemHeight] = React.useState(0);
+  const listItemContainerHeightRef = React.useRef(0);
+  const listItemHeightRef = React.useRef(0);
+  // let listItemHeightRef = 0;
 
   if (items.length > 0) {
     const item = items[0];
     if (item?.height !== undefined && typeof item?.height === 'number') {
-      itemHeight.current = item.height!;
+      listItemHeightRef.current = item.height!;
     }
   }
 
@@ -408,7 +404,7 @@ export const EqualHeightList: (
             alphabet: alphabet,
             isFirst: isFirst,
             style: itemContainerStyle,
-            height: once === false ? listItemHeightRef : undefined,
+            height: once === false ? listItemContainerHeightRef : undefined,
             data: item,
           },
         } as RenderItemProps;
@@ -488,14 +484,17 @@ export const EqualHeightList: (
   };
 
   const jumpToItemByOffset = React.useCallback(
-    (char: string, h: number) => {
+    (char: string, h: number, animated: boolean) => {
       if (char) setLastChar(char);
       for (const item of data) {
         const isFirst = item.itemContainerProps.isFirst;
         const c = item.itemContainerProps.alphabet;
         if (isFirst === true && char === c) {
           const offset = item.itemContainerProps.index * h;
-          listRef.current?.scrollToOffset({ animated: true, offset: offset });
+          listRef.current?.scrollToOffset({
+            animated: animated,
+            offset: offset,
+          });
           break;
         }
       }
@@ -593,8 +592,8 @@ export const EqualHeightList: (
               : undefined
             : undefined
         }
-        onEndReached={(info) => {
-          console.log('test:onEndReached:', info.distanceFromEnd);
+        onEndReached={(_) => {
+          // console.log('test:onEndReached:', info.distanceFromEnd);
         }}
         ListHeaderComponent={
           enableHeader === true
@@ -688,7 +687,7 @@ export const EqualHeightList: (
 
 const styles = createStyleSheet({
   container: {
-    // flex: 1,
+    flex: 1,
     justifyContent: 'center',
     // marginTop: StatusBar.currentHeight || 0,
   },
