@@ -410,6 +410,7 @@ const NavigationHeaderRight = (_: HeaderButtonProps) => {
       return null;
     }
   };
+
   return (
     <Pressable
       onPress={() => {
