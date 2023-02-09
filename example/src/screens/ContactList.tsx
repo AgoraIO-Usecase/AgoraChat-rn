@@ -27,6 +27,7 @@ import {
 } from 'react-native';
 import {
   autoFocus,
+  Blank,
   Button,
   CheckButton,
   createStyleSheet,
@@ -473,6 +474,7 @@ export default function ContactListScreen({
   const enableHeader = false;
   // const autoFocus = false;
   const data: ItemDataType[] = React.useMemo(() => [], []);
+  const [isEmpty, setIsEmpty] = React.useState(true);
 
   const initData = React.useCallback(
     (list: string[]) => {
@@ -682,6 +684,7 @@ export default function ContactListScreen({
       .getAllContactsFromServer()
       .then((result) => {
         console.log('test:ContactListScreen:success:', result);
+        setIsEmpty(result.length === 0);
         initData(
           result.map((item) => {
             return item + ' ';
@@ -738,48 +741,52 @@ export default function ContactListScreen({
           });
         }}
       />
-      <EqualHeightList
-        parentName="ContactList"
-        ref={listRef}
-        items={data}
-        ItemFC={Item}
-        enableAlphabet={enableAlphabet}
-        enableRefresh={enableRefresh}
-        enableHeader={enableHeader}
-        alphabet={{
-          alphabetCurrent: {
-            backgroundColor: 'orange',
-            color: 'white',
-          },
-          alphabetItemContainer: {
-            width: 15,
-            borderRadius: 8,
-          },
-          alphabetContainer: {
-            top: _calculateAlphabetHeight(),
-          },
-        }}
-        ItemSeparatorComponent={ListItemSeparator}
-        onRefresh={(type) => {
-          if (type === 'started') {
-            const contactID = 'aaa';
-            const v = contactID + count++;
-            listRef.current?.manualRefresh([
-              {
-                type: 'add',
-                data: [
-                  {
-                    contactID: v,
-                    contactName: v,
-                    key: v,
-                  } as EqualHeightListItemData,
-                ],
-                enableSort: true,
-              },
-            ]);
-          }
-        }}
-      />
+      {isEmpty === true ? (
+        <Blank />
+      ) : (
+        <EqualHeightList
+          parentName="ContactList"
+          ref={listRef}
+          items={data}
+          ItemFC={Item}
+          enableAlphabet={enableAlphabet}
+          enableRefresh={enableRefresh}
+          enableHeader={enableHeader}
+          alphabet={{
+            alphabetCurrent: {
+              backgroundColor: 'orange',
+              color: 'white',
+            },
+            alphabetItemContainer: {
+              width: 15,
+              borderRadius: 8,
+            },
+            alphabetContainer: {
+              top: _calculateAlphabetHeight(),
+            },
+          }}
+          ItemSeparatorComponent={ListItemSeparator}
+          onRefresh={(type) => {
+            if (type === 'started') {
+              const contactID = 'aaa';
+              const v = contactID + count++;
+              listRef.current?.manualRefresh([
+                {
+                  type: 'add',
+                  data: [
+                    {
+                      contactID: v,
+                      contactName: v,
+                      key: v,
+                    } as EqualHeightListItemData,
+                  ],
+                  enableSort: true,
+                },
+              ]);
+            }
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }

@@ -76,7 +76,11 @@ export default function SignInScreen({ navigation }: Props): JSX.Element {
       .catch((error) => {
         console.log('test:login:fail:', error);
         setButtonState('stop');
-        toast.showToast('Login Failed');
+        if (error.code === 200) {
+          navigation.push('Home', { params: undefined });
+        } else {
+          toast.showToast('Login Failed');
+        }
       });
   };
 
