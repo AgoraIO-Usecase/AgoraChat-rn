@@ -141,11 +141,11 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
 
   React.useEffect(() => {
     const load = () => {
-      console.log('test:load:');
+      console.log('test:load:', GroupListScreen.name);
       initList();
     };
     const unload = () => {
-      console.log('test:unload:');
+      console.log('test:unload:', GroupListScreen.name);
     };
 
     load();

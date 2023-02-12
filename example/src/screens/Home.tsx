@@ -11,11 +11,10 @@ import MySetting from './MySetting';
 
 const Home = createMaterialBottomTabNavigator<RootParamsList>();
 
-export default function HomeScreen({
-  navigation,
-  route,
-}: NativeStackScreenProps<ParamListBase, 'Home'>): JSX.Element {
-  console.log('test:HomeScreen:', route, navigation);
+export default function HomeScreen(
+  _: NativeStackScreenProps<ParamListBase, 'Home'>
+): JSX.Element {
+  // console.log('test:HomeScreen:', route, navigation);
 
   const shifting = true;
   return (

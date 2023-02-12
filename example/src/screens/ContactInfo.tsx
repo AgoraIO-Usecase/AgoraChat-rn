@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import {
   Avatar,
   createStyleSheet,
@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 
@@ -20,17 +21,92 @@ type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
+export default function ContactInfoScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
   //   console.log('test:ConversationListScreen:', route.params, navigation);
   //   return <Placeholder content={`${ContactInfoScreen.name}`} />;
+  const rp = route.params as any;
+  const params = rp?.params as { userId: string };
   const { contactInfo } = useAppI18nContext();
+  const { client } = useAppChatSdkContext();
   const [isMute, setIsMute] = React.useState(false);
   const alert = useAlert();
   const toast = useToastContext();
-  const id = 'AgoraID: xxx';
+  const userId = params.userId;
+  console.log('test:ContactInfoScreen:', params);
 
-  // const removeContact = () => {};
-  // const blockContact = () => {};
+  const removeContact = (
+    userId: string,
+    onResult: (result: boolean) => void
+  ) => {
+    client.contactManager
+      .deleteContact(userId)
+      .then((result) => {
+        console.log('test:deleteContact:success:', result);
+        onResult?.(true);
+      })
+      .catch((error) => {
+        onResult?.(false);
+        console.warn('test:deleteContact:fail:', error);
+      });
+  };
+  const blockContact = (
+    userId: string,
+    onResult: (result: boolean) => void
+  ) => {
+    client.contactManager
+      .addUserToBlockList(userId)
+      .then((result) => {
+        console.log('test:addUserToBlockList:success:', result);
+        onResult?.(true);
+      })
+      .catch((error) => {
+        onResult?.(false);
+        console.warn('test:addUserToBlockList:fail:', error);
+      });
+  };
+
+  const addListeners = React.useCallback(() => {
+    console.log('test:ContactInfoScreen:addListeners:');
+    const sub1 = DeviceEventEmitter.addListener(
+      'manual_block_contact',
+      (event) => {
+        console.log('test:manual_block_contact:', event);
+        toast.showToast(contactInfo.toast[0]!);
+      }
+    );
+    const sub2 = DeviceEventEmitter.addListener(
+      'manual_remove_contact',
+      (event) => {
+        console.log('test:manual_remove_contact:', event);
+        toast.showToast(contactInfo.toast[1]!);
+        navigation.goBack();
+      }
+    );
+    return () => {
+      sub1.remove();
+      sub2.remove();
+    };
+  }, [contactInfo.toast, navigation, toast]);
+
+  React.useEffect(() => {
+    const load = () => {
+      console.log('test:load:', ContactInfoScreen.name);
+      const unsubscribe = addListeners();
+      return {
+        unsubscribe: unsubscribe,
+      };
+    };
+    const unload = (params: { unsubscribe: () => void }) => {
+      console.log('test:unload:', ContactInfoScreen.name);
+      params.unsubscribe();
+    };
+
+    const res = load();
+    return () => unload(res);
+  }, [addListeners]);
 
   return (
     <SafeAreaView
@@ -46,7 +122,7 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
           <Text style={styles.name}>{contactInfo.name('NickName')}</Text>
         </View>
         <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.id}>{id}</Text>
+          <Text style={styles.id}>{userId}</Text>
         </View>
         <Pressable
           onPress={() => {
@@ -87,7 +163,12 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
                 {
                   text: contactInfo.blockAlert.confirmButton,
                   onPress: () => {
-                    toast.showToast(contactInfo.toast[0]!);
+                    blockContact(userId, (result) => {
+                      if (result === true) {
+                        // toast.showToast(contactInfo.toast[0]!); // !!! dead lock
+                        DeviceEventEmitter.emit('manual_block_contact', userId);
+                      }
+                    });
                   },
                 },
               ],
@@ -109,7 +190,15 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
                 {
                   text: contactInfo.deleteAlert.confirmButton,
                   onPress: () => {
-                    toast.showToast(contactInfo.toast[1]!);
+                    removeContact(userId, (result) => {
+                      if (result === true) {
+                        // toast.showToast(contactInfo.toast[1]!); // !!! dead lock
+                        DeviceEventEmitter.emit(
+                          'manual_remove_contact',
+                          userId
+                        );
+                      }
+                    });
                   },
                 },
               ],

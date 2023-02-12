@@ -184,7 +184,7 @@ export default function SearchScreen({
         height: 80,
         onPress: (_) => {
           if (type === 'add_contact') {
-            navigation.navigate('ContactInfo', { params: {} });
+            navigation.navigate('ContactInfo', { params: { userId: 'test' } });
           } else if (type === 'join_public_group') {
             navigation.navigate('GroupInfo', { params: {} });
           }

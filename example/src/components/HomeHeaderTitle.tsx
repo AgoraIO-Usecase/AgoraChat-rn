@@ -7,7 +7,7 @@ type HeaderTitleProps = {
 };
 
 export default function HomeHeaderTitle(props: HeaderTitleProps): JSX.Element {
-  console.log('test:HomeHeaderTitle:', props);
+  // console.log('test:HomeHeaderTitle:', props);
   const { name } = props;
   const _styles = (name: string) => {
     if (name === 'Chats') {

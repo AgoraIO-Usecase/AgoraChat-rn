@@ -26,3 +26,13 @@ export type NotificationMessageDescriptionType =
   | 'GroupRequestJoin'
   | 'GroupRequestJoinAccepted'
   | 'GroupRequestJoinDeclined';
+
+export type ContactEvents =
+  | 'manual_add_contact'
+  | 'manual_remove_contact'
+  | 'manual_block_contact';
+export type GroupEvents = '';
+export type MessageEvents = '';
+export type ConversationEvents = '';
+export type ConnectEvents = '';
+export type RequestEvents = 'request_result_sent';

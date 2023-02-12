@@ -263,6 +263,7 @@ export type EqualHeightListProps = Omit<
   | 'onRefresh'
 > & {
   items: ItemData[];
+  onItems?: (items: React.RefObject<ItemData[]>) => void;
   itemStyle?: StyleProp<ViewStyle>;
   ItemFC: ItemComponent;
   itemContainerStyle?: StyleProp<ViewStyle>;
@@ -283,6 +284,7 @@ export type ListItemUpdateType = {
   type: 'add' | 'del' | 'update' | 'clear';
   data?: ItemData[];
   enableSort?: boolean;
+  sortDirection?: 'asc' | 'dsc';
 };
 
 export type EqualHeightListRef = {
@@ -342,6 +344,7 @@ export const EqualHeightList: (
   const {
     alphabet,
     items,
+    onItems,
     itemStyle,
     ItemFC,
     itemContainerStyle,
@@ -366,6 +369,7 @@ export const EqualHeightList: (
   const listItemContainerHeightRef = React.useRef(0);
   const listItemHeightRef = React.useRef(0);
   // let listItemHeightRef = 0;
+  const childrenItems = React.useRef<ItemData[]>([]);
 
   if (items.length > 0) {
     const item = items[0];
@@ -415,7 +419,12 @@ export const EqualHeightList: (
     [ItemFC, data, itemContainerStyle, itemStyle]
   );
 
-  React.useEffect(() => {}, []);
+  const _onItems = React.useCallback(() => {
+    childrenItems.current = data.map((data) => {
+      return data.itemProps.data;
+    });
+    onItems?.(childrenItems);
+  }, [data, onItems]);
 
   if (loading) {
     data.splice(0, data.length);
@@ -423,6 +432,7 @@ export const EqualHeightList: (
     _prepareData(items).catch((e) => {
       console.warn('test:_prepareData:', e);
     });
+    // _onItems();
     setLoading(false);
   }
 
@@ -514,9 +524,9 @@ export const EqualHeightList: (
           if (item.enableSort === true) {
             data.sort((a, b) => {
               if (a.itemProps.data.key > b.itemProps.data.key) {
-                return 1;
+                return item.sortDirection === 'asc' ? 1 : -1;
               } else if (a.itemProps.data.key < b.itemProps.data.key) {
-                return -1;
+                return item.sortDirection === 'asc' ? -1 : 1;
               } else {
                 return 0;
               }
@@ -545,6 +555,7 @@ export const EqualHeightList: (
       }
     }
     setData([...data]);
+    _onItems();
   };
 
   const r = (

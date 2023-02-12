@@ -47,7 +47,7 @@ export type RootParamsList = BottomTabParamsList & {
   };
   ContactInfo: {
     option?: {} | undefined;
-    params?: {} | undefined;
+    params?: { userId: string } | undefined;
   };
   Chat: {
     option?: {} | undefined;

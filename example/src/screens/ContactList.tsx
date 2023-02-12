@@ -20,6 +20,7 @@ import type {
 } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
 import {
+  DeviceEventEmitter,
   Pressable,
   TouchableOpacity,
   useWindowDimensions,
@@ -102,31 +103,31 @@ type NavigationProp = CompositeNavigationProp<
   >
 >;
 
+type ItemActionRadioDataType = {
+  isActionEnabled: boolean;
+  isInvited: boolean;
+  onAction?: () => void;
+};
+type ItemActionBoolDataType = {
+  name: string;
+  onClicked?: () => void;
+};
+type ItemActionGroupInviteDataType = { groupInvite?: ItemActionRadioDataType };
+type ItemActionCreateGroupDataType = { createGroup?: ItemActionRadioDataType };
+type ItemActionModifyGroupMemberDataType = {
+  modifyGroupMember?: ItemActionRadioDataType;
+};
+type ItemActionBlockDataType = { block?: ItemActionBoolDataType };
+type ItemActionDataType =
+  | ItemActionGroupInviteDataType
+  | ItemActionCreateGroupDataType
+  | ItemActionModifyGroupMemberDataType
+  | ItemActionBlockDataType;
 type ItemDataType = EqualHeightListItemData & {
   contactID: string;
   contactName: string;
-  type?: Undefinable<ContactActionType>;
-  action?: {
-    groupInvite?: {
-      isActionEnabled: boolean;
-      isInvited: boolean;
-      onAction?: () => void;
-    };
-    block?: {
-      name: string;
-      onClicked?: () => void;
-    };
-    createGroup?: {
-      isActionEnabled: boolean;
-      isInvited: boolean;
-      onAction?: () => void;
-    };
-    modifyGroupMember?: {
-      isActionEnabled: boolean;
-      isInvited: boolean;
-      onAction?: () => void;
-    };
-  };
+  actionType?: Undefinable<ContactActionType>;
+  action?: ItemActionDataType;
 };
 
 const Item: EqualHeightListItemComponent = (props) => {
@@ -141,8 +142,14 @@ const Item: EqualHeightListItemComponent = (props) => {
         return (
           <View style={styles.rightItem}>
             <CheckButton
-              checked={item.action?.groupInvite?.isInvited}
-              onChecked={item.action?.groupInvite?.onAction}
+              checked={
+                (item.action as ItemActionGroupInviteDataType)?.groupInvite
+                  ?.isInvited
+              }
+              onChecked={
+                (item.action as ItemActionGroupInviteDataType)?.groupInvite
+                  ?.onAction
+              }
             />
           </View>
         );
@@ -150,8 +157,14 @@ const Item: EqualHeightListItemComponent = (props) => {
         return (
           <View style={styles.rightItem}>
             <CheckButton
-              checked={item.action?.createGroup?.isInvited}
-              onChecked={item.action?.createGroup?.onAction}
+              checked={
+                (item.action as ItemActionCreateGroupDataType)?.createGroup
+                  ?.isInvited
+              }
+              onChecked={
+                (item.action as ItemActionCreateGroupDataType)?.createGroup
+                  ?.onAction
+              }
             />
           </View>
         );
@@ -192,7 +205,7 @@ const Item: EqualHeightListItemComponent = (props) => {
                 });
               }}
             >
-              {item.action?.block?.name}
+              {(item.action as ItemActionBlockDataType)?.block?.name}
             </Button>
           </View>
         );
@@ -200,8 +213,14 @@ const Item: EqualHeightListItemComponent = (props) => {
         return (
           <View style={styles.rightItem}>
             <CheckButton
-              checked={item.action?.modifyGroupMember?.isInvited}
-              onChecked={item.action?.modifyGroupMember?.onAction}
+              checked={
+                (item.action as ItemActionModifyGroupMemberDataType)
+                  ?.modifyGroupMember?.isInvited
+              }
+              onChecked={
+                (item.action as ItemActionModifyGroupMemberDataType)
+                  ?.modifyGroupMember?.onAction
+              }
             />
           </View>
         );
@@ -219,7 +238,7 @@ const Item: EqualHeightListItemComponent = (props) => {
         </Text>
         {/* <Text>{item.contactName}</Text> */}
       </View>
-      {Right(item.type)}
+      {Right(item.actionType)}
     </View>
   );
 };
@@ -473,182 +492,227 @@ export default function ContactListScreen({
   const enableAlphabet = type === 'contact_list' ? true : false;
   const enableHeader = false;
   // const autoFocus = false;
-  const data: ItemDataType[] = React.useMemo(() => [], []);
+  const data: ItemDataType[] = React.useMemo(() => [], []); // for search
+  // let managedData = React.useRef<ItemDataType[]>(null);
   const [isEmpty, setIsEmpty] = React.useState(true);
   const { client } = useAppChatSdkContext();
 
-  const initData = React.useCallback(
-    (list: string[]) => {
-      const action = (type: ContactActionType | undefined, index: number) => {
-        switch (type) {
-          case 'group_invite':
+  const manualRefresh = React.useCallback(
+    (params: { type: 'init' | 'add' | 'search'; items: ItemDataType[] }) => {
+      if (params.type === 'init') {
+        data.length = 0;
+        listRef.current?.manualRefresh([
+          {
+            type: 'clear',
+          },
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+        data.push(...params.items);
+      } else if (params.type === 'search') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'clear',
+          },
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+      } else if (params.type === 'add') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+        data.push(...params.items);
+      } else {
+        console.warn('test:');
+        return;
+      }
+    },
+    [data]
+  );
+
+  const standardizedData = React.useCallback(
+    (item: Omit<ItemDataType, 'onLongPress' | 'onPress'>): ItemDataType => {
+      const createAction = (
+        action: Undefinable<ItemActionDataType>,
+        actionType: Undefinable<ContactActionType>
+      ) => {
+        switch (actionType) {
+          case 'group_invite': {
+            const a = action as ItemActionGroupInviteDataType | undefined;
             return {
               groupInvite: {
-                isActionEnabled: true,
-                isInvited: index % 2 === 0 ? true : false,
+                isActionEnabled: a?.groupInvite?.isActionEnabled,
+                isInvited: a?.groupInvite?.isInvited,
                 onAction: () => {
                   console.log('test:onAction:group_invite:');
                 },
               },
             };
-          case 'create_group':
+          }
+
+          case 'create_group': {
+            const a = action as ItemActionCreateGroupDataType;
             return {
               createGroup: {
-                isActionEnabled: true,
-                isInvited: index % 2 === 0 ? true : false,
+                isActionEnabled: a?.createGroup?.isActionEnabled,
+                isInvited: a?.createGroup?.isInvited,
                 onAction: () => {
                   console.log('test:create_group:');
                 },
               },
             };
-          case 'block_contact':
+          }
+
+          case 'block_contact': {
+            const a = action as ItemActionBlockDataType;
             return {
               block: {
-                name: 'Unblock',
+                name: a?.block?.name,
                 onClicked: () => {
                   console.log('test:block_contact:');
                 },
               },
             };
-          case 'group_member_modify':
+          }
+
+          case 'group_member_modify': {
+            const a = action as ItemActionModifyGroupMemberDataType;
             return {
               modifyGroupMember: {
-                isActionEnabled: true,
-                isInvited: index % 2 === 0 ? true : false,
+                isActionEnabled: a?.modifyGroupMember?.isActionEnabled,
+                isInvited: a?.modifyGroupMember?.isInvited,
                 onAction: () => {
                   console.log('test:onAction:group_member_modify:');
                 },
               },
             };
+          }
+
           default:
             return undefined;
         }
       };
 
-      const r = list.map((value, index) => {
-        const i = value.lastIndexOf(' ');
-        const contactID = value.slice(0, i);
-        const contactName = value.slice(i + 1);
-
-        return {
-          key: contactID,
-          contactID: contactID,
-          contactName: contactName,
-          height: 80,
-          onLongPress: (data) => {
-            if (type === 'contact_list') {
-              sheet.openSheet({
-                sheetItems: [
-                  {
-                    icon: 'loading',
-                    iconColor: theme.colors.primary,
-                    title: '1',
-                    titleColor: 'black',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                    },
+      const { actionType, action, contactID } = item;
+      return {
+        ...item,
+        onLongPress: (data) => {
+          if (type === 'contact_list') {
+            sheet.openSheet({
+              sheetItems: [
+                {
+                  icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: '1',
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
                   },
-                  {
-                    icon: 'loading',
-                    iconColor: theme.colors.primary,
-                    title: '2',
-                    titleColor: 'black',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                    },
+                },
+                {
+                  icon: 'loading',
+                  iconColor: theme.colors.primary,
+                  title: '2',
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
                   },
-                ],
-              });
-            }
-          },
-          onPress: (data) => {
-            if (type === 'create_conversation') {
-              navigation.navigate('Chat', { params: {} });
-            } else if (type === 'group_member') {
-              sheet.openSheet({
-                sheetItems: [
-                  {
-                    title: contactID,
-                    titleColor: 'black',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                    },
-                    containerStyle: {
-                      marginTop: sf(10),
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: undefined,
-                      minWidth: undefined,
-                      backgroundColor: undefined,
-                      borderRadius: undefined,
-                    },
-                    titleStyle: {
-                      fontWeight: '600',
-                      fontSize: sf(14),
-                      lineHeight: sf(16),
-                      color: 'rgba(102, 102, 102, 1)',
-                      marginHorizontal: undefined,
-                    },
-                  },
-                  {
-                    title: groupInfo.memberSheet.add,
-                    titleColor: 'black',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                      toast.showToast(groupInfo.toast[4]!);
-                    },
-                  },
-                  {
-                    title: groupInfo.memberSheet.remove,
-                    titleColor: 'rgba(255, 20, 204, 1)',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                      alert.openAlert({
-                        title: 'Remove NickName?',
-                        buttons: [
-                          {
-                            text: 'Cancel',
-                            onPress: () => {},
-                          },
-                          {
-                            text: 'Confirm',
-                            onPress: () => {
-                              toast.showToast('Removed');
-                            },
-                          },
-                        ],
-                      });
-                    },
-                  },
-                  {
-                    title: groupInfo.memberSheet.chat,
-                    titleColor: 'black',
-                    onPress: () => {
-                      console.log('test:onPress:data:', data);
-                    },
-                  },
-                ],
-              });
-            } else {
-              navigation.navigate({ name: 'ContactInfo', params: {} });
-            }
-          },
-          type: type,
-          action: action(type, index),
-        } as ItemDataType;
-      });
-      // data.push(...r);
-      listRef.current?.manualRefresh([
-        {
-          type: 'clear',
+                },
+              ],
+            });
+          }
         },
-        {
-          type: 'add',
-          data: r,
-          enableSort: true,
+        onPress: (data) => {
+          if (type === 'create_conversation') {
+            navigation.navigate('Chat', { params: {} });
+          } else if (type === 'group_member') {
+            sheet.openSheet({
+              sheetItems: [
+                {
+                  title: contactID,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
+                  },
+                  containerStyle: {
+                    marginTop: sf(10),
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: undefined,
+                    minWidth: undefined,
+                    backgroundColor: undefined,
+                    borderRadius: undefined,
+                  },
+                  titleStyle: {
+                    fontWeight: '600',
+                    fontSize: sf(14),
+                    lineHeight: sf(16),
+                    color: 'rgba(102, 102, 102, 1)',
+                    marginHorizontal: undefined,
+                  },
+                },
+                {
+                  title: groupInfo.memberSheet.add,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
+                    toast.showToast(groupInfo.toast[4]!);
+                  },
+                },
+                {
+                  title: groupInfo.memberSheet.remove,
+                  titleColor: 'rgba(255, 20, 204, 1)',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
+                    alert.openAlert({
+                      title: 'Remove NickName?',
+                      buttons: [
+                        {
+                          text: 'Cancel',
+                          onPress: () => {},
+                        },
+                        {
+                          text: 'Confirm',
+                          onPress: () => {
+                            toast.showToast('Removed');
+                          },
+                        },
+                      ],
+                    });
+                  },
+                },
+                {
+                  title: groupInfo.memberSheet.chat,
+                  titleColor: 'black',
+                  onPress: () => {
+                    console.log('test:onPress:data:', data);
+                  },
+                },
+              ],
+            });
+          } else {
+            navigation.navigate({
+              name: 'ContactInfo',
+              params: { params: { userId: item.contactID } },
+            });
+          }
         },
-      ]);
+        action: createAction(action, actionType),
+      };
     },
     [
       alert,
@@ -663,6 +727,22 @@ export default function ContactListScreen({
       toast,
       type,
     ]
+  );
+
+  const initData = React.useCallback(
+    (list: ItemDataType[]) => {
+      const r = list.map((item) => {
+        return standardizedData({
+          ...item,
+          height: 80,
+        });
+      });
+      manualRefresh({
+        type: 'init',
+        items: r,
+      });
+    },
+    [manualRefresh, standardizedData]
   );
 
   const _calculateAlphabetHeight = () => {
@@ -688,8 +768,14 @@ export default function ContactListScreen({
             console.log('test:ContactListScreen:success:', result);
             setIsEmpty(result.length === 0);
             initData(
-              result.map((item) => {
-                return item + ' ';
+              result.map((id) => {
+                return {
+                  key: id,
+                  contactID: id,
+                  contactName: id,
+                  actionType: 'contact_list',
+                  action: undefined,
+                } as ItemDataType;
               })
             ); // for test
           })
@@ -703,10 +789,51 @@ export default function ContactListScreen({
 
   const addListeners = React.useCallback(
     (_: Undefinable<ContactActionType>) => {
+      const sub1 = DeviceEventEmitter.addListener(
+        'manual_add_contact',
+        (event) => {
+          console.log('test:manual_add_contact:', event);
+          const id = event;
+          if (type === 'contact_list') {
+            manualRefresh({
+              type: 'add',
+              items: [
+                standardizedData({
+                  key: id,
+                  contactID: id,
+                  contactName: id,
+                  actionType: 'contact_list',
+                  action: undefined,
+                }),
+              ],
+            });
+          }
+        }
+      );
+      const sub2 = DeviceEventEmitter.addListener(
+        'manual_remove_contact',
+        (event) => {
+          console.log('test:manual_remove_contact:', event);
+        }
+      );
       const contactEventListener: ChatContactEventListener = {
         onContactAdded: (userName: string) => {
           console.log('test:onContactAdded:', userName);
           toast.showToast(contactList.toast[0]!);
+          if (type === 'contact_list') {
+            manualRefresh({
+              type: 'add',
+              items: [
+                standardizedData({
+                  key: userName,
+                  contactID: userName,
+                  contactName: userName,
+                  actionType: 'contact_list',
+                  action: undefined,
+                }),
+              ],
+            });
+          }
         },
 
         onContactDeleted: (userName: string): void => {
@@ -725,15 +852,25 @@ export default function ContactListScreen({
         },
       };
       client.contactManager.addContactListener(contactEventListener);
-      return () =>
+      return () => {
         client.contactManager.removeContactListener(contactEventListener);
+        sub1.remove();
+        sub2.remove();
+      };
     },
-    [client.contactManager, contactList.toast, toast]
+    [
+      client.contactManager,
+      contactList.toast,
+      manualRefresh,
+      standardizedData,
+      toast,
+      type,
+    ]
   );
 
   React.useEffect(() => {
     const load = () => {
-      console.log('test:load:');
+      console.log('test:load:', ContactListScreen.name);
       const unsubscribe = addListeners(type);
       initList(type);
       return {
@@ -741,7 +878,7 @@ export default function ContactListScreen({
       };
     };
     const unload = (params: { unsubscribe: () => void }) => {
-      console.log('test:unload:');
+      console.log('test:unload:', ContactListScreen.name);
       params.unsubscribe();
     };
 
@@ -749,13 +886,20 @@ export default function ContactListScreen({
     return () => unload(res);
   }, [addListeners, initList, type]);
 
+  // const onItems = (items: React.RefObject<EqualHeightListItemData[]>) => {
+  //   console.log('test:onItems:', items.current);
+  //   // managedData = items as React.RefObject<ItemDataType[]>;
+  //   // const r = managedData as React.MutableRefObject<ItemDataType[]>;
+  //   // r.current = items.current as ItemDataType[];
+  // };
+
   return (
     <SafeAreaView
       mode="padding"
       style={useStyleSheet().safe}
       edges={['right', 'left']}
-      onLayout={(event) => {
-        console.log('test:222:', event.nativeEvent.layout);
+      onLayout={(_) => {
+        // console.log('test:222:', event.nativeEvent.layout);
       }}
     >
       <ListSearchHeader
@@ -768,16 +912,10 @@ export default function ContactListScreen({
                 r.push(item);
               }
             }
-            listRef.current?.manualRefresh([
-              {
-                type: 'clear',
-              },
-              {
-                type: 'add',
-                data: r,
-                enableSort: true,
-              },
-            ]);
+            manualRefresh({
+              type: 'search',
+              items: r,
+            });
           });
         }}
       />
