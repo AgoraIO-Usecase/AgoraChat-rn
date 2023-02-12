@@ -15,9 +15,8 @@ const Contact = createMaterialTopTabNavigator<RootParamsList>();
 
 export default function ContactScreen({
   navigation,
-  route,
 }: MaterialBottomTabScreenProps<ParamListBase, 'Contact'>): JSX.Element {
-  console.log('test:ContactScreen:', route, navigation);
+  // console.log('test:ContactScreen:', route, navigation);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -68,6 +67,7 @@ export default function ContactScreen({
             <TabBarIcon focused={focused} color={color} type="TopContacts" />
           ),
         }}
+        initialParams={{ params: { type: 'contact_list' } }}
         component={ContactList}
       />
       <Contact.Screen

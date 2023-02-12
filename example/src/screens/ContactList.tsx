@@ -25,6 +25,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import type { ChatContactEventListener } from 'react-native-chat-sdk';
 import {
   autoFocus,
   Blank,
@@ -41,7 +42,6 @@ import {
   queueTask,
   useAlert,
   useBottomSheet,
-  useChatSdkContext,
   useManualCloseDialog,
   useThemeContext,
   useToastContext,
@@ -54,6 +54,7 @@ import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabParamsList,
@@ -450,7 +451,6 @@ const NavigationHeaderRight = (_: HeaderButtonProps) => {
   );
 };
 
-let count = 0;
 export default function ContactListScreen({
   route,
   navigation,
@@ -459,22 +459,23 @@ export default function ContactListScreen({
   const rp = route.params as any;
   const params = rp?.params as any;
   const type = params?.type as Undefinable<ContactActionType>;
-  console.log('test:ContactListScreen:', params, type);
+  console.log('test:ContactListScreen:', params, type, route);
   const theme = useThemeContext();
   // const menu = useActionMenu();
   const sheet = useBottomSheet();
   const toast = useToastContext();
   const alert = useAlert();
-  const { groupInfo } = useAppI18nContext();
+  const { groupInfo, contactList } = useAppI18nContext();
   const { height: screenHeight } = useWindowDimensions();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
-  const enableRefresh = true;
-  const enableAlphabet = true;
+  const enableRefresh = type === 'contact_list' ? true : false;
+  const enableAlphabet = type === 'contact_list' ? true : false;
   const enableHeader = false;
   // const autoFocus = false;
   const data: ItemDataType[] = React.useMemo(() => [], []);
   const [isEmpty, setIsEmpty] = React.useState(true);
+  const { client } = useAppChatSdkContext();
 
   const initData = React.useCallback(
     (list: string[]) => {
@@ -678,36 +679,75 @@ export default function ContactListScreen({
     });
   }, [navigation, type]);
 
-  const { client } = useChatSdkContext();
-  const initList = React.useCallback(() => {
-    client.contactManager
-      .getAllContactsFromServer()
-      .then((result) => {
-        console.log('test:ContactListScreen:success:', result);
-        setIsEmpty(result.length === 0);
-        initData(
-          result.map((item) => {
-            return item + ' ';
+  const initList = React.useCallback(
+    (type: Undefinable<ContactActionType>) => {
+      if (type === 'contact_list') {
+        client.contactManager
+          .getAllContactsFromServer()
+          .then((result) => {
+            console.log('test:ContactListScreen:success:', result);
+            setIsEmpty(result.length === 0);
+            initData(
+              result.map((item) => {
+                return item + ' ';
+              })
+            ); // for test
           })
-        ); // for test
-      })
-      .catch((error) => {
-        console.warn('test:error:', error);
-      });
-  }, [client, initData]);
+          .catch((error) => {
+            console.warn('test:error:', error);
+          });
+      }
+    },
+    [client, initData]
+  );
+
+  const addListeners = React.useCallback(
+    (_: Undefinable<ContactActionType>) => {
+      const contactEventListener: ChatContactEventListener = {
+        onContactAdded: (userName: string) => {
+          console.log('test:onContactAdded:', userName);
+          toast.showToast(contactList.toast[0]!);
+        },
+
+        onContactDeleted: (userName: string): void => {
+          console.log('test:onContactDeleted:', userName);
+          toast.showToast(contactList.toast[1]!);
+        },
+
+        onFriendRequestAccepted: (userName: string): void => {
+          console.log('test:onFriendRequestAccepted:', userName);
+          toast.showToast(contactList.toast[2]!);
+        },
+
+        onFriendRequestDeclined: (userName: string): void => {
+          console.log('test:onFriendRequestDeclined:', userName);
+          toast.showToast(contactList.toast[3]!);
+        },
+      };
+      client.contactManager.addContactListener(contactEventListener);
+      return () =>
+        client.contactManager.removeContactListener(contactEventListener);
+    },
+    [client.contactManager, contactList.toast, toast]
+  );
 
   React.useEffect(() => {
     const load = () => {
       console.log('test:load:');
-      initList();
+      const unsubscribe = addListeners(type);
+      initList(type);
+      return {
+        unsubscribe: unsubscribe,
+      };
     };
-    const unload = () => {
+    const unload = (params: { unsubscribe: () => void }) => {
       console.log('test:unload:');
+      params.unsubscribe();
     };
 
-    load();
-    return () => unload();
-  }, [initList]);
+    const res = load();
+    return () => unload(res);
+  }, [addListeners, initList, type]);
 
   return (
     <SafeAreaView
@@ -766,23 +806,10 @@ export default function ContactListScreen({
             },
           }}
           ItemSeparatorComponent={ListItemSeparator}
-          onRefresh={(type) => {
-            if (type === 'started') {
-              const contactID = 'aaa';
-              const v = contactID + count++;
-              listRef.current?.manualRefresh([
-                {
-                  type: 'add',
-                  data: [
-                    {
-                      contactID: v,
-                      contactName: v,
-                      key: v,
-                    } as EqualHeightListItemData,
-                  ],
-                  enableSort: true,
-                },
-              ]);
+          onRefresh={(refreshType) => {
+            console.log('test:onRefresh:', refreshType);
+            if (refreshType === 'started') {
+              initList(type);
             }
           }}
         />

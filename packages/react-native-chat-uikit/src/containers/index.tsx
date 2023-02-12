@@ -102,6 +102,7 @@ export function Container({
         new ChatOptions({
           autoLogin: option.autoLogin,
           appKey: option.appKey,
+          debugModel: true,
         })
       )
       .then(() => {

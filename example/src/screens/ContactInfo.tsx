@@ -29,6 +29,9 @@ export default function ContactInfoScreen({ navigation }: Props): JSX.Element {
   const toast = useToastContext();
   const id = 'AgoraID: xxx';
 
+  // const removeContact = () => {};
+  // const blockContact = () => {};
+
   return (
     <SafeAreaView
       mode="padding"

@@ -11,3 +11,18 @@ export type ContactActionType =
   | 'create_group';
 
 export type SearchActionType = 'add_contact' | 'join_public_group';
+
+export type NotificationMessageType =
+  | 'ContactInvitation'
+  | 'GroupInvitation'
+  | 'GroupRequestJoin';
+export type NotificationMessageDescriptionType =
+  | 'ContactInvitation'
+  | 'ContactInvitationAccepted'
+  | 'ContactInvitationDeclined'
+  | 'GroupInvitation'
+  | 'GroupInvitationAccepted'
+  | 'GroupInvitationDeclined'
+  | 'GroupRequestJoin'
+  | 'GroupRequestJoinAccepted'
+  | 'GroupRequestJoinDeclined';

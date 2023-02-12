@@ -2,6 +2,8 @@ import type { Locale } from 'date-fns';
 import en from 'date-fns/locale/en-US';
 import { UIKitStringSet2 } from 'react-native-chat-uikit';
 
+import type { NotificationMessageDescriptionType } from '../types';
+
 export class AppStringSet extends UIKitStringSet2 {
   header: {
     groupInvite: string;
@@ -153,9 +155,15 @@ export class AppStringSet extends UIKitStringSet2 {
       memberInvite: string;
       createGroup: string;
     };
+    toast: string[];
   };
   requestList: {
     button: string[];
+    description: (params: {
+      type: NotificationMessageDescriptionType;
+      user: string;
+      group?: string;
+    }) => string;
   };
 
   constructor(locate: Locale = en) {
@@ -356,9 +364,39 @@ export class AppStringSet extends UIKitStringSet2 {
         memberInvite: 'Allow members to invite',
         createGroup: 'Group',
       },
+      toast: ['1', '2', '3', '4'],
     };
     this.requestList = {
-      button: ['Accept'],
+      button: ['Accept', 'Accepted', 'Declined'],
+      description: (params: {
+        type: NotificationMessageDescriptionType;
+        user: string;
+        group?: string;
+      }) => {
+        switch (params.type) {
+          case 'ContactInvitation':
+            return `${params.user} wants to be your friend. Please accept the request.`;
+          case 'ContactInvitationAccepted':
+            return 'Your friend request has been accepted.';
+          case 'ContactInvitationDeclined':
+            return 'Your friend request has been declined.';
+          case 'GroupInvitation':
+            return `${params.user} invited you to join ${params.group}`;
+          case 'GroupInvitationAccepted':
+            return `You had been accepted to join ${params.group}.`;
+          case 'GroupInvitationDeclined':
+            return `You had been declined to join ${params.group}.`;
+          case 'GroupRequestJoin':
+            return `${params.user} request to join ${params.group}`;
+          case 'GroupRequestJoinAccepted':
+            return `You has been accepted to request from ${params.user}.`;
+          case 'GroupRequestJoinDeclined':
+            return `You has been declined to request from ${params.user}.`;
+
+          default:
+            return '';
+        }
+      },
     };
   }
 }
