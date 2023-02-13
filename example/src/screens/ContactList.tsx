@@ -789,11 +789,23 @@ export default function ContactListScreen({
 
   const addListeners = React.useCallback(
     (_: Undefinable<ContactActionType>) => {
+      const duplicateCheck = (id: string) => {
+        for (const item in data) {
+          if (item.includes(id)) {
+            return true;
+          }
+        }
+        return false;
+      };
+
       const sub1 = DeviceEventEmitter.addListener(
         'manual_add_contact',
         (event) => {
           console.log('test:manual_add_contact:', event);
           const id = event;
+          if (duplicateCheck(id)) {
+            return;
+          }
           if (type === 'contact_list') {
             manualRefresh({
               type: 'add',
@@ -819,7 +831,10 @@ export default function ContactListScreen({
       const contactEventListener: ChatContactEventListener = {
         onContactAdded: (userName: string) => {
           console.log('test:onContactAdded:', userName);
-          toast.showToast(contactList.toast[0]!);
+          if (duplicateCheck(userName)) {
+            return;
+          }
+          // toast.showToast(contactList.toast[0]!); /// !!! dead lock
           if (type === 'contact_list') {
             manualRefresh({
               type: 'add',
@@ -861,6 +876,7 @@ export default function ContactListScreen({
     [
       client.contactManager,
       contactList.toast,
+      data,
       manualRefresh,
       standardizedData,
       toast,

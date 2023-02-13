@@ -74,14 +74,14 @@ export default function ContactInfoScreen({
       'manual_block_contact',
       (event) => {
         console.log('test:manual_block_contact:', event);
-        toast.showToast(contactInfo.toast[0]!);
+        // toast.showToast(contactInfo.toast[0]!);
       }
     );
     const sub2 = DeviceEventEmitter.addListener(
       'manual_remove_contact',
       (event) => {
         console.log('test:manual_remove_contact:', event);
-        toast.showToast(contactInfo.toast[1]!);
+        // toast.showToast(contactInfo.toast[1]!);
         navigation.goBack();
       }
     );
@@ -89,7 +89,7 @@ export default function ContactInfoScreen({
       sub1.remove();
       sub2.remove();
     };
-  }, [contactInfo.toast, navigation, toast]);
+  }, [navigation]);
 
   React.useEffect(() => {
     const load = () => {
@@ -163,6 +163,7 @@ export default function ContactInfoScreen({
                 {
                   text: contactInfo.blockAlert.confirmButton,
                   onPress: () => {
+                    toast.showToast(contactInfo.toast[0]!); // !!! dead lock
                     blockContact(userId, (result) => {
                       if (result === true) {
                         // toast.showToast(contactInfo.toast[0]!); // !!! dead lock
@@ -190,6 +191,7 @@ export default function ContactInfoScreen({
                 {
                   text: contactInfo.deleteAlert.confirmButton,
                   onPress: () => {
+                    toast.showToast(contactInfo.toast[1]!); // !!! dead lock
                     removeContact(userId, (result) => {
                       if (result === true) {
                         // toast.showToast(contactInfo.toast[1]!); // !!! dead lock

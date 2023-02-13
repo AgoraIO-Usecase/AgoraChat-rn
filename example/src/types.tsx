@@ -35,4 +35,4 @@ export type GroupEvents = '';
 export type MessageEvents = '';
 export type ConversationEvents = '';
 export type ConnectEvents = '';
-export type RequestEvents = 'request_result_sent';
+export type RequestEvents = '';

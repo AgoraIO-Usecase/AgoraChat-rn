@@ -6,7 +6,7 @@ import Alert from '../components/Alert';
 import BottomSheet from '../components/BottomSheet';
 import Prompt from '../components/Prompt';
 import { CustomEvents } from '../events';
-import { useUpdate } from '../hooks';
+import { useForceUpdate } from '../hooks';
 import type { DialogPropsT, DialogTask } from '../types';
 import type { DialogContextType } from './types';
 
@@ -66,7 +66,7 @@ export const DialogContextProvider = ({
     [completeDismiss]
   );
 
-  const update = useUpdate();
+  const update = useForceUpdate();
 
   const taskQueue = React.useRef<DialogTask[]>([]);
   const workingTask = React.useRef<DialogTask>();

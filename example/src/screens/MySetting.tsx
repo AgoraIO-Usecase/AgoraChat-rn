@@ -3,6 +3,7 @@ import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
 import { Linking, Pressable, TouchableOpacity, View } from 'react-native';
+import { ChatConversationType } from 'react-native-chat-sdk';
 import {
   createStyleSheet,
   Divider,
@@ -11,7 +12,6 @@ import {
   Services,
   useAlert,
   useBottomSheet,
-  useChatSdkContext,
   usePrompt,
   useToastContext,
 } from 'react-native-chat-uikit';
@@ -20,6 +20,7 @@ import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabScreenParamsList,
@@ -77,7 +78,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const sdkVersion = 'AgoraChat v1.0.0';
   const uiVersion = 'AgoraChat v1.0.0';
   const urlName = 'agora.io';
-  const { client } = useChatSdkContext();
+  const { client } = useAppChatSdkContext();
 
   const D = () => (
     <Divider
@@ -100,6 +101,22 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     },
     [toast]
   );
+
+  const removeAllMessage = async () => {
+    const currentId = await client.getCurrentUsername();
+    client.chatManager
+      .deleteAllMessages(currentId, ChatConversationType.PeerChat)
+      .then()
+      .catch((error) => {
+        console.warn('test:removeAllMessage:', error);
+      });
+    // client.chatManager
+    //   .deleteMessagesBeforeTimestamp(timestamp())
+    //   .then()
+    //   .catch((error) => {
+    //     console.warn('test:deleteMessagesBeforeTimestamp:', error);
+    //   });
+  };
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -255,6 +272,31 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
             }}
           >
             <Text style={styles.listItemText4}>{urlName}</Text>
+          </TouchableOpacity>
+        </Pressable>
+        <Pressable onPress={() => {}} style={styles.listItem}>
+          <TouchableOpacity
+            onPress={() => {
+              alert.openAlert({
+                title: 'Sure to delete all messages',
+                buttons: [
+                  {
+                    text: 'Cancel',
+                    onPress: () => {},
+                  },
+                  {
+                    text: 'Confirm',
+                    onPress: () => {
+                      removeAllMessage();
+                    },
+                  },
+                ],
+              });
+            }}
+          >
+            <Text style={[styles.listItemText1, { color: 'red' }]}>
+              Delete All Messages
+            </Text>
           </TouchableOpacity>
         </Pressable>
         <Intervallum content={settings.logins} />

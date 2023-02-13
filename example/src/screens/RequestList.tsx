@@ -1,6 +1,6 @@
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import * as React from 'react';
-import { DeviceEventEmitter, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import {
   ChatContactEventListener,
   ChatConversationType,
@@ -194,7 +194,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
   const data: ItemDataType[] = [];
   const [isEmpty, setIsEmpty] = React.useState(false);
 
-  const updateData = React.useCallback(
+  const updateDataThen = React.useCallback(
     (
       isAccepted: boolean,
       item: ItemDataType,
@@ -239,6 +239,46 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               .then(() => {
                 console.log('test:result:success');
                 onResult?.(true, body);
+                if (
+                  body.params.type === 'ContactInvitationAccepted' ||
+                  body.params.type === 'ContactInvitationDeclined'
+                ) {
+                  if (body.params.type === 'ContactInvitationAccepted') {
+                    client.contactManager.acceptInvitation(body.params.from);
+                  } else {
+                    client.contactManager.declineInvitation(body.params.from);
+                  }
+                } else if (
+                  body.params.type === 'GroupRequestJoinAccepted' ||
+                  body.params.type === 'GroupRequestJoinDeclined'
+                ) {
+                  if (body.params.type === 'GroupRequestJoinAccepted') {
+                    client.groupManager.acceptJoinApplication(
+                      body.params.groupId,
+                      body.params.from
+                    );
+                  } else {
+                    client.groupManager.declineJoinApplication(
+                      body.params.groupId,
+                      body.params.from
+                    );
+                  }
+                } else if (
+                  body.params.type === 'GroupInvitationAccepted' ||
+                  body.params.type === 'GroupInvitationDeclined'
+                ) {
+                  if (body.params.type === 'GroupInvitationAccepted') {
+                    client.groupManager.acceptInvitation(
+                      body.params.groupId,
+                      body.params.from
+                    );
+                  } else {
+                    client.groupManager.declineInvitation(
+                      body.params.groupId,
+                      body.params.from
+                    );
+                  }
+                }
               })
               .catch((error) => {
                 console.warn('test:error:', error);
@@ -250,21 +290,113 @@ export default function RequestListScreen(_props: Props): JSX.Element {
           console.warn('test:error:', error);
         });
     },
-    [client.chatManager]
+    [client.chatManager, client.contactManager, client.groupManager]
+  );
+
+  const updateDataAwait = React.useCallback(
+    async (
+      isAccepted: boolean,
+      item: ItemDataType
+    ): Promise<{ body: ChatCustomMessageBody } | undefined> => {
+      try {
+        const result = await client.chatManager.getMessage(item.msgId);
+        if (result) {
+          let body = result.body as ChatCustomMessageBody;
+
+          if (
+            body.params.type === 'ContactInvitationAccepted' ||
+            body.params.type === 'ContactInvitationDeclined' ||
+            body.params.type === 'GroupRequestJoinAccepted' ||
+            body.params.type === 'GroupRequestJoinDeclined' ||
+            body.params.type === 'GroupInvitationAccepted' ||
+            body.params.type === 'GroupInvitationDeclined'
+          ) {
+            return undefined;
+          }
+
+          if (body.event === 'ContactInvitation') {
+            body.params.type =
+              isAccepted === true
+                ? 'ContactInvitationAccepted'
+                : 'ContactInvitationDeclined';
+          } else if (body.event === 'GroupRequestJoin') {
+            body.params.type =
+              isAccepted === true
+                ? 'GroupRequestJoinAccepted'
+                : 'GroupRequestJoinDeclined';
+          } else if (body.event === 'GroupInvitation') {
+            body.params.type =
+              isAccepted === true
+                ? 'GroupInvitationAccepted'
+                : 'GroupInvitationDeclined';
+          } else {
+            return undefined;
+          }
+          await client.chatManager.updateMessage(result);
+
+          if (
+            body.params.type === 'ContactInvitationAccepted' ||
+            body.params.type === 'ContactInvitationDeclined'
+          ) {
+            if (body.params.type === 'ContactInvitationAccepted') {
+              await client.contactManager.acceptInvitation(body.params.from);
+            } else {
+              await client.contactManager.declineInvitation(body.params.from);
+            }
+          } else if (
+            body.params.type === 'GroupRequestJoinAccepted' ||
+            body.params.type === 'GroupRequestJoinDeclined'
+          ) {
+            if (body.params.type === 'GroupRequestJoinAccepted') {
+              client.groupManager.acceptJoinApplication(
+                body.params.groupId,
+                body.params.from
+              );
+            } else {
+              client.groupManager.declineJoinApplication(
+                body.params.groupId,
+                body.params.from
+              );
+            }
+          } else if (
+            body.params.type === 'GroupInvitationAccepted' ||
+            body.params.type === 'GroupInvitationDeclined'
+          ) {
+            if (body.params.type === 'GroupInvitationAccepted') {
+              client.groupManager.acceptInvitation(
+                body.params.groupId,
+                body.params.from
+              );
+            } else {
+              client.groupManager.declineInvitation(
+                body.params.groupId,
+                body.params.from
+              );
+            }
+          }
+
+          return {
+            body: body,
+          };
+        } else {
+          return undefined;
+        }
+      } catch (error) {
+        console.warn('test:error:555:', error);
+        return undefined;
+      }
+    },
+    [client.chatManager, client.contactManager, client.groupManager]
   );
 
   const standardizedData = React.useCallback(
     (data: Omit<ItemDataType, 'onAction'>): ItemDataType => {
       return {
         ...data,
-        onAction: (isAccepted: boolean, item: ItemDataType) => {
-          updateData(isAccepted, item, (result, body) => {
-            // DeviceEventEmitter.emit('request_result_sent', {
-            //   item,
-            //   result,
-            //   body,
-            // });
-            if (result === true) {
+        onAction: async (isAccepted: boolean, item: ItemDataType) => {
+          const select = 'await' as 'then' | 'await';
+          if (select === 'then') {
+            updateDataThen(isAccepted, item, (_, body) => {
               listRef.current?.manualRefresh([
                 {
                   type: 'update',
@@ -277,57 +409,30 @@ export default function RequestListScreen(_props: Props): JSX.Element {
                   ],
                 },
               ]);
-            }
-
-            if (body === undefined) {
+            });
+          } else if (select === 'await') {
+            const ret = await updateDataAwait(isAccepted, item);
+            if (ret === undefined) {
               return;
             }
-
-            if (
-              body.params.type === 'ContactInvitationAccepted' ||
-              body.params.type === 'ContactInvitationDeclined'
-            ) {
-              if (body.params.type === 'ContactInvitationAccepted') {
-                client.contactManager.acceptInvitation(body.params.from);
-              } else {
-                client.contactManager.declineInvitation(body.params.from);
-              }
-            } else if (
-              body.params.type === 'GroupRequestJoinAccepted' ||
-              body.params.type === 'GroupRequestJoinDeclined'
-            ) {
-              if (body.params.type === 'GroupRequestJoinAccepted') {
-                client.groupManager.acceptJoinApplication(
-                  body.params.groupId,
-                  body.params.from
-                );
-              } else {
-                client.groupManager.declineJoinApplication(
-                  body.params.groupId,
-                  body.params.from
-                );
-              }
-            } else if (
-              body.params.type === 'GroupInvitationAccepted' ||
-              body.params.type === 'GroupInvitationDeclined'
-            ) {
-              if (body.params.type === 'GroupInvitationAccepted') {
-                client.groupManager.acceptInvitation(
-                  body.params.groupId,
-                  body.params.from
-                );
-              } else {
-                client.groupManager.declineInvitation(
-                  body.params.groupId,
-                  body.params.from
-                );
-              }
-            }
-          });
+            const { body } = ret;
+            listRef.current?.manualRefresh([
+              {
+                type: 'update',
+                enableSort: false,
+                data: [
+                  {
+                    ...item,
+                    notificationType: body!.params.type,
+                  } as EqualHeightListItemData,
+                ],
+              },
+            ]);
+          }
         },
       };
     },
-    [client.contactManager, client.groupManager, updateData]
+    [updateDataThen, updateDataAwait]
   );
 
   const initData = React.useCallback(
@@ -369,55 +474,6 @@ export default function RequestListScreen(_props: Props): JSX.Element {
   );
 
   const initList = React.useCallback(async () => {
-    // const pseudoData = async () => {
-    //   const convId = await client.getCurrentUsername();
-    //   console.log('test:pseudoData:', convId);
-    //   const msg = ChatMessage.createCustomMessage(
-    //     convId,
-    //     'ContactInvitation',
-    //     ChatMessageChatType.PeerChat,
-    //     {
-    //       params: {
-    //         from: 'yyy',
-    //         groupId: 'zzz',
-    //         type: 'ContactInvitation',
-    //         describe: requestList.description,
-    //       },
-    //     }
-    //   );
-    //   console.log('test:msg:', msg);
-    //   client.chatManager
-    //     .insertMessage(msg)
-    //     .then((result) => {
-    //       console.log('test:RequestListScreen:111:', result);
-    //       client.chatManager
-    //         .getMessage(msg.msgId)
-    //         .then((result) => {
-    //           console.log('test:RequestListScreen:222:', result);
-    //         })
-    //         .catch((error) => {
-    //           console.warn('test:error:', error);
-    //         });
-    //       client.chatManager
-    //         .getMessagesWithMsgType(
-    //           convId,
-    //           ChatConversationType.PeerChat,
-    //           ChatMessageType.CUSTOM,
-    //           ChatSearchDirection.DOWN
-    //         )
-    //         .then((result) => {
-    //           console.log('test:RequestListScreen:333:', result);
-    //         })
-    //         .catch((error) => {
-    //           console.warn('test:error:', error);
-    //         });
-    //     })
-    //     .catch((error) => {
-    //       console.warn('test:error:', error);
-    //     });
-    // };
-    // pseudoData();
-
     const convId = await client.getCurrentUsername();
     if (convId === undefined || convId.length === 0) {
       return;
@@ -455,84 +511,6 @@ export default function RequestListScreen(_props: Props): JSX.Element {
   }, [client, initData]);
 
   const addListeners = React.useCallback(() => {
-    const sub1 = DeviceEventEmitter.addListener(
-      'request_result_sent',
-      (event) => {
-        console.log('test:request_result_sent:', event);
-        const { result, body, item } = event as {
-          result: boolean;
-          body?: ChatCustomMessageBody;
-          item: ItemDataType;
-        };
-        if (result === true) {
-          listRef.current?.manualRefresh([
-            {
-              type: 'update',
-              enableSort: false,
-              sortDirection: 'dsc',
-              data: [
-                {
-                  ...item,
-                  notificationType: body!.params.type,
-                } as EqualHeightListItemData,
-              ],
-            },
-          ]);
-        }
-
-        if (body === undefined) {
-          return;
-        }
-
-        if (
-          body.params.type === 'ContactInvitationAccepted' ||
-          body.params.type === 'ContactInvitationDeclined'
-        ) {
-          if (body.params.type === 'ContactInvitationAccepted') {
-            client.contactManager
-              .acceptInvitation(body.params.from)
-              .then((result) => {
-                console.log('test:acceptInvitation:', result); // !!! dead lock for result with pre same variable
-              })
-              .catch((error) => {
-                console.log('test:acceptInvitation:error:', error);
-              });
-          } else {
-            client.contactManager.declineInvitation(body.params.from);
-          }
-        } else if (
-          body.params.type === 'GroupRequestJoinAccepted' ||
-          body.params.type === 'GroupRequestJoinDeclined'
-        ) {
-          if (body.params.type === 'GroupRequestJoinAccepted') {
-            client.groupManager.acceptJoinApplication(
-              body.params.groupId,
-              body.params.from
-            );
-          } else {
-            client.groupManager.declineJoinApplication(
-              body.params.groupId,
-              body.params.from
-            );
-          }
-        } else if (
-          body.params.type === 'GroupInvitationAccepted' ||
-          body.params.type === 'GroupInvitationDeclined'
-        ) {
-          if (body.params.type === 'GroupInvitationAccepted') {
-            client.groupManager.acceptInvitation(
-              body.params.groupId,
-              body.params.from
-            );
-          } else {
-            client.groupManager.declineInvitation(
-              body.params.groupId,
-              body.params.from
-            );
-          }
-        }
-      }
-    );
     const contactEventListener: ChatContactEventListener = {
       onContactInvited: async (userName: string, reason?: string) => {
         console.log('test:onContactInvited:', userName, reason);
@@ -580,7 +558,6 @@ export default function RequestListScreen(_props: Props): JSX.Element {
     client.contactManager.addContactListener(contactEventListener);
     return () => {
       client.contactManager.removeContactListener(contactEventListener);
-      sub1.remove();
     };
   }, [client, standardizedData]);
 
