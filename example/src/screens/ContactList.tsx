@@ -498,7 +498,10 @@ export default function ContactListScreen({
   const { client } = useAppChatSdkContext();
 
   const manualRefresh = React.useCallback(
-    (params: { type: 'init' | 'add' | 'search'; items: ItemDataType[] }) => {
+    (params: {
+      type: 'init' | 'add' | 'search' | 'del-one';
+      items: ItemDataType[];
+    }) => {
       if (params.type === 'init') {
         data.length = 0;
         listRef.current?.manualRefresh([
@@ -535,6 +538,28 @@ export default function ContactListScreen({
           },
         ]);
         data.push(...params.items);
+      } else if (params.type === 'del-one') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'del',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: false,
+          },
+        ]);
+        let hadDeleted = false;
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          for (const item of params.items) {
+            if (element && item.key === element.key) {
+              data.splice(index, 1);
+              hadDeleted = true;
+              break;
+            }
+          }
+          if (hadDeleted === true) {
+            break;
+          }
+        }
       } else {
         console.warn('test:');
         return;
@@ -853,7 +878,20 @@ export default function ContactListScreen({
 
         onContactDeleted: (userName: string): void => {
           console.log('test:onContactDeleted:', userName);
-          toast.showToast(contactList.toast[1]!);
+          if (type === 'contact_list') {
+            manualRefresh({
+              type: 'del-one',
+              items: [
+                standardizedData({
+                  key: userName,
+                  contactID: userName,
+                  contactName: userName,
+                  actionType: 'contact_list',
+                  action: undefined,
+                }),
+              ],
+            });
+          }
         },
 
         onFriendRequestAccepted: (userName: string): void => {

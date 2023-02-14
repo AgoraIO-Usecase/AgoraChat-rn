@@ -416,6 +416,9 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               return;
             }
             const { body } = ret;
+            if (body === undefined) {
+              return;
+            }
             listRef.current?.manualRefresh([
               {
                 type: 'update',
@@ -423,7 +426,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
                 data: [
                   {
                     ...item,
-                    notificationType: body!.params.type,
+                    notificationType: body.params.type,
                   } as EqualHeightListItemData,
                 ],
               },

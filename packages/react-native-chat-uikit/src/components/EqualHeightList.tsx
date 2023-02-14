@@ -546,7 +546,23 @@ export const EqualHeightList: (
           }
           break;
         case 'del':
-          throw new Error('Array deletion is expensive.');
+          if (item.data) {
+            let hadDeleted = false;
+            for (const d of item.data) {
+              for (let index = 0; index < data.length; index++) {
+                const dd = data[index];
+                if (dd && dd.itemProps.data.key === d.key) {
+                  data.splice(index, 1);
+                  hadDeleted = true;
+                  break;
+                }
+              }
+              if (hadDeleted === true) {
+                break;
+              }
+            }
+          }
+          break;
         case 'clear':
           data.splice(0, data.length);
           break;
