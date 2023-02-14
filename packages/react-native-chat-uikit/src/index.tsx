@@ -75,7 +75,7 @@ export { default as SearchBar, SearchBarProps } from './components/SearchBar';
 export { default as Switch } from './components/Switch';
 export { default as TextInput } from './components/TextInput';
 export { default as Toast } from './components/Toast';
-export { ContainerProps, Container as UIKitContainer } from './containers';
+export * from './containers';
 export * from './contexts';
 export * from './fragments';
 export { useAsyncTask, useDeferredValue, useForceUpdate } from './hooks';

@@ -6,22 +6,21 @@ import {
   createStyleSheet,
   getScaleFactor,
   LocalIcon,
+  ScreenContainer,
   Switch,
   useAlert,
   useToastContext,
 } from 'react-native-chat-uikit';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
-import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export default function ContactInfoScreen({
+export function ContactInfoScreenInternal({
   route,
   navigation,
 }: Props): JSX.Element {
@@ -109,108 +108,99 @@ export default function ContactInfoScreen({
   }, [addListeners]);
 
   return (
-    <SafeAreaView
-      mode="padding"
-      style={useStyleSheet().safe}
-      edges={['right', 'left', 'bottom']}
-    >
-      <View style={styles.container}>
-        <View style={styles.top}>
-          <Avatar uri="" size={sf(100)} radius={sf(50)} />
-        </View>
-        <View style={styles.top}>
-          <Text style={styles.name}>{contactInfo.name('NickName')}</Text>
-        </View>
-        <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.id}>{userId}</Text>
-        </View>
-        <Pressable
-          onPress={() => {
-            navigation.navigate('Chat', {});
-          }}
-          style={styles.chatButton}
-        >
-          <LocalIcon name="tabbar_chats" size={sf(30)} />
-        </Pressable>
-        <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.chat}>{contactInfo.chat}</Text>
-        </View>
-        <View style={{ height: sf(66) }} />
-        <View style={styles.listItem}>
-          <Text style={styles.listItemText1}>{contactInfo.mute}</Text>
-          <Switch
-            value={isMute}
-            onChangeValue={function (val: boolean): void {
-              console.log('test:Switch:', val);
-              setIsMute(val);
-            }}
-            size={sf(28)}
-            thumbColor="white"
-            inactiveThumbColor="white"
-            inactiveTrackColor="rgba(216, 216, 216, 1)"
-          />
-        </View>
-        <Pressable
-          style={styles.listItem}
-          onPress={() => {
-            alert.openAlert({
-              title: contactInfo.blockAlert.title,
-              message: contactInfo.blockAlert.message,
-              buttons: [
-                {
-                  text: contactInfo.blockAlert.cancelButton,
-                },
-                {
-                  text: contactInfo.blockAlert.confirmButton,
-                  onPress: () => {
-                    toast.showToast(contactInfo.toast[0]!); // !!! dead lock
-                    blockContact(userId, (result) => {
-                      if (result === true) {
-                        // toast.showToast(contactInfo.toast[0]!); // !!! dead lock
-                        DeviceEventEmitter.emit('manual_block_contact', userId);
-                      }
-                    });
-                  },
-                },
-              ],
-            });
-          }}
-        >
-          <Text style={styles.listItemText1}>{contactInfo.block}</Text>
-        </Pressable>
-        <Pressable
-          style={styles.listItem}
-          onPress={() => {
-            alert.openAlert({
-              title: contactInfo.deleteAlert.title,
-              message: contactInfo.deleteAlert.message,
-              buttons: [
-                {
-                  text: contactInfo.deleteAlert.cancelButton,
-                },
-                {
-                  text: contactInfo.deleteAlert.confirmButton,
-                  onPress: () => {
-                    toast.showToast(contactInfo.toast[1]!); // !!! dead lock
-                    removeContact(userId, (result) => {
-                      if (result === true) {
-                        // toast.showToast(contactInfo.toast[1]!); // !!! dead lock
-                        DeviceEventEmitter.emit(
-                          'manual_remove_contact',
-                          userId
-                        );
-                      }
-                    });
-                  },
-                },
-              ],
-            });
-          }}
-        >
-          <Text style={styles.listItemText2}>{contactInfo.delete}</Text>
-        </Pressable>
+    <View style={styles.container}>
+      <View style={styles.top}>
+        <Avatar uri="" size={sf(100)} radius={sf(50)} />
       </View>
-    </SafeAreaView>
+      <View style={styles.top}>
+        <Text style={styles.name}>{contactInfo.name('NickName')}</Text>
+      </View>
+      <View style={{ marginTop: sf(10) }}>
+        <Text style={styles.id}>{userId}</Text>
+      </View>
+      <Pressable
+        onPress={() => {
+          navigation.navigate('Chat', {});
+        }}
+        style={styles.chatButton}
+      >
+        <LocalIcon name="tabbar_chats" size={sf(30)} />
+      </Pressable>
+      <View style={{ marginTop: sf(10) }}>
+        <Text style={styles.chat}>{contactInfo.chat}</Text>
+      </View>
+      <View style={{ height: sf(66) }} />
+      <View style={styles.listItem}>
+        <Text style={styles.listItemText1}>{contactInfo.mute}</Text>
+        <Switch
+          value={isMute}
+          onChangeValue={function (val: boolean): void {
+            console.log('test:Switch:', val);
+            setIsMute(val);
+          }}
+          size={sf(28)}
+          thumbColor="white"
+          inactiveThumbColor="white"
+          inactiveTrackColor="rgba(216, 216, 216, 1)"
+        />
+      </View>
+      <Pressable
+        style={styles.listItem}
+        onPress={() => {
+          alert.openAlert({
+            title: contactInfo.blockAlert.title,
+            message: contactInfo.blockAlert.message,
+            buttons: [
+              {
+                text: contactInfo.blockAlert.cancelButton,
+              },
+              {
+                text: contactInfo.blockAlert.confirmButton,
+                onPress: () => {
+                  toast.showToast(contactInfo.toast[0]!); // !!! dead lock
+                  blockContact(userId, (result) => {
+                    if (result === true) {
+                      // toast.showToast(contactInfo.toast[0]!); // !!! dead lock
+                      DeviceEventEmitter.emit('manual_block_contact', userId);
+                    }
+                  });
+                },
+              },
+            ],
+          });
+        }}
+      >
+        <Text style={styles.listItemText1}>{contactInfo.block}</Text>
+      </Pressable>
+      <Pressable
+        style={styles.listItem}
+        onPress={() => {
+          alert.openAlert({
+            title: contactInfo.deleteAlert.title,
+            message: contactInfo.deleteAlert.message,
+            buttons: [
+              {
+                text: contactInfo.deleteAlert.cancelButton,
+              },
+              {
+                text: contactInfo.deleteAlert.confirmButton,
+                onPress: () => {
+                  toast.showToast(contactInfo.toast[1]!); // !!! dead lock
+                  removeContact(userId, (result) => {
+                    if (result === true) {
+                      // toast.showToast(contactInfo.toast[1]!); // !!! dead lock
+                      DeviceEventEmitter.emit('manual_remove_contact', userId);
+                    }
+                  });
+                },
+              },
+            ],
+          });
+        }}
+      >
+        <Text style={styles.listItemText2}>{contactInfo.delete}</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -269,3 +259,14 @@ const styles = createStyleSheet({
     color: 'rgba(255, 20, 204, 1)',
   },
 });
+
+export default function ContactInfoScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ContactInfoScreenInternal route={route} navigation={navigation} />
+    </ScreenContainer>
+  );
+}

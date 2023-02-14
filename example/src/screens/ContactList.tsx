@@ -20,7 +20,6 @@ import type {
 } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
 import {
-  DeviceEventEmitter,
   Pressable,
   TouchableOpacity,
   useWindowDimensions,
@@ -822,37 +821,6 @@ export default function ContactListScreen({
         }
         return false;
       };
-
-      const sub1 = DeviceEventEmitter.addListener(
-        'manual_add_contact',
-        (event) => {
-          console.log('test:manual_add_contact:', event);
-          const id = event;
-          if (duplicateCheck(id)) {
-            return;
-          }
-          if (type === 'contact_list') {
-            manualRefresh({
-              type: 'add',
-              items: [
-                standardizedData({
-                  key: id,
-                  contactID: id,
-                  contactName: id,
-                  actionType: 'contact_list',
-                  action: undefined,
-                }),
-              ],
-            });
-          }
-        }
-      );
-      const sub2 = DeviceEventEmitter.addListener(
-        'manual_remove_contact',
-        (event) => {
-          console.log('test:manual_remove_contact:', event);
-        }
-      );
       const contactEventListener: ChatContactEventListener = {
         onContactAdded: (userName: string) => {
           console.log('test:onContactAdded:', userName);
@@ -907,8 +875,6 @@ export default function ContactListScreen({
       client.contactManager.addContactListener(contactEventListener);
       return () => {
         client.contactManager.removeContactListener(contactEventListener);
-        sub1.remove();
-        sub2.remove();
       };
     },
     [

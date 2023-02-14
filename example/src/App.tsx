@@ -20,10 +20,10 @@ import {
   createStringSetEn2,
   DarkTheme,
   getScaleFactor,
+  GlobalContainer,
   LightTheme,
   Loading,
   Services,
-  UIKitContainer,
   updateScaleFactor,
 } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
@@ -137,7 +137,7 @@ export default function App() {
 
   return (
     <React.StrictMode>
-      <UIKitContainer
+      <GlobalContainer
         option={{ appKey: appKey, autoLogin: false }}
         theme={isLightTheme ? LightTheme : DarkTheme}
         localization={createStringSetEn2(new AppStringSet())}
@@ -287,7 +287,7 @@ export default function App() {
             </Root.Navigator>
           </NavigationContainer>
         )}
-      </UIKitContainer>
+      </GlobalContainer>
     </React.StrictMode>
   );
 }
