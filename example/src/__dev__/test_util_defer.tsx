@@ -17,6 +17,8 @@ export default function TestUtilDefer() {
   };
 
   const [obj, setObj] = React.useState<ObjType>({ name: 'zs', age: count });
+  const data = React.useMemo<ObjType[]>(() => [{ name: 'zs', age: count }], []);
+  const [objs, setObjs] = React.useState<ObjType[]>(data);
 
   return (
     <View style={{ marginTop: 100 }}>
@@ -55,6 +57,18 @@ export default function TestUtilDefer() {
         </RNButton>
         <Text>{obj.age}</Text>
         <Text>{useDeferredValueM(obj).age}</Text>
+      </View>
+      <View>
+        <RNButton
+          title="compare object array value"
+          onPress={() => {
+            setObjs([{ name: objs[0]!.name, age: objs[0]!.age + 1 }]);
+          }}
+        >
+          defer object value
+        </RNButton>
+        <Text>{objs[0]!.age}</Text>
+        <Text>{useDeferredValueM(objs)[0]!.age}</Text>
       </View>
     </View>
   );

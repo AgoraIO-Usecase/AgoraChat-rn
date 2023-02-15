@@ -1,6 +1,7 @@
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import * as React from 'react';
 import { View } from 'react-native';
+import type { ChatGroupEventListener } from 'react-native-chat-sdk';
 import {
   autoFocus,
   Blank,
@@ -11,9 +12,9 @@ import {
   EqualHeightListRef,
   getScaleFactor,
   queueTask,
-  useBottomSheet,
+  throttle,
   useChatSdkContext,
-  useThemeContext,
+  useDeferredValue,
 } from 'react-native-chat-uikit';
 import { Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,6 +25,15 @@ import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootParamsList } from '../routes';
+
+export const useDeferredQueueTask = (f: Function, ...args: any[]) => {
+  try {
+    const deferred = useDeferredValue(() => f(args));
+    queueTask(deferred);
+  } catch (error) {
+    console.warn('test:useDeferredQueueTask:', error);
+  }
+};
 
 type Props = MaterialTopTabScreenProps<RootParamsList>;
 
@@ -40,20 +50,19 @@ const Item: EqualHeightListItemComponent = (props) => {
       <DefaultAvatar size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         <Text style={{ lineHeight: 20, fontSize: 16, fontWeight: '600' }}>
-          {item.groupID}
+          {item.groupName.length !== 0 ? item.groupName : item.groupID}
         </Text>
-        <Text>{item.groupName}</Text>
+        {/* <Text>{item.groupID}</Text> */}
       </View>
     </View>
   );
 };
 
-let count = 0;
 export default function GroupListScreen({ navigation }: Props): JSX.Element {
   // console.log('test:GroupListScreen:', route, navigation);
-  const theme = useThemeContext();
+  // const theme = useThemeContext();
   // const menu = useActionMenu();
-  const sheet = useBottomSheet();
+  // const sheet = useBottomSheet();
   const sf = getScaleFactor();
 
   const listRef = React.useRef<EqualHeightListRef>(null);
@@ -61,64 +70,122 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
   const enableAlphabet = false;
   const enableHeader = true;
   // const autoFocus = false;
-  const data: ItemDataType[] = [];
+  const data: ItemDataType[] = React.useMemo(() => [], []); // for search
   const [isEmpty, setIsEmpty] = React.useState(true);
 
-  const initData = React.useCallback(
-    (list: string[]) => {
-      const r = list.map((value) => {
-        const i = value.lastIndexOf(' ');
-        const groupID = value.slice(0, i);
-        const groupName = value.slice(i + 1);
-        return {
-          key: groupID,
-          groupID: groupID,
-          groupName: groupName,
-          onLongPress: (data) => {
-            console.log('test:onLongPress:data:', data);
-            sheet.openSheet({
-              sheetItems: [
-                {
-                  icon: 'loading',
-                  iconColor: theme.colors.primary,
-                  title: '1',
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:', data);
-                  },
-                },
-                {
-                  icon: 'loading',
-                  iconColor: theme.colors.primary,
-                  title: '2',
-                  titleColor: 'black',
-                  onPress: () => {
-                    console.log('test:onPress:data:', data);
-                  },
-                },
-              ],
-            });
+  const manualRefresh = React.useCallback(
+    (params: {
+      type: 'init' | 'add' | 'search' | 'del-one' | 'update-one';
+      items: ItemDataType[];
+    }) => {
+      if (params.type === 'init') {
+        data.length = 0;
+        listRef.current?.manualRefresh([
+          {
+            type: 'clear',
           },
-          onPress: (data) => {
-            console.log('test:onPress:data:', data);
-            navigation.navigate('GroupInfo', { params: {} });
-            // navigation.navigate({ name: 'GroupInfo', params: {} });
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
           },
-        } as ItemDataType;
-      });
-      // data.push(...r);
-      listRef.current?.manualRefresh([
-        {
-          type: 'clear',
-        },
-        {
-          type: 'add',
-          data: r,
-          enableSort: true,
-        },
-      ]);
+        ]);
+        data.push(...params.items);
+      } else if (params.type === 'search') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'clear',
+          },
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+      } else if (params.type === 'add') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'add',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+        data.push(...params.items);
+      } else if (params.type === 'del-one') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'del',
+            data: params.items as EqualHeightListItemData[],
+          },
+        ]);
+        let hadDeleted = false;
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          for (const item of params.items) {
+            if (element && item.key === element.key) {
+              data.splice(index, 1);
+              hadDeleted = true;
+              break;
+            }
+          }
+          if (hadDeleted === true) {
+            break;
+          }
+        }
+      } else if (params.type === 'update-one') {
+        listRef.current?.manualRefresh([
+          {
+            type: 'update',
+            data: params.items as EqualHeightListItemData[],
+            enableSort: true,
+            sortDirection: 'asc',
+          },
+        ]);
+        let hadUpdated = false;
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let index = 0; index < data.length; index++) {
+          const element = data[index];
+          for (const item of params.items) {
+            if (element && item.key === element.key) {
+              element.groupName = item.groupName;
+              hadUpdated = true;
+              break;
+            }
+          }
+          if (hadUpdated === true) {
+            break;
+          }
+        }
+      } else {
+        console.warn('test:');
+        return;
+      }
     },
-    [navigation, sheet, theme.colors.primary]
+    [data]
+  );
+
+  const standardizedData = React.useCallback(
+    (item: Omit<ItemDataType, 'onLongPress' | 'onPress'>): ItemDataType => {
+      return {
+        ...item,
+        onPress: (data) => {
+          console.log('test:onPress:data:', data);
+          navigation.navigate('GroupInfo', { params: {} });
+          // navigation.navigate({ name: 'GroupInfo', params: {} });
+        },
+      };
+    },
+    [navigation]
+  );
+
+  const initData = React.useCallback(
+    (list: ItemDataType[]) => {
+      manualRefresh({ type: 'init', items: list });
+    },
+    [manualRefresh]
   );
 
   const { client } = useChatSdkContext();
@@ -130,27 +197,176 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
         setIsEmpty(result.length === 0);
         initData(
           result.map((item) => {
-            return item.groupId + ' ' + item.groupName;
+            return standardizedData({
+              key: item.groupId,
+              groupID: item.groupId,
+              groupName: item.groupName,
+            });
           })
         ); // for test
       })
       .catch((error) => {
         console.warn('test:error:', error);
       });
-  }, [client, initData]);
+  }, [client.groupManager, initData, standardizedData]);
+
+  const requestGroupInfo = React.useCallback(
+    (groupId: string) => {
+      client.groupManager
+        .getGroupWithId(groupId)
+        .then((result) => {
+          console.log('test:requestGroupInfo:', result);
+          if (result) {
+            manualRefresh({
+              type: 'update-one',
+              items: [
+                {
+                  key: result.groupId,
+                  groupID: result.groupId,
+                  groupName: result.groupName ?? '',
+                },
+              ],
+            });
+          }
+        })
+        .catch((error) => {
+          console.warn('test:requestGroupInfo:', error);
+        });
+    },
+    [client.groupManager, manualRefresh]
+  );
+
+  const addListeners = React.useCallback(() => {
+    const duplicateCheck = (id: string) => {
+      for (const item in data) {
+        if (item.includes(id)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    const groupEventListener: ChatGroupEventListener = {
+      onRequestToJoinAccepted: (params: {
+        groupId: string;
+        accepter: string;
+        groupName?: string;
+      }): void => {
+        if (duplicateCheck(params.groupId)) {
+          return;
+        }
+        manualRefresh({
+          type: 'add',
+          items: [
+            {
+              key: params.groupId,
+              groupID: params.groupId,
+              groupName: params.groupName ?? '',
+            },
+          ],
+        });
+        if (params.groupName === undefined) {
+          requestGroupInfo(params.groupId);
+        }
+      },
+      onUserRemoved: (params: {
+        groupId: string;
+        groupName?: string;
+      }): void => {
+        if (duplicateCheck(params.groupId)) {
+          return;
+        }
+        manualRefresh({
+          type: 'add',
+          items: [
+            {
+              key: params.groupId,
+              groupID: params.groupId,
+              groupName: params.groupName ?? '',
+            },
+          ],
+        });
+        if (params.groupName === undefined) {
+          requestGroupInfo(params.groupId);
+        }
+      },
+      onGroupDestroyed: (params: {
+        groupId: string;
+        groupName?: string;
+      }): void => {
+        if (duplicateCheck(params.groupId)) {
+          return;
+        }
+        manualRefresh({
+          type: 'add',
+          items: [
+            {
+              key: params.groupId,
+              groupID: params.groupId,
+              groupName: params.groupName ?? '',
+            },
+          ],
+        });
+        if (params.groupName === undefined) {
+          requestGroupInfo(params.groupId);
+        }
+      },
+      onAutoAcceptInvitation: (params: {
+        groupId: string;
+        inviter: string;
+        inviteMessage?: string;
+      }): void => {
+        if (duplicateCheck(params.groupId)) {
+          return;
+        }
+        manualRefresh({
+          type: 'add',
+          items: [
+            {
+              key: params.groupId,
+              groupID: params.groupId,
+              groupName: '',
+            },
+          ],
+        });
+        requestGroupInfo(params.groupId);
+      },
+    };
+    client.groupManager.addGroupListener(groupEventListener);
+    return () => {
+      client.groupManager.removeGroupListener(groupEventListener);
+    };
+  }, [client.groupManager, data, manualRefresh, requestGroupInfo]);
 
   React.useEffect(() => {
     const load = () => {
       console.log('test:load:', GroupListScreen.name);
+      const unsubscribe = addListeners();
       initList();
+      return {
+        unsubscribe: unsubscribe,
+      };
     };
-    const unload = () => {
+    const unload = (params: { unsubscribe: () => void }) => {
       console.log('test:unload:', GroupListScreen.name);
+      params.unsubscribe();
     };
 
-    load();
-    return () => unload();
-  }, [initList]);
+    const res = load();
+    return () => unload(res);
+  }, [addListeners, initList]);
+
+  const deferredSearch = throttle((text: string) => {
+    const r: ItemDataType[] = [];
+    for (const item of data) {
+      if (item.groupName?.includes(text)) {
+        r.push(item);
+      }
+    }
+    manualRefresh({
+      type: 'search',
+      items: r,
+    });
+  });
 
   return (
     <SafeAreaView
@@ -162,24 +378,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
         autoFocus={autoFocus()}
         onChangeText={(text) => {
           console.log('test:ListSearchHeader:onChangeText:', Text);
-          queueTask(() => {
-            const r: ItemDataType[] = [];
-            for (const item of data) {
-              if (item.key.includes(text)) {
-                r.push(item);
-              }
-            }
-            listRef.current?.manualRefresh([
-              {
-                type: 'clear',
-              },
-              {
-                type: 'add',
-                data: r,
-                enableSort: true,
-              },
-            ]);
-          });
+          deferredSearch(text);
         }}
       />
       {isEmpty === true ? (
@@ -206,21 +405,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
           ItemSeparatorComponent={ListItemSeparator}
           onRefresh={(type) => {
             if (type === 'started') {
-              const groupID = 'aaa';
-              const v = groupID + count++;
-              listRef.current?.manualRefresh([
-                {
-                  type: 'add',
-                  data: [
-                    {
-                      groupID: v,
-                      groupName: v,
-                      key: v,
-                    } as EqualHeightListItemData,
-                  ],
-                  enableSort: true,
-                },
-              ]);
+              initList();
             }
           }}
         />

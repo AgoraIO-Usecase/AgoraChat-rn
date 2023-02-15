@@ -37,6 +37,7 @@ import {
   getScaleFactor,
   LocalIcon,
   queueTask,
+  ScreenContainer,
   useAlert,
   useBottomSheet,
   useManualCloseDialog,
@@ -44,7 +45,6 @@ import {
   useToastContext,
 } from 'react-native-chat-uikit';
 import { Switch, Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 // import { COUNTRY } from '../__dev__/const';
 import { DefaultAvatar } from '../components/DefaultAvatars';
@@ -52,7 +52,6 @@ import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
-import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabParamsList,
   BottomTabScreenParamsList,
@@ -250,7 +249,7 @@ const NavigationHeaderTitle = (type: Undefinable<ContactActionType>) => {
   }
 };
 
-export default function ContactListScreen({
+export function ContactListScreenInternal({
   route,
   navigation,
 }: Props): JSX.Element {
@@ -937,14 +936,7 @@ export default function ContactListScreen({
   // };
 
   return (
-    <SafeAreaView
-      mode="padding"
-      style={useStyleSheet().safe}
-      edges={['right', 'left']}
-      onLayout={(_) => {
-        // console.log('test:222:', event.nativeEvent.layout);
-      }}
-    >
+    <>
       <ListSearchHeader
         autoFocus={autoFocus()}
         onChangeText={(text) => {
@@ -995,7 +987,7 @@ export default function ContactListScreen({
           }}
         />
       )}
-    </SafeAreaView>
+    </>
   );
 }
 
@@ -1021,3 +1013,14 @@ const styles = createStyleSheet({
   },
   rightButton: { padding: 10, marginRight: -10 },
 });
+
+export default function ContactListScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left']}>
+      <ContactListScreenInternal route={route} navigation={navigation} />
+    </ScreenContainer>
+  );
+}

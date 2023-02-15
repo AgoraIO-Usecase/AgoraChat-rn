@@ -521,17 +521,6 @@ export const EqualHeightList: (
               console.warn('test:_prepareData:', e);
             });
           }
-          if (item.enableSort === true) {
-            data.sort((a, b) => {
-              if (a.itemProps.data.key > b.itemProps.data.key) {
-                return item.sortDirection === 'asc' ? 1 : -1;
-              } else if (a.itemProps.data.key < b.itemProps.data.key) {
-                return item.sortDirection === 'asc' ? -1 : 1;
-              } else {
-                return 0;
-              }
-            });
-          }
           break;
         case 'update':
           if (item.data) {
@@ -569,7 +558,22 @@ export const EqualHeightList: (
         default:
           throw new Error(`This type ${item.type} is not supported.`);
       }
+      if (
+        item.enableSort === true &&
+        (item.type === 'add' || item.type === 'update')
+      ) {
+        data.sort((a, b) => {
+          if (a.itemProps.data.key > b.itemProps.data.key) {
+            return item.sortDirection === 'asc' ? 1 : -1;
+          } else if (a.itemProps.data.key < b.itemProps.data.key) {
+            return item.sortDirection === 'asc' ? -1 : 1;
+          } else {
+            return 0;
+          }
+        });
+      }
     }
+
     setData([...data]);
     _onItems();
   };

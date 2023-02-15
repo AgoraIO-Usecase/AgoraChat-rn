@@ -127,6 +127,7 @@ export {
 } from './utils/function';
 export { seqId, timestamp, uuid } from './utils/generator';
 export { autoFocus } from './utils/platform';
+export { throttle } from './utils/throttle';
 
 // declare module 'example/src/common' {
 //   import type DevDebugInternal from './example/src/common/screens/DevDebug';
