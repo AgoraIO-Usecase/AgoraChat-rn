@@ -240,7 +240,7 @@ export default function ConversationListScreen({
                     title: conversation.createGroup,
                     titleColor: 'black',
                     onPress: () => {
-                      console.log('test:onPress:data:');
+                      console.log('test:onPress:createGroup:');
                       navigation.navigate('ContactList', {
                         params: { type: 'create_group' },
                       });

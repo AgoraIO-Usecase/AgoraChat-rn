@@ -6,12 +6,9 @@ import type {
   MaterialTopTabNavigationProp,
   MaterialTopTabScreenProps,
 } from '@react-navigation/material-top-tabs';
-import {
+import type {
   CompositeNavigationProp,
   CompositeScreenProps,
-  // NavigationProp,
-  useNavigation,
-  useRoute,
 } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type {
@@ -82,7 +79,7 @@ type Props = CompositeScreenProps<
   >
 >;
 
-type NavigationProp = CompositeNavigationProp<
+export type NavigationProp = CompositeNavigationProp<
   MaterialTopTabNavigationProp<
     TopTabScreenParamsList<TopTabParamsList, 'option'>,
     'ContactList',
@@ -253,222 +250,6 @@ const NavigationHeaderTitle = (type: Undefinable<ContactActionType>) => {
   }
 };
 
-const NavigationHeaderRight = (_: HeaderButtonProps) => {
-  const navigation = useNavigation<NavigationProp>();
-  const route = useRoute();
-  const rp = route.params as any;
-  const params = rp?.params as any;
-  const type = params?.type as Undefinable<ContactActionType>;
-  console.log('test:NavigationHeaderRight:', params, type);
-  // const theme = useThemeContext();
-  // const menu = useActionMenu();
-  const sf = getScaleFactor();
-  const sheet = useBottomSheet();
-  const toast = useToastContext();
-  const { manualClose } = useManualCloseDialog();
-  const alert = useAlert();
-  const { header, groupInfo } = useAppI18nContext();
-  const { width: screenWidth } = useWindowDimensions();
-
-  const [selectedCount] = React.useState(10);
-
-  const Right = ({ type }: { type: Undefinable<ContactActionType> }) => {
-    const { contactList } = useAppI18nContext();
-    if (type === 'group_invite') {
-      const right = `${header.groupInvite}(${selectedCount})`;
-      return (
-        <View style={styles.rightButton}>
-          <Text>{right}</Text>
-        </View>
-      );
-    } else if (type === 'group_member') {
-      return (
-        <View style={styles.rightButton}>
-          <LocalIcon name="contact_add_contacts" size={sf(28)} />
-        </View>
-      );
-    } else if (type === 'create_group') {
-      const _createGroup = () => {
-        sheet.openSheet({
-          sheetItems: [
-            {
-              key: '1',
-              Custom: (
-                <View
-                  style={{
-                    width: sf(screenWidth - 40),
-                  }}
-                >
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingVertical: sf(12),
-                      flexGrow: 1,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: '#666666',
-                        fontSize: sf(14),
-                        fontWeight: '600',
-                        lineHeight: sf(18),
-                      }}
-                    >
-                      {contactList.groupSetting.groupSetting}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingVertical: sf(12),
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: '#333333',
-                        fontSize: sf(15),
-                        fontWeight: '600',
-                        lineHeight: sf(20),
-                      }}
-                    >
-                      {contactList.groupSetting.publicGroup}
-                    </Text>
-                    <Switch />
-                  </View>
-                  <Divider height={sf(0.25)} marginLeft={1} marginRight={1} />
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingVertical: sf(12),
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: '#333333',
-                        fontSize: sf(15),
-                        fontWeight: '600',
-                        lineHeight: sf(20),
-                      }}
-                    >
-                      {contactList.groupSetting.memberInvite}
-                    </Text>
-                    <Switch />
-                  </View>
-                  <Divider height={sf(0.25)} marginLeft={1} marginRight={1} />
-                  <View
-                    style={{
-                      paddingVertical: sf(20),
-                    }}
-                  >
-                    <Button
-                      style={{ height: sf(48), borderRadius: sf(24) }}
-                      onPress={() => {
-                        manualClose()
-                          .then(() => {
-                            if (navigation.canGoBack()) {
-                              navigation.goBack();
-                              // navigation.pop(1);
-                              navigation.push('Chat', { params: {} });
-                              // navigation.popToTop();
-                            }
-                          })
-                          .catch((error) => {
-                            console.warn('test:error:', error);
-                          });
-                      }}
-                    >
-                      {contactList.groupSetting.createGroup}
-                    </Button>
-                  </View>
-                </View>
-              ),
-            },
-          ],
-        });
-      };
-      const right = `${header.createGroup}(${selectedCount})`;
-      return (
-        <TouchableOpacity style={styles.rightButton} onPress={_createGroup}>
-          <Text style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}>
-            {right}
-          </Text>
-        </TouchableOpacity>
-      );
-    } else if (type === 'group_member_modify') {
-      const _addMember = () => {
-        alert.openAlert({
-          title: groupInfo.inviteAlert.title,
-          message: groupInfo.inviteAlert.message,
-          buttons: [
-            {
-              text: groupInfo.inviteAlert.cancelButton,
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-            {
-              text: groupInfo.inviteAlert.confirmButton,
-              onPress: () => {
-                navigation.goBack();
-                toast.showToast(groupInfo.toast[0]!);
-              },
-            },
-          ],
-        });
-      };
-      const right = `${header.addMembers}(${selectedCount})`;
-      return (
-        <TouchableOpacity style={styles.rightButton} onPress={_addMember}>
-          <Text style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}>
-            {right}
-          </Text>
-        </TouchableOpacity>
-      );
-    } else {
-      return null;
-    }
-  };
-
-  return (
-    <Pressable
-      onPress={() => {
-        if (type === 'group_member') {
-          navigation.push('ContactList' as any, {
-            params: { type: 'group_member_modify' },
-          });
-        } else {
-          alert.openAlert({
-            title: groupInfo.inviteAlert.title,
-            message: groupInfo.inviteAlert.message,
-            buttons: [
-              {
-                text: groupInfo.inviteAlert.cancelButton,
-                onPress: () => {
-                  navigation.goBack();
-                },
-              },
-              {
-                text: groupInfo.inviteAlert.confirmButton,
-                onPress: () => {
-                  navigation.goBack();
-                  toast.showToast(groupInfo.toast[0]!);
-                },
-              },
-            ],
-          });
-        }
-      }}
-    >
-      <Right type={type} />
-    </Pressable>
-  );
-};
-
 export default function ContactListScreen({
   route,
   navigation,
@@ -483,8 +264,12 @@ export default function ContactListScreen({
   const sheet = useBottomSheet();
   const toast = useToastContext();
   const alert = useAlert();
-  const { groupInfo, contactList } = useAppI18nContext();
-  const { height: screenHeight } = useWindowDimensions();
+  const { header, groupInfo, contactList } = useAppI18nContext();
+  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+
+  const { manualClose } = useManualCloseDialog();
+
+  const [selectedCount] = React.useState(10);
 
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = type === 'contact_list' ? true : false;
@@ -774,6 +559,244 @@ export default function ContactListScreen({
     return r;
   };
 
+  const NavigationHeaderRight = React.useCallback(
+    (_: HeaderButtonProps) => {
+      // const navigation = useNavigation<NavigationProp>();
+      // const route = useRoute();
+      const rp = route.params as any;
+      const params = rp?.params as any;
+      const type = params?.type as Undefinable<ContactActionType>;
+      console.log('test:NavigationHeaderRight:', params, type);
+      const sf = getScaleFactor();
+
+      const Right = ({ type }: { type: Undefinable<ContactActionType> }) => {
+        const { contactList } = useAppI18nContext();
+        if (type === 'group_invite') {
+          const right = `${header.groupInvite}(${selectedCount})`;
+          return (
+            <View style={styles.rightButton}>
+              <Text>{right}</Text>
+            </View>
+          );
+        } else if (type === 'group_member') {
+          return (
+            <View style={styles.rightButton}>
+              <LocalIcon name="contact_add_contacts" size={sf(28)} />
+            </View>
+          );
+        } else if (type === 'create_group') {
+          const _createGroup = () => {
+            sheet.openSheet({
+              sheetItems: [
+                {
+                  key: '1',
+                  Custom: (
+                    <View
+                      style={{
+                        width: sf(screenWidth - 40),
+                      }}
+                    >
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          paddingVertical: sf(12),
+                          flexGrow: 1,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#666666',
+                            fontSize: sf(14),
+                            fontWeight: '600',
+                            lineHeight: sf(18),
+                          }}
+                        >
+                          {contactList.groupSetting.groupSetting}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingVertical: sf(12),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#333333',
+                            fontSize: sf(15),
+                            fontWeight: '600',
+                            lineHeight: sf(20),
+                          }}
+                        >
+                          {contactList.groupSetting.publicGroup}
+                        </Text>
+                        <Switch />
+                      </View>
+                      <Divider
+                        height={sf(0.25)}
+                        marginLeft={1}
+                        marginRight={1}
+                      />
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingVertical: sf(12),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#333333',
+                            fontSize: sf(15),
+                            fontWeight: '600',
+                            lineHeight: sf(20),
+                          }}
+                        >
+                          {contactList.groupSetting.memberInvite}
+                        </Text>
+                        <Switch />
+                      </View>
+                      <Divider
+                        height={sf(0.25)}
+                        marginLeft={1}
+                        marginRight={1}
+                      />
+                      <View
+                        style={{
+                          paddingVertical: sf(20),
+                        }}
+                      >
+                        <Button
+                          style={{ height: sf(48), borderRadius: sf(24) }}
+                          onPress={() => {
+                            manualClose()
+                              .then(() => {
+                                if (navigation.canGoBack()) {
+                                  navigation.goBack();
+                                  // navigation.pop(1);
+                                  navigation.push('Chat', { params: {} });
+                                  // navigation.popToTop();
+                                }
+                              })
+                              .catch((error) => {
+                                console.warn('test:error:', error);
+                              });
+                          }}
+                        >
+                          {contactList.groupSetting.createGroup}
+                        </Button>
+                      </View>
+                    </View>
+                  ),
+                },
+              ],
+            });
+          };
+          const right = `${header.createGroup}(${selectedCount})`;
+          return (
+            <TouchableOpacity style={styles.rightButton} onPress={_createGroup}>
+              <Text
+                style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}
+              >
+                {right}
+              </Text>
+            </TouchableOpacity>
+          );
+        } else if (type === 'group_member_modify') {
+          const _addMember = () => {
+            alert.openAlert({
+              title: groupInfo.inviteAlert.title,
+              message: groupInfo.inviteAlert.message,
+              buttons: [
+                {
+                  text: groupInfo.inviteAlert.cancelButton,
+                  onPress: () => {
+                    navigation.goBack();
+                  },
+                },
+                {
+                  text: groupInfo.inviteAlert.confirmButton,
+                  onPress: () => {
+                    navigation.goBack();
+                    toast.showToast(groupInfo.toast[0]!);
+                  },
+                },
+              ],
+            });
+          };
+          const right = `${header.addMembers}(${selectedCount})`;
+          return (
+            <TouchableOpacity style={styles.rightButton} onPress={_addMember}>
+              <Text
+                style={{ color: selectedCount === 0 ? 'black' : '#114EFF' }}
+              >
+                {right}
+              </Text>
+            </TouchableOpacity>
+          );
+        } else {
+          return null;
+        }
+      };
+
+      return (
+        <Pressable
+          onPress={() => {
+            if (type === 'group_member') {
+              navigation.push('ContactList' as any, {
+                params: { type: 'group_member_modify' },
+              });
+            } else {
+              alert.openAlert({
+                title: groupInfo.inviteAlert.title,
+                message: groupInfo.inviteAlert.message,
+                buttons: [
+                  {
+                    text: groupInfo.inviteAlert.cancelButton,
+                    onPress: () => {
+                      navigation.goBack();
+                    },
+                  },
+                  {
+                    text: groupInfo.inviteAlert.confirmButton,
+                    onPress: () => {
+                      navigation.goBack();
+                      toast.showToast(groupInfo.toast[0]!);
+                    },
+                  },
+                ],
+              });
+            }
+          }}
+        >
+          <Right type={type} />
+        </Pressable>
+      );
+    },
+    [
+      alert,
+      groupInfo.inviteAlert.cancelButton,
+      groupInfo.inviteAlert.confirmButton,
+      groupInfo.inviteAlert.message,
+      groupInfo.inviteAlert.title,
+      groupInfo.toast,
+      header.addMembers,
+      header.createGroup,
+      header.groupInvite,
+      manualClose,
+      navigation,
+      route.params,
+      screenWidth,
+      selectedCount,
+      sheet,
+      toast,
+    ]
+  );
+
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: NavigationHeaderRight,
@@ -781,7 +804,7 @@ export default function ContactListScreen({
       headerShadowVisible: false,
       headerBackTitleVisible: false,
     });
-  }, [navigation, type]);
+  }, [NavigationHeaderRight, navigation, type]);
 
   const initList = React.useCallback(
     (type: Undefinable<ContactActionType>) => {
