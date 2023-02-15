@@ -6,6 +6,7 @@ import {
   createStyleSheet,
   getScaleFactor,
   LocalIcon,
+  ScreenContainer,
   Services,
   Switch,
   useAlert,
@@ -13,17 +14,15 @@ import {
   usePrompt,
   useToastContext,
 } from 'react-native-chat-uikit';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
-import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
+export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
   //   console.log('test:ConversationListScreen:', route.params, navigation);
   //   return <Placeholder content={`${GroupInfoScreen.name}`} />;
   const { groupInfo } = useAppI18nContext();
@@ -108,102 +107,96 @@ export default function GroupInfoScreen({ navigation }: Props): JSX.Element {
   };
 
   return (
-    <SafeAreaView
-      mode="padding"
-      style={useStyleSheet().safe}
-      edges={['right', 'left', 'bottom']}
-    >
-      <View style={styles.container}>
-        <Pressable style={{ paddingHorizontal: sf(50) }} onPress={onHeader}>
-          <View style={styles.top}>
-            <Avatar uri="" size={sf(100)} radius={sf(50)} />
+    <View style={styles.container}>
+      <Pressable style={{ paddingHorizontal: sf(50) }} onPress={onHeader}>
+        <View style={styles.top}>
+          <Avatar uri="" size={sf(100)} radius={sf(50)} />
+        </View>
+        <View style={styles.top}>
+          <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
+        </View>
+        <View style={{ marginTop: sf(10) }}>
+          <Text style={styles.id}>{id}</Text>
+        </View>
+        <View style={{ marginTop: sf(10) }}>
+          <Text style={styles.description}>{groupInfo.groupDescription}</Text>
+        </View>
+      </Pressable>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: 130,
+        }}
+      >
+        <Pressable onPress={onInvite}>
+          <View style={styles.chatButton}>
+            <LocalIcon name="group_invite" size={sf(30)} />
           </View>
-          <View style={styles.top}>
-            <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
-          </View>
-          <View style={{ marginTop: sf(10) }}>
-            <Text style={styles.id}>{id}</Text>
-          </View>
-          <View style={{ marginTop: sf(10) }}>
-            <Text style={styles.description}>{groupInfo.groupDescription}</Text>
-          </View>
+          <Text style={[styles.chat, { marginTop: sf(5) }]}>
+            {groupInfo.invite}
+          </Text>
         </Pressable>
+        <View>
+          <Pressable
+            onPress={() => {
+              navigation.navigate('Chat', {});
+            }}
+            style={styles.chatButton}
+          >
+            <LocalIcon name="tabbar_chats" size={sf(30)} />
+          </Pressable>
+          <Text style={[styles.chat, { marginTop: sf(5) }]}>
+            {groupInfo.chat}
+          </Text>
+        </View>
+      </View>
+      <View style={{ height: sf(66) }} />
+      <Pressable onPress={onMembers} style={styles.listItem}>
+        <Text style={styles.listItemText1}>{groupInfo.members}</Text>
         <View
           style={{
             flexDirection: 'row',
+            width: sf(20),
             justifyContent: 'space-between',
-            width: 130,
           }}
         >
-          <Pressable onPress={onInvite}>
-            <View style={styles.chatButton}>
-              <LocalIcon name="group_invite" size={sf(30)} />
-            </View>
-            <Text style={[styles.chat, { marginTop: sf(5) }]}>
-              {groupInfo.invite}
-            </Text>
-          </Pressable>
-          <View>
-            <Pressable
-              onPress={() => {
-                navigation.navigate('Chat', {});
-              }}
-              style={styles.chatButton}
-            >
-              <LocalIcon name="tabbar_chats" size={sf(30)} />
-            </Pressable>
-            <Text style={[styles.chat, { marginTop: sf(5) }]}>
-              {groupInfo.chat}
-            </Text>
-          </View>
+          <Text style={styles.memberCount}>{memberCount}</Text>
+          <View style={{ width: sf(5) }} />
+          <LocalIcon name="go_small_black_mobile" size={sf(14)} />
         </View>
-        <View style={{ height: sf(66) }} />
-        <Pressable onPress={onMembers} style={styles.listItem}>
-          <Text style={styles.listItemText1}>{groupInfo.members}</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              width: sf(20),
-              justifyContent: 'space-between',
-            }}
-          >
-            <Text style={styles.memberCount}>{memberCount}</Text>
-            <View style={{ width: sf(5) }} />
-            <LocalIcon name="go_small_black_mobile" size={sf(14)} />
-          </View>
-        </Pressable>
-        <View style={styles.listItem}>
-          <Text style={styles.listItemText1}>{groupInfo.mute}</Text>
-          <Switch
-            value={isMute}
-            onChangeValue={function (val: boolean): void {
-              setIsMute(val);
-            }}
-            size={sf(28)}
-            thumbColor="white"
-            inactiveThumbColor="white"
-            inactiveTrackColor="rgba(216, 216, 216, 1)"
-          />
-        </View>
-        <Pressable
-          style={styles.listItem}
-          onPress={() => {
-            alert.openAlert({
-              title: groupInfo.leaveAlert.title,
-              message: groupInfo.leaveAlert.message,
-              buttons: [
-                {
-                  text: groupInfo.leaveAlert.cancelButton,
-                },
-                { text: groupInfo.leaveAlert.confirmButton },
-              ],
-            });
+      </Pressable>
+      <View style={styles.listItem}>
+        <Text style={styles.listItemText1}>{groupInfo.mute}</Text>
+        <Switch
+          value={isMute}
+          onChangeValue={function (val: boolean): void {
+            setIsMute(val);
           }}
-        >
-          <Text style={styles.listItemText2}>{groupInfo.leave}</Text>
-        </Pressable>
+          size={sf(28)}
+          thumbColor="white"
+          inactiveThumbColor="white"
+          inactiveTrackColor="rgba(216, 216, 216, 1)"
+        />
       </View>
-    </SafeAreaView>
+      <Pressable
+        style={styles.listItem}
+        onPress={() => {
+          alert.openAlert({
+            title: groupInfo.leaveAlert.title,
+            message: groupInfo.leaveAlert.message,
+            buttons: [
+              {
+                text: groupInfo.leaveAlert.cancelButton,
+              },
+              { text: groupInfo.leaveAlert.confirmButton },
+            ],
+          });
+        }}
+      >
+        <Text style={styles.listItemText2}>{groupInfo.leave}</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -274,3 +267,14 @@ const styles = createStyleSheet({
     textAlign: 'right',
   },
 });
+
+export default function GroupInfoScreen({
+  route,
+  navigation,
+}: Props): JSX.Element {
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <GroupInfoScreenInternal route={route} navigation={navigation} />
+    </ScreenContainer>
+  );
+}
