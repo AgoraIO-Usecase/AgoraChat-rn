@@ -51,7 +51,7 @@ export type RootParamsList = BottomTabParamsList & {
   };
   Chat: {
     option?: {} | undefined;
-    params?: {} | undefined;
+    params?: { ChatId: string } | undefined;
   };
   Home: {
     option?: {} | undefined;

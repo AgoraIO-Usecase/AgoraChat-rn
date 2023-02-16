@@ -27,9 +27,9 @@ type ButtonItemType = {
 
 type CustomItemType<Props extends {} = {}> = {
   key: string;
-  // Custom: React.ComponentType<Props>;
-  // CustomProps: Props;
-  Custom: React.ReactElement<Props>;
+  Custom: React.ComponentType<Props>;
+  CustomProps: Props;
+  // Custom: React.ReactElement<Props>; // !!! Cannot display dynamically.
 };
 
 type ItemType = ButtonItemType | CustomItemType;
@@ -87,13 +87,14 @@ export default function BottomSheet({
               </TouchableOpacity>
             );
           } else if (Object.getOwnPropertyNames(value).includes('key')) {
-            const { Custom, key } = value as CustomItemType;
+            const { Custom, CustomProps, key } = value as CustomItemType;
             return (
               <View
                 key={key}
                 style={{ paddingLeft: left, paddingRight: right }}
               >
-                {Custom}
+                {/* {Custom} */}
+                <Custom {...CustomProps} />
               </View>
             );
           } else {

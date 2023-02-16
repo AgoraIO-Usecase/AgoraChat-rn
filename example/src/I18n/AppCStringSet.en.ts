@@ -362,7 +362,7 @@ export class AppStringSet extends UIKitStringSet2 {
         groupSetting: 'Group Settings',
         publicGroup: 'Public Group',
         memberInvite: 'Allow members to invite',
-        createGroup: 'Group',
+        createGroup: 'Create New Group',
       },
       toast: ['1', '2', '3', '4'],
     };

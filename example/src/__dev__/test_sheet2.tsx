@@ -34,16 +34,19 @@ export default function TestSheet() {
                 sheetItems: [
                   {
                     key: '1',
-                    Custom: (
-                      <Button
-                        onPress={() => {
-                          manualClose();
-                          // DeviceEventEmitter.emit(CustomEvents.closeDialog.key);
-                        }}
-                      >
-                        click me
-                      </Button>
-                    ),
+                    Custom: () => {
+                      return (
+                        <Button
+                          onPress={() => {
+                            manualClose();
+                            // DeviceEventEmitter.emit(CustomEvents.closeDialog.key);
+                          }}
+                        >
+                          click me
+                        </Button>
+                      );
+                    },
+                    CustomProps: {},
                   },
                 ],
               });

@@ -40,6 +40,7 @@ export default function TestSwitch() {
         inactiveThumbColor="white"
         size={80}
       />
+      <Switch size={30} />
     </View>
   );
 }
