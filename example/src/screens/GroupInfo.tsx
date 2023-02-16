@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import {
   Avatar,
   createStyleSheet,
@@ -16,25 +16,39 @@ import {
 } from 'react-native-chat-uikit';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
+import { GroupInfoEvent } from '../events';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
 
 const sf = getScaleFactor();
 
-export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
+export function GroupInfoScreenInternal({
+  route,
+  navigation,
+}: Props): JSX.Element {
   //   console.log('test:ConversationListScreen:', route.params, navigation);
   //   return <Placeholder content={`${GroupInfoScreen.name}`} />;
+  const rp = route.params as any;
+  const params = rp?.params as { groupId: string };
+
   const { groupInfo } = useAppI18nContext();
-  const [isMute, setIsMute] = React.useState(false);
+  const { client } = useAppChatSdkContext();
   const alert = useAlert();
   const sheet = useBottomSheet();
   const prompt = usePrompt();
   const toast = useToastContext();
   const cbs = Services.cbs;
-  const id = 'GroupId: xxx';
+  const groupId = params.groupId ?? 'GroupId: xxx';
   const memberCount = 5;
-  const groupName = 'GroupName';
+  const [groupName, setGroupName] = React.useState('GroupName');
+  const [groupDesc, setGroupDesc] = React.useState(groupInfo.groupDescription);
+  const [isAllMemberMuted, setIsAllMemberMuted] = React.useState(false);
+
+  const onMute = (isMute: boolean) => {
+    setIsAllMemberMuted(isMute);
+  };
 
   const onHeader = () => {
     sheet.openSheet({
@@ -106,6 +120,79 @@ export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
     });
   };
 
+  const onDestroyGroup = React.useCallback(
+    (groupId: string) => {
+      client.groupManager
+        .destroyGroup(groupId)
+        .then((result) => {
+          console.log('test:destroyGroup:success:', result);
+          DeviceEventEmitter.emit(GroupInfoEvent, {
+            type: 'destroy_group',
+            params: { groupId: groupId },
+          });
+          navigation.goBack();
+        })
+        .catch((error) => {
+          console.warn('test:destroyGroup:error:', error);
+        });
+    },
+    [client.groupManager, navigation]
+  );
+
+  const onLeaveGroup = React.useCallback(
+    (groupId: string) => {
+      client.groupManager
+        .leaveGroup(groupId)
+        .then((result) => {
+          console.log('test:leaveGroup:success:', result);
+          navigation.goBack();
+        })
+        .catch((error) => {
+          console.warn('test:leaveGroup:error:', error);
+        });
+    },
+    [client.groupManager, navigation]
+  );
+
+  const addListeners = React.useCallback(() => {
+    return () => {};
+  }, []);
+
+  const initList = React.useCallback(() => {
+    client.groupManager
+      .getGroupWithId(groupId)
+      .then((result) => {
+        console.log('test:getGroupWithId:success:', result);
+        if (result) {
+          setGroupName(result.groupName);
+          setGroupDesc(result.description);
+          setIsAllMemberMuted(result.isAllMemberMuted);
+        }
+      })
+      .catch((error) => {
+        console.warn('test:getGroupWithId:error:', error);
+      });
+  }, [client.groupManager, groupId]);
+
+  React.useEffect(() => {
+    console.log('test:useEffect:', addListeners, initList);
+    const load = () => {
+      console.log('test:load:', GroupInfoScreen.name);
+      const unsubscribe = addListeners();
+      initList();
+      return {
+        unsubscribe: unsubscribe,
+      };
+    };
+    const unload = (params: { unsubscribe: () => void }) => {
+      console.log('test:unload:', GroupInfoScreen.name);
+      params.unsubscribe();
+    };
+
+    const res = load();
+    return () => unload(res);
+  }, [addListeners, initList]);
+
   return (
     <View style={styles.container}>
       <Pressable style={{ paddingHorizontal: sf(50) }} onPress={onHeader}>
@@ -116,10 +203,10 @@ export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
           <Text style={styles.name}>{groupInfo.name(groupName)}</Text>
         </View>
         <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.id}>{id}</Text>
+          <Text style={styles.id}>{groupId}</Text>
         </View>
         <View style={{ marginTop: sf(10) }}>
-          <Text style={styles.description}>{groupInfo.groupDescription}</Text>
+          <Text style={styles.description}>{groupDesc}</Text>
         </View>
       </Pressable>
       <View
@@ -169,9 +256,9 @@ export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
       <View style={styles.listItem}>
         <Text style={styles.listItemText1}>{groupInfo.mute}</Text>
         <Switch
-          value={isMute}
+          value={isAllMemberMuted}
           onChangeValue={function (val: boolean): void {
-            setIsMute(val);
+            onMute(val);
           }}
           size={sf(28)}
           thumbColor="white"
@@ -189,12 +276,37 @@ export function GroupInfoScreenInternal({ navigation }: Props): JSX.Element {
               {
                 text: groupInfo.leaveAlert.cancelButton,
               },
-              { text: groupInfo.leaveAlert.confirmButton },
+              {
+                text: groupInfo.leaveAlert.confirmButton,
+                onPress: () => onLeaveGroup(groupId),
+              },
             ],
           });
         }}
       >
         <Text style={styles.listItemText2}>{groupInfo.leave}</Text>
+      </Pressable>
+      <Pressable
+        style={styles.listItem}
+        onPress={() => {
+          alert.openAlert({
+            title: groupInfo.destroyAlert.title,
+            message: groupInfo.destroyAlert.message,
+            buttons: [
+              {
+                text: groupInfo.destroyAlert.cancelButton,
+              },
+              {
+                text: groupInfo.destroyAlert.confirmButton,
+                onPress: () => onDestroyGroup(groupId),
+              },
+            ],
+          });
+        }}
+      >
+        <Text style={[styles.listItemText2, { color: 'red' }]}>
+          {groupInfo.destroy}
+        </Text>
       </Pressable>
     </View>
   );

@@ -11,3 +11,6 @@ export type ContactListEventType =
   | 'sheet_'
   | 'create_group_result'
   | 'create_group_result_fail';
+
+export const GroupInfoEvent = 'GroupInfoEvent';
+export type GroupInfoEventType = 'destroy_group';

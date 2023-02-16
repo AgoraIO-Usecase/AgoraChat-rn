@@ -1,6 +1,6 @@
 import type { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import * as React from 'react';
-import { View } from 'react-native';
+import { DeviceEventEmitter, View } from 'react-native';
 import type { ChatGroupEventListener } from 'react-native-chat-sdk';
 import {
   autoFocus,
@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
+import { GroupInfoEvent, GroupInfoEventType } from '../events';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootParamsList } from '../routes';
 
@@ -173,7 +174,10 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
         ...item,
         onPress: (data) => {
           console.log('test:onPress:data:', data);
-          navigation.navigate('GroupInfo', { params: {} });
+          const info = data as ItemDataType;
+          navigation.navigate('GroupInfo', {
+            params: { groupId: info.groupID },
+          });
           // navigation.navigate({ name: 'GroupInfo', params: {} });
         },
       };
@@ -276,7 +280,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
           return;
         }
         manualRefresh({
-          type: 'add',
+          type: 'del-one',
           items: [
             {
               key: params.groupId,
@@ -297,7 +301,7 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
           return;
         }
         manualRefresh({
-          type: 'add',
+          type: 'del-one',
           items: [
             {
               key: params.groupId,
@@ -354,6 +358,28 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
     const res = load();
     return () => unload(res);
   }, [addListeners, initList]);
+
+  React.useEffect(() => {
+    const sub1 = DeviceEventEmitter.addListener(GroupInfoEvent, (event) => {
+      console.log('test:GroupInfoEvent:', event);
+      const eventType = event.type as GroupInfoEventType;
+      if (eventType === 'destroy_group') {
+        manualRefresh({
+          type: 'del-one',
+          items: [
+            standardizedData({
+              groupID: event.params.groupId,
+              key: event.params.groupId,
+              groupName: '',
+            }),
+          ],
+        });
+      }
+    });
+    return () => {
+      sub1.remove();
+    };
+  }, [manualRefresh, standardizedData]);
 
   const deferredSearch = throttle((text: string) => {
     const r: ItemDataType[] = [];

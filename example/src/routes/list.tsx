@@ -43,7 +43,7 @@ export type RootParamsList = BottomTabParamsList & {
   };
   GroupInfo: {
     option?: {} | undefined;
-    params?: {} | undefined;
+    params?: { groupId: string } | undefined;
   };
   ContactInfo: {
     option?: {} | undefined;

@@ -90,6 +90,13 @@ export class AppStringSet extends UIKitStringSet2 {
       cancelButton: string;
       confirmButton: string;
     };
+    destroy: string;
+    destroyAlert: {
+      title: string;
+      message: string;
+      cancelButton: string;
+      confirmButton: string;
+    };
     modify: {
       name: string;
       namePrompt: {
@@ -289,6 +296,14 @@ export class AppStringSet extends UIKitStringSet2 {
         title: 'Leave Group',
         message:
           'No prompt for other members and no group messages after you quit this group.',
+        cancelButton: 'Cancel',
+        confirmButton: 'Confirm',
+      },
+      destroy: 'Dismiss Group',
+      destroyAlert: {
+        title: 'Dismiss Group',
+        message:
+          'No prompt for other members and no group messages after you dismiss this group.',
         cancelButton: 'Cancel',
         confirmButton: 'Confirm',
       },
