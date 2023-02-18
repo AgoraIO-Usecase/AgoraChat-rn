@@ -51,6 +51,7 @@ const wait = (timeout: number) => {
 
 let count = 0;
 export default function TestListPrototype() {
+  console.log('test:TestListPrototype:');
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [isMoving, setIsMoving] = React.useState(false);
@@ -191,6 +192,29 @@ export default function TestListPrototype() {
         }}
       >
         add item
+      </Button>
+      <Button
+        onPress={() => {
+          if (data.length > 0) {
+            const last = data[data.length - 1] as ItemType;
+            const v = last.en + (count++).toString();
+            console.log('test:update:', v, last.ch);
+            last.ch = v;
+            setData([...data]);
+          } else {
+            const id = count;
+            const v = 'zuoyu' + (count++).toString();
+            const d = {
+              id: id,
+              en: v,
+              ch: v,
+              height: 79.666,
+            };
+            setData([d as ItemType]);
+          }
+        }}
+      >
+        modify item
       </Button>
       <Button
         onPress={() => {

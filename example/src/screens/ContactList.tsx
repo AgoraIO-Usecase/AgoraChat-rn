@@ -870,9 +870,11 @@ export function ContactListScreenInternal({
             });
           }
         },
-        onPress: (_: ItemDataType) => {
+        onPress: (data: ItemDataType) => {
           if (type === 'create_conversation') {
-            navigation.navigate('Chat', { params: { chatId: 'xxx' } });
+            navigation.navigate('Chat', {
+              params: { chatId: data.contactID, chatType: 0 },
+            });
           } else if (type === 'group_member') {
             // sheet.openSheet({
             //   sheetItems: [

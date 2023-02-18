@@ -116,6 +116,10 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     //   .catch((error) => {
     //     console.warn('test:deleteMessagesBeforeTimestamp:', error);
     //   });
+    const list = await client.chatManager.getAllConversations();
+    for (const item of list) {
+      await client.chatManager.deleteConversation(item.convId, true);
+    }
   };
 
   React.useEffect(() => {

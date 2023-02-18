@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
+import { ChatMessageType } from 'react-native-chat-sdk';
 import { seqId, timestamp } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
@@ -44,7 +45,7 @@ export default function TestMessageList() {
                   flexWrap: 'wrap',
                 },
                 text: 'test',
-                type: 'text',
+                type: ChatMessageType.TXT,
               } as TextMessageItemType,
             ]);
           }}

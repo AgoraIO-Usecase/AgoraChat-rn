@@ -234,7 +234,7 @@ const InvisiblePlaceholder = React.memo(
     // }, [client, data]);
 
     React.useEffect(() => {
-      console.log('test:load:111:');
+      console.log('test:load:111:', ConversationListScreen.name);
       const sub = DeviceEventEmitter.addListener(
         ConversationListEvent,
         (event) => {
@@ -615,7 +615,9 @@ export default function ConversationListScreen({
           });
         },
         onPress: (data: ItemDataType) => {
-          navigation.navigate('Chat', { params: { chatId: data.convId } });
+          navigation.navigate('Chat', {
+            params: { chatId: data.convId, chatType: data.convType },
+          });
         },
         actions: {
           onMute: (_) => {},

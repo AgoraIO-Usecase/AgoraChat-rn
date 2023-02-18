@@ -18,6 +18,13 @@ import {
   View,
 } from 'react-native';
 import {
+  ChatError,
+  ChatMessage,
+  ChatMessageChatType,
+  ChatMessageStatusCallback,
+  ChatMessageType,
+} from 'react-native-chat-sdk';
+import {
   Button,
   createStyleSheet,
   FACE_ASSETS,
@@ -44,10 +51,14 @@ import {
 import moji from 'twemoji';
 
 import MessageBubbleList, {
+  ImageMessageItemType,
+  MessageItemType,
   MessageListRef,
   TextMessageItemType,
+  VoiceMessageItemType,
 } from '../components/MessageBubbleList';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import { type AlertEvent, type ChatEventType, ChatEvent } from '../events';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootParamsList, RootScreenParamsList } from '../routes';
@@ -80,7 +91,7 @@ const InvisiblePlaceholder = React.memo(() => {
   React.useEffect(() => {
     console.log('test:load:111:');
     const sub = DeviceEventEmitter.addListener(ChatEvent, (event) => {
-      console.log('test:ChatEvent:', event);
+      // console.log('test:ChatEvent:Chat:', event);
       switch (event.type as ChatEventType) {
         case 'enable_voice':
           {
@@ -182,313 +193,420 @@ const FaceList = React.memo(
   }
 );
 
-const Content = React.memo((_: Props) => {
-  const sf = getScaleFactor();
-  const theme = useThemeContext();
-  const { chat } = useAppI18nContext();
-  const ms = Services.ms;
-  const TextInputRef = React.useRef<RNTextInput>(null);
-  const msgListRef = React.useRef<MessageListRef>(null);
-  const sheet = useBottomSheet();
-  const faces = ['face', 'key'] as ('face' | 'key')[];
-  const waves = ['wave_in_circle', 'key'] as ('wave_in_circle' | 'key')[];
-  const [face, setFace] = React.useState(faces[0]);
-  const [wave, setWave] = React.useState(waves[0]);
-  // const [content, setContent] = React.useState('');
-  const content = React.useRef('');
-  const [isInput, setIsInput] = React.useState(false);
-  const { width } = useWindowDimensions();
-  const faceHeight = sf(300);
-  const faceHeightRef = React.useRef(new Animated.Value(0)).current;
+const Content = React.memo(
+  ({
+    chatId,
+    chatType,
+  }: Props & { chatId: string; chatType: ChatMessageChatType }) => {
+    const sf = getScaleFactor();
+    const theme = useThemeContext();
+    const { chat } = useAppI18nContext();
+    const ms = Services.ms;
+    const TextInputRef = React.useRef<RNTextInput>(null);
+    const msgListRef = React.useRef<MessageListRef>(null);
+    const sheet = useBottomSheet();
+    const faces = ['face', 'key'] as ('face' | 'key')[];
+    const waves = ['wave_in_circle', 'key'] as ('wave_in_circle' | 'key')[];
+    const [face, setFace] = React.useState(faces[0]);
+    const [wave, setWave] = React.useState(waves[0]);
+    // const [content, setContent] = React.useState('');
+    const content = React.useRef('');
+    const [isInput, setIsInput] = React.useState(false);
+    const { width } = useWindowDimensions();
+    const faceHeight = sf(300);
+    const faceHeightRef = React.useRef(new Animated.Value(0)).current;
+    const { client } = useAppChatSdkContext();
+    console.log('test:Content:', chatId, chatType);
 
-  const onContent = (text: string) => {
-    content.current = text;
-  };
-
-  const createFaceTableAnimated = React.useMemo(() => {
-    return {
-      showFace: () => {
-        Animated.timing(faceHeightRef, {
-          toValue: faceHeight,
-          duration: 250,
-          useNativeDriver: false,
-        }).start();
-      },
-      hideFace: () => {
-        Animated.timing(faceHeightRef, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: false,
-        }).start();
-      },
+    const onContent = (text: string) => {
+      content.current = text;
     };
-  }, [faceHeight, faceHeightRef]);
 
-  const { showFace, hideFace } = createFaceTableAnimated;
+    const createFaceTableAnimated = React.useMemo(() => {
+      return {
+        showFace: () => {
+          Animated.timing(faceHeightRef, {
+            toValue: faceHeight,
+            duration: 250,
+            useNativeDriver: false,
+          }).start();
+        },
+        hideFace: () => {
+          Animated.timing(faceHeightRef, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: false,
+          }).start();
+        },
+      };
+    }, [faceHeight, faceHeightRef]);
 
-  const calculateInputWidth = React.useCallback(
-    (width: number, isInput: boolean) => {
-      return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));
-    },
-    [sf]
-  );
+    const { showFace, hideFace } = createFaceTableAnimated;
 
-  const sendMessage = (text: string) => {
-    if (text.length === 0) {
-      return;
-    }
-    TextInputRef.current?.clear();
-    msgListRef.current?.addMessage([
-      {
-        sender: 'zs',
-        timestamp: timestamp(),
-        isSender: ++count % 2 === 0 ? true : false,
-        key: seqId('ml').toString(),
-        text: text,
-        type: 'text',
-      } as TextMessageItemType,
-    ]);
-    timeoutTask(() => {
-      msgListRef.current?.scrollToEnd();
-    });
-  };
+    const calculateInputWidth = React.useCallback(
+      (width: number, isInput: boolean) => {
+        return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));
+      },
+      [sf]
+    );
 
-  const onFace = (value?: 'face' | 'key') => {
-    setFace(value);
-    if (value === 'key') {
-      showFace();
-    } else if (value === 'face') {
-      hideFace();
-    } else {
-      hideFace();
-    }
-  };
+    const convertMessage = React.useCallback(
+      (item: MessageItemType): ChatMessage | undefined => {
+        let r;
+        switch (item.type) {
+          case ChatMessageType.TXT:
+            {
+              const txt = item as TextMessageItemType;
+              r = ChatMessage.createTextMessage(chatId, txt.text, chatType);
+            }
+            break;
+          case ChatMessageType.IMAGE:
+            {
+              const img = item as ImageMessageItemType;
+              r = ChatMessage.createImageMessage(
+                chatId,
+                img.localPath!,
+                chatType
+              );
+            }
+            break;
+          case ChatMessageType.VOICE:
+            {
+              const voice = item as VoiceMessageItemType;
+              r = ChatMessage.createVoiceMessage(
+                chatId,
+                voice.localPath!,
+                chatType
+              );
+            }
+            break;
+          default:
+            break;
+        }
+        return r;
+      },
+      [chatId, chatType]
+    );
 
-  React.useEffect(() => {
-    const subscription1 = Keyboard.addListener('keyboardWillHide', (_) => {
-      setIsInput(false);
-    });
-    const subscription2 = Keyboard.addListener('keyboardWillShow', (_) => {
-      setIsInput(true);
-    });
-    const subscription3 = DeviceEventEmitter.addListener('onFace', (face) => {
-      const s = content + moji.convert.fromCodePoint(face);
-      onContent(s);
-      setIsInput(true);
-    });
-    return () => {
-      subscription1.remove();
-      subscription2.remove();
-      subscription3.remove();
+    const sendToServer = React.useCallback(
+      (msg: ChatMessage) => {
+        client.chatManager
+          .sendMessage(msg, {
+            onProgress: (localMsgId: string, progress: number): void => {
+              console.log('test:message:onProgress:', localMsgId, progress);
+              DeviceEventEmitter.emit(ChatEvent, {
+                type: 'msg_progress' as ChatEventType,
+                params: {
+                  localMsgId,
+                  progress,
+                },
+              });
+            },
+            onError: (localMsgId: string, error: ChatError): void => {
+              console.log('test:message:onError:', localMsgId, error);
+              DeviceEventEmitter.emit(ChatEvent, {
+                type: 'msg_state' as ChatEventType,
+                params: {
+                  localMsgId,
+                  result: false,
+                  reason: error,
+                },
+              });
+            },
+            onSuccess: (message: ChatMessage): void => {
+              console.log('test:message:onSuccess:', message.localMsgId);
+              setTimeout(() => {
+                DeviceEventEmitter.emit(ChatEvent, {
+                  type: 'msg_state' as ChatEventType,
+                  params: {
+                    localMsgId: message.localMsgId,
+                    result: true,
+                    msg: message,
+                  },
+                });
+              }, 1000);
+            },
+          } as ChatMessageStatusCallback)
+          .then((result) => {
+            console.log('test:result:', result);
+          })
+          .catch((error) => {
+            console.warn('test:error:', error);
+          });
+      },
+      [client]
+    );
+
+    const sendTextMessage = React.useCallback(
+      (text: string) => {
+        if (text.length === 0) {
+          return;
+        }
+        TextInputRef.current?.clear();
+        const item = {
+          sender: chatId,
+          timestamp: timestamp(),
+          isSender: true,
+          key: seqId('ml').toString(),
+          text: text,
+          type: ChatMessageType.TXT,
+          state: 'sending',
+        } as TextMessageItemType;
+
+        const msg = convertMessage(item);
+        if (msg === undefined) {
+          throw new Error('This is impossible.');
+        }
+        item.key = msg.localMsgId;
+
+        msgListRef.current?.addMessage([item]);
+        timeoutTask(() => {
+          msgListRef.current?.scrollToEnd();
+        });
+        sendToServer(msg);
+      },
+      [chatId, convertMessage, sendToServer]
+    );
+
+    const onFace = (value?: 'face' | 'key') => {
+      setFace(value);
+      if (value === 'key') {
+        showFace();
+      } else if (value === 'face') {
+        hideFace();
+      } else {
+        hideFace();
+      }
     };
-  }, [content]);
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          flexGrow: 1,
-          backgroundColor: '#fff8dc',
-        }}
-      >
-        <MessageBubbleList
-          ref={msgListRef}
-          onPressed={() => {
-            // keyboardVerticalOffset = sf(0);
-            Keyboard.dismiss();
-            onFace('face');
-          }}
-        />
-      </View>
+    React.useEffect(() => {
+      console.log('test:Chat:listener:111:');
+      const subscription1 = Keyboard.addListener('keyboardWillHide', (_) => {
+        setIsInput(false);
+      });
+      const subscription2 = Keyboard.addListener('keyboardWillShow', (_) => {
+        setIsInput(true);
+      });
+      const subscription3 = DeviceEventEmitter.addListener('onFace', (face) => {
+        const s = content + moji.convert.fromCodePoint(face);
+        onContent(s);
+        setIsInput(true);
+      });
+      return () => {
+        console.log('test:Chat:listener:222:');
+        subscription1.remove();
+        subscription2.remove();
+        subscription3.remove();
+      };
+    }, [content]);
 
-      <View
-        style={styles.inputContainer}
-        onLayout={(_) => {
-          // console.log('test:event:', event.nativeEvent.layout);
-        }}
-      >
-        <TouchableOpacity
-          style={{ justifyContent: 'center' }}
-          onPress={() => {
-            setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
-            Keyboard.dismiss();
-            onFace('face');
+    return (
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flexGrow: 1,
+            // backgroundColor: '#fff8dc',
           }}
         >
-          <LocalIcon name={wave as LocalIconName} color="#A5A7A6" size={28} />
-        </TouchableOpacity>
+          <MessageBubbleList
+            ref={msgListRef}
+            onPressed={() => {
+              // keyboardVerticalOffset = sf(0);
+              Keyboard.dismiss();
+              onFace('face');
+            }}
+          />
+        </View>
 
-        {wave === 'wave_in_circle' ? (
-          <React.Fragment>
-            <View style={styles.inputContainer2}>
-              <View style={styles.inputContainer3}>
-                <TextInput
-                  ref={TextInputRef}
-                  style={{
-                    flexGrow: 1,
-                    backgroundColor: 'white',
-                    width: calculateInputWidth(width, isInput),
-                  }}
-                  onChangeText={(text) => {
-                    onContent(text);
-                  }}
-                  // value={content}
-                  returnKeyType="send"
-                  onKeyPress={(_) => {
-                    // console.log(
-                    //   'test:event:event.nativeEvent.key:',
-                    //   event.nativeEvent.key
-                    // );
-                  }}
-                  onSubmitEditing={(event) => {
-                    const c = event.nativeEvent.text;
-                    // Keyboard.dismiss();
-                    event.preventDefault();
-                    sendMessage(c);
-                  }}
-                  onFocus={() => {
-                    onFace('face');
-                  }}
-                />
+        <View
+          style={styles.inputContainer}
+          onLayout={(_) => {
+            // console.log('test:event:', event.nativeEvent.layout);
+          }}
+        >
+          <TouchableOpacity
+            style={{ justifyContent: 'center' }}
+            onPress={() => {
+              setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
+              Keyboard.dismiss();
+              onFace('face');
+            }}
+          >
+            <LocalIcon name={wave as LocalIconName} color="#A5A7A6" size={28} />
+          </TouchableOpacity>
 
+          {wave === 'wave_in_circle' ? (
+            <React.Fragment>
+              <View style={styles.inputContainer2}>
+                <View style={styles.inputContainer3}>
+                  <TextInput
+                    ref={TextInputRef}
+                    style={{
+                      flexGrow: 1,
+                      backgroundColor: 'white',
+                      width: calculateInputWidth(width, isInput),
+                    }}
+                    onChangeText={(text) => {
+                      onContent(text);
+                    }}
+                    // value={content}
+                    returnKeyType="send"
+                    onKeyPress={(_) => {
+                      // console.log(
+                      //   'test:event:event.nativeEvent.key:',
+                      //   event.nativeEvent.key
+                      // );
+                    }}
+                    onSubmitEditing={(event) => {
+                      const c = event.nativeEvent.text;
+                      // Keyboard.dismiss();
+                      event.preventDefault();
+                      sendTextMessage(c);
+                    }}
+                    onFocus={() => {
+                      onFace('face');
+                    }}
+                  />
+
+                  <TouchableOpacity
+                    style={{ justifyContent: 'center' }}
+                    onPress={() => {
+                      onFace(face === 'face' ? faces[1] : faces[0]);
+                      Keyboard.dismiss();
+                    }}
+                  >
+                    <LocalIcon
+                      name={face as 'face' | 'key'}
+                      color="#A5A7A6"
+                      size={sf(28)}
+                    />
+                  </TouchableOpacity>
+
+                  <View style={{ width: sf(4) }} />
+                </View>
+              </View>
+
+              {isInput ? (
+                <View style={{ justifyContent: 'center' }}>
+                  <Button
+                    style={{
+                      height: sf(36),
+                      width: sf(66),
+                      borderRadius: sf(18),
+                    }}
+                    onPress={() => {
+                      sendTextMessage(content.current);
+                    }}
+                  >
+                    Send
+                  </Button>
+                </View>
+              ) : (
                 <TouchableOpacity
-                  style={{ justifyContent: 'center' }}
                   onPress={() => {
-                    onFace(face === 'face' ? faces[1] : faces[0]);
-                    Keyboard.dismiss();
+                    sheet.openSheet({
+                      sheetItems: [
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Camera',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openCamera({})
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Album',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openMediaLibrary({ selectionLimit: 1 })
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                        {
+                          iconColor: theme.colors.primary,
+                          title: 'Files',
+                          titleColor: 'black',
+                          onPress: () => {
+                            ms.openDocument({})
+                              .then((result) => {
+                                console.log('test:result:', result);
+                              })
+                              .catch((error) => {
+                                console.warn('error:', error);
+                              });
+                          },
+                        },
+                      ],
+                    });
                   }}
                 >
                   <LocalIcon
-                    name={face as 'face' | 'key'}
+                    name="plus_in_circle"
                     color="#A5A7A6"
                     size={sf(28)}
                   />
                 </TouchableOpacity>
-
-                <View style={{ width: sf(4) }} />
-              </View>
-            </View>
-
-            {isInput ? (
-              <View style={{ justifyContent: 'center' }}>
-                <Button
-                  style={{
-                    height: sf(36),
-                    width: sf(66),
-                    borderRadius: sf(18),
-                  }}
-                  onPress={() => {
-                    sendMessage(content.current);
-                  }}
-                >
-                  Send
-                </Button>
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  sheet.openSheet({
-                    sheetItems: [
-                      {
-                        iconColor: theme.colors.primary,
-                        title: 'Camera',
-                        titleColor: 'black',
-                        onPress: () => {
-                          ms.openCamera({})
-                            .then((result) => {
-                              console.log('test:result:', result);
-                            })
-                            .catch((error) => {
-                              console.warn('error:', error);
-                            });
-                        },
-                      },
-                      {
-                        iconColor: theme.colors.primary,
-                        title: 'Album',
-                        titleColor: 'black',
-                        onPress: () => {
-                          ms.openMediaLibrary({ selectionLimit: 1 })
-                            .then((result) => {
-                              console.log('test:result:', result);
-                            })
-                            .catch((error) => {
-                              console.warn('error:', error);
-                            });
-                        },
-                      },
-                      {
-                        iconColor: theme.colors.primary,
-                        title: 'Files',
-                        titleColor: 'black',
-                        onPress: () => {
-                          ms.openDocument({})
-                            .then((result) => {
-                              console.log('test:result:', result);
-                            })
-                            .catch((error) => {
-                              console.warn('error:', error);
-                            });
-                        },
-                      },
-                    ],
+              )}
+            </React.Fragment>
+          ) : (
+            <View style={{ flexDirection: 'row' }}>
+              <Button
+                color={{
+                  enabled: {
+                    content: 'black',
+                    background: 'rgba(242, 242, 242, 1)',
+                  },
+                  pressed: {
+                    content: 'black',
+                    background: '#E6E6E6',
+                  },
+                }}
+                style={[styles.talk, { width: sf(width - 24 - 28 - 20) }]}
+                onPressIn={() => {
+                  DeviceEventEmitter.emit(ChatEvent, {
+                    type: 'enable_voice' as ChatEventType,
+                    params: {},
+                  });
+                }}
+                onPressOut={() => {
+                  DeviceEventEmitter.emit(ChatEvent, {
+                    type: 'disable_voice' as ChatEventType,
+                    params: {},
                   });
                 }}
               >
-                <LocalIcon
-                  name="plus_in_circle"
-                  color="#A5A7A6"
-                  size={sf(28)}
-                />
-              </TouchableOpacity>
-            )}
-          </React.Fragment>
-        ) : (
-          <View style={{ flexDirection: 'row' }}>
-            <Button
-              color={{
-                enabled: {
-                  content: 'black',
-                  background: 'rgba(242, 242, 242, 1)',
-                },
-                pressed: {
-                  content: 'black',
-                  background: '#E6E6E6',
-                },
-              }}
-              style={[styles.talk, { width: sf(width - 24 - 28 - 20) }]}
-              onPressIn={() => {
-                DeviceEventEmitter.emit(ChatEvent, {
-                  type: 'enable_voice' as ChatEventType,
-                  params: {},
-                });
-              }}
-              onPressOut={() => {
-                DeviceEventEmitter.emit(ChatEvent, {
-                  type: 'disable_voice' as ChatEventType,
-                  params: {},
-                });
-              }}
-            >
-              {chat.voiceButton}
-            </Button>
-          </View>
-        )}
+                {chat.voiceButton}
+              </Button>
+            </View>
+          )}
+        </View>
+
+        <FaceList height={faceHeightRef} />
       </View>
+    );
+  }
+);
 
-      <FaceList height={faceHeightRef} />
-    </View>
-  );
-});
-
-let count = 0;
 export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   console.log('test:ChatScreen:');
   const rp = route.params as any;
-  const params = rp?.params as { chatId: string };
+  const params = rp?.params as { chatId: string; chatType: number };
   const sf = getScaleFactor();
   const { bottom } = useSafeAreaInsets();
   const chatId = params.chatId;
+  const chatType = params.chatType;
   let keyboardVerticalOffset = sf(bottom + 50);
 
   React.useEffect(() => {
@@ -524,7 +642,12 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
               onFace('face');
             }}
           > */}
-          <Content route={route} navigation={navigation} />
+          <Content
+            route={route}
+            navigation={navigation}
+            chatId={chatId}
+            chatType={chatType}
+          />
           {/* </TouchableWithoutFeedback> */}
         </KeyboardAvoidingView>
       </View>

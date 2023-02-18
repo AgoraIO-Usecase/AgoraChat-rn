@@ -86,12 +86,15 @@ export const CreateGroupSettings = () => {
       setButtonState('stop');
       if (eventParams.result === true) {
         const chatId = eventParams.id;
+        const chatType = eventParams.type;
         manualClose()
           .then(() => {
             if (navigation.canGoBack()) {
               navigation.goBack();
               // navigation.pop(1);
-              navigation.push('Chat', { params: { chatId: chatId } });
+              navigation.push('Chat', {
+                params: { chatId: chatId, chatType: chatType },
+              });
               // navigation.popToTop();
             }
           })
