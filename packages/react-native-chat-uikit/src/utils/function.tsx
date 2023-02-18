@@ -32,6 +32,14 @@ export const queueTask = (f: Function, ...args: any[]) => {
   }
 };
 
+export const timeoutTask = (f: Function, ...args: any[]) => {
+  try {
+    setTimeout(() => f(args), 0);
+  } catch (error) {
+    console.warn('test:queueTask:', error);
+  }
+};
+
 export const arraySort = <T extends { key: string }>(list: T[]) => {
   list.sort((a, b) => {
     if (a.key > b.key) {

@@ -4,10 +4,17 @@ import { LocalIcon, TextInput } from 'react-native-chat-uikit';
 import { Button } from 'react-native-paper';
 
 export default function TestInput() {
+  console.log('test:TestInput:');
   const [icon, setIcon] = React.useState(true);
   const content = '😃😃😃😀😃😚😀😀';
   const secureTextEntry = true;
   const [value, setValue] = React.useState('');
+  // const [value2, setValue2] = React.useState('');
+  const value3 = React.useRef('');
+
+  const onValue3 = (text: string) => {
+    value3.current = text;
+  };
 
   React.useEffect(() => {}, []);
 
@@ -45,6 +52,8 @@ export default function TestInput() {
           }}
           secureTextEntry={secureTextEntry}
           clearButtonMode="never"
+          onChangeText={onValue3}
+          // value={value3.current}
         />
         <LocalIcon
           style={{

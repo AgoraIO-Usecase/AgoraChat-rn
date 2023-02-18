@@ -31,3 +31,6 @@ export type ConversationListEventType =
   | MessageEvent
   | ConversationEvent
   | 'create_conversation';
+
+export const ChatEvent = 'ConversationListEvent';
+export type ChatEventType = 'enable_voice' | 'disable_voice';

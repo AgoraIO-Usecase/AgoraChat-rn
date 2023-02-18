@@ -483,6 +483,20 @@ export default function ConversationListScreen({
     [data]
   );
 
+  const removeConversation = React.useCallback(
+    (convId: string) => {
+      client.chatManager
+        .deleteConversation(convId, true)
+        .then((result) => {
+          console.log('test:result:', result);
+        })
+        .catch((error) => {
+          console.warn('test:error:', error);
+        });
+    },
+    [client.chatManager]
+  );
+
   const manualRefresh = React.useCallback(
     (params: {
       type: 'init' | 'add' | 'search' | 'del-one' | 'update-one';
@@ -600,8 +614,8 @@ export default function ConversationListScreen({
             },
           });
         },
-        onPress: (_: ItemDataType) => {
-          navigation.navigate('Chat', { params: { ChatId: 'xxx' } });
+        onPress: (data: ItemDataType) => {
+          navigation.navigate('Chat', { params: { chatId: data.convId } });
         },
         actions: {
           onMute: (_) => {},
@@ -610,12 +624,13 @@ export default function ConversationListScreen({
               type: 'del-one',
               items: [{ ...data } as ItemDataType],
             });
+            removeConversation(data.convId);
           },
         },
       } as ItemDataType;
       return r;
     },
-    [getContent, manualRefresh, navigation, sf]
+    [getContent, manualRefresh, navigation, removeConversation, sf]
   );
 
   const getConvIfNot = React.useCallback(

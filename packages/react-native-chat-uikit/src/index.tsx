@@ -122,6 +122,7 @@ export {
   once,
   onceEx,
   queueTask,
+  timeoutTask,
   versionToArray,
   wait,
 } from './utils/function';

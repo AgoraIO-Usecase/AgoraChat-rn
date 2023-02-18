@@ -872,7 +872,7 @@ export function ContactListScreenInternal({
         },
         onPress: (_: ItemDataType) => {
           if (type === 'create_conversation') {
-            navigation.navigate('Chat', { params: { ChatId: 'xxx' } });
+            navigation.navigate('Chat', { params: { chatId: 'xxx' } });
           } else if (type === 'group_member') {
             // sheet.openSheet({
             //   sheetItems: [

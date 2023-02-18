@@ -91,7 +91,7 @@ export const CreateGroupSettings = () => {
             if (navigation.canGoBack()) {
               navigation.goBack();
               // navigation.pop(1);
-              navigation.push('Chat', { params: { ChatId: chatId } });
+              navigation.push('Chat', { params: { chatId: chatId } });
               // navigation.popToTop();
             }
           })
