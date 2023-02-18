@@ -41,11 +41,11 @@ import {
   EqualHeightListItemComponent,
   EqualHeightListItemData,
   EqualHeightListRef,
+  FragmentContainer,
   getScaleFactor,
   LocalIcon,
   queueTask,
   ScreenContainer,
-  ToastContextProvider,
   useAlert,
   useBottomSheet,
   useThemeContext,
@@ -241,6 +241,7 @@ const InvisiblePlaceholder = React.memo(
     }, [client, data]);
 
     React.useEffect(() => {
+      console.log('test:load:111:');
       const sub = DeviceEventEmitter.addListener(ContactListEvent, (event) => {
         console.log('test:ContactListEvent:', event);
         switch (event.type as ContactListEventType) {
@@ -1875,11 +1876,9 @@ export function ContactListScreenInternal({
           }}
         />
       )}
-      <DialogContextProvider>
-        <ToastContextProvider>
-          <InvisiblePlaceholder data={data} />
-        </ToastContextProvider>
-      </DialogContextProvider>
+      <FragmentContainer>
+        <InvisiblePlaceholder data={data} />
+      </FragmentContainer>
     </>
   );
 }

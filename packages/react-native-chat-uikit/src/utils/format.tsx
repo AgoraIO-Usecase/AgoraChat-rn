@@ -53,6 +53,6 @@ export function truncatedBadgeCount(count: number, MAX: number = 99): string {
   return `${count}`;
 }
 
-export function messageTimestamp(date: Date, locale?: Locale): string {
+export function messageTimestamp(date: Date | number, locale?: Locale): string {
   return format(date, 'p', { locale });
 }

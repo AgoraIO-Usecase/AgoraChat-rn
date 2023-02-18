@@ -35,7 +35,7 @@ export function ScreenContainer({
                 style={{
                   height: 100,
                   width: 100,
-                  backgroundColor: 'green',
+                  backgroundColor: 'blue',
                 }}
               >
                 hh

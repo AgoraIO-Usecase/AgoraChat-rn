@@ -92,6 +92,21 @@ const DefaultItemContainer: ItemContainerComponent = (
       onPress={() => {
         props.data?.onPress?.(props.data);
       }}
+      // onStartShouldSetResponder={(_) => {
+      //   return false;
+      // }}
+      // onStartShouldSetResponderCapture={(_) => {
+      //   return false;
+      // }}
+      // onMoveShouldSetResponder={(_) => {
+      //   return false;
+      // }}
+      // onResponderEnd={(_) => {
+      //   return false;
+      // }}
+      // onResponderGrant={(_) => {
+      //   return false;
+      // }}
     >
       {props.children}
     </Pressable>
@@ -109,6 +124,7 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
   const currentY = React.useRef(0);
   const startTime = React.useRef(0);
   const endTime = React.useRef(0);
+  const [isEditable, setIsEditable] = React.useState(false);
 
   React.useEffect(() => {
     const subscription = DeviceEventEmitter.addListener(
@@ -121,19 +137,25 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
   }, []);
 
   const _closeEditable = () => {
+    setIsEditable(false);
     scrollViewRef.current?.scrollTo({ x: 0, animated: true });
   };
 
   const _autoAlign = (moveX: number, width: number) => {
     const w = width / 2;
     if (0 <= moveX && moveX < w) {
+      setIsEditable(false);
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
     } else {
+      setIsEditable(true);
       scrollViewRef.current?.scrollTo({ x: width, animated: true });
     }
   };
 
   const _onClicked = () => {
+    if (isEditable === true) {
+      return;
+    }
     endTime.current = timestamp();
     if (endTime.current - startTime.current < 1000) {
       props.data?.onPress?.(props.data);
