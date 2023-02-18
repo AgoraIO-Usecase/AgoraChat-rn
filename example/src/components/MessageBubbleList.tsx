@@ -386,7 +386,9 @@ const MessageBubbleList = (
   const enableRefresh = true;
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-  const [items, setItems] = React.useState<MessageItemType[]>([]);
+  const data1 = React.useMemo(() => [] as MessageItemType[], []);
+  const data2 = React.useMemo(() => [] as MessageItemType[], []);
+  const [items, setItems] = React.useState<MessageItemType[]>(data1);
   // const items = React.useMemo(() => [] as MessageItemType[], []);
   const listRef = React.useRef<DynamicHeightListRef>(null);
   // const items = React.useMemo(() => {
@@ -409,6 +411,31 @@ const MessageBubbleList = (
 
   // console.log('test:MessageBubbleList:length:', items.length);
 
+  const updateDataInternal = React.useCallback(
+    (data: MessageItemType[]) => {
+      if (data === data1) {
+        console.log('test:data1');
+        for (let index = 0; index < data1.length; index++) {
+          const element = data1[index] as MessageItemType;
+          data2[index] = element;
+        }
+        data2.splice(data1.length, data2.length);
+        setItems(data2);
+      } else if (data === data2) {
+        console.log('test:data2');
+        for (let index = 0; index < data2.length; index++) {
+          const element = data2[index] as MessageItemType;
+          data1[index] = element;
+        }
+        data1.splice(data2.length, data1.length);
+        setItems(data1);
+      } else {
+        throw new Error('This is impossible.');
+      }
+    },
+    [data1, data2]
+  );
+
   const updateData = React.useCallback(
     ({
       type,
@@ -421,7 +448,7 @@ const MessageBubbleList = (
       switch (type) {
         case 'add':
           items.push(...list);
-          setItems([...items]);
+          // setItems([...items]);
           break;
         case 'update-all':
           for (let index = 0; index < items.length; index++) {
@@ -434,7 +461,7 @@ const MessageBubbleList = (
               }
             }
           }
-          setItems([...items]);
+          // setItems([...items]);
           break;
         case 'update-part':
           // for (const item of items) {
@@ -466,13 +493,14 @@ const MessageBubbleList = (
             }
           }
           // console.log('test:updateData:222:', items);
-          setItems([...items]);
+          // setItems([...items]);
           break;
         default:
-          break;
+          return;
       }
+      updateDataInternal(items);
     },
-    [items]
+    [items, updateDataInternal]
   );
 
   React.useImperativeHandle(
