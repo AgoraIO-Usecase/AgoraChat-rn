@@ -18,11 +18,21 @@ import {
   View,
 } from 'react-native';
 import {
+  ChatConversationType,
   ChatError,
+  ChatGroupMessageAck,
+  ChatImageMessageBody,
   ChatMessage,
   ChatMessageChatType,
+  ChatMessageDirection,
+  ChatMessageEventListener,
+  ChatMessageReactionEvent,
+  ChatMessageStatus,
   ChatMessageStatusCallback,
+  ChatMessageThreadEvent,
   ChatMessageType,
+  ChatSearchDirection,
+  ChatTextMessageBody,
 } from 'react-native-chat-sdk';
 import {
   Button,
@@ -52,6 +62,7 @@ import moji from 'twemoji';
 
 import MessageBubbleList, {
   ImageMessageItemType,
+  MessageItemStateType,
   MessageItemType,
   MessageListRef,
   TextMessageItemType,
@@ -250,7 +261,7 @@ const Content = React.memo(
       [sf]
     );
 
-    const convertMessage = React.useCallback(
+    const convertToMessage = React.useCallback(
       (item: MessageItemType): ChatMessage | undefined => {
         let r;
         switch (item.type) {
@@ -288,6 +299,63 @@ const Content = React.memo(
       [chatId, chatType]
     );
 
+    const convertFromMessage = React.useCallback(
+      (msg: ChatMessage): MessageItemType => {
+        const convertFromMessageState = (msg: ChatMessage) => {
+          if (msg.status === ChatMessageStatus.SUCCESS) {
+            return 'arrived' as MessageItemStateType;
+          } else if (msg.status === ChatMessageStatus.FAIL) {
+            return 'failed' as MessageItemStateType;
+          } else if (msg.status === ChatMessageStatus.PROGRESS) {
+            if (msg.direction === ChatMessageDirection.RECEIVE)
+              return 'receiving' as MessageItemStateType;
+            else return 'sending' as MessageItemStateType;
+          } else {
+            return 'failed' as MessageItemStateType;
+          }
+        };
+        const convertFromMessageBody = (
+          msg: ChatMessage,
+          item: MessageItemType
+        ) => {
+          const type = msg.body.type;
+          switch (type) {
+            case ChatMessageType.IMAGE:
+              {
+                const body = msg.body as ChatImageMessageBody;
+                const r = item as ImageMessageItemType;
+                r.localPath = body.localPath;
+                r.remoteUrl = body.remotePath;
+                r.type = ChatMessageType.IMAGE;
+              }
+              break;
+            case ChatMessageType.TXT:
+              {
+                const body = msg.body as ChatTextMessageBody;
+                const r = item as TextMessageItemType;
+                r.text = body.content;
+                r.type = ChatMessageType.TXT;
+              }
+              break;
+            default:
+              throw new Error('This is impossible.');
+          }
+        };
+        const r = {
+          sender: msg.from,
+          timestamp: msg.serverTime,
+          isSender:
+            msg.direction === ChatMessageDirection.RECEIVE ? false : true,
+          key: msg.localMsgId,
+          state: convertFromMessageState(msg),
+        } as MessageItemType;
+        convertFromMessageBody(msg, r);
+        console.log('test:convertFromMessage:', r);
+        return r;
+      },
+      []
+    );
+
     const sendToServer = React.useCallback(
       (msg: ChatMessage) => {
         client.chatManager
@@ -315,16 +383,14 @@ const Content = React.memo(
             },
             onSuccess: (message: ChatMessage): void => {
               console.log('test:message:onSuccess:', message.localMsgId);
-              setTimeout(() => {
-                DeviceEventEmitter.emit(ChatEvent, {
-                  type: 'msg_state' as ChatEventType,
-                  params: {
-                    localMsgId: message.localMsgId,
-                    result: true,
-                    msg: message,
-                  },
-                });
-              }, 1000);
+              DeviceEventEmitter.emit(ChatEvent, {
+                type: 'msg_state' as ChatEventType,
+                params: {
+                  localMsgId: message.localMsgId,
+                  result: true,
+                  msg: message,
+                },
+              });
             },
           } as ChatMessageStatusCallback)
           .then((result) => {
@@ -353,11 +419,12 @@ const Content = React.memo(
           state: 'sending',
         } as TextMessageItemType;
 
-        const msg = convertMessage(item);
+        const msg = convertToMessage(item);
         if (msg === undefined) {
           throw new Error('This is impossible.');
         }
         item.key = msg.localMsgId;
+        item.timestamp = msg.serverTime;
 
         msgListRef.current?.addMessage([item]);
         timeoutTask(() => {
@@ -365,7 +432,22 @@ const Content = React.memo(
         });
         sendToServer(msg);
       },
-      [chatId, convertMessage, sendToServer]
+      [chatId, convertToMessage, sendToServer]
+    );
+
+    const loadMessage = React.useCallback(
+      (msgs: ChatMessage[]) => {
+        const items = [] as MessageItemType[];
+        for (const msg of msgs) {
+          const item = convertFromMessage(msg);
+          items.push(item);
+        }
+        msgListRef.current?.addMessage(items);
+        timeoutTask(() => {
+          msgListRef.current?.scrollToEnd();
+        });
+      },
+      [convertFromMessage]
     );
 
     const onFace = (value?: 'face' | 'key') => {
@@ -399,6 +481,84 @@ const Content = React.memo(
         subscription3.remove();
       };
     }, [content]);
+
+    const addListeners = React.useCallback(() => {
+      const msgListener: ChatMessageEventListener = {
+        onMessagesReceived: async (messages: ChatMessage[]): Promise<void> => {
+          /// todo: !!! 10000 message count ???
+          loadMessage(messages);
+        },
+
+        onCmdMessagesReceived: (_: ChatMessage[]): void => {},
+
+        onMessagesRead: async (_: ChatMessage[]): Promise<void> => {
+          /// todo: !!! 10000 message count ???
+        },
+
+        onGroupMessageRead: (_: ChatGroupMessageAck[]): void => {},
+
+        onMessagesDelivered: (_: ChatMessage[]): void => {},
+
+        onMessagesRecalled: (_: ChatMessage[]): void => {},
+
+        onConversationsUpdate: (): void => {},
+
+        onConversationRead: (): void => {},
+
+        onMessageReactionDidChange: (_: ChatMessageReactionEvent[]): void => {},
+
+        onChatMessageThreadCreated: (_: ChatMessageThreadEvent): void => {},
+
+        onChatMessageThreadUpdated: (_: ChatMessageThreadEvent): void => {},
+
+        onChatMessageThreadDestroyed: (_: ChatMessageThreadEvent): void => {},
+
+        onChatMessageThreadUserRemoved: (_: ChatMessageThreadEvent): void => {},
+      };
+      client.chatManager.addMessageListener(msgListener);
+      return () => {
+        client.chatManager.removeMessageListener(msgListener);
+      };
+    }, [client.chatManager]);
+
+    const initList = React.useCallback(() => {
+      client.chatManager
+        .getMessages(
+          chatId,
+          chatType as number as ChatConversationType,
+          '',
+          ChatSearchDirection.UP,
+          5
+        )
+        .then((result) => {
+          console.log('test:result:', result);
+          if (result) {
+            loadMessage(result);
+          }
+        })
+        .catch((error) => {
+          console.warn('test:error:', error);
+        });
+    }, [chatId, chatType, client.chatManager, loadMessage]);
+
+    React.useEffect(() => {
+      console.log('test:useEffect:', addListeners, initList);
+      const load = () => {
+        console.log('test:load:', ChatScreen.name);
+        const unsubscribe = addListeners();
+        initList();
+        return {
+          unsubscribe: unsubscribe,
+        };
+      };
+      const unload = (params: { unsubscribe: () => void }) => {
+        console.log('test:unload:', ChatScreen.name);
+        params.unsubscribe();
+      };
+
+      const res = load();
+      return () => unload(res);
+    }, [addListeners, initList]);
 
     return (
       <View style={{ flex: 1 }}>

@@ -121,7 +121,7 @@ export function ContactInfoScreenInternal({
       <Pressable
         onPress={() => {
           navigation.navigate('Chat', {
-            params: { chatId: 'xxx', chatType: 0 },
+            params: { chatId: userId, chatType: 0 },
           });
         }}
         style={styles.chatButton}

@@ -31,7 +31,8 @@ export type MessageItemStateType =
   | 'arrived'
   | 'played'
   | 'sending'
-  | 'failed';
+  | 'failed'
+  | 'receiving';
 
 export interface MessageItemType {
   sender: string;
@@ -142,7 +143,7 @@ const TextMessageRenderItem: ListRenderItem<MessageItemType> = React.memo(
     const sf = getScaleFactor();
     const { item } = info;
     const msg = item as TextMessageItemType;
-    console.log('test:TextMessageRenderItem:', msg);
+    // console.log('test:TextMessageRenderItem:', msg);
     return (
       <View
         style={[
