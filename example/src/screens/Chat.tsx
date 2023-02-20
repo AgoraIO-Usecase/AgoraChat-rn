@@ -519,7 +519,7 @@ const Content = React.memo(
       return () => {
         client.chatManager.removeMessageListener(msgListener);
       };
-    }, [client.chatManager]);
+    }, [client.chatManager, loadMessage]);
 
     const initList = React.useCallback(() => {
       client.chatManager
