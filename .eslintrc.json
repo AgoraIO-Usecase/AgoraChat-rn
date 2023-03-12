@@ -5,7 +5,10 @@
     "react": {
       "version": "16"
     },
-    "import/core-modules": ["react-native-chat-uikit"]
+    "import/core-modules": [
+      "react-native-chat-uikit",
+      "react-native-chat-callkit"
+    ]
   },
   "env": {
     "browser": true,

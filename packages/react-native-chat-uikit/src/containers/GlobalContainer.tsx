@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Text } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
 import { ChatClient, ChatOptions } from 'react-native-chat-sdk';
-import { UikitModalPlaceholder } from 'react-native-chat-uikit';
 import CreateThumbnail from 'react-native-create-thumbnail';
 import * as DocumentPicker from 'react-native-document-picker';
 import * as FileAccess from 'react-native-file-access';
@@ -31,6 +30,7 @@ import {
   UIKitChatSdkContext,
 } from '../contexts/ImSdkContext';
 import { ThemeContextProvider } from '../contexts/ThemeContext';
+import { UikitModalPlaceholder } from '../events';
 import { createStringSetEn, UIKitStringSet } from '../I18n2/CStringSet.en';
 import {
   ClipboardService,
