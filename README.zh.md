@@ -1084,7 +1084,7 @@ type ChatFragmentProps = {
 
 如果你有更多疑问请查看这里，如果你有更多建议，也请贡献到这里。
 
-[skip to here](./qa.md)
+[skip to here](./QA.md)
 
 ---
 

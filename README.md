@@ -1084,7 +1084,7 @@ In order to solve code reuse and reduce data loading, more sub-components are ad
 
 If you have more questions, please check here, and if you have more suggestions, please contribute here.
 
-[skip to here](./qa.md)
+[skip to here](./QA.md)
 
 ---
 
