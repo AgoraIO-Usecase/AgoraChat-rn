@@ -49,6 +49,7 @@ This is a multi-package management project managed by `lerna` and `yarn workspac
 
 1. Use `vscode` to open the project `react-native-chat-library`
 2. Use `terminal` to initialize the project `yarn`
+3. If this is the first project initialization, run the 'yarn run generate-source-env' command.
 
 **Note** `yarn` is a compound command. For developers who don’t understand the command, more relevant knowledge is needed to replace it with the `npm` command.
 **Note** When creating this project, some commands related to `yarn` have been preset, so it is recommended to use `yarn`.

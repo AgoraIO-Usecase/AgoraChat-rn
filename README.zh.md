@@ -49,6 +49,7 @@ git clone git@github.com:easemob/react-native-chat-library.git
 
 1. 使用 `vscode` 打开项目 `react-native-chat-library`
 2. 使用 `terminal` 初始化项目 `yarn`
+3. 如果是第一次项目初始化，还需要执行命令 `yarn run generate-source-env`
 
 **注意** `yarn`是复合命令，对于不了解命令的开发者，需要更多的相关知识才能替换为 `npm` 命令。
 **注意** 在创建该项目的时候，里面已经预置了部分 `yarn` 相关的命令，所以，推荐使用 `yarn`。
