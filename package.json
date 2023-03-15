@@ -10,7 +10,7 @@
   "workspaces": [
     "packages/react-native-chat-uikit",
     "packages/react-native-chat-callkit",
-    "examples/*",
+    "examples/callkit-example",
     "example"
   ],
   "devDependencies": {
@@ -34,7 +34,7 @@
   },
   "scripts": {
     "generate-source-version": "node scripts/generate-version.js",
-    "generate-source-env": "yarn workspace example run gse",
+    "generate-source-env": "yarn workspace example run gse && yarn workspace callkit-example run gse",
     "generate-source": "yarn run generate-source-version && yarn run generate-source-env",
     "generate-lib": "lerna run gl",
     "generate": "yarn run generate-source && yarn run generate-lib",

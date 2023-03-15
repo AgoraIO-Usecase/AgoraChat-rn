@@ -28,7 +28,7 @@ Take you to quickly complete the compilation and operation of the project.
 
 [download link](https://github.com/easemob/react-native-chat-library/)
 
-```bash
+```sh
 git clone git@github.com:easemob/react-native-chat-library.git
 ```
 
@@ -149,7 +149,7 @@ The following is the most common way, the introduction of integrating `uikit` in
 
 ## Install `uikit` into an existing project
 
-```bash
+```sh
 cd your_project_root
 yarn add react-native-chat-uikit
 ```

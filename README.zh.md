@@ -28,7 +28,7 @@ _中文 | [English](./README.md)_
 
 [下载地址](https://github.com/easemob/react-native-chat-library/)
 
-```bash
+```sh
 git clone git@github.com:easemob/react-native-chat-library.git
 ```
 
@@ -149,7 +149,7 @@ export const accountType = 'agora'; // 'easemob' or 'agora'
 
 ## 安装 `uikit` 到现有项目中
 
-```bash
+```sh
 cd your_project_root
 yarn add react-native-chat-uikit
 ```
