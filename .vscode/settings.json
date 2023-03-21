@@ -3,20 +3,21 @@
         "aftertreatment",
         "callkeep",
         "callkit",
+        "calllog",
+        "chatcallkit",
         "commitlint",
         "conv",
         "easemob",
+        "gradlew",
         "IMSDK",
         "IMUI",
         "Intervallum",
         "lefthook",
         "logined",
         "moji",
+        "podspec",
         "Pressable",
         "tabbar",
-        "uikit",
-        "chatcallkit",
-        "gradlew",
-        "podspec"
+        "uikit"
     ]
 }
