@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DevApp from './test_alert';
+import DevApp from './test_single_call';
 
 export default function dev(): JSX.Element {
   return (

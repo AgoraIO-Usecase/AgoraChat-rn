@@ -1,5 +1,5 @@
-import type { CallType } from '../types';
-import type { CallState } from './CallTypes';
+import type { CallType } from '../enums';
+import type { CallSignalingState } from './CallTypes';
 
 /**
  * Information about the invitees.
@@ -80,7 +80,7 @@ export interface CallObject {
   /**
    * The state in the call flow.
    */
-  state: CallState;
+  state: CallSignalingState;
 }
 
 /**

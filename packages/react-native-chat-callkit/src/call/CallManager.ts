@@ -117,6 +117,13 @@ export interface CallManager {
   }): void;
 }
 
+/**
+ * Create a signaling manager.
+ *
+ * Please initialize before use, and reset resources please de-initialize. {@link CallManager.init} {@link CallManager.unInit}
+ *
+ * @returns
+ */
 export function createManager(): CallManager {
   return createManagerImpl();
 }

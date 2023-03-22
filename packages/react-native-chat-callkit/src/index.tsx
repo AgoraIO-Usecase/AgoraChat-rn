@@ -32,23 +32,12 @@ export const ChatCallkitView =
     : () => {
         throw new Error(LINKING_ERROR);
       };
-
-// import type rn from 'react-native';
-// import type { addons } from 'react-native';
-
-// declare module 'example/src/common' {
-//   import type DevDebugInternal from './example/src/common/screens/DevDebug';
-//   export interface TestModuleStatic {
-//     verifySnapshot: (done: (indicator?: any) => void) => void;
-//     markTestPassed: (indicator: any) => void;
-//     markTestCompleted: () => void;
-//   }
-
-//   export const TestModule: DevDebugInternal;
-//   export type TestModule = DevDebugInternal;
-// }
-
-// function test222(): void {
-//   interface ss extends rn.addons.TestModule {}
-//   interface sss extends addons.TestModule {}
-// }
+export {
+  CallEndReason,
+  CallErrorCode,
+  CallErrorType,
+  CallState,
+  CallType,
+} from './enums';
+export * from './types';
+export { SingleCall, SingleCallProps } from './view/SingleCall';

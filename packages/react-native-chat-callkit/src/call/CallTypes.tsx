@@ -1,4 +1,4 @@
-export enum CallState {
+export enum CallSignalingState {
   /**
    * Idle state.
    */

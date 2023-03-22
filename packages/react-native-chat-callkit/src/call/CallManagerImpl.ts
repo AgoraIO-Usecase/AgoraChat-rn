@@ -1,4 +1,5 @@
 import {
+  AudioVolumeInfo,
   ChannelProfileType,
   createAgoraRtcEngine,
   ErrorCodeType,
@@ -14,7 +15,12 @@ import {
 } from 'react-native-agora';
 import { ChatClient } from 'react-native-chat-sdk';
 
-import { CallErrorCode, CallErrorType, CallType } from '../types';
+import {
+  CallEndReason,
+  CallErrorCode,
+  CallErrorType,
+  CallType,
+} from '../enums';
 import { timestamp, uuid } from '../utils/utils';
 import { calllog } from './CallConst';
 import * as K from './CallConst';
@@ -32,7 +38,7 @@ import {
   CallSignallingListener,
 } from './CallSignallingHandler';
 import { CallTimeoutHandler, CallTimeoutListener } from './CallTimeoutHandler';
-import { CallState } from './CallTypes';
+import { CallSignalingState } from './CallTypes';
 import type { CallUser } from './CallUser';
 
 export class CallManagerImpl
@@ -271,17 +277,20 @@ export class CallManagerImpl
     const call = this._getCall(params.callId);
     if (call) {
       if (call.isInviter === true) {
-        if (call.state === CallState.Idle || call.state === CallState.Joined) {
+        if (
+          call.state === CallSignalingState.Idle ||
+          call.state === CallSignalingState.Joined
+        ) {
           this._hangUpCall(params.callId);
         } else if (
-          call.state === CallState.InviterInviting ||
-          call.state === CallState.InviterInviteConfirming ||
-          call.state === CallState.InviterJoining
+          call.state === CallSignalingState.InviterInviting ||
+          call.state === CallSignalingState.InviterInviteConfirming ||
+          call.state === CallSignalingState.InviterJoining
         ) {
           this._cancelCall(params.callId);
         }
       } else {
-        if (call.state === CallState.Joined) {
+        if (call.state === CallSignalingState.Joined) {
           this._hangUpCall(params.callId);
         }
       }
@@ -327,7 +336,7 @@ export class CallManagerImpl
         if (invitee) {
           this._changeState({
             callId: params.callId,
-            new: CallState.InviteeInviteConfirming,
+            new: CallSignalingState.InviteeInviteConfirming,
           });
           this.handler.sendInviteReply({
             callId: call.callId,
@@ -376,7 +385,7 @@ export class CallManagerImpl
         if (invitee) {
           this._changeState({
             callId: params.callId,
-            new: CallState.InviteeInviteConfirming,
+            new: CallSignalingState.InviteeInviteConfirming,
           });
           this.handler.sendInviteReply({
             callId: call.callId,
@@ -485,7 +494,7 @@ export class CallManagerImpl
 
   private _isBusy(): boolean {
     if (this.ship.currentCall) {
-      if (this.ship.currentCall.state !== CallState.Idle) {
+      if (this.ship.currentCall.state !== CallSignalingState.Idle) {
         return true;
       }
     } else if (this.ship.receiveCallList) {
@@ -496,7 +505,10 @@ export class CallManagerImpl
     return false;
   }
 
-  private _changeState(params: { callId: string; new: CallState }): void {
+  private _changeState(params: {
+    callId: string;
+    new: CallSignalingState;
+  }): void {
     calllog.log('CallManagerImpl:_changeState:', params);
     const call = this._getCall(params.callId);
     if (call) {
@@ -524,7 +536,11 @@ export class CallManagerImpl
           },
         });
       }
-      this.listener?.onCallEnded?.();
+      this.onCallEndedInternal({
+        channelId: call.channelId,
+        callType: call.callType,
+        endReason: CallEndReason.Cancel,
+      });
       this._reset();
     }
   }
@@ -533,8 +549,12 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:_hangUpCall:', callId);
     const call = this.ship.currentCall;
     if (call) {
-      if (call.state === CallState.Joined) {
-        this.listener?.onCallEnded?.();
+      if (call.state === CallSignalingState.Joined) {
+        this.onCallEndedInternal({
+          channelId: call.channelId,
+          callType: call.callType,
+          endReason: CallEndReason.HungUp,
+        });
         this._reset();
       }
     }
@@ -567,7 +587,7 @@ export class CallManagerImpl
       },
       timestamp: params.timestamp ?? timestamp(),
       ext: params.ext,
-      state: CallState.Idle,
+      state: CallSignalingState.Idle,
     };
     this.ship.currentCall = call;
     this._addInvitee(
@@ -616,7 +636,7 @@ export class CallManagerImpl
       },
       timestamp: params.timestamp,
       ext: params.ext,
-      state: CallState.Idle,
+      state: CallSignalingState.Idle,
     };
     this.ship.receiveCallList.set(call.callId, call);
     this._addInvitee(call.callId, [
@@ -697,7 +717,10 @@ export class CallManagerImpl
         call.inviter.userId
       );
       if (call.isInviter === false) {
-        if (call.state !== CallState.Idle && call.state !== CallState.Joined) {
+        if (
+          call.state !== CallSignalingState.Idle &&
+          call.state !== CallSignalingState.Joined
+        ) {
           params.onResult({
             callId: call.callId,
             error: new CallError({
@@ -717,7 +740,10 @@ export class CallManagerImpl
           rtcToken: params.rtcToken,
         });
       } else {
-        if (call.state !== CallState.Idle && call.state !== CallState.Joined) {
+        if (
+          call.state !== CallSignalingState.Idle &&
+          call.state !== CallSignalingState.Joined
+        ) {
           params.onResult({
             callId: call.callId,
             error: new CallError({
@@ -732,7 +758,7 @@ export class CallManagerImpl
       }
       this._changeState({
         callId: call.callId,
-        new: CallState.InviterInviting,
+        new: CallSignalingState.InviterInviting,
       });
       const toAdd = [] as string[];
       for (const id of params.inviteeIds) {
@@ -782,7 +808,11 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._reset();
-                  this.listener?.onCallEnded?.();
+                  this.onCallEndedInternal({
+                    channelId: call.channelId,
+                    callType: call.callType,
+                    endReason: CallEndReason.NoResponse,
+                  });
                 } else {
                   // TODO: Remove the invitee.
                 }
@@ -802,7 +832,7 @@ export class CallManagerImpl
       });
       this._changeState({
         callId: call.callId,
-        new: CallState.InviterInviting,
+        new: CallSignalingState.InviterInviting,
       });
 
       for (const id of params.inviteeIds) {
@@ -823,7 +853,11 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._reset();
-                  this.listener?.onCallEnded?.();
+                  this.onCallEndedInternal({
+                    channelId: call.channelId,
+                    callType: call.callType,
+                    endReason: CallEndReason.NoResponse,
+                  });
                 } else {
                   // TODO: Remove the invitee.
                 }
@@ -856,7 +890,11 @@ export class CallManagerImpl
       if (call.callType !== CallType.Multi) {
         // TODO: End the call and notify the user.
         this._reset();
-        this.listener?.onCallEnded?.();
+        this.onCallEndedInternal({
+          channelId: call.channelId,
+          callType: call.callType,
+          endReason: CallEndReason.RemoteNoResponse,
+        });
       } else {
         // TODO: Remove the invitee.
       }
@@ -876,8 +914,26 @@ export class CallManagerImpl
     const call = this._getCall(params.callId);
     if (call) {
       this._removeCall(params.callId);
-      this.listener?.onCallEnded?.();
+      this.onCallEndedInternal({
+        channelId: call.channelId,
+        callType: call.callType,
+        endReason: CallEndReason.RemoteNoResponse,
+      });
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  //// CallListener ////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  protected onCallEndedInternal(params: {
+    channelId: string;
+    callType: CallType;
+    endReason: CallEndReason;
+  }): void {
+    calllog.log('CallManagerImpl:onCallEndedInternal', params);
+    // TODO:
+    this.listener?.onCallEnded?.({ ...params, elapsed: 0 });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -956,7 +1012,7 @@ export class CallManagerImpl
     if (invitee) {
       this._changeState({
         callId: params.callId,
-        new: CallState.InviteeAlerting,
+        new: CallSignalingState.InviteeAlerting,
       });
       this.handler.sendAlert({
         callId: call.callId,
@@ -999,7 +1055,7 @@ export class CallManagerImpl
       if (invitee) {
         this._changeState({
           callId: params.callId,
-          new: CallState.InviterInviteConfirming,
+          new: CallSignalingState.InviterInviteConfirming,
         });
         const inviteTimer = this.timer.hasTiming({
           callId: params.callId,
@@ -1019,7 +1075,11 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._reset();
-                  this.listener?.onCallEnded?.();
+                  this.onCallEndedInternal({
+                    channelId: call.channelId,
+                    callType: call.callType,
+                    endReason: CallEndReason.NoResponse,
+                  });
                 } else {
                   // TODO: Remove the invitee.
                 }
@@ -1055,7 +1115,12 @@ export class CallManagerImpl
             this._removeCall(params.callId);
             this.ship.currentCall = call;
             // TODO: As the invitee, start playing music and display the interface in establishing the connection.
-            this.listener?.onCallReceived?.();
+            this.listener?.onCallReceived?.({
+              channelId: call.channelId,
+              inviterId: call.inviter.userId,
+              callType: call.callType,
+              extension: call.ext,
+            });
           }
         }
       }
@@ -1075,22 +1140,29 @@ export class CallManagerImpl
       const invitee = call.invitees.get(this.userId);
       if (invitee) {
         if (
-          call.state === CallState.InviteeAlerting ||
-          call.state === CallState.InviteeInviteConfirming ||
-          call.state === CallState.InviteeJoining
+          call.state === CallSignalingState.InviteeAlerting ||
+          call.state === CallSignalingState.InviteeInviteConfirming ||
+          call.state === CallSignalingState.InviteeJoining
         ) {
           this.timer.stopTiming({
             callId: params.callId,
             userId: params.inviterId,
           });
-          this._changeState({ callId: params.callId, new: CallState.Idle });
+          this._changeState({
+            callId: params.callId,
+            new: CallSignalingState.Idle,
+          });
           this._removeCall(params.callId);
           if (
-            call.state === CallState.InviteeInviteConfirming ||
-            call.state === CallState.InviteeJoining
+            call.state === CallSignalingState.InviteeInviteConfirming ||
+            call.state === CallSignalingState.InviteeJoining
           ) {
             // TODO: The call is not connected yet.
-            this.listener?.onCallEnded?.();
+            this.onCallEndedInternal({
+              channelId: call.channelId,
+              callType: call.callType,
+              endReason: CallEndReason.RemoteCancel,
+            });
           }
         }
       }
@@ -1124,17 +1196,21 @@ export class CallManagerImpl
             if (params.reply === 'accept') {
               this._changeState({
                 callId: params.callId,
-                new: CallState.InviterJoining,
+                new: CallSignalingState.InviterJoining,
               });
               // TODO: to add channel
             } else {
-              this.listener?.onCallEnded?.();
+              this.onCallEndedInternal({
+                channelId: call.channelId,
+                callType: call.callType,
+                endReason: CallEndReason.RemoteRefuse,
+              });
             }
           } else {
             if (params.reply === 'accept') {
               this._changeState({
                 callId: params.callId,
-                new: CallState.InviterJoining,
+                new: CallSignalingState.InviterJoining,
               });
             } else {
               // TODO: remove from ui
@@ -1148,12 +1224,26 @@ export class CallManagerImpl
             inviteeDeviceToken: invitee.userDeviceToken,
             inviterDeviceToken: params.inviterDeviceToken,
             reply: params.reply,
-            onResult: (params: { callId: string; error?: any }) => {
+            onResult: ({ callId, error }) => {
               calllog.log(
                 'CallManagerImpl:onInviteReply:sendInviteReplyConfirm:',
                 params
               );
-              // TODO: ignore
+              if (error) {
+                const call = this._getCall(callId);
+                if (call) {
+                  if (call.callType !== CallType.Multi) {
+                    this._reset();
+                    this.onCallEndedInternal({
+                      channelId: call.channelId,
+                      callType: call.callType,
+                      endReason: CallEndReason.NoResponse,
+                    });
+                  } else {
+                    // TODO: Remove the invitee.
+                  }
+                }
+              }
             },
           });
         }
@@ -1186,15 +1276,26 @@ export class CallManagerImpl
           if (params.reply === 'accept') {
             this._changeState({
               callId: params.callId,
-              new: CallState.InviteeJoining,
+              new: CallSignalingState.InviteeJoining,
             });
             // TODO: add channel
           } else {
-            this.listener?.onCallEnded?.();
+            this.onCallEndedInternal({
+              channelId: call.channelId,
+              callType: call.callType,
+              endReason:
+                params.reply === 'busy'
+                  ? CallEndReason.RemoteBusy
+                  : CallEndReason.RemoteRefuse,
+            });
           }
         } else {
           this._removeCall(params.callId);
-          this.listener?.onCallEnded?.();
+          this.onCallEndedInternal({
+            channelId: call.channelId,
+            callType: call.callType,
+            endReason: CallEndReason.HandleOnOtherDevice,
+          });
         }
       }
     }
@@ -1207,9 +1308,9 @@ export class CallManagerImpl
 
   public onError(err: ErrorCodeType, msg: string) {
     calllog.log('CallManagerImpl:onError:', err, msg);
-    if (err !== ErrorCodeType.ErrOk) {
+    if (err !== ErrorCodeType.ErrOk && this.ship.currentCall) {
       this.listener?.onCallOccurError?.({
-        channelId: this.ship.currentCall?.channelId,
+        channelId: this.ship.currentCall.channelId,
         error: new CallError({
           code: err,
           description: msg,
@@ -1221,10 +1322,35 @@ export class CallManagerImpl
 
   public onJoinChannelSuccess(connection: RtcConnection, elapsed: number) {
     calllog.log('CallManagerImpl:onJoinChannelSuccess:', connection, elapsed);
+    if (connection.channelId && connection.localUid) {
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        if (call.isInviter === true) {
+          call.inviter.userChannelId = connection.localUid;
+        } else {
+          if (call.callType !== CallType.Multi) {
+            const invitee = call.invitees.get(this.userId);
+            if (invitee) {
+              invitee.userChannelId = connection.localUid;
+            }
+          }
+        }
+      }
+      this.listener?.onSelfJoined?.({
+        channelId: connection.channelId,
+        userChannelId: connection.localUid,
+      });
+    }
   }
 
   public onLeaveChannel(connection: RtcConnection, stats: RtcStats) {
     calllog.log('CallManagerImpl:onLeaveChannel:', connection, stats);
+    if (connection.channelId && connection.localUid) {
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        // TODO:
+      }
+    }
   }
 
   public onUserJoined(
@@ -1238,26 +1364,11 @@ export class CallManagerImpl
       remoteUid,
       elapsed
     );
-    if (connection.channelId) {
-      const call = this._getCallByChannelId(connection.channelId);
-      if (call) {
-        if (call.isInviter === true) {
-          call.inviter.userHadJoined = true;
-          call.inviter.userChannelId = remoteUid;
-        } else {
-          const invitee = call.invitees.get(this.userId);
-          if (invitee) {
-            invitee.userHadJoined = true;
-            invitee.userChannelId = remoteUid;
-          }
-        }
-        if (call.channelId !== connection.channelId) {
-          throw new CallError({
-            code: CallErrorCode.ExceptionState,
-            description: "Shouldn't happen.",
-          });
-        }
-      }
+    if (connection.channelId && connection.localUid) {
+      this.listener?.onRemoteUserJoined?.({
+        channelId: connection.channelId,
+        userChannelId: connection.localUid,
+      });
     }
   }
 
@@ -1275,21 +1386,10 @@ export class CallManagerImpl
     if (connection.channelId) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
-        if (call.isInviter === true) {
-          call.inviter.userHadJoined = true;
-          call.inviter.userChannelId = remoteUid;
+        if (call.callType !== CallType.Multi) {
+          // TODO:
         } else {
-          const invitee = call.invitees.get(this.userId);
-          if (invitee) {
-            invitee.userHadJoined = true;
-            invitee.userChannelId = remoteUid;
-          }
-        }
-        if (call.channelId !== connection.channelId) {
-          throw new CallError({
-            code: CallErrorCode.ExceptionState,
-            description: "Shouldn't happen.",
-          });
+          // TODO:
         }
       }
     }
@@ -1306,6 +1406,10 @@ export class CallManagerImpl
       deviceType,
       deviceState
     );
+    const call = this.ship.currentCall;
+    if (call) {
+      call.videoToAudio = true;
+    }
   }
 
   public onLocalVideoStateChanged(
@@ -1319,6 +1423,10 @@ export class CallManagerImpl
       state,
       error
     );
+    const call = this.ship.currentCall;
+    if (call) {
+      call.videoToAudio = true;
+    }
   }
 
   public onRemoteAudioStats(
@@ -1369,8 +1477,31 @@ export class CallManagerImpl
     );
   }
 
-  public onActiveSpeaker(connection: RtcConnection, uid: number): void {
-    calllog.log('CallManagerImpl:onActiveSpeaker:', connection, uid);
+  public onAudioVolumeIndication?(
+    connection: RtcConnection,
+    speakers: AudioVolumeInfo[],
+    speakerNumber: number,
+    totalVolume: number
+  ): void {
+    calllog.log(
+      'CallManagerImpl:onAudioVolumeIndication:',
+      connection,
+      speakers.length,
+      speakerNumber,
+      totalVolume
+    );
+    if (connection.channelId) {
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        for (const speaker of speakers) {
+          if (speaker.volume && speaker.volume > 5) {
+            // TODO:
+          } else {
+            // TODO:
+          }
+        }
+      }
+    }
   }
 }
 

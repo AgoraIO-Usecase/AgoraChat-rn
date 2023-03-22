@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyphenate.rnchatcallkit",
+      "bundleIdentifier": "com.hyphenate.callkit.demo",
       "googleServicesFile": "./ios/example/GoogleService-Info.plist"
     },
     "android": {
