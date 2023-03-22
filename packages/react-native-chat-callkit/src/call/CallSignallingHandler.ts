@@ -100,13 +100,13 @@ export interface CallSignallingListener {
 }
 
 export class CallSignallingHandler implements ChatMessageEventListener {
-  private _listener: CallSignallingListener | undefined;
-  constructor(params: { listener: CallSignallingListener }) {
+  private _listener?: CallSignallingListener | undefined;
+
+  public init(params: { listener: CallSignallingListener }): void {
     this._listener = params.listener;
-    calllog.log('CallSignallingHandler:constructor:', this._listener);
   }
-  public destructor(): void {
-    calllog.log('CallSignallingHandler:destructor:', this._listener);
+
+  public unInit(): void {
     this._listener = undefined;
   }
 

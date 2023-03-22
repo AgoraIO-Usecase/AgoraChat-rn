@@ -13,7 +13,7 @@ import {
   UserOfflineReasonType,
   VideoSourceType,
 } from 'react-native-agora';
-import { ChatClient } from 'react-native-chat-sdk';
+import type { ChatClient } from 'react-native-chat-sdk';
 
 import {
   CallEndReason,
@@ -51,9 +51,9 @@ export class CallManagerImpl
   private _client?: ChatClient;
   private _option: CallOption;
   private _listener?: CallListener;
-  private _engine: IRtcEngine;
+  private _engine?: IRtcEngine;
   private _ship: CallRelationship;
-  private _handler: CallSignallingHandler;
+  private _sig: CallSignallingHandler;
   private _timer: CallTimeoutHandler;
   private _userId: string;
   private _deviceToken: string;
@@ -66,25 +66,15 @@ export class CallManagerImpl
     this._ship = {
       receiveCallList: new Map(),
     } as CallRelationship;
-    this._handler = new CallSignallingHandler({ listener: this });
-    ChatClient.getInstance().chatManager.addMessageListener(this._handler);
-    this._timer = new CallTimeoutHandler({
-      listener: this,
-      timeout: K.KeyTimeout,
-    });
-    this._engine = createAgoraRtcEngine();
     this._userId = ''; // TODO: Initialization is required.
     this._deviceToken = ''; // TODO: Get the sdk yourself.
+    this._timer = new CallTimeoutHandler();
+    this._sig = new CallSignallingHandler();
   }
 
   protected destructor(): void {
     calllog.log('CallManagerImpl:destructor:');
     // TODO: reserve.
-    this._reset();
-    ChatClient.getInstance().chatManager.removeMessageListener(this._handler);
-    this.handler.destructor();
-    this.timer.destructor();
-    this.engine.release();
   }
 
   public init(params: {
@@ -101,6 +91,7 @@ export class CallManagerImpl
     calllog.enableLog = params.enableLog ?? false;
     calllog.log('CallManagerImpl:init:', params);
     this._client = params.client;
+    this._client.chatManager.addMessageListener(this._sig);
     this._userId = params.userId;
     this._deviceToken = params.userDeviceToken; // TODO:
     this._setUser({
@@ -114,16 +105,27 @@ export class CallManagerImpl
       ringFilePath: params.option.ringFilePath ?? '', // TODO:
     };
     this._listener = params.listener;
-    if (params.option.callTimeout) {
-      this._timer.setTimeoutNumber(params.option.callTimeout);
-    }
+    this._timer.init({
+      listener: this,
+      timeout: params.option.callTimeout ?? K.KeyTimeout,
+    });
+    this._sig.init({ listener: this });
+    this._engine = createAgoraRtcEngine();
     this._engine.initialize({
       appId: this._option.agoraAppId,
       channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
     });
+    this._engine.registerEventHandler(this);
   }
   public unInit(): void {
     this._reset();
+    this._client?.chatManager.removeMessageListener(this._sig);
+    this._userId = '';
+    this._listener = undefined;
+    this._timer.unInit();
+    this._sig.unInit();
+    this._engine?.unregisterEventHandler(this);
+    this._engine?.release();
   }
   protected get option() {
     return this._option;
@@ -140,8 +142,8 @@ export class CallManagerImpl
   protected get deviceToken() {
     return this._deviceToken;
   }
-  protected get handler() {
-    return this._handler;
+  protected get signalling() {
+    return this._sig;
   }
   protected get users() {
     return this._users;
@@ -338,7 +340,7 @@ export class CallManagerImpl
             callId: params.callId,
             new: CallSignalingState.InviteeInviteConfirming,
           });
-          this.handler.sendInviteReply({
+          this.signalling.sendInviteReply({
             callId: call.callId,
             inviterId: call.inviter.userId,
             inviteeDeviceToken: invitee.userDeviceToken ?? '',
@@ -387,7 +389,7 @@ export class CallManagerImpl
             callId: params.callId,
             new: CallSignalingState.InviteeInviteConfirming,
           });
-          this.handler.sendInviteReply({
+          this.signalling.sendInviteReply({
             callId: call.callId,
             inviterId: call.inviter.userId,
             inviteeDeviceToken: invitee.userDeviceToken ?? '',
@@ -483,7 +485,7 @@ export class CallManagerImpl
   private _reset(): void {
     calllog.log('CallManagerImpl:_reset:');
     this._clearShip();
-    this.timer.stopAllTiming();
+    this.timer.clear();
     this._clearUser();
   }
 
@@ -522,7 +524,7 @@ export class CallManagerImpl
     if (call && call.isInviter === true) {
       for (const key in call.invitees) {
         const invitee = call.invitees.get(key)!;
-        this.handler.sendInviteCancel({
+        this.signalling.sendInviteCancel({
           callId: call.callId,
           inviteeId: invitee?.userId,
           inviterDeviceToken: call.inviter.userDeviceToken!,
@@ -641,8 +643,8 @@ export class CallManagerImpl
     this.ship.receiveCallList.set(call.callId, call);
     this._addInvitee(call.callId, [
       {
-        userId: this._userId,
-        userDeviceToken: this._deviceToken,
+        userId: this.userId,
+        userDeviceToken: this.deviceToken,
         userHadJoined: false,
       } as CallInvitee,
     ]);
@@ -792,7 +794,7 @@ export class CallManagerImpl
 
       for (const id of toAdd) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
-        this.handler.sendInvite({
+        this.signalling.sendInvite({
           inviteeId: id,
           channelId: call.channelId,
           callType: call.callType,
@@ -837,7 +839,7 @@ export class CallManagerImpl
 
       for (const id of params.inviteeIds) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
-        this.handler.sendInvite({
+        this.signalling.sendInvite({
           inviteeId: id,
           channelId: call.channelId,
           callType: call.callType,
@@ -874,7 +876,7 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:_inviteTimeout', params);
     const call = this._getCall(params.callId);
     if (call) {
-      this.handler.sendInviteCancel({
+      this.signalling.sendInviteCancel({
         ...params,
         inviteeId: params.userId,
         inviterDeviceToken: call.inviter.userDeviceToken!,
@@ -984,7 +986,7 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:onInvite:', params);
     if (this._isBusy()) {
       calllog.log('CallManagerImpl:onInvite:', this._isBusy());
-      this.handler.sendInviteReply({
+      this.signalling.sendInviteReply({
         callId: params.callId,
         inviterId: params.inviterId,
         inviteeDeviceToken: this.deviceToken,
@@ -1014,7 +1016,7 @@ export class CallManagerImpl
         callId: params.callId,
         new: CallSignalingState.InviteeAlerting,
       });
-      this.handler.sendAlert({
+      this.signalling.sendAlert({
         callId: call.callId,
         inviterId: call.inviter.userId,
         inviterDeviceToken: call.inviter.userDeviceToken!,
@@ -1061,7 +1063,7 @@ export class CallManagerImpl
           callId: params.callId,
           userId: params.inviteeId,
         });
-        this.handler.sendAlertConfirm({
+        this.signalling.sendAlertConfirm({
           callId: params.callId,
           inviteeId: params.inviteeId,
           inviterDeviceToken: params.inviterDeviceToken,
@@ -1218,7 +1220,7 @@ export class CallManagerImpl
           }
         }
         if (params.reply === 'accept' || params.reply === 'refuse') {
-          this.handler.sendInviteReplyConfirm({
+          this.signalling.sendInviteReplyConfirm({
             callId: params.callId,
             inviteeId: params.inviteeId,
             inviteeDeviceToken: invitee.userDeviceToken,

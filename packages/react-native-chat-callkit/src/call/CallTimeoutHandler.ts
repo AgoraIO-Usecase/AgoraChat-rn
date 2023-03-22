@@ -22,30 +22,30 @@ export interface CallTimeoutListener {
 }
 
 export class CallTimeoutHandler {
-  private _listener: CallTimeoutListener | undefined;
+  private _listener?: CallTimeoutListener | undefined;
   private _timer: Map<string, NodeJS.Timeout>;
   private _timeout: number;
-  constructor(params: { listener: CallTimeoutListener; timeout: number }) {
-    this._listener = params.listener;
+
+  constructor() {
     this._timer = new Map();
+    this._timeout = 30000;
+  }
+
+  public init(params: {
+    listener: CallTimeoutListener;
+    timeout: number;
+  }): void {
+    this._listener = params.listener;
     this._timeout = params.timeout;
-    calllog.log(
-      'CallTimeoutHandler:constructor:',
-      this._listener,
-      this._timeout,
-      this._timer
-    );
   }
-  public destructor(): void {
-    calllog.log('CallTimeoutHandler:destructor:', this._listener);
+
+  public unInit(): void {
     this._listener = undefined;
-    this.stopAllTiming();
+    this.clear();
   }
+
   protected key(params: { callId: string; userId: string }) {
     return `${params.callId}_${params.userId}`;
-  }
-  public setTimeoutNumber(timeout: number): void {
-    this._timeout = timeout;
   }
 
   /**
@@ -96,7 +96,7 @@ export class CallTimeoutHandler {
   /**
    * Stop all timers and destroy.
    */
-  public stopAllTiming(): void {
+  public clear(): void {
     for (const key in this._timer) {
       const timeoutId = this._timer.get(key);
       clearTimeout(timeoutId);
