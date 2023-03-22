@@ -109,4 +109,5 @@ export type DialogPropsT<
 
 export type ContentStateProps = React.PropsWithChildren<{
   container?: StyleProp<ViewStyle>;
+  pointerEvents?: 'box-none' | 'none' | 'box-only' | 'auto' | undefined;
 }>;

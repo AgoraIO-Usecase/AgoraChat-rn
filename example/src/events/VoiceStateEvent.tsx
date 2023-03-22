@@ -62,6 +62,7 @@ export function handleVoiceStateEvent(params: {
               <Text style={{ color: 'white' }}>{chat.voiceState}</Text>
             </View>
           ),
+          pointerEvents: 'box-none',
         });
       }
       break;

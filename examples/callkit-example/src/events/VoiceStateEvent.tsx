@@ -1,10 +1,22 @@
+import * as React from 'react';
+import { CallType, SingleCall } from 'react-native-chat-callkit';
 import type {
   ExtraDataType,
   VoiceStateContextType,
 } from 'react-native-chat-uikit';
 
 import type { StateActionEventType } from './Events';
+import { sendEvent, sendEventProps } from './sendEvent';
 import type { BizEventType } from './types';
+
+export const sendEventFromState = (
+  params: Omit<sendEventProps, 'senderId' | 'timestamp'>
+) => {
+  sendEvent({
+    ...params,
+    senderId: 'VoiceStateEvent',
+  } as sendEventProps);
+};
 
 export function handleVoiceStateEvent(params: {
   voiceState: VoiceStateContextType;
@@ -29,6 +41,71 @@ export function handleVoiceStateEvent(params: {
   );
   let ret = true;
   switch (stateEvent.action) {
+    case 'show_single_call':
+      {
+        const { isInviter, callType } = stateEvent.params as {
+          inviterId: string;
+          isInviter: boolean;
+          inviteeIds: string[];
+          callType: CallType;
+        };
+        const peerNickName = 'test';
+        params.voiceState.showState({
+          children: (
+            <SingleCall
+              peerNickName={peerNickName}
+              elapsed={0}
+              isInviter={isInviter}
+              callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
+              onClose={() => {
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_single_call',
+                  params: {},
+                });
+              }}
+              onHangUp={() => {
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_single_call',
+                  params: {},
+                });
+              }}
+              onCancel={() => {
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_single_call',
+                  params: {},
+                });
+              }}
+              onRefuse={() => {
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_single_call',
+                  params: {},
+                });
+              }}
+              onError={() => {
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_single_call',
+                  params: {},
+                });
+              }}
+            />
+          ),
+          pointerEvents: 'box-none',
+        });
+      }
+      break;
+    case 'hide_single_call':
+      params.voiceState.hideState();
+      break;
     default:
       ret = false;
       break;

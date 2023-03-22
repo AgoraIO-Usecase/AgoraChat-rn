@@ -5,7 +5,9 @@ export type RootParamsList = {
   };
   Login: {
     option?: {} | undefined;
-    params?: { id: string; pass: string; accountType: 'agora' } | undefined;
+    params?:
+      | { id: string; pass: string; accountType: 'agora' | 'easemob' }
+      | undefined;
   };
   Splash: {
     option?: {} | undefined;

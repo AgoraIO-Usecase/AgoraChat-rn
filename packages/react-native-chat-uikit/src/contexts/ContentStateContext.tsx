@@ -15,10 +15,19 @@ type ContentStateContextProps = React.PropsWithChildren<{
 
 export function ContentStateContextProvider(props: ContentStateContextProps) {
   const { children } = props;
-  const [opacity, setOpacity] = React.useState(0);
+  // const [opacity, setOpacity] = React.useState(0);
+  const [display, setDisplay] = React.useState<'none' | 'flex' | undefined>(
+    'none'
+  );
+  // const [backfaceVisibility, setBackfaceVisibility] = React.useState<
+  //   'visible' | 'hidden' | undefined
+  // >('hidden');
   const [content, setContent] = React.useState(props.content);
   const ContentStateMemo = React.memo((content?: ContentStateProps) => (
-    <ContentState container={[content?.container, { opacity: opacity }]}>
+    <ContentState
+      container={[content?.container, { display }]}
+      pointerEvents={content?.pointerEvents}
+    >
       {content?.children}
     </ContentState>
   ));
@@ -26,18 +35,25 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
     <ContentStateContext.Provider
       value={{
         showState: (props) => {
-          setOpacity(1);
+          // setOpacity(1);
+          // setBackfaceVisibility('visible');
+          setDisplay('flex');
           if (props?.children) {
             setContent(props);
           }
         },
         hideState: () => {
-          setOpacity(0);
+          // setOpacity(0);
+          // setBackfaceVisibility('hidden');
+          setDisplay('none');
         },
       }}
     >
       {children}
-      <ContentStateMemo container={content?.container}>
+      <ContentStateMemo
+        container={content?.container}
+        pointerEvents={content?.pointerEvents}
+      >
         {content?.children}
       </ContentStateMemo>
     </ContentStateContext.Provider>

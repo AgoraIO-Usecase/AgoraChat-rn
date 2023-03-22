@@ -21,11 +21,13 @@ import type { RootParamsList } from '../routes';
 
 let gid: string = '';
 let gps: string = '';
+let gt = 'agora' as 'agora' | 'easemob';
 
 try {
   const env = require('../env');
   gid = env.id ?? '';
   gps = env.ps ?? '';
+  gt = env.accountType ?? 'agora';
 } catch (e) {
   console.warn('test:', e);
 }
@@ -63,7 +65,7 @@ export function SplashScreen({
         errorCode === 305
       ) {
         navigation.navigate('Login', {
-          params: { id: gid, pass: gps, accountType: 'agora' },
+          params: { id: gid, pass: gps, accountType: gt },
         });
       }
     },
@@ -73,7 +75,7 @@ export function SplashScreen({
   const onTokenDidExpire = React.useCallback(() => {
     console.log('test:onTokenDidExpire:');
     navigation.navigate('Login', {
-      params: { id: gid, pass: gps, accountType: 'agora' },
+      params: { id: gid, pass: gps, accountType: gt },
     });
   }, [navigation]);
 
@@ -143,7 +145,7 @@ export function SplashScreen({
                             params: {
                               id: gid,
                               pass: gps,
-                              accountType: 'agora',
+                              accountType: gt,
                             },
                           })
                         );
@@ -156,7 +158,7 @@ export function SplashScreen({
               } else {
                 eventParams.navigation.dispatch(
                   CommonActions.navigate('Login', {
-                    params: { id: gid, pass: gps, accountType: 'agora' },
+                    params: { id: gid, pass: gps, accountType: gt },
                   })
                 );
               }

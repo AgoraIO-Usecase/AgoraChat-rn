@@ -32,6 +32,7 @@ export const ChatCallkitView =
     : () => {
         throw new Error(LINKING_ERROR);
       };
+export * from './call/index';
 export {
   CallEndReason,
   CallErrorCode,

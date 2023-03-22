@@ -27,7 +27,7 @@ import * as K from './CallConst';
 import { CallError } from './CallError';
 import type { CallListener } from './CallListener';
 import type { CallManager } from './CallManager';
-import type { CallOption } from './CallOptions';
+import type { CallOption } from './CallOption';
 import type {
   CallInvitee,
   CallObject,

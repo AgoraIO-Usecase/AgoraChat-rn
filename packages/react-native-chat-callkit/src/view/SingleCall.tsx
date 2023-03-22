@@ -31,6 +31,11 @@ export type SingleCallProps = {
   callType: 'video' | 'audio';
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;
+  onHangUp?: () => void;
+  onCancel?: () => void;
+  onRefuse?: () => void;
+  onClose?: () => void;
+  onError?: () => void;
 };
 export type SingleCallState = {
   isMinimize: boolean;
@@ -59,6 +64,34 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       muteVideo: props.muteVideo ?? false,
     };
   }
+
+  onClickHangUp = () => {
+    const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
+    const { callState } = this.state;
+    if (isInviter === true) {
+      if (callState === CallState.Calling) {
+        onHangUp?.();
+      } else {
+        onCancel?.();
+      }
+    } else {
+      if (callState === CallState.Calling) {
+        onHangUp?.();
+      } else {
+        onRefuse?.();
+      }
+    }
+  };
+  onClickSpeaker = () => {};
+  onClickMicrophone = () => {};
+  onClickVideo = () => {};
+  onClickRecall = () => {};
+  onClickClose = () => {
+    const { onClose } = this.props;
+    onClose?.();
+  };
+  onClickAccept = () => {};
+
   protected renderSafeArea(): React.ReactNode {
     return (
       <View
@@ -116,7 +149,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { elapsed } = this.props;
     const { callType, callState } = this.state;
     return (
-      <View style={{ alignItems: 'center' }}>
+      <View
+        style={{
+          alignItems: 'center',
+          // backgroundColor: 'red',
+        }}
+      >
         <View style={{ height: 60 }} />
         <Avatar uri="" size={100} radius={100} />
         <View style={{ marginVertical: 10 }}>
@@ -151,6 +189,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected renderBottomMenu(): React.ReactNode {
     const { bottomButtonType } = this.state;
+    calllog.log('test:renderBottomMenu', bottomButtonType);
     const disabled = true;
     let ret = <></>;
     switch (bottomButtonType) {
@@ -159,9 +198,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="speaker" />
-            <BottomMenuButton name="microphone" />
-            <BottomMenuButton name="hangup" />
+            <BottomMenuButton name="speaker" onPress={this.onClickSpeaker} />
+            <BottomMenuButton
+              name="microphone"
+              onPress={this.onClickMicrophone}
+            />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
           </View>
         );
         break;
@@ -170,9 +212,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="video" />
-            <BottomMenuButton name="microphone" />
-            <BottomMenuButton name="hangup" />
+            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton
+              name="microphone"
+              onPress={this.onClickMicrophone}
+            />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
           </View>
         );
         break;
@@ -181,8 +226,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="recall" />
-            <BottomMenuButton name="close" />
+            <BottomMenuButton name="recall" onPress={this.onClickRecall} />
+            <BottomMenuButton name="close" onPress={this.onClickClose} />
           </View>
         );
         break;
@@ -191,9 +236,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="video" />
-            <BottomMenuButton name="hangup" />
-            <BottomMenuButton name="accept" />
+            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
+            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
           </View>
         );
         break;
@@ -202,9 +247,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="video" />
-            <BottomMenuButton name="hangup" disabled={disabled} />
-            <BottomMenuButton name="accepting" />
+            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
+            <BottomMenuButton name="accepting" disabled={disabled} />
           </View>
         );
         break;
@@ -213,9 +258,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="video" />
-            <BottomMenuButton name="microphone" />
-            <BottomMenuButton name="hangup" />
+            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton
+              name="microphone"
+              onPress={this.onClickMicrophone}
+            />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
           </View>
         );
         break;
@@ -224,8 +272,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="hangup" />
-            <BottomMenuButton name="accept" />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
+            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
           </View>
         );
         break;
@@ -234,8 +282,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="hangup" disabled={disabled} />
-            <BottomMenuButton name="accepting" />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
+            <BottomMenuButton name="accepting" disabled={disabled} />
           </View>
         );
         break;
@@ -244,8 +292,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
           >
-            <BottomMenuButton name="microphone" />
-            <BottomMenuButton name="hangup" />
+            <BottomMenuButton
+              name="microphone"
+              onPress={this.onClickMicrophone}
+            />
+            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
           </View>
         );
         break;
@@ -265,7 +316,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           width: 76,
           height: 76,
           position: 'absolute',
-          backgroundColor: 'red',
+          // backgroundColor: 'red',
           right: 10,
           top: 54,
           borderRadius: 12,
@@ -314,7 +365,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             width: callState === CallState.Calling ? 90 : 76,
             height: callState === CallState.Calling ? 160 : 76,
             position: 'absolute',
-            backgroundColor: 'red',
+            // backgroundColor: 'red',
             right: 10,
             top: 54,
             borderRadius: 12,

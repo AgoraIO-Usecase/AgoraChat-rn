@@ -7,11 +7,11 @@ import type { ContentStateProps } from '../types';
 
 export default function ContentState(props: ContentStateProps): JSX.Element {
   const { colors } = useThemeContext();
-  const { container, children } = props;
+  const { container, children, pointerEvents } = props;
   const { width, height } = useWindowDimensions();
   return (
     <View
-      pointerEvents="none"
+      pointerEvents={pointerEvents ?? 'none'}
       style={[
         { backgroundColor: colors.backdrop, width: width, height: height },
         styles.container,

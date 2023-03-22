@@ -2,7 +2,7 @@ import type { ChatClient } from 'react-native-chat-sdk';
 
 import type { CallListener } from './CallListener';
 import { createManagerImpl } from './CallManagerImpl';
-import type { CallOption } from './CallOptions';
+import type { CallOption } from './CallOption';
 
 export interface CallManager {
   /**
