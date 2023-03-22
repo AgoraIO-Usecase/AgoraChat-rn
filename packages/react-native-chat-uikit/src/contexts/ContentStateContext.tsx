@@ -45,6 +45,7 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
         hideState: () => {
           // setOpacity(0);
           // setBackfaceVisibility('hidden');
+          setContent(undefined);
           setDisplay('none');
         },
       }}
