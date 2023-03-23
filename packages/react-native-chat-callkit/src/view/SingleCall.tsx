@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
-import { ChatClient } from 'react-native-chat-sdk';
 
 import type { CallOption } from '../call';
 import { calllog } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
-import { CallState } from '../enums';
+import { CallEndReason, CallState, CallType } from '../enums';
 import { BasicCall, BasicCallProps, BasicCallState } from './BasicCall';
 import { Avatar } from './components/Avatar';
 import { BottomMenuButton } from './components/BottomMenuButton';
@@ -28,6 +27,7 @@ export type SingleCallProps = BasicCallProps & {
   isMinimize?: boolean;
   elapsed: number; // second unit
   isInviter: boolean;
+  inviteeId: string;
   callState?: CallState;
   callType: 'video' | 'audio';
   bottomButtonType?: BottomButtonType;
@@ -63,32 +63,85 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           ? 'invitee-audio-loading'
           : 'invitee-video-loading'),
       muteVideo: props.muteVideo ?? false,
+      channelId: '',
+      callId: '',
     };
   }
 
   protected init(): void {
     this.manager = createManagerImpl();
     this.manager?.init({
-      client: ChatClient.getInstance(),
       userId: this.props.currentId,
       userNickName: this.props.currentName,
       userAvatarUrl: this.props.currentUrl,
       option: {
-        agoraAppId: '', // TODO:
-        callTimeout: 30000, // TODO;
+        agoraAppId: this.props.appKey,
+        callTimeout: this.props.timeout ?? 30000,
         ringFilePath: '', // TODO:
       } as CallOption,
       enableLog: true,
       listener: this,
+      onResult: () => {
+        console.log('test:init:onResult:');
+        if (this.state.callState === CallState.Connecting) {
+          this.startCall();
+        }
+      },
     });
   }
   protected unInit(): void {
     this.manager?.unInit();
   }
 
+  private startCall() {
+    if (this.manager) {
+      this.setState({ channelId: this.manager.createChannelId() });
+      switch (this.props.callType) {
+        case 'audio':
+          this.manager.startSingleAudioCall({
+            inviteeId: this.props.inviteeId,
+            channelId: this.state.channelId,
+            onResult: (params) => {
+              calllog.log('SingleCall:startSingleAudioCall:', params);
+              if (params.callId) {
+                if (params.error) {
+                  throw params.error;
+                }
+                this.setState({ callId: params.callId });
+              }
+            },
+          });
+          break;
+        case 'video':
+          this.manager.startSingleVideoCall({
+            inviteeId: this.props.inviteeId,
+            channelId: this.state.channelId,
+            onResult: (params) => {
+              calllog.log('SingleCall:startSingleAudioCall:', params);
+              if (params.callId) {
+                if (params.error) {
+                  throw params.error;
+                }
+                this.setState({ callId: params.callId });
+              }
+            },
+          });
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
   onClickHangUp = () => {
     const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
     const { callState } = this.state;
+    this.manager?.hangUpCall({
+      callId: this.state.callId,
+      onResult: (params) => {
+        calllog.log('SingleCall:onClickHangUp:', params);
+      },
+    });
     if (isInviter === true) {
       if (callState === CallState.Calling) {
         onHangUp?.();
@@ -111,7 +164,19 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { onClose } = this.props;
     onClose?.();
   };
-  onClickAccept = () => {};
+  onClickAccept = () => {
+    this.startCall();
+  };
+
+  onCallEnded(params: {
+    channelId: string;
+    callType: CallType;
+    endReason: CallEndReason;
+    elapsed: number;
+  }): void {
+    calllog.log('BasicCall:onCallEnded:', params);
+    this.onClickClose();
+  }
 
   protected renderSafeArea(): React.ReactNode {
     return (
@@ -494,7 +559,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
       Dimensions.get('screen');
-    calllog.log('test:1:', screenWidth, screenHeight);
     const { isMinimize, callType } = this.state;
     if (isMinimize) {
       if (callType === 'audio') {

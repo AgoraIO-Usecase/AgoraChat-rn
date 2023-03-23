@@ -93,6 +93,7 @@ const ContactList = React.memo((props: ContactListProps) => {
         eventType: 'VoiceStateEvent',
         action: 'show_single_call',
         params: {
+          appKey: client.options?.appKey ?? '',
           isInviter: true,
           inviterId: currentId,
           currentId: currentId,
@@ -214,7 +215,6 @@ export default function HomeScreen({
     );
   };
   const list = () => {
-    console.log('test:234234234:');
     return (
       <View
         style={{

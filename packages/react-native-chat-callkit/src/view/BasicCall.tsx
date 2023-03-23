@@ -7,12 +7,14 @@ import type { CallViewListener } from '../call/CallViewListener';
 import type { CallEndReason, CallType } from '../enums';
 
 export type BasicCallProps = {
+  appKey: string;
   inviterId: string;
   inviterName: string;
   inviterUrl?: string;
   currentId: string;
   currentName: string;
   currentUrl?: string;
+  timeout?: number;
   requestRTCToken: (params: {
     appKey: string;
     channelId: string;
@@ -26,7 +28,10 @@ export type BasicCallProps = {
     onResult: (params: { data: any; error?: any }) => void;
   }) => void;
 };
-export type BasicCallState = {};
+export type BasicCallState = {
+  channelId: string;
+  callId: string;
+};
 export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
   extends React.Component<Props, State>
   implements CallViewListener
@@ -61,6 +66,7 @@ export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
     elapsed: number;
   }): void {
     calllog.log('BasicCall:onCallEnded:', params);
+    throw new Error('Requires subclass implementation.');
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {

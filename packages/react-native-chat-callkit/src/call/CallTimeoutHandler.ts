@@ -37,6 +37,7 @@ export class CallTimeoutHandler {
   }): void {
     this._listener = params.listener;
     this._timeout = params.timeout;
+    this._timeout = 10000; // TODO: for test
   }
 
   public unInit(): void {
@@ -97,9 +98,9 @@ export class CallTimeoutHandler {
    * Stop all timers and destroy.
    */
   public clear(): void {
-    for (const key in this._timer) {
-      const timeoutId = this._timer.get(key);
-      clearTimeout(timeoutId);
+    calllog.log('CallTimeoutHandler:clear:', this._timer.size);
+    for (const key of this._timer) {
+      clearTimeout(key[1]);
     }
     this._timer.clear();
   }
@@ -116,12 +117,13 @@ export class CallTimeoutHandler {
     userId: string;
     callTimeoutState: CallTimeoutState;
   }): void {
+    calllog.log('CallTimeoutHandler:startTiming:', params);
     const timeoutId = setTimeout(() => {
       const callId = params.callId;
       const userId = params.userId;
       const callTimeoutState = params.callTimeoutState;
       calllog.log(
-        'CallTimeoutHandler:startTiming:',
+        'CallTimeoutHandler:startTiming:setTimeout:',
         callId,
         userId,
         callTimeoutState

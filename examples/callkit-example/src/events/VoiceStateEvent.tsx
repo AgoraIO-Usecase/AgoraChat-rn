@@ -43,21 +43,31 @@ export function handleVoiceStateEvent(params: {
   switch (stateEvent.action) {
     case 'show_single_call':
       {
-        const { inviterId, isInviter, callType, currentId } =
-          stateEvent.params as {
-            isInviter: boolean;
-            inviterId: string;
-            currentId: string;
-            inviteeIds: string[];
-            callType: CallType;
-          };
+        console.log('test:stateEvent.params', stateEvent.params);
+        const {
+          inviterId,
+          isInviter,
+          callType,
+          currentId,
+          inviteeIds,
+          appKey,
+        } = stateEvent.params as {
+          appKey: string;
+          isInviter: boolean;
+          inviterId: string;
+          currentId: string;
+          inviteeIds: string[];
+          callType: CallType;
+        };
         params.voiceState.showState({
           children: (
             <SingleCall
+              appKey={appKey}
               inviterId={inviterId}
               inviterName={inviterId}
               currentId={currentId}
               currentName={currentId}
+              inviteeId={inviteeIds[0] ?? ''}
               elapsed={0}
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}

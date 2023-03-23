@@ -76,7 +76,6 @@ const UikitModalPlaceholderInternal = (
     voiceState: VoiceStateContextType;
     others: ExtraDataType;
   } => {
-    console.log('test:UikitModalPlaceholderInternal:useImperativeHandle');
     return {
       sheet,
       toast,

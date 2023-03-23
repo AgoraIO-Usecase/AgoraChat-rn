@@ -16,7 +16,7 @@ export enum CallSignalingState {
    */
   InviterInviteConfirming,
   /**
-   * After receiving the answer, join the audio and video chat. And the result of whether to join is sent to the invitee.
+   * After receiving the answer, ready to join the audio and video chat. And the result of whether to join is sent to the invitee.
    */
   InviterJoining,
   /**
@@ -28,7 +28,7 @@ export enum CallSignalingState {
    */
   InviteeInviteConfirming,
   /**
-   * After receiving the result of allowing to join, join the chat.
+   * After receiving the result of allowing to join, ready to join the chat.
    */
   InviteeJoining,
 }
