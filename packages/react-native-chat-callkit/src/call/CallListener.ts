@@ -33,7 +33,7 @@ export interface CallListener {
    * - callType: call type. {@link CallType}
    * - extension: Extend the information.
    */
-  onCallReceived?: (params: {
+  onCallReceived: (params: {
     channelId: string;
     inviterId: string;
     callType: CallType;
@@ -47,27 +47,4 @@ export interface CallListener {
    * - error: An error occurred during a call or signaling process. {@link CallError}
    */
   onCallOccurError?: (params: { channelId: string; error: CallError }) => void;
-  /**
-   * Notifications when other invitees join.
-   *
-   * **Note** Users need to obtain the mapping relationship between user id and channel user id through app server. And notify the Callkit SDK.
-   *
-   * @param -
-   * - channelId: Call channel ID.
-   * - userChannelId: The ID of the user who joined the channel.
-   */
-  onRemoteUserJoined?: (params: {
-    channelId: string;
-    userChannelId: number;
-  }) => void;
-  /**
-   * Notifications when you join a channel.
-   *
-   * **Note** Users need to obtain the mapping relationship between user id and channel user id through app server. And notify the Callkit SDK.
-   *
-   * @param -
-   * - channelId: Call channel ID.
-   * - userChannelId: The ID of the user who joined the channel.
-   */
-  onSelfJoined?: (params: { channelId: string; userChannelId: number }) => void;
 }

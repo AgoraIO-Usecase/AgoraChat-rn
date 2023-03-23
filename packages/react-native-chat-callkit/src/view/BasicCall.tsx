@@ -1,51 +1,80 @@
 import * as React from 'react';
-import {
-  ChannelProfileType,
-  createAgoraRtcEngine,
-  IRtcEngine,
-} from 'react-native-agora';
 
 import { calllog } from '../call/CallConst';
+import type { CallError } from '../call/CallError';
+import type { CallManagerImpl } from '../call/CallManagerImpl';
+import type { CallViewListener } from '../call/CallViewListener';
+import type { CallEndReason, CallType } from '../enums';
 
-export abstract class BasicCall<Props, State> extends React.Component<
-  Props,
-  State
-> {
+export type BasicCallProps = {
+  inviterId: string;
+  inviterName: string;
+  inviterUrl?: string;
+  currentId: string;
+  currentName: string;
+  currentUrl?: string;
+  requestRTCToken: (params: {
+    appKey: string;
+    channelId: string;
+    userId: string;
+    onResult: (params: { data: any; error?: any }) => void;
+  }) => void;
+  requestUserMap: (params: {
+    appKey: string;
+    channelId: string;
+    userId: string;
+    onResult: (params: { data: any; error?: any }) => void;
+  }) => void;
+};
+export type BasicCallState = {};
+export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
+  extends React.Component<Props, State>
+  implements CallViewListener
+{
   componentDidMount(): void {
     calllog.log('BasicCall:componentDidMount:');
-    this.initRtcEngine();
+    this.init();
   }
   componentWillUnmount(): void {
     calllog.log('BasicCall:componentWillUnmount:');
-    this.releaseRtcEngine();
+    this.unInit();
   }
 
-  protected engine?: IRtcEngine;
+  protected manager?: CallManagerImpl;
 
-  protected initRtcEngine(): void {
-    calllog.log('BasicCall:initRtcEngine:');
-    this.engine = createAgoraRtcEngine();
-    this.engine?.initialize({
-      appId: 'easemob#easeim',
-      // Should use ChannelProfileLiveBroadcasting on most of cases
-      channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
-    });
-  }
-
-  protected joinChannel() {}
-
-  protected leaveChannel() {}
-
-  protected releaseRtcEngine(): void {
-    calllog.log('BasicCall:releaseRtcEngine:');
-    this.engine?.release();
-  }
+  protected abstract init(): void;
+  protected abstract unInit(): void;
 
   protected renderBody(): React.ReactNode {
-    throw new Error('You need a subclass implementation.');
+    throw new Error('Requires subclass implementation.');
   }
 
+  // eslint-disable-next-line react/sort-comp
   render(): React.ReactNode {
     return this.renderBody();
+  }
+
+  onCallEnded(params: {
+    channelId: string;
+    callType: CallType;
+    endReason: CallEndReason;
+    elapsed: number;
+  }): void {
+    calllog.log('BasicCall:onCallEnded:', params);
+  }
+
+  onCallOccurError(params: { channelId: string; error: CallError }): void {
+    calllog.log('BasicCall:onCallOccurError:', params);
+  }
+
+  onRemoteUserJoined(params: {
+    channelId: string;
+    userChannelId: number;
+  }): void {
+    calllog.log('BasicCall:onRemoteUserJoined:', params);
+  }
+
+  onSelfJoined(params: { channelId: string; userChannelId: number }): void {
+    calllog.log('BasicCall:onSelfJoined:', params);
   }
 }

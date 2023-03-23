@@ -1,6 +1,6 @@
 import type { ErrorCodeType } from 'react-native-agora';
 
-import { CallErrorCode, CallErrorType } from '../types';
+import { CallErrorCode, CallErrorType } from '../enums';
 
 export class CallError {
   private _code: CallErrorCode | ErrorCodeType;

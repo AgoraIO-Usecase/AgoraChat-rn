@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
+import { ChatClient } from 'react-native-chat-sdk';
 
+import type { CallOption } from '../call';
 import { calllog } from '../call/CallConst';
+import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallState } from '../enums';
-import { BasicCall } from './BasicCall';
+import { BasicCall, BasicCallProps, BasicCallState } from './BasicCall';
 import { Avatar } from './components/Avatar';
 import { BottomMenuButton } from './components/BottomMenuButton';
 import { Elapsed } from './components/Elapsed';
@@ -21,10 +24,8 @@ type BottomButtonType =
   | 'invitee-audio-loading'
   | 'invitee-audio-calling';
 
-export type SingleCallProps = {
+export type SingleCallProps = BasicCallProps & {
   isMinimize?: boolean;
-  peerNickName: string;
-  peerAvatarUrl?: string;
   elapsed: number; // second unit
   isInviter: boolean;
   callState?: CallState;
@@ -37,7 +38,7 @@ export type SingleCallProps = {
   onClose?: () => void;
   onError?: () => void;
 };
-export type SingleCallState = {
+export type SingleCallState = BasicCallState & {
   isMinimize: boolean;
   callState: CallState;
   callType: 'video' | 'audio';
@@ -63,6 +64,26 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           : 'invitee-video-loading'),
       muteVideo: props.muteVideo ?? false,
     };
+  }
+
+  protected init(): void {
+    this.manager = createManagerImpl();
+    this.manager?.init({
+      client: ChatClient.getInstance(),
+      userId: this.props.currentId,
+      userNickName: this.props.currentName,
+      userAvatarUrl: this.props.currentUrl,
+      option: {
+        agoraAppId: '', // TODO:
+        callTimeout: 30000, // TODO;
+        ringFilePath: '', // TODO:
+      } as CallOption,
+      enableLog: true,
+      listener: this,
+    });
+  }
+  protected unInit(): void {
+    this.manager?.unInit();
   }
 
   onClickHangUp = () => {

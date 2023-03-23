@@ -24,6 +24,7 @@ import {
 import { timestamp, uuid } from '../utils/utils';
 import { calllog } from './CallConst';
 import * as K from './CallConst';
+import { CallDevice } from './CallDevice';
 import { CallError } from './CallError';
 import type { CallListener } from './CallListener';
 import type { CallManager } from './CallManager';
@@ -40,6 +41,7 @@ import {
 import { CallTimeoutHandler, CallTimeoutListener } from './CallTimeoutHandler';
 import { CallSignalingState } from './CallTypes';
 import type { CallUser } from './CallUser';
+import type { CallViewListener } from './CallViewListener';
 
 export class CallManagerImpl
   implements
@@ -50,7 +52,7 @@ export class CallManagerImpl
 {
   private _client?: ChatClient;
   private _option: CallOption;
-  private _listener?: CallListener;
+  private _listener?: CallViewListener;
   private _engine?: IRtcEngine;
   private _ship: CallRelationship;
   private _sig: CallSignallingHandler;
@@ -58,6 +60,8 @@ export class CallManagerImpl
   private _userId: string;
   private _deviceToken: string;
   private _users: Map<string, CallUser>;
+  private _device: CallDevice;
+  private _userListener?: CallListener;
 
   constructor() {
     calllog.log('CallManagerImpl:constructor:');
@@ -67,9 +71,10 @@ export class CallManagerImpl
       receiveCallList: new Map(),
     } as CallRelationship;
     this._userId = ''; // TODO: Initialization is required.
-    this._deviceToken = ''; // TODO: Get the sdk yourself.
+    this._deviceToken = 'magic'; // TODO: Get the sdk yourself.
     this._timer = new CallTimeoutHandler();
     this._sig = new CallSignallingHandler();
+    this._device = new CallDevice();
   }
 
   protected destructor(): void {
@@ -80,20 +85,25 @@ export class CallManagerImpl
   public init(params: {
     client: ChatClient;
     userId: string;
-    userDeviceToken: string;
     userNickName: string;
-    userRTCToken: string;
-    option: CallOption;
-    listener?: CallListener;
-    enableLog?: boolean;
     userAvatarUrl?: string;
+    option: CallOption;
+    listener?: CallViewListener;
+    enableLog?: boolean;
   }): void {
     calllog.enableLog = params.enableLog ?? false;
-    calllog.log('CallManagerImpl:init:', params);
+    calllog.log(
+      'CallManagerImpl:init:',
+      params.client !== undefined,
+      params.listener !== undefined,
+      params.userId,
+      params.userNickName,
+      params.option,
+      params.enableLog
+    );
     this._client = params.client;
     this._client.chatManager.addMessageListener(this._sig);
     this._userId = params.userId;
-    this._deviceToken = params.userDeviceToken; // TODO:
     this._setUser({
       userId: params.userId,
       userNickName: params.userNickName,
@@ -110,6 +120,9 @@ export class CallManagerImpl
       timeout: params.option.callTimeout ?? K.KeyTimeout,
     });
     this._sig.init({ listener: this });
+    this._device.init((dt) => {
+      this._deviceToken = dt;
+    });
     this._engine = createAgoraRtcEngine();
     this._engine.initialize({
       appId: this._option.agoraAppId,
@@ -118,6 +131,7 @@ export class CallManagerImpl
     this._engine.registerEventHandler(this);
   }
   public unInit(): void {
+    calllog.log('CallManagerImpl:unInit:');
     this._reset();
     this._client?.chatManager.removeMessageListener(this._sig);
     this._userId = '';
@@ -157,9 +171,19 @@ export class CallManagerImpl
   protected get client() {
     return this._client;
   }
+  protected get userListener() {
+    return this._userListener;
+  }
 
   public createChannelId(): string {
     return uuid();
+  }
+
+  public addListener(listener: CallListener): void {
+    this._userListener = listener;
+  }
+  public removeListener(_: CallListener): void {
+    this._userListener = undefined;
   }
 
   /**
@@ -175,7 +199,6 @@ export class CallManagerImpl
   public startSingleAudioCall(params: {
     inviteeId: string;
     channelId: string;
-    rtcToken: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: any }) => void;
   }): void {
@@ -202,7 +225,6 @@ export class CallManagerImpl
   public startSingleVideoCall(params: {
     inviteeId: string;
     channelId: string;
-    rtcToken: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: any }) => void;
   }): void {
@@ -231,7 +253,6 @@ export class CallManagerImpl
   public startMultiCall(params: {
     inviteeIds: string[];
     channelId: string;
-    rtcToken: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: any }) => void;
   }): void {
@@ -268,7 +289,7 @@ export class CallManagerImpl
    * You can hang up the call during the call, or the inviter initiates the invitation and has not been answered.
    *
    * @param params -
-   * - callId: The ID obtained by {@link CallListener.onCallReceived}.
+   * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
   public hangUpCall(params: {
@@ -322,7 +343,7 @@ export class CallManagerImpl
    * decline the current call. Can only be used by the invitee.
    *
    * @param params -
-   * - callId: The ID obtained by {@link CallListener.onCallReceived}.
+   * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
   public declineCall(params: {
@@ -370,12 +391,11 @@ export class CallManagerImpl
    * Accept the current call. Can only be used by the invitee.
    *
    * @param params -
-   * - callId: The ID obtained by {@link CallListener.onCallReceived}.
+   * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
   public acceptCall(params: {
     callId: string;
-    rtcToken: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: any }) => void;
   }): void {
@@ -476,7 +496,30 @@ export class CallManagerImpl
     this._setUser(user);
   }
 
-  protected setRTCToken(): void {}
+  /**
+   * Set agora information for the current user.
+   *
+   * @param params -
+   * - channelId: The unique identifier of the call channel. It is recommended to create via {@link createChannelId}. This property is highly recommended for preservation.
+   * - userId: The current user ID.
+   * - userChannelId: The channel ID of user.
+   * - userRTCToken: The channel token of user.
+   */
+  public setRTCToken(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    userRTCToken: string;
+  }): void {
+    calllog.log('CallManagerImpl:setRTCToken:', params);
+    if (this.userId === params.userId) {
+      const call = this._getCallByChannelId(params.channelId);
+      if (call) {
+        call.userRTCToken = params.userRTCToken;
+        call.userChannelId = params.userChannelId;
+      }
+    }
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   //// Private Methods /////////////////////////////////////////////////////////
@@ -565,7 +608,6 @@ export class CallManagerImpl
   private _createInviterCall(params: {
     callType: CallType;
     channelId: string;
-    rtcToken: string;
     inviteeIds: string[];
     timestamp?: number;
     ext?: any;
@@ -580,7 +622,6 @@ export class CallManagerImpl
       ...params,
       callId: uuid(),
       invitees: new Map(),
-      userRTCToken: params.rtcToken,
       isInviter: true,
       inviter: {
         userId: this.userId,
@@ -694,7 +735,6 @@ export class CallManagerImpl
     inviteeIds: string[];
     callType: CallType;
     channelId: string;
-    rtcToken: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: any }) => void;
   }): void {
@@ -739,7 +779,6 @@ export class CallManagerImpl
           callType: params.callType,
           channelId: params.channelId,
           inviteeIds: params.inviteeIds,
-          rtcToken: params.rtcToken,
         });
       } else {
         if (
@@ -792,6 +831,13 @@ export class CallManagerImpl
         return;
       }
 
+      if (call.callType === CallType.Multi) {
+        this.listener?.onNeedRTCTokenForJoin?.({
+          appKey: this.option.agoraAppId,
+          channelId: call.channelId,
+        });
+      }
+
       for (const id of toAdd) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
         this.signalling.sendInvite({
@@ -830,12 +876,18 @@ export class CallManagerImpl
         callType: params.callType,
         channelId: params.channelId,
         inviteeIds: params.inviteeIds,
-        rtcToken: params.rtcToken,
       });
       this._changeState({
         callId: call.callId,
         new: CallSignalingState.InviterInviting,
       });
+
+      if (call.callType === CallType.Multi) {
+        this.listener?.onNeedRTCTokenForJoin?.({
+          appKey: this.option.agoraAppId,
+          channelId: call.channelId,
+        });
+      }
 
       for (const id of params.inviteeIds) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
@@ -925,7 +977,7 @@ export class CallManagerImpl
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  //// CallListener ////////////////////////////////////////////////////////////
+  //// CallViewListener ////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   protected onCallEndedInternal(params: {
@@ -936,6 +988,15 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:onCallEndedInternal', params);
     // TODO:
     this.listener?.onCallEnded?.({ ...params, elapsed: 0 });
+  }
+
+  protected onCallOccurErrorInternal(params: {
+    channelId: string;
+    error: CallError;
+  }): void {
+    calllog.log('CallManagerImpl:onCallOccurErrorInternal', params);
+    // TODO:
+    this.listener?.onCallOccurError?.(params);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -1117,7 +1178,7 @@ export class CallManagerImpl
             this._removeCall(params.callId);
             this.ship.currentCall = call;
             // TODO: As the invitee, start playing music and display the interface in establishing the connection.
-            this.listener?.onCallReceived?.({
+            this.userListener?.onCallReceived?.({
               channelId: call.channelId,
               inviterId: call.inviter.userId,
               callType: call.callType,
@@ -1200,7 +1261,10 @@ export class CallManagerImpl
                 callId: params.callId,
                 new: CallSignalingState.InviterJoining,
               });
-              // TODO: to add channel
+              this.listener?.onNeedRTCTokenForJoin?.({
+                appKey: this.option.agoraAppId,
+                channelId: call.channelId,
+              });
             } else {
               this.onCallEndedInternal({
                 channelId: call.channelId,
@@ -1280,7 +1344,10 @@ export class CallManagerImpl
               callId: params.callId,
               new: CallSignalingState.InviteeJoining,
             });
-            // TODO: add channel
+            this.listener?.onNeedRTCTokenForJoin?.({
+              appKey: this.option.agoraAppId,
+              channelId: call.channelId,
+            });
           } else {
             this.onCallEndedInternal({
               channelId: call.channelId,
@@ -1311,7 +1378,7 @@ export class CallManagerImpl
   public onError(err: ErrorCodeType, msg: string) {
     calllog.log('CallManagerImpl:onError:', err, msg);
     if (err !== ErrorCodeType.ErrOk && this.ship.currentCall) {
-      this.listener?.onCallOccurError?.({
+      this.onCallOccurErrorInternal({
         channelId: this.ship.currentCall.channelId,
         error: new CallError({
           code: err,
@@ -1507,8 +1574,8 @@ export class CallManagerImpl
   }
 }
 
-let gCallManager: CallManager;
-export function createManagerImpl(): CallManager {
+let gCallManager: CallManagerImpl;
+export function createManagerImpl(): CallManagerImpl {
   if (gCallManager === undefined) {
     gCallManager = new CallManagerImpl();
   }

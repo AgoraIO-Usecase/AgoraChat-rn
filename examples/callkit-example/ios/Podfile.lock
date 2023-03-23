@@ -550,6 +550,8 @@ PODS:
     - React-Core
   - RNCClipboard (1.11.1):
     - React-Core
+  - RNDeviceInfo (10.4.0):
+    - React-Core
   - RNFastImage (8.6.3):
     - React-Core
     - SDWebImage (~> 5.11.1)
@@ -682,6 +684,7 @@ DEPENDENCIES:
   - RNAudioRecorderPlayer (from `../../../node_modules/react-native-audio-recorder-player`)
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../../../node_modules/@react-native-clipboard/clipboard`)"
+  - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNFastImage (from `../../../node_modules/react-native-fast-image`)
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../../../node_modules/@react-native-firebase/messaging`)"
@@ -872,6 +875,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
     :path: "../../../node_modules/@react-native-clipboard/clipboard"
+  RNDeviceInfo:
+    :path: "../../../node_modules/react-native-device-info"
   RNFastImage:
     :path: "../../../node_modules/react-native-fast-image"
   RNFBApp:
@@ -989,6 +994,7 @@ SPEC CHECKSUMS:
   RNAudioRecorderPlayer: 308940de4f9d1448a064874fd9d83479ae47c7a7
   RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
   RNCClipboard: 2834e1c4af68697089cdd455ee4a4cdd198fa7dd
+  RNDeviceInfo: 749f2e049dcd79e2e44f134f66b73a06951b5066
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: 9295dac8a4e8857918bcff90328b197807ee0dc1
   RNFBMessaging: 1a84a46789e1ee9820d70839683faff890a22411

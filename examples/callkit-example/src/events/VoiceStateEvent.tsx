@@ -43,17 +43,21 @@ export function handleVoiceStateEvent(params: {
   switch (stateEvent.action) {
     case 'show_single_call':
       {
-        const { isInviter, callType } = stateEvent.params as {
-          inviterId: string;
-          isInviter: boolean;
-          inviteeIds: string[];
-          callType: CallType;
-        };
-        const peerNickName = 'test';
+        const { inviterId, isInviter, callType, currentId } =
+          stateEvent.params as {
+            isInviter: boolean;
+            inviterId: string;
+            currentId: string;
+            inviteeIds: string[];
+            callType: CallType;
+          };
         params.voiceState.showState({
           children: (
             <SingleCall
-              peerNickName={peerNickName}
+              inviterId={inviterId}
+              inviterName={inviterId}
+              currentId={currentId}
+              currentName={currentId}
               elapsed={0}
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
@@ -96,6 +100,22 @@ export function handleVoiceStateEvent(params: {
                   action: 'hide_single_call',
                   params: {},
                 });
+              }}
+              requestRTCToken={function (params: {
+                appKey: string;
+                channelId: string;
+                userId: string;
+                onResult: (params: { data: any; error?: any }) => void;
+              }): void {
+                console.log('test:requestRTCToken:', params);
+              }}
+              requestUserMap={function (params: {
+                appKey: string;
+                channelId: string;
+                userId: string;
+                onResult: (params: { data: any; error?: any }) => void;
+              }): void {
+                console.log('test:requestUserMap:', params);
               }}
             />
           ),

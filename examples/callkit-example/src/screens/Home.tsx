@@ -93,8 +93,9 @@ const ContactList = React.memo((props: ContactListProps) => {
         eventType: 'VoiceStateEvent',
         action: 'show_single_call',
         params: {
-          inviterId: currentId,
           isInviter: true,
+          inviterId: currentId,
+          currentId: currentId,
           inviteeIds: l,
           callType: params.callType,
         },
