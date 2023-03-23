@@ -50,6 +50,7 @@ export class CallManagerImpl
     CallSignallingListener,
     CallTimeoutListener
 {
+  private _isInit: boolean;
   private _client?: ChatClient;
   private _option: CallOption;
   private _listener?: CallViewListener;
@@ -62,6 +63,18 @@ export class CallManagerImpl
   private _users: Map<string, CallUser>;
   private _device: CallDevice;
   private _userListener?: CallListener;
+  private _requestRTCToken?: (params: {
+    appKey: string;
+    channelId: string;
+    userId: string;
+    onResult: (params: { data: any; error?: any }) => void;
+  }) => void;
+  private _requestUserMap?: (params: {
+    appKey: string;
+    channelId: string;
+    userId: string;
+    onResult: (params: { data: any; error?: any }) => void;
+  }) => void;
 
   constructor() {
     calllog.log('CallManagerImpl:constructor:');
@@ -75,6 +88,7 @@ export class CallManagerImpl
     this._timer = new CallTimeoutHandler();
     this._sig = new CallSignallingHandler();
     this._device = new CallDevice();
+    this._isInit = false;
   }
 
   protected destructor(): void {
@@ -83,44 +97,67 @@ export class CallManagerImpl
   }
 
   public init(params: {
-    userId: string;
-    userNickName: string;
-    userAvatarUrl?: string;
+    // userId: string;
+    // userNickName: string;
+    // userAvatarUrl?: string;
     option: CallOption;
     listener?: CallViewListener;
     enableLog?: boolean;
+    requestRTCToken: (params: {
+      appKey: string;
+      channelId: string;
+      userId: string;
+      onResult: (params: { data: any; error?: any }) => void;
+    }) => void;
+    requestUserMap: (params: {
+      appKey: string;
+      channelId: string;
+      userId: string;
+      onResult: (params: { data: any; error?: any }) => void;
+    }) => void;
     onResult?: (params?: { error?: CallError }) => void;
   }): void {
+    if (this._isInit === true) {
+      params.onResult?.({
+        error: new CallError({
+          code: CallErrorCode.Initialized,
+          description: 'Already initialized.',
+        }),
+      });
+      return;
+    } else {
+      this._isInit = true;
+    }
     let i1 = false;
     let i2 = false;
     calllog.enableLog = params.enableLog ?? false;
     calllog.log(
       'CallManagerImpl:init:',
       params.listener !== undefined,
-      params.userId,
-      params.userNickName,
       params.option,
       params.enableLog
     );
-    this._client = ChatClient.getInstance();
-    this._client.chatManager.addMessageListener(this._sig);
-    this._userId = params.userId;
-    this._setUser({
-      userId: params.userId,
-      userNickName: params.userNickName,
-      userAvatarUrl: params.userAvatarUrl ?? '', // TODO:
-    });
+    // this._client = ChatClient.getInstance();
+    // this._client.chatManager.addMessageListener(this._sig);
+    // this._userId = params.userId;
+    // this._setUser({
+    //   userId: params.userId,
+    //   userNickName: params.userNickName,
+    //   userAvatarUrl: params.userAvatarUrl ?? '', // TODO:
+    // });
     this._option = {
       agoraAppId: params.option.agoraAppId,
       callTimeout: params.option.callTimeout ?? K.KeyTimeout,
       ringFilePath: params.option.ringFilePath ?? '', // TODO:
     };
     this._listener = params.listener;
-    this._timer.init({
-      listener: this,
-      timeout: params.option.callTimeout ?? K.KeyTimeout,
-    });
-    this._sig.init({ listener: this });
+    this._requestRTCToken = params.requestRTCToken;
+    this._requestUserMap = params.requestUserMap;
+    // this._timer.init({
+    //   listener: this,
+    //   timeout: params.option.callTimeout ?? K.KeyTimeout,
+    // });
+    // this._sig.init({ listener: this });
     this._device.init((dt) => {
       this._deviceToken = dt;
       i2 = true;
@@ -128,12 +165,13 @@ export class CallManagerImpl
         params.onResult?.();
       }
     });
-    this._engine = createAgoraRtcEngine();
-    this._engine.initialize({
-      appId: this._option.agoraAppId,
-      channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
-    });
-    this._engine.registerEventHandler(this);
+    // this._engine = createAgoraRtcEngine();
+    // this._engine.initialize({
+    //   appId: this._option.agoraAppId,
+    //   channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
+    // });
+    // this._engine.registerEventHandler(this);
+    this.initListener();
     i1 = true;
     if (i1 && i2) {
       params.onResult?.();
@@ -141,15 +179,47 @@ export class CallManagerImpl
   }
   public unInit(): void {
     calllog.log('CallManagerImpl:unInit:');
+    if (this._isInit === false) {
+      return;
+    } else {
+      this._isInit = false;
+    }
     this._reset();
-    this._client?.chatManager.removeMessageListener(this._sig);
+    // this._client?.chatManager.removeMessageListener(this._sig);
     this._userId = '';
     this._listener = undefined;
+    this._requestUserMap = undefined;
+    this._requestRTCToken = undefined;
+    // this._timer.unInit();
+    // this._sig.unInit();
+    // this._engine?.unregisterEventHandler(this);
+    // this._engine?.release();
+    this.unInitListener();
+  }
+
+  private initListener(): void {
+    this._timer.init({
+      listener: this,
+      timeout: K.KeyTimeout,
+    });
+    this._client = ChatClient.getInstance();
+    this.client?.chatManager.addMessageListener(this._sig);
+    this._sig.init({ listener: this });
+    this._engine = createAgoraRtcEngine();
+    this._engine.initialize({
+      appId: this._option.agoraAppId,
+      channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
+    });
+    this._engine.registerEventHandler(this);
+  }
+  private unInitListener(): void {
     this._timer.unInit();
+    this.client?.chatManager.removeMessageListener(this._sig);
     this._sig.unInit();
     this._engine?.unregisterEventHandler(this);
     this._engine?.release();
   }
+
   protected get option() {
     return this._option;
   }
@@ -184,15 +254,41 @@ export class CallManagerImpl
     return this._userListener;
   }
 
+  public get requestRTCToken() {
+    return this._requestRTCToken;
+  }
+
+  public get requestUserMap() {
+    return this._requestUserMap;
+  }
+
   public createChannelId(): string {
     return uuid();
   }
 
   public addListener(listener: CallListener): void {
+    calllog.log('CallManagerImpl:addListener:');
+    // this.client?.chatManager.addMessageListener(this._sig);
+    // this.initListener();
     this._userListener = listener;
   }
   public removeListener(_: CallListener): void {
+    calllog.log('CallManagerImpl:removeListener:');
+    // this.client?.chatManager.removeMessageListener(this._sig);
+    // this.unInitListener();
     this._userListener = undefined;
+  }
+
+  public addViewListener(listener: CallViewListener): void {
+    this._listener = listener;
+  }
+  public removeViewListener(_: CallViewListener): void {
+    this._listener = undefined;
+  }
+
+  public setCurrentUser(currentUser: CallUser): void {
+    this._userId = currentUser.userId;
+    this.users.set(currentUser.userId, currentUser);
   }
 
   /**
@@ -1017,7 +1113,7 @@ export class CallManagerImpl
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  //// CallViewListener ////////////////////////////////////////////////////////////
+  //// CallViewListener ////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   protected onCallEndedInternal(params: {

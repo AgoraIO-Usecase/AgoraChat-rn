@@ -71,6 +71,7 @@ export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
     calllog.log('BasicCall:onCallOccurError:', params);
+    throw new Error('Requires subclass implementation.');
   }
 
   onRemoteUserJoined(params: {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 
-import type { CallOption } from '../call';
+import type { CallError } from '../call';
 import { calllog } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallEndReason, CallState, CallType } from '../enums';
@@ -70,27 +70,40 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected init(): void {
     this.manager = createManagerImpl();
-    this.manager?.init({
+    // this.manager?.init({
+    //   option: {
+    //     agoraAppId: this.props.appKey,
+    //     callTimeout: this.props.timeout ?? 30000,
+    //     ringFilePath: '', // TODO:
+    //   } as CallOption,
+    //   enableLog: true,
+    //   requestRTCToken: this.props.requestRTCToken,
+    //   requestUserMap: this.props.requestUserMap,
+    //   listener: this,
+    //   onResult: () => {
+    //     console.log('test:init:onResult:');
+    //     if (this.props.isInviter === true) {
+    //       if (this.state.callState === CallState.Connecting) {
+    //         this.startCall();
+    //       }
+    //     }
+    //   },
+    // });
+    this.manager?.setCurrentUser({
       userId: this.props.currentId,
       userNickName: this.props.currentName,
       userAvatarUrl: this.props.currentUrl,
-      option: {
-        agoraAppId: this.props.appKey,
-        callTimeout: this.props.timeout ?? 30000,
-        ringFilePath: '', // TODO:
-      } as CallOption,
-      enableLog: true,
-      listener: this,
-      onResult: () => {
-        console.log('test:init:onResult:');
-        if (this.state.callState === CallState.Connecting) {
-          this.startCall();
-        }
-      },
     });
+    this.manager?.addViewListener(this);
+    if (this.props.isInviter === true) {
+      if (this.state.callState === CallState.Connecting) {
+        this.startCall();
+      }
+    }
   }
   protected unInit(): void {
-    this.manager?.unInit();
+    this.manager?.removeViewListener(this);
+    // this.manager?.unInit();
   }
 
   private startCall() {
@@ -133,6 +146,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  //// OnButton ////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
   onClickHangUp = () => {
     const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
     const { callState } = this.state;
@@ -168,15 +185,28 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     this.startCall();
   };
 
+  //////////////////////////////////////////////////////////////////////////////
+  //// CallViewListener ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
   onCallEnded(params: {
     channelId: string;
     callType: CallType;
     endReason: CallEndReason;
     elapsed: number;
   }): void {
-    calllog.log('BasicCall:onCallEnded:', params);
+    calllog.log('SingleCall:onCallEnded:', params);
     this.onClickClose();
   }
+
+  onCallOccurError(params: { channelId: string; error: CallError }): void {
+    calllog.log('SingleCall:onCallOccurError:', params);
+    this.onClickClose();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  //// Render //////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   protected renderSafeArea(): React.ReactNode {
     return (

@@ -32,7 +32,10 @@ export const ChatCallkitView =
     : () => {
         throw new Error(LINKING_ERROR);
       };
+
 export * from './call/index';
+export { GlobalContainer } from './containers/GlobalContainer';
+export { useCallkitSdkContext } from './contexts/CallkitSdkContext';
 export {
   CallEndReason,
   CallErrorCode,

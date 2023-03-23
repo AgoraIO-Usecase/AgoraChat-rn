@@ -1,7 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ListRenderItemInfo, Text, View } from 'react-native';
-import { CallType } from 'react-native-chat-callkit';
+import {
+  CallEndReason,
+  CallError,
+  CallListener,
+  CallType,
+  useCallkitSdkContext,
+} from 'react-native-chat-callkit';
 import { Button, RadioButton } from 'react-native-chat-uikit';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -66,7 +72,11 @@ const FlatListRenderItem = (
   );
 };
 type ContactListRef = {
-  showSingleCall: (params: { callType: CallType }) => void;
+  showSingleCall: (params: {
+    callType: CallType;
+    isInviter: boolean;
+    inviterId?: string;
+  }) => void;
   hideSingleCall: () => void;
 };
 type ContactListProps = {
@@ -81,7 +91,11 @@ const ContactList = React.memo((props: ContactListProps) => {
   const [_data, setData] = React.useState(data);
 
   if (propsRef?.current) {
-    propsRef.current.showSingleCall = (params: { callType: CallType }) => {
+    propsRef.current.showSingleCall = (params: {
+      callType: CallType;
+      isInviter: boolean;
+      inviterId?: string;
+    }) => {
       console.log('test:showSingleCall:', params);
       const l = [] as string[];
       for (const i of _data) {
@@ -94,10 +108,10 @@ const ContactList = React.memo((props: ContactListProps) => {
         action: 'show_single_call',
         params: {
           appKey: client.options?.appKey ?? '',
-          isInviter: true,
-          inviterId: currentId,
+          isInviter: params.isInviter,
+          inviterId: params.isInviter === true ? currentId : params.inviterId!,
           currentId: currentId,
-          inviteeIds: l,
+          inviteeIds: params.isInviter === true ? l : [currentId],
           callType: params.callType,
         },
       });
@@ -152,10 +166,47 @@ export default function HomeScreen({
   console.log('test:HomeScreen:');
   const contactListRef = React.useRef<ContactListRef>({} as any);
   const { logout: logoutAction } = useAppChatSdkContext();
+  const { call } = useCallkitSdkContext();
+
+  const addListener = React.useCallback(() => {
+    const listener = {
+      onCallEnded: (params: {
+        channelId: string;
+        callType: CallType;
+        endReason: CallEndReason;
+        elapsed: number;
+      }) => {
+        console.log('onCallEnded:', params);
+      },
+      onCallReceived: (params: {
+        channelId: string;
+        inviterId: string;
+        callType: CallType;
+        extension?: any;
+      }) => {
+        console.log('onCallReceived:', params);
+        contactListRef.current.showSingleCall({
+          callType: params.callType,
+          isInviter: false,
+          inviterId: params.inviterId,
+        });
+      },
+      onCallOccurError: (params: { channelId: string; error: CallError }) => {
+        console.log('onCallOccurError:', params);
+      },
+    } as CallListener;
+    call.addListener(listener);
+    return () => {
+      call.removeListener(listener);
+    };
+  }, [call]);
 
   React.useEffect(() => {
-    // const s = createManager();
-  }, []);
+    const sub = addListener();
+    return () => {
+      sub();
+    };
+  }, [addListener]);
 
   const tools = () => {
     return (
@@ -188,6 +239,7 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showSingleCall({
               callType: CallType.Video1v1,
+              isInviter: true,
             });
           }}
         >
@@ -197,6 +249,7 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showSingleCall({
               callType: CallType.Audio1v1,
+              isInviter: true,
             });
           }}
         >

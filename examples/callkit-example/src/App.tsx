@@ -16,6 +16,7 @@ import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { Linking, Platform, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
+import { GlobalContainer as CallkitContainer } from 'react-native-chat-callkit';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
   createStringSetEn2,
@@ -97,6 +98,7 @@ export default function App() {
   const RootRef = useNavigationContainerRef<RootParamsList>();
   const isOnInitialized = React.useRef(false);
   const isOnReady = React.useRef(false);
+  const enableLog = true;
 
   React.useEffect(() => {
     const restoreState = async () => {
@@ -205,70 +207,93 @@ export default function App() {
         }}
         ModalComponent={() => <ModalPlaceholder />}
       >
-        {__TEST__ === true ? (
-          Dev()
-        ) : (
-          <NavigationContainer
-            ref={RootRef}
-            initialState={initialState}
-            theme={isLightTheme ? NDefaultTheme : NDarkTheme}
-            onStateChange={(state: NavigationState | undefined) => {
-              const rr: string[] & string[][] = [];
-              formatNavigationState(state, rr);
-              console.log(
-                'test:onStateChange:',
-                JSON.stringify(rr, undefined, '  ')
-              );
-              // console.log('test:onStateChange:o:', JSON.stringify(state));
-              storage.setItem(__KEY__, JSON.stringify(state));
-            }}
-            onUnhandledAction={(action: NavigationAction) => {
-              console.log('test:onUnhandledAction:', action);
-            }}
-            onReady={() => {
-              console.log('test:NavigationContainer:onReady:');
-              isOnReady.current = true;
-              onInitApp();
-            }}
-            fallback={
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 1,
-                }}
-              >
-                <Loading color="rgba(15, 70, 230, 1)" size={sf(45)} />
-              </View>
-            }
-          >
-            <Root.Navigator initialRouteName={initialRouteName}>
-              <Root.Screen
-                name="Splash"
-                options={{
-                  headerShown: false,
-                }}
-                component={SplashScreen}
-              />
-              <Root.Screen
-                name="Login"
-                options={{
-                  headerShown: false,
-                }}
-                component={LoginScreen}
-              />
-              <Root.Screen
-                name="Home"
-                options={() => {
-                  return {
+        <CallkitContainer
+          option={{
+            agoraAppId: appKey,
+          }}
+          enableLog={enableLog}
+          requestRTCToken={(params: {
+            appKey: string;
+            channelId: string;
+            userId: string;
+            onResult: (params: { data: any; error?: any }) => void;
+          }) => {
+            console.log('requestRTCToken:', params);
+          }}
+          requestUserMap={(params: {
+            appKey: string;
+            channelId: string;
+            userId: string;
+            onResult: (params: { data: any; error?: any }) => void;
+          }) => {
+            console.log('requestRTCToken:', params);
+          }}
+        >
+          {__TEST__ === true ? (
+            Dev()
+          ) : (
+            <NavigationContainer
+              ref={RootRef}
+              initialState={initialState}
+              theme={isLightTheme ? NDefaultTheme : NDarkTheme}
+              onStateChange={(state: NavigationState | undefined) => {
+                const rr: string[] & string[][] = [];
+                formatNavigationState(state, rr);
+                console.log(
+                  'test:onStateChange:',
+                  JSON.stringify(rr, undefined, '  ')
+                );
+                // console.log('test:onStateChange:o:', JSON.stringify(state));
+                storage.setItem(__KEY__, JSON.stringify(state));
+              }}
+              onUnhandledAction={(action: NavigationAction) => {
+                console.log('test:onUnhandledAction:', action);
+              }}
+              onReady={() => {
+                console.log('test:NavigationContainer:onReady:');
+                isOnReady.current = true;
+                onInitApp();
+              }}
+              fallback={
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                  }}
+                >
+                  <Loading color="rgba(15, 70, 230, 1)" size={sf(45)} />
+                </View>
+              }
+            >
+              <Root.Navigator initialRouteName={initialRouteName}>
+                <Root.Screen
+                  name="Splash"
+                  options={{
                     headerShown: false,
-                  };
-                }}
-                component={HomeScreen}
-              />
-            </Root.Navigator>
-          </NavigationContainer>
-        )}
+                  }}
+                  component={SplashScreen}
+                />
+                <Root.Screen
+                  name="Login"
+                  options={{
+                    headerShown: false,
+                  }}
+                  component={LoginScreen}
+                />
+                <Root.Screen
+                  name="Home"
+                  options={() => {
+                    return {
+                      headerShown: false,
+                    };
+                  }}
+                  component={HomeScreen}
+                />
+              </Root.Navigator>
+            </NavigationContainer>
+          )}
+        </CallkitContainer>
       </GlobalContainer>
     </React.StrictMode>
   );

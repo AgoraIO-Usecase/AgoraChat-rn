@@ -103,10 +103,12 @@ export class CallSignallingHandler implements ChatMessageEventListener {
   private _listener?: CallSignallingListener | undefined;
 
   public init(params: { listener: CallSignallingListener }): void {
+    calllog.log('CallSignallingHandler:init:');
     this._listener = params.listener;
   }
 
   public unInit(): void {
+    calllog.log('CallSignallingHandler:unInit:');
     this._listener = undefined;
   }
 

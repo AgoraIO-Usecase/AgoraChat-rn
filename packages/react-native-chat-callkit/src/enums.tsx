@@ -62,6 +62,10 @@ export enum CallErrorCode {
    */
   NetworkError,
   /**
+   * Already initialized.
+   */
+  Initialized,
+  /**
    * other situations.
    */
   Others,
