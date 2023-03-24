@@ -1,4 +1,4 @@
-import type { CallOption } from './call';
+import type { CallOption, CallUser } from './call';
 
 export interface CallkitSdkContextType {
   option: CallOption;
@@ -14,5 +14,8 @@ export interface CallkitSdkContextType {
     channelId: string;
     userId: string;
     onResult: (params: { data: any; error?: any }) => void;
+  }) => void;
+  requestCurrentUser: (params: {
+    onResult: (params: { user: CallUser; error?: any }) => void;
   }) => void;
 }

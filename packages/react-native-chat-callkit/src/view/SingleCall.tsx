@@ -89,6 +89,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     //     }
     //   },
     // });
+    // this.manager?.clear();
     this.manager?.setCurrentUser({
       userId: this.props.currentId,
       userNickName: this.props.currentName,
@@ -103,6 +104,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
   protected unInit(): void {
     this.manager?.removeViewListener(this);
+    this.manager?.clear();
     // this.manager?.unInit();
   }
 

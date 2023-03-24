@@ -75,6 +75,9 @@ export class CallManagerImpl
     userId: string;
     onResult: (params: { data: any; error?: any }) => void;
   }) => void;
+  private _requestCurrentUser?: (params: {
+    onResult: (params: { user: CallUser; error?: any }) => void;
+  }) => void;
 
   constructor() {
     calllog.log('CallManagerImpl:constructor:');
@@ -115,6 +118,9 @@ export class CallManagerImpl
       userId: string;
       onResult: (params: { data: any; error?: any }) => void;
     }) => void;
+    requestCurrentUser: (params: {
+      onResult: (params: { user: CallUser; error?: any }) => void;
+    }) => void;
     onResult?: (params?: { error?: CallError }) => void;
   }): void {
     if (this._isInit === true) {
@@ -153,6 +159,7 @@ export class CallManagerImpl
     this._listener = params.listener;
     this._requestRTCToken = params.requestRTCToken;
     this._requestUserMap = params.requestUserMap;
+    this._requestCurrentUser = params.requestCurrentUser;
     // this._timer.init({
     //   listener: this,
     //   timeout: params.option.callTimeout ?? K.KeyTimeout,
@@ -184,7 +191,7 @@ export class CallManagerImpl
     } else {
       this._isInit = false;
     }
-    this._reset();
+    this._clear();
     // this._client?.chatManager.removeMessageListener(this._sig);
     this._userId = '';
     this._listener = undefined;
@@ -262,6 +269,10 @@ export class CallManagerImpl
     return this._requestUserMap;
   }
 
+  public get requestCurrentUser() {
+    return this._requestCurrentUser;
+  }
+
   public createChannelId(): string {
     return uuid();
   }
@@ -287,8 +298,13 @@ export class CallManagerImpl
   }
 
   public setCurrentUser(currentUser: CallUser): void {
+    calllog.log('CallManagerImpl:setCurrentUser:', currentUser);
     this._userId = currentUser.userId;
     this.users.set(currentUser.userId, currentUser);
+  }
+
+  public clear(): void {
+    this._clear();
   }
 
   /**
@@ -630,8 +646,8 @@ export class CallManagerImpl
   //// Private Methods /////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  private _reset(): void {
-    calllog.log('CallManagerImpl:_reset:');
+  private _clear(): void {
+    calllog.log('CallManagerImpl:_clear:');
     this._clearShip();
     this.timer.clear();
     this._clearUser();
@@ -691,7 +707,7 @@ export class CallManagerImpl
         callType: call.callType,
         endReason: CallEndReason.Cancel,
       });
-      this._reset();
+      this._clear();
     }
   }
 
@@ -705,7 +721,7 @@ export class CallManagerImpl
           callType: call.callType,
           endReason: CallEndReason.HungUp,
         });
-        this._reset();
+        this._clear();
       }
     }
   }
@@ -983,7 +999,7 @@ export class CallManagerImpl
               const call = this._getCall(callId);
               if (call) {
                 if (call.callType !== CallType.Multi) {
-                  this._reset();
+                  this._clear();
                   this.onCallEndedInternal({
                     channelId: call.channelId,
                     callType: call.callType,
@@ -1038,7 +1054,7 @@ export class CallManagerImpl
               const call = this._getCall(callId);
               if (call) {
                 if (call.callType !== CallType.Multi) {
-                  this._reset();
+                  this._clear();
                   this.onCallEndedInternal({
                     channelId: call.channelId,
                     callType: call.callType,
@@ -1079,7 +1095,7 @@ export class CallManagerImpl
       });
       if (call.callType !== CallType.Multi) {
         // TODO: End the call and notify the user.
-        this._reset();
+        this._clear();
         this.onCallEndedInternal({
           channelId: call.channelId,
           callType: call.callType,
@@ -1194,46 +1210,67 @@ export class CallManagerImpl
       });
       return;
     }
-    const call = this._createInviteeCall({
-      callId: params.callId,
-      callType: params.callType,
-      channelId: params.channelId,
-      inviter: {
-        userId: params.inviterId,
-        userDeviceToken: params.inviterDeviceToken,
-      },
-      timestamp: params.ts,
-      ext: params.ext,
-    });
-    const invitee = call.invitees.get(this.userId);
-    if (invitee) {
-      this._changeState({
+    const onInviteInternal = () => {
+      const call = this._createInviteeCall({
         callId: params.callId,
-        new: CallSignalingState.InviteeAlerting,
+        callType: params.callType,
+        channelId: params.channelId,
+        inviter: {
+          userId: params.inviterId,
+          userDeviceToken: params.inviterDeviceToken,
+        },
+        timestamp: params.ts,
+        ext: params.ext,
       });
-      this.signalling.sendAlert({
-        callId: call.callId,
-        inviterId: call.inviter.userId,
-        inviterDeviceToken: call.inviter.userDeviceToken!,
-        inviteeDeviceToken: invitee.userDeviceToken!,
-        onResult: ({ callId, error }) => {
-          calllog.log('CallManagerImpl:onInvite:sendAlert:', callId, error);
-          if (error) {
-            this.timer.stopTiming({
-              callId: call.callId,
-              userId: call.inviter.userId,
-            });
-            this._alertTimeout({
-              callId: params.callId,
-              userId: call.inviter.userId,
+      const invitee = call.invitees.get(this.userId);
+      if (invitee) {
+        this._changeState({
+          callId: params.callId,
+          new: CallSignalingState.InviteeAlerting,
+        });
+        this.signalling.sendAlert({
+          callId: call.callId,
+          inviterId: call.inviter.userId,
+          inviterDeviceToken: call.inviter.userDeviceToken!,
+          inviteeDeviceToken: invitee.userDeviceToken!,
+          onResult: ({ callId, error }) => {
+            calllog.log('CallManagerImpl:onInvite:sendAlert:', callId, error);
+            if (error) {
+              this.timer.stopTiming({
+                callId: call.callId,
+                userId: call.inviter.userId,
+              });
+              this._alertTimeout({
+                callId: params.callId,
+                userId: call.inviter.userId,
+              });
+            }
+          },
+        });
+        this.timer.startAlertTiming({
+          callId: call.callId,
+          userId: call.inviter.userId,
+        });
+      }
+    };
+    if (this.userId.length === 0) {
+      this.requestCurrentUser?.({
+        onResult: ({ user, error }) => {
+          calllog.log('CallManagerImpl:onInvite:', user, error);
+          if (error === undefined) {
+            this._userId = user.userId;
+            this.users.set(user.userId, user);
+            onInviteInternal();
+          } else {
+            throw new CallError({
+              code: CallErrorCode.ExceptionState,
+              description: 'The current logged-in user cannot be obtained.',
             });
           }
         },
       });
-      this.timer.startAlertTiming({
-        callId: call.callId,
-        userId: call.inviter.userId,
-      });
+    } else {
+      onInviteInternal();
     }
   }
   onAlert(params: {
@@ -1278,7 +1315,7 @@ export class CallManagerImpl
               const call = this._getCall(callId);
               if (call) {
                 if (call.callType !== CallType.Multi) {
-                  this._reset();
+                  this._clear();
                   this.onCallEndedInternal({
                     channelId: call.channelId,
                     callType: call.callType,
@@ -1356,16 +1393,11 @@ export class CallManagerImpl
             new: CallSignalingState.Idle,
           });
           this._removeCall(params.callId);
-          if (
-            call.state === CallSignalingState.InviteeInviteConfirming ||
-            call.state === CallSignalingState.InviteeJoining
-          ) {
-            this.onCallEndedInternal({
-              channelId: call.channelId,
-              callType: call.callType,
-              endReason: CallEndReason.RemoteCancel,
-            });
-          }
+          this.onCallEndedInternal({
+            channelId: call.channelId,
+            callType: call.callType,
+            endReason: CallEndReason.RemoteCancel,
+          });
         }
       }
     }
@@ -1434,7 +1466,7 @@ export class CallManagerImpl
                 const call = this._getCall(callId);
                 if (call) {
                   if (call.callType !== CallType.Multi) {
-                    this._reset();
+                    this._clear();
                     this.onCallEndedInternal({
                       channelId: call.channelId,
                       callType: call.callType,

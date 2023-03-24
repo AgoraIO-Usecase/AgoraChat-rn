@@ -16,7 +16,10 @@ import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { Linking, Platform, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
-import { GlobalContainer as CallkitContainer } from 'react-native-chat-callkit';
+import {
+  CallUser,
+  GlobalContainer as CallkitContainer,
+} from 'react-native-chat-callkit';
 import { ChatClient } from 'react-native-chat-sdk';
 import {
   createStringSetEn2,
@@ -227,6 +230,24 @@ export default function App() {
             onResult: (params: { data: any; error?: any }) => void;
           }) => {
             console.log('requestRTCToken:', params);
+          }}
+          requestCurrentUser={(params: {
+            onResult: (params: { user: CallUser; error?: any }) => void;
+          }) => {
+            console.log('requestCurrentUser:', params);
+            ChatClient.getInstance()
+              .getCurrentUsername()
+              .then((result) => {
+                params.onResult({
+                  user: {
+                    userId: result,
+                    userNickName: result,
+                  },
+                });
+              })
+              .catch((error) => {
+                console.warn('test:getCurrentUsername:error:', error);
+              });
           }}
         >
           {__TEST__ === true ? (
