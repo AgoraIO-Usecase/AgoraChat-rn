@@ -12,6 +12,9 @@ import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
 
+const StateBarHeight = 44;
+const BottomBarHeight = 60;
+
 type BottomButtonType =
   | 'inviter-video'
   | 'inviter-audio'
@@ -37,6 +40,7 @@ export type SingleCallProps = BasicCallProps & {
   onRefuse?: () => void;
   onClose?: () => void;
   onError?: () => void;
+  isTest?: boolean;
 };
 export type SingleCallState = BasicCallState & {
   isMinimize: boolean;
@@ -69,6 +73,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected init(): void {
+    if (this.props.isTest === true) {
+      return;
+    }
     this.manager = createManagerImpl();
     // this.manager?.init({
     //   option: {
@@ -103,6 +110,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
   protected unInit(): void {
+    if (this.props.isTest === true) {
+      return;
+    }
     this.manager?.removeViewListener(this);
     this.manager?.clear();
     // this.manager?.unInit();
@@ -214,7 +224,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     return (
       <View
         style={{
-          height: 44,
+          height: StateBarHeight,
           // backgroundColor: 'green',
         }}
       />
@@ -225,6 +235,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       <View
         style={{
           flexDirection: 'row',
+          position: 'absolute',
+          top: StateBarHeight,
           // backgroundColor: 'red',
         }}
       >
@@ -310,112 +322,110 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     calllog.log('test:renderBottomMenu', bottomButtonType);
     const disabled = true;
     let ret = <></>;
+    const Container = (props: React.PropsWithChildren<{}>) => {
+      const { children } = props;
+      return (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            position: 'absolute',
+            bottom: BottomBarHeight,
+            width: '100%',
+          }}
+        >
+          {children}
+        </View>
+      );
+    };
     switch (bottomButtonType) {
       case 'inviter-audio':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="speaker" onPress={this.onClickSpeaker} />
             <BottomMenuButton
               name="microphone"
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </View>
+          </Container>
         );
         break;
       case 'inviter-video':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="video" onPress={this.onClickVideo} />
             <BottomMenuButton
               name="microphone"
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </View>
+          </Container>
         );
         break;
       case 'inviter-timeout':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="recall" onPress={this.onClickRecall} />
             <BottomMenuButton name="close" onPress={this.onClickClose} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-video-init':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="video" onPress={this.onClickVideo} />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-video-loading':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="video" onPress={this.onClickVideo} />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accepting" disabled={disabled} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-video-calling':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="video" onPress={this.onClickVideo} />
             <BottomMenuButton
               name="microphone"
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-audio-init':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-audio-loading':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accepting" disabled={disabled} />
-          </View>
+          </Container>
         );
         break;
       case 'invitee-audio-calling':
         ret = (
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}
-          >
+          <Container>
             <BottomMenuButton
               name="microphone"
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </View>
+          </Container>
         );
         break;
 
@@ -434,7 +444,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           width: 76,
           height: 76,
           position: 'absolute',
-          // backgroundColor: 'red',
+          backgroundColor: 'grey',
           right: 10,
           top: 54,
           borderRadius: 12,
@@ -483,7 +493,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             width: callState === CallState.Calling ? 90 : 76,
             height: callState === CallState.Calling ? 160 : 76,
             position: 'absolute',
-            // backgroundColor: 'red',
+            backgroundColor: 'grey',
             right: 10,
             top: 54,
             borderRadius: 12,
@@ -494,8 +504,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               style={{
                 flex: 1,
                 marginBottom: 10,
-                justifyContent: 'flex-end',
+                alignSelf: 'center',
                 // backgroundColor: 'green',
+                position: 'absolute',
+                bottom: 7,
               }}
             >
               <Elapsed timer={elapsed} />
@@ -530,7 +542,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             width: muteVideo === false ? 90 : 76,
             height: muteVideo === false ? 160 : 76,
             position: 'absolute',
-            backgroundColor: 'white',
+            backgroundColor: 'grey',
             right: 10,
             top: 10,
             borderRadius: 12,
@@ -586,7 +598,19 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         content = this.renderFloatVideo();
       }
     }
-    return <View style={{ flex: 1, alignItems: 'center' }}>{content}</View>;
+    return (
+      <View
+        style={{
+          // flex: 1,
+          alignItems: 'center',
+          position: 'absolute',
+          width: '100%',
+          top: 100,
+        }}
+      >
+        {content}
+      </View>
+    );
   }
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
@@ -608,12 +632,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           backgroundColor: 'rgba(0,0,0,0.4)',
         }}
       >
-        {this.renderSafeArea()}
+        <View style={{ flex: 1, backgroundColor: 'blue' }} />
+        {/* {this.renderSafeArea()} */}
         {this.renderTopBar()}
         {this.renderContent()}
-        {/* <View style={{ flex: 1 }} /> */}
         {this.renderBottomMenu()}
-        {this.renderSafeArea()}
+        {/* {this.renderSafeArea()} */}
       </View>
     );
   }

@@ -1,6 +1,7 @@
 import {
   AudioVolumeInfo,
   ChannelProfileType,
+  ClientRoleType,
   createAgoraRtcEngine,
   ErrorCodeType,
   IRtcEngine,
@@ -702,7 +703,7 @@ export class CallManagerImpl
           },
         });
       }
-      this.onCallEndedInternal({
+      this._onCallEnded({
         channelId: call.channelId,
         callType: call.callType,
         endReason: CallEndReason.Cancel,
@@ -716,7 +717,7 @@ export class CallManagerImpl
     const call = this.ship.currentCall;
     if (call) {
       if (call.state === CallSignalingState.Joined) {
-        this.onCallEndedInternal({
+        this._onCallEnded({
           channelId: call.channelId,
           callType: call.callType,
           endReason: CallEndReason.HungUp,
@@ -1000,7 +1001,7 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._clear();
-                  this.onCallEndedInternal({
+                  this._onCallEnded({
                     channelId: call.channelId,
                     callType: call.callType,
                     endReason: CallEndReason.NoResponse,
@@ -1055,7 +1056,7 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._clear();
-                  this.onCallEndedInternal({
+                  this._onCallEnded({
                     channelId: call.channelId,
                     callType: call.callType,
                     endReason: CallEndReason.NoResponse,
@@ -1096,7 +1097,7 @@ export class CallManagerImpl
       if (call.callType !== CallType.Multi) {
         // TODO: End the call and notify the user.
         this._clear();
-        this.onCallEndedInternal({
+        this._onCallEnded({
           channelId: call.channelId,
           callType: call.callType,
           endReason: CallEndReason.RemoteNoResponse,
@@ -1120,7 +1121,7 @@ export class CallManagerImpl
     const call = this._getCall(params.callId);
     if (call) {
       this._removeCall(params.callId);
-      this.onCallEndedInternal({
+      this._onCallEnded({
         channelId: call.channelId,
         callType: call.callType,
         endReason: CallEndReason.RemoteNoResponse,
@@ -1132,20 +1133,20 @@ export class CallManagerImpl
   //// CallViewListener ////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  protected onCallEndedInternal(params: {
+  protected _onCallEnded(params: {
     channelId: string;
     callType: CallType;
     endReason: CallEndReason;
   }): void {
-    calllog.log('CallManagerImpl:onCallEndedInternal', params);
+    calllog.log('CallManagerImpl:_onCallEnded', params);
     this.listener?.onCallEnded?.({ ...params, elapsed: 0 });
   }
 
-  protected onCallOccurErrorInternal(params: {
+  protected _onCallOccurError(params: {
     channelId: string;
     error: CallError;
   }): void {
-    calllog.log('CallManagerImpl:onCallOccurErrorInternal', params);
+    calllog.log('CallManagerImpl:_onCallOccurError', params);
     this.listener?.onCallOccurError?.(params);
   }
 
@@ -1316,7 +1317,7 @@ export class CallManagerImpl
               if (call) {
                 if (call.callType !== CallType.Multi) {
                   this._clear();
-                  this.onCallEndedInternal({
+                  this._onCallEnded({
                     channelId: call.channelId,
                     callType: call.callType,
                     endReason: CallEndReason.NoResponse,
@@ -1393,7 +1394,7 @@ export class CallManagerImpl
             new: CallSignalingState.Idle,
           });
           this._removeCall(params.callId);
-          this.onCallEndedInternal({
+          this._onCallEnded({
             channelId: call.channelId,
             callType: call.callType,
             endReason: CallEndReason.RemoteCancel,
@@ -1437,7 +1438,7 @@ export class CallManagerImpl
                 channelId: call.channelId,
               });
             } else {
-              this.onCallEndedInternal({
+              this._onCallEnded({
                 channelId: call.channelId,
                 callType: call.callType,
                 endReason: CallEndReason.RemoteRefuse,
@@ -1467,7 +1468,7 @@ export class CallManagerImpl
                 if (call) {
                   if (call.callType !== CallType.Multi) {
                     this._clear();
-                    this.onCallEndedInternal({
+                    this._onCallEnded({
                       channelId: call.channelId,
                       callType: call.callType,
                       endReason: CallEndReason.NoResponse,
@@ -1516,7 +1517,7 @@ export class CallManagerImpl
               channelId: call.channelId,
             });
           } else {
-            this.onCallEndedInternal({
+            this._onCallEnded({
               channelId: call.channelId,
               callType: call.callType,
               endReason:
@@ -1527,7 +1528,7 @@ export class CallManagerImpl
           }
         } else {
           this._removeCall(params.callId);
-          this.onCallEndedInternal({
+          this._onCallEnded({
             channelId: call.channelId,
             callType: call.callType,
             endReason: CallEndReason.HandleOnOtherDevice,
@@ -1539,13 +1540,100 @@ export class CallManagerImpl
   onVideoToAudio(): void {}
 
   //////////////////////////////////////////////////////////////////////////////
+  //// IRtcEngine //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+
+  public joinChannel(params: {
+    userRTCToken: string;
+    userChannelId: number;
+    channelId: string;
+  }): void {
+    calllog.log('CallManagerImpl:joinChannel:', params);
+    this.engine?.joinChannel(
+      params.userRTCToken,
+      params.channelId,
+      params.userChannelId,
+      {
+        clientRoleType: ClientRoleType.ClientRoleBroadcaster,
+      }
+    );
+  }
+  public leaveChannel(): void {
+    calllog.log('CallManagerImpl:leaveChannel:');
+    this.engine?.leaveChannel();
+  }
+
+  public enableVideo(): void {
+    calllog.log('CallManagerImpl:enableVideo:');
+    this.engine?.enableVideo();
+  }
+  public disableVideo(): void {
+    calllog.log('CallManagerImpl:disableVideo:');
+    this.engine?.disableVideo();
+  }
+
+  public startPreview(): void {
+    calllog.log('CallManagerImpl:startPreview:');
+    this.engine?.startPreview();
+  }
+  public stopPreview(): void {
+    calllog.log('CallManagerImpl:stopPreview:');
+    this.engine?.stopPreview();
+  }
+
+  public switchCamera(): void {
+    calllog.log('CallManagerImpl:switchCamera:');
+    this.engine?.switchCamera();
+  }
+
+  public enableLocalVideo(enabled: boolean): void {
+    calllog.log('CallManagerImpl:enableLocalVideo:', enabled);
+    this.engine?.enableLocalVideo(enabled);
+  }
+  public muteLocalVideoStream(mute: boolean): void {
+    calllog.log('CallManagerImpl:muteLocalVideoStream:', mute);
+    this.engine?.muteLocalVideoStream(mute);
+  }
+  public muteRemoteVideoStream(params: {
+    userChannelId: number;
+    mute: boolean;
+  }): void {
+    calllog.log('CallManagerImpl:muteRemoteVideoStream:', params);
+    this.engine?.muteRemoteVideoStream(params.userChannelId, params.mute);
+  }
+  public muteAllRemoteVideoStreams(mute: boolean): void {
+    calllog.log('CallManagerImpl:muteAllRemoteVideoStreams:', mute);
+    this.engine?.muteAllRemoteVideoStreams(mute);
+  }
+
+  public enableLocalAudio(enabled: boolean): void {
+    calllog.log('CallManagerImpl:enableLocalAudio:', enabled);
+    this.engine?.enableLocalAudio(enabled);
+  }
+  public muteLocalAudioStream(mute: boolean): void {
+    calllog.log('CallManagerImpl:muteLocalAudioStream:', mute);
+    this.engine?.muteLocalAudioStream(mute);
+  }
+  public muteRemoteAudioStream(params: {
+    userChannelId: number;
+    mute: boolean;
+  }): void {
+    calllog.log('CallManagerImpl:muteRemoteAudioStream:', params);
+    this.engine?.muteRemoteAudioStream(params.userChannelId, params.mute);
+  }
+  public muteAllRemoteAudioStreams(mute: boolean): void {
+    calllog.log('CallManagerImpl:muteAllRemoteAudioStreams:', mute);
+    this.engine?.muteAllRemoteAudioStreams(mute);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
   //// IRtcEngineEventHandler //////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   public onError(err: ErrorCodeType, msg: string) {
     calllog.log('CallManagerImpl:onError:', err, msg);
     if (err !== ErrorCodeType.ErrOk && this.ship.currentCall) {
-      this.onCallOccurErrorInternal({
+      this._onCallOccurError({
         channelId: this.ship.currentCall.channelId,
         error: new CallError({
           code: err,
@@ -1644,7 +1732,7 @@ export class CallManagerImpl
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
         if (call.callType !== CallType.Multi) {
-          this.onCallEndedInternal({
+          this._onCallEnded({
             channelId: call.channelId,
             callType: call.callType,
             endReason: CallEndReason.RemoteNoResponse,

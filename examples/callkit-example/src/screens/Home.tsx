@@ -165,7 +165,7 @@ export default function HomeScreen({
 }: NativeStackScreenProps<RootParamsList, 'Home'>): JSX.Element {
   console.log('test:HomeScreen:');
   const contactListRef = React.useRef<ContactListRef>({} as any);
-  const { logout: logoutAction } = useAppChatSdkContext();
+  const { currentId, logout: logoutAction } = useAppChatSdkContext();
   const { call } = useCallkitSdkContext();
 
   const addListener = React.useCallback(() => {
@@ -208,17 +208,14 @@ export default function HomeScreen({
     };
   }, [addListener]);
 
-  const tools = () => {
+  const info = () => {
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-          marginVertical: 20,
-          flexWrap: 'wrap',
-        }}
-      >
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ marginHorizontal: 20 }}>
+          <Text>{currentId}</Text>
+        </View>
         <Button
+          style={{ height: 40, width: 100 }}
           onPress={() => {
             logoutAction({
               onResult: ({ result, error }) => {
@@ -235,7 +232,22 @@ export default function HomeScreen({
         >
           logout
         </Button>
+      </View>
+    );
+  };
+
+  const tools = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          marginVertical: 20,
+          flexWrap: 'wrap',
+        }}
+      >
         <Button
+          style={{ height: 40, width: 100 }}
           onPress={() => {
             contactListRef.current.showSingleCall({
               callType: CallType.Video1v1,
@@ -246,6 +258,7 @@ export default function HomeScreen({
           singleV
         </Button>
         <Button
+          style={{ height: 40, width: 100 }}
           onPress={() => {
             contactListRef.current.showSingleCall({
               callType: CallType.Audio1v1,
@@ -282,6 +295,7 @@ export default function HomeScreen({
   };
   return (
     <View style={{ top: 44, flex: 1 }}>
+      {info()}
       {tools()}
       {list()}
     </View>
