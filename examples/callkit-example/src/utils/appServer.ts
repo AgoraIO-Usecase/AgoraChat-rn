@@ -5,32 +5,57 @@ export class AppServerClient {
   private static _mapUrl: string = 'http://a1.easemob.com/channel/mapper';
 
   protected _(): void {}
-  private static request(params: {
+  private static async req(params: {
+    method: 'GET' | 'POST';
     url: string;
     kvs: any;
-    onResult: (params: { data?: any; error?: any }) => void;
-  }): void {
-    ChatClient.getInstance()
-      .getAccessToken()
-      .then((accessToken) => {
-        fetch(params.url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...params.kvs,
-            Authorization: `Bearer ${accessToken}`,
-          }),
-        })
-          .then()
-          .catch((error) => {
-            params.onResult({ error });
-          });
-      })
-      .catch((error) => {
-        params.onResult({ error });
+    from: 'requestToken' | 'requestUserMap';
+    onResult: (p: { data?: any; error?: any }) => void;
+  }): Promise<void> {
+    console.log('AppServerClient:req:', params);
+    try {
+      const accessToken = await ChatClient.getInstance().getAccessToken();
+      console.log('AppServerClient:req:', accessToken);
+      const json = params.kvs as {
+        userAccount: string;
+        channelName: string;
+        appkey: string;
+      };
+      const url = `${params.url}?appkey=${encodeURIComponent(
+        json.appkey
+      )}&channelName=${encodeURIComponent(
+        json.channelName
+      )}&userAccount=${encodeURIComponent(json.userAccount)}`;
+      console.log('AppServerClient:req:', url);
+      const response = await fetch(url, {
+        method: params.method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
       });
+      const value = await response.json();
+      console.log('AppServerClient:req:', value);
+      if (value.code !== 'RES_0K') {
+        params.onResult({ error: { code: value.code } });
+      } else {
+        if (params.from === 'requestToken') {
+          params.onResult({
+            data: {
+              token: value.accessToken,
+            },
+          });
+        } else if (params.from === 'requestUserMap') {
+          params.onResult({
+            data: {
+              result: value.result,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      params.onResult({ error });
+    }
   }
   public static getRtcToken(params: {
     userAccount: string;
@@ -38,13 +63,15 @@ export class AppServerClient {
     appKey: string;
     onResult: (params: { data?: any; error?: any }) => void;
   }): void {
-    AppServerClient.request({
+    AppServerClient.req({
+      method: 'GET',
       url: AppServerClient._rtcTokenUrl,
       kvs: {
         userAccount: params.userAccount,
         channelName: params.channelId,
         appkey: params.appKey,
       },
+      from: 'requestToken',
       onResult: params.onResult,
     });
   }
@@ -54,13 +81,15 @@ export class AppServerClient {
     appKey: string;
     onResult: (params: { data?: any; error?: any }) => void;
   }): void {
-    AppServerClient.request({
+    AppServerClient.req({
+      method: 'GET',
       url: AppServerClient._mapUrl,
       kvs: {
         userAccount: params.userAccount,
         channelName: params.channelId,
         appkey: params.appKey,
       },
+      from: 'requestUserMap',
       onResult: params.onResult,
     });
   }

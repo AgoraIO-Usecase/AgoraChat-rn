@@ -5,40 +5,88 @@ import { CallState, SingleCall } from 'react-native-chat-callkit';
 
 export function test_all() {
   const isMinimize = false; // for test
-  const peerNickName = 'NickName'; // for test
-  const peerAvatarUrl = ''; // for test
   const elapsed = 10000; // for test
   const isInviter = true; // !!! must
   const callState = CallState.Calling; // for test
   const callType = 'video'; // !!! must
   const bottomButtonType = 'invitee-video-init'; // for test
   const muteVideo = true; // for test
+  const appKey = 'sdf';
+  const inviterId = 'inviterId';
+  const currentId = 'wo';
+  const inviteeId = 'inviteeId';
   return (
     <SingleCall
       isMinimize={isMinimize}
-      peerNickName={peerNickName}
-      peerAvatarUrl={peerAvatarUrl}
       elapsed={elapsed}
       isInviter={isInviter}
       callState={callState}
       callType={callType}
       bottomButtonType={bottomButtonType}
       muteVideo={muteVideo}
+      appKey={appKey}
+      inviterId={inviterId}
+      inviterName={inviterId}
+      currentId={currentId}
+      currentName={currentId}
+      requestRTCToken={function (params: {
+        appKey: string; // for test
+        // for test
+        channelId: string;
+        userId: string;
+        onResult: (params: { data: any; error?: any }) => void;
+      }): void {
+        console.log(params);
+      }}
+      requestUserMap={function (params: {
+        appKey: string;
+        channelId: string;
+        userId: string;
+        onResult: (params: { data: any; error?: any }) => void;
+      }): void {
+        console.log(params);
+      }}
+      inviteeId={inviteeId}
     />
   );
 }
 
 export function test_default() {
-  const peerNickName = 'NickName'; // for test
   const elapsed = 10000; // for test
   const isInviter = false; // !!! must
   const callType = 'audio'; // !!! must
+  const appKey = 'sdf';
+  const inviterId = 'inviterId';
+  const currentId = 'wo';
+  const inviteeId = 'inviteeId';
   return (
     <SingleCall
-      peerNickName={peerNickName}
       elapsed={elapsed}
       isInviter={isInviter}
       callType={callType}
+      appKey={appKey}
+      inviterId={inviterId}
+      inviterName={inviterId}
+      currentId={currentId}
+      currentName={currentId}
+      requestRTCToken={function (params: {
+        appKey: string; // for test
+        // for test
+        channelId: string;
+        userId: string;
+        onResult: (params: { data: any; error?: any }) => void;
+      }): void {
+        console.log(params);
+      }}
+      requestUserMap={function (params: {
+        appKey: string;
+        channelId: string;
+        userId: string;
+        onResult: (params: { data: any; error?: any }) => void;
+      }): void {
+        console.log(params);
+      }}
+      inviteeId={inviteeId}
     />
   );
 }

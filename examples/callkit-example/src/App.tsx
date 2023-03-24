@@ -48,6 +48,7 @@ import HomeScreen from './screens/Home';
 import LoginScreen from './screens/Login';
 import { SplashScreen } from './screens/Splash';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
+import { AppServerClient } from './utils/AppServer';
 
 if (Platform.OS === 'web') {
   console.error('web platforms are not supported.');
@@ -222,6 +223,14 @@ export default function App() {
             onResult: (params: { data: any; error?: any }) => void;
           }) => {
             console.log('requestRTCToken:', params);
+            AppServerClient.getRtcToken({
+              userAccount: params.userId,
+              channelId: params.channelId,
+              appKey,
+              onResult: (params: { data?: any; error?: any }) => {
+                console.log('test:', params);
+              },
+            });
           }}
           requestUserMap={(params: {
             appKey: string;
@@ -230,6 +239,14 @@ export default function App() {
             onResult: (params: { data: any; error?: any }) => void;
           }) => {
             console.log('requestRTCToken:', params);
+            AppServerClient.getRtcMap({
+              userAccount: params.userId,
+              channelId: params.channelId,
+              appKey,
+              onResult: (params: { data?: any; error?: any }) => {
+                console.log('test:', params);
+              },
+            });
           }}
           requestCurrentUser={(params: {
             onResult: (params: { user: CallUser; error?: any }) => void;
