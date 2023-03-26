@@ -18,12 +18,14 @@ import type { RootParamsList } from '../routes';
 let gid: string = '';
 let gps: string = '';
 let gt = 'agora' as 'agora' | 'easemob';
+let agoraAppId = '';
 
 try {
   const env = require('../env');
   gid = env.id ?? '';
   gps = env.ps ?? '';
   gt = env.accountType ?? 'agora';
+  agoraAppId = env.agoraAppId;
 } catch (e) {
   console.warn('test:', e);
 }
@@ -108,6 +110,7 @@ const ContactList = React.memo((props: ContactListProps) => {
         action: 'show_single_call',
         params: {
           appKey: client.options?.appKey ?? '',
+          agoraAppId: agoraAppId,
           isInviter: params.isInviter,
           inviterId: params.isInviter === true ? currentId : params.inviterId!,
           currentId: currentId,

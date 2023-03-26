@@ -38,10 +38,12 @@ export interface CallViewListener {
    * @param -
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
+   * - userId: the user ID.
    */
   onRemoteUserJoined?: (params: {
     channelId: string;
     userChannelId: number;
+    userId: string;
   }) => void;
   /**
    * Notifications when you join a channel.
@@ -51,20 +53,29 @@ export interface CallViewListener {
    * @param -
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
+   * - userId: the user ID.
+   * - elapsed: Time already spent. The unit is milliseconds.
    */
-  onSelfJoined?: (params: { channelId: string; userChannelId: number }) => void;
+  onSelfJoined?: (params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+    elapsed: number;
+  }) => void;
 
   /**
-   * The callback notification that requires token to join the channel.
+   * Callback notification for request to join a channel.
    *
-   * **Note** After the token is obtained, the operation of joining the channel starts automatically.
-   *
-   * @param -
+   * @param params -
    * - channelId: Call channel ID.
-   * - appKey: The App ID.
+   * - userId: the user ID.
+   * - userChannelId: the user channel ID.
+   * - userRTCToken: the user channel token.
    */
-  onNeedRTCTokenForJoin?: (params: {
-    appKey: string;
+  onRequestJoin?: (params: {
     channelId: string;
+    userId: string;
+    userChannelId: number;
+    userRTCToken: string;
   }) => void;
 }

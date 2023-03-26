@@ -2,6 +2,8 @@ import {
   AudioVolumeInfo,
   ChannelProfileType,
   ClientRoleType,
+  ConnectionChangedReasonType,
+  ConnectionStateType,
   createAgoraRtcEngine,
   ErrorCodeType,
   IRtcEngine,
@@ -68,13 +70,13 @@ export class CallManagerImpl
     appKey: string;
     channelId: string;
     userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
+    onResult: (params: { data?: any; error?: any }) => void;
   }) => void;
   private _requestUserMap?: (params: {
     appKey: string;
     channelId: string;
     userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
+    onResult: (params: { data?: any; error?: any }) => void;
   }) => void;
   private _requestCurrentUser?: (params: {
     onResult: (params: { user: CallUser; error?: any }) => void;
@@ -111,13 +113,13 @@ export class CallManagerImpl
       appKey: string;
       channelId: string;
       userId: string;
-      onResult: (params: { data: any; error?: any }) => void;
+      onResult: (params: { data?: any; error?: any }) => void;
     }) => void;
     requestUserMap: (params: {
       appKey: string;
       channelId: string;
       userId: string;
-      onResult: (params: { data: any; error?: any }) => void;
+      onResult: (params: { data?: any; error?: any }) => void;
     }) => void;
     requestCurrentUser: (params: {
       onResult: (params: { user: CallUser; error?: any }) => void;
@@ -153,6 +155,7 @@ export class CallManagerImpl
     //   userAvatarUrl: params.userAvatarUrl ?? '', // TODO:
     // });
     this._option = {
+      appKey: params.option.appKey,
       agoraAppId: params.option.agoraAppId,
       callTimeout: params.option.callTimeout ?? K.KeyTimeout,
       ringFilePath: params.option.ringFilePath ?? '', // TODO:
@@ -213,19 +216,11 @@ export class CallManagerImpl
     this._client = ChatClient.getInstance();
     this.client?.chatManager.addMessageListener(this._sig);
     this._sig.init({ listener: this });
-    this._engine = createAgoraRtcEngine();
-    this._engine.initialize({
-      appId: this._option.agoraAppId,
-      channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
-    });
-    this._engine.registerEventHandler(this);
   }
   private unInitListener(): void {
     this._timer.unInit();
     this.client?.chatManager.removeMessageListener(this._sig);
     this._sig.unInit();
-    this._engine?.unregisterEventHandler(this);
-    this._engine?.release();
   }
 
   protected get option() {
@@ -298,6 +293,22 @@ export class CallManagerImpl
     this._listener = undefined;
   }
 
+  public initRTC(): void {
+    calllog.log('CallManagerImpl:initRTC:', this.option.agoraAppId);
+    this._engine = createAgoraRtcEngine();
+    const ret1 = this._engine.initialize({
+      appId: this.option.agoraAppId,
+      channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
+    });
+    const ret2 = this._engine.registerEventHandler(this);
+    calllog.log('CallManagerImpl:initRTC:', ret1, ret2);
+  }
+  public unInitRTC(): void {
+    calllog.log('CallManagerImpl:unInitRTC:');
+    this._engine?.unregisterEventHandler(this);
+    this._engine?.release();
+  }
+
   public setCurrentUser(currentUser: CallUser): void {
     calllog.log('CallManagerImpl:setCurrentUser:', currentUser);
     this._userId = currentUser.userId;
@@ -306,6 +317,10 @@ export class CallManagerImpl
 
   public clear(): void {
     this._clear();
+  }
+
+  public getCurrentCallId(): string | undefined {
+    return this.ship.currentCall?.callId;
   }
 
   /**
@@ -468,12 +483,12 @@ export class CallManagerImpl
    * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
-  public declineCall(params: {
+  public refuseCall(params: {
     callId: string;
     extension?: any;
     onResult: (params: { callId?: string; error?: CallError }) => void;
   }): void {
-    calllog.log('CallManagerImpl:declineCall:', params);
+    calllog.log('CallManagerImpl:refuseCall:', params);
     const call = this._getCall(params.callId);
     if (call) {
       if (call.isInviter === false) {
@@ -491,7 +506,7 @@ export class CallManagerImpl
             reply: 'refuse',
             onResult: ({ callId, error }) => {
               calllog.log(
-                'CallManagerImpl:declineCall:sendInviteReply:',
+                'CallManagerImpl:refuseCall:sendInviteReply:',
                 params
               );
               if (error) {
@@ -539,7 +554,7 @@ export class CallManagerImpl
             reply: 'accept',
             onResult: ({ callId, error }) => {
               calllog.log(
-                'CallManagerImpl:declineCall:sendInviteReply:',
+                'CallManagerImpl:refuseCall:sendInviteReply:',
                 params
               );
               if (error) {
@@ -978,10 +993,7 @@ export class CallManagerImpl
       }
 
       if (call.callType === CallType.Multi) {
-        this.listener?.onNeedRTCTokenForJoin?.({
-          appKey: this.option.agoraAppId,
-          channelId: call.channelId,
-        });
+        this._onRequestJoin({ callId: call.callId });
       }
 
       for (const id of toAdd) {
@@ -1032,10 +1044,7 @@ export class CallManagerImpl
       });
 
       if (call.callType === CallType.Multi) {
-        this.listener?.onNeedRTCTokenForJoin?.({
-          appKey: this.option.agoraAppId,
-          channelId: call.channelId,
-        });
+        this._onRequestJoin({ callId: call.callId });
       }
 
       for (const id of params.inviteeIds) {
@@ -1150,6 +1159,44 @@ export class CallManagerImpl
     this.listener?.onCallOccurError?.(params);
   }
 
+  protected _onRequestJoin(params: { callId: string }): void {
+    calllog.log('CallManagerImpl:onRequestJoin', params);
+    const call = this._getCall(params.callId);
+    if (call) {
+      this.requestRTCToken?.({
+        appKey: this.option.appKey,
+        channelId: call.channelId,
+        userId: this.userId,
+        onResult: (p: { data?: any; error?: any }) => {
+          calllog.log('CallManagerImpl:onRequestJoin:requestRTCToken:', p);
+          if (p.error === undefined) {
+            const uid = p.data.uid as number;
+            if (call.isInviter) {
+              call.inviter.userChannelId = uid;
+            } else {
+              const invitee = call.invitees.get(this.userId);
+              if (invitee) {
+                invitee.userChannelId = uid;
+              }
+            }
+            this.listener?.onRequestJoin?.({
+              channelId: call.channelId,
+              userId: this.userId,
+              userChannelId: uid,
+              userRTCToken: p.data.token,
+            });
+          } else {
+            this._onCallEnded({
+              channelId: call.channelId,
+              callType: call.callType,
+              endReason: CallEndReason.NoResponse,
+            });
+          }
+        },
+      });
+    }
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   //// Users ///////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -1205,7 +1252,7 @@ export class CallManagerImpl
         inviterDeviceToken: params.inviterDeviceToken,
         reply: 'busy',
         onResult: (params: { callId: string; error?: CallError }) => {
-          calllog.log('CallManagerImpl:declineCall:sendInviteReply:', params);
+          calllog.log('CallManagerImpl:refuseCall:sendInviteReply:', params);
           // TODO: ignore.
         },
       });
@@ -1433,10 +1480,7 @@ export class CallManagerImpl
                 callId: params.callId,
                 new: CallSignalingState.InviterJoining,
               });
-              this.listener?.onNeedRTCTokenForJoin?.({
-                appKey: this.option.agoraAppId,
-                channelId: call.channelId,
-              });
+              this._onRequestJoin({ callId: call.callId });
             } else {
               this._onCallEnded({
                 channelId: call.channelId,
@@ -1512,10 +1556,7 @@ export class CallManagerImpl
               callId: params.callId,
               new: CallSignalingState.InviteeJoining,
             });
-            this.listener?.onNeedRTCTokenForJoin?.({
-              appKey: this.option.agoraAppId,
-              channelId: call.channelId,
-            });
+            this._onRequestJoin({ callId: call.callId });
           } else {
             this._onCallEnded({
               channelId: call.channelId,
@@ -1548,8 +1589,7 @@ export class CallManagerImpl
     userChannelId: number;
     channelId: string;
   }): void {
-    calllog.log('CallManagerImpl:joinChannel:', params);
-    this.engine?.joinChannel(
+    const ret = this.engine?.joinChannel(
       params.userRTCToken,
       params.channelId,
       params.userChannelId,
@@ -1557,73 +1597,89 @@ export class CallManagerImpl
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       }
     );
+    calllog.log('CallManagerImpl:joinChannel:ret:', params, ret);
   }
   public leaveChannel(): void {
-    calllog.log('CallManagerImpl:leaveChannel:');
-    this.engine?.leaveChannel();
+    const ret = this.engine?.leaveChannel();
+    calllog.log('CallManagerImpl:leaveChannel:', ret);
   }
 
   public enableVideo(): void {
-    calllog.log('CallManagerImpl:enableVideo:');
-    this.engine?.enableVideo();
+    const ret = this.engine?.enableVideo();
+    calllog.log('CallManagerImpl:enableVideo:', ret);
   }
   public disableVideo(): void {
-    calllog.log('CallManagerImpl:disableVideo:');
-    this.engine?.disableVideo();
+    const ret = this.engine?.disableVideo();
+    calllog.log('CallManagerImpl:disableVideo:', ret);
+  }
+
+  public enableAudio(): void {
+    calllog.log('CallManagerImpl:enableAudio:');
+    this.engine?.enableAudio();
+  }
+  public disableAudio(): void {
+    const ret = this.engine?.disableAudio();
+    calllog.log('CallManagerImpl:disableAudio:', ret);
   }
 
   public startPreview(): void {
-    calllog.log('CallManagerImpl:startPreview:');
-    this.engine?.startPreview();
+    const ret = this.engine?.startPreview();
+    calllog.log('CallManagerImpl:startPreview:', ret);
   }
   public stopPreview(): void {
-    calllog.log('CallManagerImpl:stopPreview:');
-    this.engine?.stopPreview();
+    const ret = this.engine?.stopPreview();
+    calllog.log('CallManagerImpl:stopPreview:', ret);
   }
 
   public switchCamera(): void {
-    calllog.log('CallManagerImpl:switchCamera:');
-    this.engine?.switchCamera();
+    const ret = this.engine?.switchCamera();
+    calllog.log('CallManagerImpl:switchCamera:', ret);
   }
 
   public enableLocalVideo(enabled: boolean): void {
-    calllog.log('CallManagerImpl:enableLocalVideo:', enabled);
-    this.engine?.enableLocalVideo(enabled);
+    const ret = this.engine?.enableLocalVideo(enabled);
+    calllog.log('CallManagerImpl:enableLocalVideo:', enabled, ret);
   }
   public muteLocalVideoStream(mute: boolean): void {
-    calllog.log('CallManagerImpl:muteLocalVideoStream:', mute);
-    this.engine?.muteLocalVideoStream(mute);
+    const ret = this.engine?.muteLocalVideoStream(mute);
+    calllog.log('CallManagerImpl:muteLocalVideoStream:', mute, ret);
   }
   public muteRemoteVideoStream(params: {
     userChannelId: number;
     mute: boolean;
   }): void {
-    calllog.log('CallManagerImpl:muteRemoteVideoStream:', params);
-    this.engine?.muteRemoteVideoStream(params.userChannelId, params.mute);
+    const ret = this.engine?.muteRemoteVideoStream(
+      params.userChannelId,
+      params.mute
+    );
+    calllog.log('CallManagerImpl:muteRemoteVideoStream:', params, ret);
   }
   public muteAllRemoteVideoStreams(mute: boolean): void {
-    calllog.log('CallManagerImpl:muteAllRemoteVideoStreams:', mute);
-    this.engine?.muteAllRemoteVideoStreams(mute);
+    const ret = this.engine?.muteAllRemoteVideoStreams(mute);
+    calllog.log('CallManagerImpl:muteAllRemoteVideoStreams:', mute, ret);
   }
 
   public enableLocalAudio(enabled: boolean): void {
-    calllog.log('CallManagerImpl:enableLocalAudio:', enabled);
-    this.engine?.enableLocalAudio(enabled);
+    const ret = this.engine?.enableLocalAudio(enabled);
+    calllog.log('CallManagerImpl:enableLocalAudio:', enabled, ret);
   }
   public muteLocalAudioStream(mute: boolean): void {
-    calllog.log('CallManagerImpl:muteLocalAudioStream:', mute);
-    this.engine?.muteLocalAudioStream(mute);
+    const ret = this.engine?.muteLocalAudioStream(mute);
+    calllog.log('CallManagerImpl:muteLocalAudioStream:', mute, ret);
   }
   public muteRemoteAudioStream(params: {
     userChannelId: number;
     mute: boolean;
   }): void {
-    calllog.log('CallManagerImpl:muteRemoteAudioStream:', params);
-    this.engine?.muteRemoteAudioStream(params.userChannelId, params.mute);
+    const ret = this.engine?.muteRemoteAudioStream(
+      params.userChannelId,
+      params.mute
+    );
+    calllog.log('CallManagerImpl:muteRemoteAudioStream:', params, ret);
   }
   public muteAllRemoteAudioStreams(mute: boolean): void {
-    calllog.log('CallManagerImpl:muteAllRemoteAudioStreams:', mute);
-    this.engine?.muteAllRemoteAudioStreams(mute);
+    const ret = this.engine?.muteAllRemoteAudioStreams(mute);
+    calllog.log('CallManagerImpl:muteAllRemoteAudioStreams:', mute, ret);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -1669,6 +1725,8 @@ export class CallManagerImpl
       this.listener?.onSelfJoined?.({
         channelId: connection.channelId,
         userChannelId: connection.localUid,
+        userId: this.userId,
+        elapsed,
       });
     }
   }
@@ -1710,10 +1768,61 @@ export class CallManagerImpl
       elapsed
     );
     if (connection.channelId && connection.localUid) {
-      this.listener?.onRemoteUserJoined?.({
-        channelId: connection.channelId,
-        userChannelId: connection.localUid,
-      });
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        this.requestUserMap?.({
+          appKey: this.option.appKey,
+          channelId: call.channelId,
+          userId: this.userId,
+          onResult: (p: { data?: any; error?: any }) => {
+            calllog.log('CallManagerImpl:onUserJoined:requestUserMap:', p);
+            if (p.error === undefined) {
+              let remoteUserId;
+              Object.entries(p.data.result).forEach((value: [string, any]) => {
+                if (call.inviter.userId === value[1]) {
+                  call.inviter.userChannelId = parseInt(value[0]);
+                  call.inviter.userHadJoined = true;
+                } else {
+                  const invitee = call.invitees.get(value[1]);
+                  if (invitee) {
+                    invitee.userChannelId = parseInt(value[0]);
+                    invitee.userHadJoined = true;
+                  }
+                }
+              });
+
+              calllog.log(
+                'CallManagerImpl:onUserJoined:requestUserMap:',
+                call.inviter,
+                call.invitees
+              );
+
+              if (call.inviter.userChannelId === remoteUid) {
+                remoteUserId = call.inviter.userId;
+              } else {
+                for (const invitee of call.invitees) {
+                  if (invitee[1].userChannelId === remoteUid) {
+                    remoteUserId = invitee[0];
+                    break;
+                  }
+                }
+              }
+
+              this.listener?.onRemoteUserJoined?.({
+                channelId: call.channelId,
+                userChannelId: remoteUid,
+                userId: remoteUserId ?? '',
+              });
+            } else {
+              this._onCallEnded({
+                channelId: call.channelId,
+                callType: call.callType,
+                endReason: CallEndReason.NoResponse,
+              });
+            }
+          },
+        });
+      }
     }
   }
 
@@ -1731,6 +1840,16 @@ export class CallManagerImpl
     if (connection.channelId) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
+        if (call.inviter.userChannelId === remoteUid) {
+          call.inviter.userHadJoined = false;
+        } else {
+          for (const invitee of call.invitees) {
+            if (invitee[1].userChannelId === remoteUid) {
+              invitee[1].userHadJoined = false;
+              break;
+            }
+          }
+        }
         if (call.callType !== CallType.Multi) {
           this._onCallEnded({
             channelId: call.channelId,
@@ -1851,6 +1970,19 @@ export class CallManagerImpl
         }
       }
     }
+  }
+
+  onConnectionStateChanged(
+    connection: RtcConnection,
+    state: ConnectionStateType,
+    reason: ConnectionChangedReasonType
+  ): void {
+    calllog.log(
+      'CallManagerImpl:onConnectionStateChanged:',
+      connection,
+      state,
+      reason
+    );
   }
 }
 

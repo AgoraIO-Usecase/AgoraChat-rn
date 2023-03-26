@@ -1,5 +1,9 @@
 export interface CallOption {
   /**
+   * appId.
+   */
+  appKey: string;
+  /**
    * agora appId.
    */
   agoraAppId: string;

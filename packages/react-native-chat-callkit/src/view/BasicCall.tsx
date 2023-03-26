@@ -8,6 +8,7 @@ import type { CallEndReason, CallType } from '../enums';
 
 export type BasicCallProps = {
   appKey: string;
+  agoraAppId: string;
   inviterId: string;
   inviterName: string;
   inviterUrl?: string;
@@ -31,6 +32,8 @@ export type BasicCallProps = {
 export type BasicCallState = {
   channelId: string;
   callId: string;
+  joinChannelSuccess: boolean;
+  startPreview: boolean;
 };
 export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
   extends React.Component<Props, State>
@@ -77,11 +80,29 @@ export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
   onRemoteUserJoined(params: {
     channelId: string;
     userChannelId: number;
+    userId: string;
   }): void {
     calllog.log('BasicCall:onRemoteUserJoined:', params);
+    throw new Error('Requires subclass implementation.');
   }
 
-  onSelfJoined(params: { channelId: string; userChannelId: number }): void {
+  onSelfJoined(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+    elapsed: number;
+  }): void {
     calllog.log('BasicCall:onSelfJoined:', params);
+    throw new Error('Requires subclass implementation.');
+  }
+
+  onRequestJoin(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    userRTCToken: string;
+  }): void {
+    calllog.log('BasicCall:onRequestJoin:', params);
+    throw new Error('Requires subclass implementation.');
   }
 }

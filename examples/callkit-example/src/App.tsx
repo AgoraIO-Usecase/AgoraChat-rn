@@ -59,11 +59,13 @@ const Root = createNativeStackNavigator<RootParamsList>();
 const __KEY__ = '__KEY__';
 let __TEST__ = true;
 let appKey = '';
+let agoraAppId = '';
 
 try {
   const env = require('./env');
   __TEST__ = env.test ?? false;
   appKey = env.appKey;
+  agoraAppId = env.agoraAppId;
 } catch (e) {
   console.warn('test:', e);
 }
@@ -213,22 +215,24 @@ export default function App() {
       >
         <CallkitContainer
           option={{
-            agoraAppId: appKey,
+            appKey: appKey,
+            agoraAppId: agoraAppId,
           }}
           enableLog={enableLog}
           requestRTCToken={(params: {
             appKey: string;
             channelId: string;
             userId: string;
-            onResult: (params: { data: any; error?: any }) => void;
+            onResult: (params: { data?: any; error?: any }) => void;
           }) => {
             console.log('requestRTCToken:', params);
             AppServerClient.getRtcToken({
               userAccount: params.userId,
               channelId: params.channelId,
               appKey,
-              onResult: (params: { data?: any; error?: any }) => {
-                console.log('test:', params);
+              onResult: (pp: { data?: any; error?: any }) => {
+                console.log('test:', pp);
+                params.onResult(pp);
               },
             });
           }}
@@ -236,15 +240,16 @@ export default function App() {
             appKey: string;
             channelId: string;
             userId: string;
-            onResult: (params: { data: any; error?: any }) => void;
+            onResult: (params: { data?: any; error?: any }) => void;
           }) => {
-            console.log('requestRTCToken:', params);
+            console.log('requestUserMap:', params);
             AppServerClient.getRtcMap({
               userAccount: params.userId,
               channelId: params.channelId,
               appKey,
-              onResult: (params: { data?: any; error?: any }) => {
-                console.log('test:', params);
+              onResult: (pp: { data?: any; error?: any }) => {
+                console.log('requestUserMap:getRtcMap:', pp);
+                params.onResult(pp);
               },
             });
           }}

@@ -7,13 +7,13 @@ export interface CallkitSdkContextType {
     appKey: string;
     channelId: string;
     userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
+    onResult: (params: { data?: any; error?: any }) => void;
   }) => void;
   requestUserMap: (params: {
     appKey: string;
     channelId: string;
     userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
+    onResult: (params: { data?: any; error?: any }) => void;
   }) => void;
   requestCurrentUser: (params: {
     onResult: (params: { user: CallUser; error?: any }) => void;

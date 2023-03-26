@@ -86,6 +86,7 @@ export class CallTimeoutHandler {
    * - userId: Could be an inviter or an invitee.
    */
   public stopTiming(params: { callId: string; userId: string }): void {
+    calllog.log('CallTimeoutHandler:stopTiming:', params);
     const timeoutId = this._timer.get(
       this.key({ callId: params.callId, userId: params.userId })
     );

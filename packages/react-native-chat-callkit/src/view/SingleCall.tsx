@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
 
 import type { CallError } from '../call';
-import { calllog } from '../call/CallConst';
+import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallEndReason, CallState, CallType } from '../enums';
 import { BasicCall, BasicCallProps, BasicCallState } from './BasicCall';
@@ -28,7 +28,7 @@ type BottomButtonType =
 
 export type SingleCallProps = BasicCallProps & {
   isMinimize?: boolean;
-  elapsed: number; // second unit
+  elapsed: number; // ms unit
   isInviter: boolean;
   inviteeId: string;
   callState?: CallState;
@@ -48,9 +48,12 @@ export type SingleCallState = BasicCallState & {
   callType: 'video' | 'audio';
   bottomButtonType: BottomButtonType;
   muteVideo: boolean;
+  peerJoinChannelSuccess: boolean;
+  elapsed: number; // ms unit
 };
 
 export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
+  private _inviteeTimer?: NodeJS.Timeout;
   constructor(props: SingleCallProps) {
     super(props);
     this.state = {
@@ -64,11 +67,15 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             ? 'inviter-audio'
             : 'inviter-video'
           : props.callType === 'audio'
-          ? 'invitee-audio-loading'
-          : 'invitee-video-loading'),
+          ? 'invitee-audio-init'
+          : 'invitee-video-init'),
       muteVideo: props.muteVideo ?? false,
       channelId: '',
       callId: '',
+      startPreview: false,
+      joinChannelSuccess: false,
+      peerJoinChannelSuccess: false,
+      elapsed: props.elapsed ?? 0,
     };
   }
 
@@ -102,36 +109,61 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       userNickName: this.props.currentName,
       userAvatarUrl: this.props.currentUrl,
     });
+
+    this.manager?.initRTC();
+
+    if (this.props.callType === 'audio') {
+      this.manager?.enableAudio();
+    } else {
+      this.manager?.enableVideo();
+      this.manager?.startPreview();
+      this.setState({ startPreview: true });
+    }
+
     this.manager?.addViewListener(this);
     if (this.props.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         this.startCall();
       }
+    } else {
+      this._inviteeTimer = setTimeout(() => {
+        this.onClickClose();
+      }, this.props.timeout ?? KeyTimeout);
     }
   }
   protected unInit(): void {
     if (this.props.isTest === true) {
       return;
     }
+    if (this.props.callType === 'audio') {
+      this.manager?.disableAudio();
+    } else {
+      this.manager?.disableVideo();
+      this.manager?.stopPreview();
+      this.setState({ startPreview: false });
+    }
     this.manager?.removeViewListener(this);
     this.manager?.clear();
+
+    this.manager?.unInitRTC();
     // this.manager?.unInit();
   }
 
   private startCall() {
     if (this.manager) {
-      this.setState({ channelId: this.manager.createChannelId() });
+      const channelId = this.manager.createChannelId();
+      this.setState({ channelId });
       switch (this.props.callType) {
         case 'audio':
           this.manager.startSingleAudioCall({
             inviteeId: this.props.inviteeId,
-            channelId: this.state.channelId,
+            channelId: channelId,
             onResult: (params) => {
               calllog.log('SingleCall:startSingleAudioCall:', params);
+              if (params.error) {
+                throw params.error;
+              }
               if (params.callId) {
-                if (params.error) {
-                  throw params.error;
-                }
                 this.setState({ callId: params.callId });
               }
             },
@@ -140,13 +172,13 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         case 'video':
           this.manager.startSingleVideoCall({
             inviteeId: this.props.inviteeId,
-            channelId: this.state.channelId,
+            channelId: channelId,
             onResult: (params) => {
-              calllog.log('SingleCall:startSingleAudioCall:', params);
+              calllog.log('SingleCall:startSingleVideoCall:', params);
+              if (params.error) {
+                throw params.error;
+              }
               if (params.callId) {
-                if (params.error) {
-                  throw params.error;
-                }
                 this.setState({ callId: params.callId });
               }
             },
@@ -158,29 +190,82 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
 
+  private updateBottomButtons(): void {
+    const { peerJoinChannelSuccess, joinChannelSuccess } = this.state;
+    if (peerJoinChannelSuccess && joinChannelSuccess) {
+      if (this.props.isInviter === false) {
+        let s;
+        if (this.props.callType === 'audio') {
+          s = 'invitee-audio-calling' as BottomButtonType;
+        } else {
+          s = 'invitee-video-calling' as BottomButtonType;
+        }
+        this.setState({ bottomButtonType: s });
+      }
+    }
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   //// OnButton ////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
   onClickHangUp = () => {
     const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
-    const { callState } = this.state;
+    const { callState, callId } = this.state;
     this.manager?.hangUpCall({
-      callId: this.state.callId,
+      callId: callId,
       onResult: (params) => {
         calllog.log('SingleCall:onClickHangUp:', params);
       },
     });
     if (isInviter === true) {
       if (callState === CallState.Calling) {
+        this.manager?.hangUpCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('SingleCall:onClickHangUp:hangUpCall:', params);
+          },
+        });
         onHangUp?.();
       } else {
+        this.manager?.cancelCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('SingleCall:onClickHangUp:cancelCall:', params);
+          },
+        });
         onCancel?.();
       }
     } else {
+      clearTimeout(this._inviteeTimer);
+      this._inviteeTimer = undefined;
       if (callState === CallState.Calling) {
+        this.manager?.hangUpCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('SingleCall:onClickHangUp:hangUpCall:', params);
+          },
+        });
         onHangUp?.();
       } else {
+        this.manager?.refuseCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('SingleCall:onClickHangUp:refuseCall:', params);
+          },
+        });
         onRefuse?.();
       }
     }
@@ -190,11 +275,31 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   onClickVideo = () => {};
   onClickRecall = () => {};
   onClickClose = () => {
+    this.setState({ callState: CallState.Idle });
     const { onClose } = this.props;
     onClose?.();
   };
   onClickAccept = () => {
-    this.startCall();
+    clearTimeout(this._inviteeTimer);
+    this._inviteeTimer = undefined;
+    if (this.props.callType === 'audio') {
+      this.setState({ bottomButtonType: 'invitee-audio-loading' });
+    } else {
+      this.setState({ bottomButtonType: 'invitee-video-loading' });
+    }
+    const callId = this.manager?.getCurrentCallId();
+    if (callId) {
+      this.setState({ callId });
+      this.manager?.acceptCall({
+        callId: callId,
+        onResult: (params: {
+          callId?: string | undefined;
+          error?: CallError | undefined;
+        }) => {
+          calllog.log('SingleCall:onClickAccept:acceptCall:', params);
+        },
+      });
+    }
   };
 
   //////////////////////////////////////////////////////////////////////////////
@@ -214,6 +319,38 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   onCallOccurError(params: { channelId: string; error: CallError }): void {
     calllog.log('SingleCall:onCallOccurError:', params);
     this.onClickClose();
+  }
+
+  onRequestJoin(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    userRTCToken: string;
+  }): void {
+    calllog.log('SingleCall:onRequestJoin:', params);
+    this.manager?.joinChannel(params);
+  }
+
+  onRemoteUserJoined(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }): void {
+    calllog.log('SingleCall:onRemoteUserJoined:', params);
+    this.setState({ peerJoinChannelSuccess: true });
+    this.updateBottomButtons();
+  }
+
+  onSelfJoined(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+    elapsed: number;
+  }): void {
+    calllog.log('SingleCall:onSelfJoined:', params);
+    this.setState({ joinChannelSuccess: true, elapsed: params.elapsed });
+    this.setState({ callState: CallState.Calling });
+    this.updateBottomButtons();
   }
 
   //////////////////////////////////////////////////////////////////////////////

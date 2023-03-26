@@ -51,8 +51,10 @@ export function handleVoiceStateEvent(params: {
           currentId,
           inviteeIds,
           appKey,
+          agoraAppId,
         } = stateEvent.params as {
           appKey: string;
+          agoraAppId: string;
           isInviter: boolean;
           inviterId: string;
           currentId: string;
@@ -63,6 +65,7 @@ export function handleVoiceStateEvent(params: {
           children: (
             <SingleCall
               appKey={appKey}
+              agoraAppId={agoraAppId}
               inviterId={inviterId}
               inviterName={inviterId}
               currentId={currentId}

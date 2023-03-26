@@ -1,7 +1,8 @@
 import { ChatClient } from 'react-native-chat-sdk';
 
 export class AppServerClient {
-  private static _rtcTokenUrl: string = 'http://a1.easemob.com/token/rtcToken';
+  private static _rtcTokenUrl: string =
+    'http://a1.easemob.com/token/rtcToken/v1';
   private static _mapUrl: string = 'http://a1.easemob.com/channel/mapper';
 
   protected _(): void {}
@@ -43,6 +44,7 @@ export class AppServerClient {
           params.onResult({
             data: {
               token: value.accessToken,
+              uid: value.agoraUserId,
             },
           });
         } else if (params.from === 'requestUserMap') {

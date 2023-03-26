@@ -147,7 +147,7 @@ export interface CallManager {
   //  * - callId: The ID obtained by {@link CallListener.onCallReceived}.
   //  * - onResult: Returns `callId` on success, `error` on failure.
   //  */
-  // declineCall(params: {
+  // refuseCall(params: {
   //   callId: string;
   //   extension?: any;
   //   onResult: (params: { callId?: string; error?: any }) => void;
