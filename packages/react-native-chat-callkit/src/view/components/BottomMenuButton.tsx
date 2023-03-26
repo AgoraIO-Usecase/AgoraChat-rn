@@ -83,6 +83,7 @@ function buttonNameConvertToIconName(name: BottomMenuButtonType): IconName {
 
 export function BottomMenuButton(props: BottomMenuButtonProps): JSX.Element {
   const { name, onPress, backgroundColor, disabled } = props;
+  const isLoading = name === 'accepting' ? true : false;
   return (
     <IconButton
       iconName={buttonNameConvertToIconName(name)}
@@ -91,6 +92,7 @@ export function BottomMenuButton(props: BottomMenuButtonProps): JSX.Element {
       containerSize={64}
       backgroundColor={getButtonBackgroundColor(name) ?? backgroundColor}
       disabled={disabled}
+      isLoading={isLoading}
     />
   );
 }
