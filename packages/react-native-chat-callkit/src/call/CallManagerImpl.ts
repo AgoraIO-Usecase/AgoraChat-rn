@@ -1740,18 +1740,29 @@ export class CallManagerImpl
           callId: call.callId,
           new: CallSignalingState.Idle,
         });
+        let remoteUid;
+        let remoteUserId;
         if (call.isInviter === true) {
           call.inviter.userHadJoined = false;
           call.inviter.userChannelId = undefined;
+          remoteUid = call.inviter.userChannelId;
+          remoteUserId = call.inviter.userId;
         } else {
           if (call.callType !== CallType.Multi) {
             const invitee = call.invitees.get(this.userId);
             if (invitee) {
               invitee.userHadJoined = false;
               invitee.userChannelId = undefined;
+              remoteUid = invitee.userChannelId;
+              remoteUserId = invitee.userId;
             }
           }
         }
+        this.listener?.onSelfLeave?.({
+          channelId: call.channelId,
+          userChannelId: remoteUid ?? 0,
+          userId: remoteUserId ?? '',
+        });
       }
     }
   }
@@ -1840,12 +1851,15 @@ export class CallManagerImpl
     if (connection.channelId) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
+        let userId;
         if (call.inviter.userChannelId === remoteUid) {
           call.inviter.userHadJoined = false;
+          userId = call.inviter.userId;
         } else {
           for (const invitee of call.invitees) {
             if (invitee[1].userChannelId === remoteUid) {
               invitee[1].userHadJoined = false;
+              userId = invitee[1].userId;
               break;
             }
           }
@@ -1859,6 +1873,11 @@ export class CallManagerImpl
         } else {
           // TODO: Remove the invitee.
         }
+        this.listener?.onRemoteUserOffline?.({
+          channelId: call.channelId,
+          userChannelId: remoteUid ?? 0,
+          userId: userId ?? '',
+        });
       }
     }
   }

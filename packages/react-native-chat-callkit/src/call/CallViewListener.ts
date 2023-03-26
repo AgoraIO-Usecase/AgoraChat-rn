@@ -45,6 +45,11 @@ export interface CallViewListener {
     userChannelId: number;
     userId: string;
   }) => void;
+  onRemoteUserOffline?: (params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }) => void;
   /**
    * Notifications when you join a channel.
    *
@@ -61,6 +66,11 @@ export interface CallViewListener {
     userChannelId: number;
     userId: string;
     elapsed: number;
+  }) => void;
+  onSelfLeave?: (params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
   }) => void;
 
   /**

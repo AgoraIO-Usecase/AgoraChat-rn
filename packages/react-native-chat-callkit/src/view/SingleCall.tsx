@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
+import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
 import type { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
@@ -50,6 +51,8 @@ export type SingleCallState = BasicCallState & {
   muteVideo: boolean;
   peerJoinChannelSuccess: boolean;
   elapsed: number; // ms unit
+  peerUid: number;
+  isSwitchVideo: boolean;
 };
 
 export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
@@ -76,6 +79,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       joinChannelSuccess: false,
       peerJoinChannelSuccess: false,
       elapsed: props.elapsed ?? 0,
+      selfUid: 0,
+      peerUid: 1,
+      setupMode: VideoViewSetupMode.VideoViewSetupReplace,
+      isSwitchVideo: false,
     };
   }
 
@@ -301,6 +308,13 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       });
     }
   };
+  onSwitchVideo = () => {
+    calllog.log(
+      'SingleCall:onClickAccept:onSwitchVideo:',
+      this.state.isSwitchVideo
+    );
+    this.setState({ isSwitchVideo: !this.state.isSwitchVideo });
+  };
 
   //////////////////////////////////////////////////////////////////////////////
   //// CallViewListener ////////////////////////////////////////////////////////
@@ -337,7 +351,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     userId: string;
   }): void {
     calllog.log('SingleCall:onRemoteUserJoined:', params);
-    this.setState({ peerJoinChannelSuccess: true });
+    this.setState({
+      peerJoinChannelSuccess: true,
+      peerUid: params.userChannelId,
+    });
     this.updateBottomButtons();
   }
 
@@ -348,14 +365,268 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     elapsed: number;
   }): void {
     calllog.log('SingleCall:onSelfJoined:', params);
-    this.setState({ joinChannelSuccess: true, elapsed: params.elapsed });
+    this.setState({
+      joinChannelSuccess: true,
+      elapsed: params.elapsed,
+      selfUid: params.userChannelId,
+    });
     this.setState({ callState: CallState.Calling });
     this.updateBottomButtons();
+  }
+
+  onRemoteUserOffline(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }): void {
+    calllog.log('SingleCall:onRemoteUserOffline:', params);
+    this.setState({ peerJoinChannelSuccess: false });
+  }
+
+  onSelfLeave(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }): void {
+    calllog.log('SingleCall:onSelfLeave:', params);
+    this.setState({ joinChannelSuccess: false });
   }
 
   //////////////////////////////////////////////////////////////////////////////
   //// Render //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
+
+  protected renderSelfVideo(): React.ReactNode {
+    const { isMinimize, selfUid, setupMode, startPreview, joinChannelSuccess } =
+      this.state;
+    calllog.log('SingleCall:renderSelfVideo:', selfUid);
+    if (isMinimize === true) {
+      return null;
+    }
+    if (this.props.callType === 'audio') {
+      return null;
+    }
+    if (startPreview !== true && joinChannelSuccess !== true) {
+      return null;
+    }
+    return (
+      <RtcSurfaceView
+        style={{ flex: 1 }}
+        canvas={{
+          uid: selfUid,
+          setupMode,
+        }}
+      />
+    );
+  }
+
+  protected renderPeerVideo(): React.ReactNode {
+    const { peerUid, setupMode, peerJoinChannelSuccess } = this.state;
+    calllog.log('SingleCall:renderPeerVideo:', peerUid);
+    if (this.props.callType === 'audio') {
+      return null;
+    }
+    if (peerJoinChannelSuccess !== true) {
+      return null;
+    }
+    return (
+      <RtcSurfaceView
+        style={{ flex: 1 }}
+        canvas={{
+          uid: peerUid,
+          setupMode,
+        }}
+      />
+    );
+  }
+
+  protected renderMiniVideo(): React.ReactNode {
+    calllog.log('SingleCall:renderMiniVideo:');
+    if (this.props.callType === 'audio') {
+      return null;
+    }
+    const { isSwitchVideo, isMinimize, callState } = this.state;
+    let ret = null;
+    // const getUid = () => {
+    //   if (callState === CallState.Calling) {
+    //     // TODO: 已连接渲染大屏别人
+    //   } else {
+    //     // TODO: 未连接渲染大屏自己
+    //   }
+    //   if (isMinimize === true) {
+    //     // TODO: 只渲染对方
+    //   } else {
+    //     // TODO:都渲染
+    //   }
+    //   if (isSwitchVideo === true) {
+    //     // TODO:调换双方屏幕
+    //   } else {
+    //     // TODO:再次调换双方屏幕
+    //   }
+    //   return 0;
+    // };
+    if (callState === CallState.Calling) {
+      // TODO: 已连接大屏渲染别人
+      if (isMinimize === true) {
+        // TODO: 只渲染对方
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+          ret = this.renderPeerVideo();
+        } else {
+          // TODO:再次调换双方屏幕
+        }
+      } else {
+        // TODO:都渲染
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+          calllog.log('test:renderMiniVideo:', true);
+          ret = this.renderPeerVideo();
+        } else {
+          // TODO:再次调换双方屏幕
+          calllog.log('test:renderMiniVideo:', false);
+          ret = this.renderSelfVideo();
+        }
+      }
+    } else {
+      // TODO: 未连接大屏渲染自己
+      if (isMinimize === true) {
+        // TODO: 只渲染对方
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+        } else {
+          // TODO:再次调换双方屏幕
+          ret = this.renderPeerVideo();
+        }
+      } else {
+        // TODO:都渲染
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+          calllog.log('test:renderMiniVideo:2', true);
+          ret = this.renderSelfVideo();
+        } else {
+          // TODO:再次调换双方屏幕
+          calllog.log('test:renderMiniVideo:2', false);
+          ret = this.renderPeerVideo();
+        }
+      }
+    }
+    calllog.log('test:renderMiniVideo:ret:', ret === null);
+    return ret;
+  }
+
+  protected renderFullVideo(): React.ReactNode {
+    calllog.log('SingleCall:renderFullVideo:');
+    if (this.props.callType === 'audio') {
+      return null;
+    }
+    const { isSwitchVideo, isMinimize, callState } = this.state;
+    let renderType = 0 as 0 | 1 | 2; // 0: no, 1: self, 2: peer
+    let ret = null;
+    // const getUid = () => {
+    //   if (callState === CallState.Calling) {
+    //     // TODO: 已连接渲染大屏别人
+    //   } else {
+    //     // TODO: 未连接渲染大屏自己
+    //   }
+    //   if (isMinimize === true) {
+    //     // TODO: 只渲染对方
+    //   } else {
+    //     // TODO:都渲染
+    //   }
+    //   if (isSwitchVideo === true) {
+    //     // TODO:调换双方屏幕
+    //   } else {
+    //     // TODO:再次调换双方屏幕
+    //   }
+    //   return 0;
+    // };
+    if (callState === CallState.Calling) {
+      // TODO: 已连接大屏渲染别人
+      if (isMinimize === true) {
+        // TODO: 只渲染对方
+      } else {
+        // TODO:都渲染
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+          ret = this.renderSelfVideo();
+          renderType = 1;
+        } else {
+          // TODO:再次调换双方屏幕
+          ret = this.renderPeerVideo();
+          renderType = 2;
+        }
+      }
+    } else {
+      // TODO: 未连接大屏渲染自己
+      if (isMinimize === true) {
+        // TODO: 只渲染对方
+      } else {
+        // TODO:都渲染
+        if (isSwitchVideo === true) {
+          // TODO:调换双方屏幕
+          ret = this.renderPeerVideo();
+          renderType = 2;
+        } else {
+          // TODO:再次调换双方屏幕
+          ret = this.renderSelfVideo();
+          renderType = 1;
+        }
+      }
+    }
+    calllog.log('SingleCall:renderSelfVideo:ret:', renderType, ret);
+    // if (renderType === 0) {
+    //   return null;
+    // } else if (renderType === 1) {
+    //   const {
+    //     isMinimize,
+    //     selfUid,
+    //     setupMode,
+    //     startPreview,
+    //     joinChannelSuccess,
+    //   } = this.state;
+    //   calllog.log('SingleCall:renderSelfVideo:', selfUid);
+    //   if (isMinimize === true) {
+    //     return null;
+    //   }
+    //   if (startPreview !== true && joinChannelSuccess !== true) {
+    //     return null;
+    //   }
+    //   return (
+    //     <RtcSurfaceView
+    //       style={{ flex: 1 }}
+    //       canvas={{
+    //         uid: selfUid,
+    //         setupMode,
+    //       }}
+    //     />
+    //   );
+    // } else if (renderType === 2) {
+    //   const { peerUid, setupMode, peerJoinChannelSuccess } = this.state;
+    //   calllog.log('SingleCall:renderPeerVideo:', peerUid);
+    //   if (peerJoinChannelSuccess !== true) {
+    //     return null;
+    //   }
+    //   return (
+    //     <RtcSurfaceView
+    //       style={{ flex: 1 }}
+    //       canvas={{
+    //         uid: peerUid,
+    //         setupMode,
+    //       }}
+    //     />
+    //   );
+    // }
+    // return (
+    //   <RtcSurfaceView
+    //     style={{ flex: 1 }}
+    //     canvas={{
+    //       uid: isSwitchVideo ? selfUid : peerUid,
+    //       setupMode,
+    //     }}
+    //   />
+    // );
+    return ret;
+  }
 
   protected renderSafeArea(): React.ReactNode {
     return (
@@ -673,8 +944,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         </Pressable>
       );
     } else {
+      calllog.log('test:renderFloatVideo:234');
       return (
-        <View
+        <Pressable
+          onPress={this.onSwitchVideo}
           style={{
             width: muteVideo === false ? 90 : 76,
             height: muteVideo === false ? 160 : 76,
@@ -685,6 +958,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             borderRadius: 12,
           }}
         >
+          {this.renderSelfVideo()}
+          {/* {isSwitchVideo ? this.renderSelfVideo() : this.renderPeerVideo()} */}
+          {/* {this.renderMiniVideo()} */}
           {muteVideo === false ? null : (
             <View
               style={{
@@ -715,7 +991,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               </View>
             </View>
           )}
-        </View>
+        </Pressable>
       );
     }
   }
@@ -752,6 +1028,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
       Dimensions.get('screen');
+    // const { isMinimize, callType, isSwitchVideo } = this.state;
     const { isMinimize, callType } = this.state;
     if (isMinimize) {
       if (callType === 'audio') {
@@ -769,7 +1046,37 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           backgroundColor: 'rgba(0,0,0,0.4)',
         }}
       >
-        <View style={{ flex: 1, backgroundColor: 'blue' }} />
+        {this.renderPeerVideo()}
+        {/* {peerJoinChannelSuccess && joinChannelSuccess ? (
+          <RtcSurfaceView
+            style={{ flex: 1 }}
+            canvas={{
+              uid: isSwitchVideo ? peerUid : selfUid,
+              setupMode,
+            }}
+          />
+        ) : null} */}
+        {/* {isSwitchVideo ? (
+          peerJoinChannelSuccess ? (
+            <RtcSurfaceView
+              style={{ flex: 1 }}
+              canvas={{
+                uid: isSwitchVideo ? peerUid : selfUid,
+                setupMode,
+              }}
+            />
+          ) : null
+        ) : startPreview || joinChannelSuccess ? (
+          <RtcSurfaceView
+            style={{ flex: 1 }}
+            canvas={{
+              uid: isSwitchVideo ? selfUid : peerUid,
+              setupMode,
+            }}
+          />
+        ) : null} */}
+        {/* {this.renderFullVideo()} */}
+        {/* <View style={{ flex: 1, backgroundColor: 'blue' }} /> */}
         {/* {this.renderSafeArea()} */}
         {this.renderTopBar()}
         {this.renderContent()}

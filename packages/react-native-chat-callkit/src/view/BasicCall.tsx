@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { VideoViewSetupMode } from 'react-native-agora';
 
 import { calllog } from '../call/CallConst';
 import type { CallError } from '../call/CallError';
@@ -34,6 +35,8 @@ export type BasicCallState = {
   callId: string;
   joinChannelSuccess: boolean;
   startPreview: boolean;
+  selfUid: number;
+  setupMode: VideoViewSetupMode;
 };
 export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
   extends React.Component<Props, State>
@@ -103,6 +106,22 @@ export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
     userRTCToken: string;
   }): void {
     calllog.log('BasicCall:onRequestJoin:', params);
+    throw new Error('Requires subclass implementation.');
+  }
+  onRemoteUserOffline(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }): void {
+    calllog.log('BasicCall:onRemoteUserOffline:', params);
+    throw new Error('Requires subclass implementation.');
+  }
+  onSelfLeave(params: {
+    channelId: string;
+    userChannelId: number;
+    userId: string;
+  }): void {
+    calllog.log('BasicCall:onSelfLeave:', params);
     throw new Error('Requires subclass implementation.');
   }
 }
