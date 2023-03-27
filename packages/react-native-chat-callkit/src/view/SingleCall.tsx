@@ -8,7 +8,10 @@ import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallEndReason, CallState, CallType } from '../enums';
 import { BasicCall, BasicCallProps, BasicCallState } from './BasicCall';
 import { Avatar } from './components/Avatar';
-import { BottomMenuButton } from './components/BottomMenuButton';
+import {
+  BottomMenuButton,
+  BottomMenuButtonType,
+} from './components/BottomMenuButton';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
@@ -83,6 +86,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       peerUid: 1,
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
       isSwitchVideo: false,
+      muteCamera: false,
+      muteMicrophone: false,
+      isInSpeaker: true,
     };
   }
 
@@ -255,9 +261,24 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       }
     }
   };
-  onClickSpeaker = () => {};
-  onClickMicrophone = () => {};
-  onClickVideo = () => {};
+  onClickSpeaker = () => {
+    const isIn = this.state.isInSpeaker;
+    calllog.log('SingleCall:onClickSpeaker:', isIn);
+    this.setState({ isInSpeaker: !isIn });
+    this.manager?.setEnableSpeakerphone(!isIn);
+  };
+  onClickMicrophone = () => {
+    const mute = this.state.muteMicrophone;
+    calllog.log('SingleCall:onClickMicrophone:', mute);
+    this.setState({ muteMicrophone: !mute });
+    this.manager?.enableLocalAudio(mute);
+  };
+  onClickVideo = () => {
+    const mute = this.state.muteVideo;
+    calllog.log('SingleCall:onClickVideo:');
+    this.setState({ muteVideo: !mute });
+    this.manager?.enableLocalVideo(mute);
+  };
   onClickRecall = () => {};
   onClickClose = () => {
     this.setState({ callState: CallState.Idle });
@@ -292,6 +313,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       this.state.isSwitchVideo
     );
     this.setState({ isSwitchVideo: !this.state.isSwitchVideo });
+  };
+  switchCamera = () => {
+    calllog.log('SingleCall:switchCamera:');
+    this.manager?.switchCamera();
   };
 
   //////////////////////////////////////////////////////////////////////////////
@@ -370,6 +395,26 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     this.setState({ joinChannelSuccess: false });
   }
 
+  onRemoteUserMuteVideo(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('SingleCall:onRemoteUserMuteVideo:', params);
+    this.setState({ muteVideo: params.muted });
+  }
+
+  onRemoteUserMuteAudio(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('SingleCall:onRemoteUserMuteAudio:', params);
+    this.setState({ muteMicrophone: params.muted });
+  }
+
   //////////////////////////////////////////////////////////////////////////////
   //// Render //////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -442,9 +487,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     let ret = null;
     if (callState === CallState.Calling) {
       if (isMinimize === true) {
-        if (isSwitchVideo === true) {
-          ret = this.renderPeerVideo();
-        }
+        ret = this.renderPeerVideo();
       } else {
         if (isSwitchVideo === true) {
           ret = this.renderPeerVideo();
@@ -454,9 +497,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       }
     } else {
       if (isMinimize === true) {
-        if (isSwitchVideo === false) {
-          ret = this.renderPeerVideo();
-        }
+        ret = this.renderPeerVideo();
       } else {
         if (isSwitchVideo === true) {
           ret = this.renderSelfVideo();
@@ -533,9 +574,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             backgroundColor="rgba(255, 255, 255, 0.2)"
             size={28}
             containerSize={40}
-            onPress={() => {
-              calllog.log('test:22343');
-            }}
+            onPress={this.switchCamera}
           />
         </View>
       </View>
@@ -584,10 +623,20 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected renderBottomMenu(): React.ReactNode {
-    const { bottomButtonType } = this.state;
+    const { bottomButtonType, isInSpeaker, muteMicrophone, muteVideo } =
+      this.state;
     calllog.log('test:renderBottomMenu', bottomButtonType);
     const disabled = true;
     let ret = <></>;
+    const speaker = (): BottomMenuButtonType => {
+      return isInSpeaker ? 'mute-speaker' : 'speaker';
+    };
+    const microphone = (): BottomMenuButtonType => {
+      return muteMicrophone ? 'mute-microphone' : 'microphone';
+    };
+    const video = (): BottomMenuButtonType => {
+      return muteVideo ? 'mute-video' : 'video';
+    };
     const Container = (props: React.PropsWithChildren<{}>) => {
       const { children } = props;
       return (
@@ -608,9 +657,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       case 'inviter-audio':
         ret = (
           <Container>
-            <BottomMenuButton name="speaker" onPress={this.onClickSpeaker} />
+            <BottomMenuButton name={speaker()} onPress={this.onClickSpeaker} />
             <BottomMenuButton
-              name="microphone"
+              name={microphone()}
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
@@ -620,9 +669,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       case 'inviter-video':
         ret = (
           <Container>
-            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
             <BottomMenuButton
-              name="microphone"
+              name={microphone()}
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
@@ -640,7 +689,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       case 'invitee-video-init':
         ret = (
           <Container>
-            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accept" onPress={this.onClickAccept} />
           </Container>
@@ -649,7 +698,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       case 'invitee-video-loading':
         ret = (
           <Container>
-            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
             <BottomMenuButton name="accepting" disabled={disabled} />
           </Container>
@@ -658,9 +707,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       case 'invitee-video-calling':
         ret = (
           <Container>
-            <BottomMenuButton name="video" onPress={this.onClickVideo} />
+            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
             <BottomMenuButton
-              name="microphone"
+              name={microphone()}
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
@@ -687,7 +736,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         ret = (
           <Container>
             <BottomMenuButton
-              name="microphone"
+              name={microphone()}
               onPress={this.onClickMicrophone}
             />
             <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
@@ -749,6 +798,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { elapsed } = this.props;
     const { callState, isMinimize, muteVideo } = this.state;
     const content = 'Calling...';
+    calllog.log('renderFloatVideo:', isMinimize);
     if (isMinimize === true) {
       return (
         <Pressable
@@ -765,6 +815,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             borderRadius: 12,
           }}
         >
+          {this.renderMiniVideo()}
           {callState === CallState.Calling ? (
             <View
               style={{
@@ -802,7 +853,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         </Pressable>
       );
     } else {
-      calllog.log('test:renderFloatVideo:234');
       return (
         <Pressable
           onPress={this.onSwitchVideo}

@@ -88,4 +88,36 @@ export interface CallViewListener {
     userChannelId: number;
     userRTCToken: string;
   }) => void;
+
+  /**
+   * Notification for remote user disable/enable video.
+   *
+   * @param params -
+   * - channelId: Call channel ID.
+   * - userId: the user ID.
+   * - userChannelId: the user channel ID.
+   * - muted: Whether the remote user stops publishing the video stream:true: The remote user stops publishing the video stream.false: The remote user resumes publishing the video stream.
+   */
+  onRemoteUserMuteVideo?: (params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }) => void;
+
+  /**
+   * Notification for remote user disable/enable audio.
+   *
+   * @param params -
+   * - channelId: Call channel ID.
+   * - userId: the user ID.
+   * - userChannelId: the user channel ID.
+   * - muted: Whether the remote user stops publishing the audio stream:true: The remote user stops publishing the audio stream.false: The remote user resumes publishing the audio stream.
+   */
+  onRemoteUserMuteAudio?: (params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }) => void;
 }

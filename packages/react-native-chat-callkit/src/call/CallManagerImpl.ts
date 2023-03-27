@@ -281,7 +281,7 @@ export class CallManagerImpl
   public setCurrentUser(currentUser: CallUser): void {
     calllog.log('CallManagerImpl:setCurrentUser:', currentUser);
     this._userId = currentUser.userId;
-    this.users.set(currentUser.userId, currentUser);
+    this._setUser(currentUser);
   }
 
   public clear(): void {
@@ -1276,7 +1276,7 @@ export class CallManagerImpl
           calllog.log('CallManagerImpl:onInvite:', user, error);
           if (error === undefined) {
             this._userId = user.userId;
-            this.users.set(user.userId, user);
+            this._setUser(user);
             onInviteInternal();
           } else {
             throw new CallError({
@@ -1650,6 +1650,10 @@ export class CallManagerImpl
     const ret = this.engine?.muteAllRemoteAudioStreams(mute);
     calllog.log('CallManagerImpl:muteAllRemoteAudioStreams:', mute, ret);
   }
+  public setEnableSpeakerphone(speakerOn: boolean): void {
+    const ret = this.engine?.setEnableSpeakerphone(speakerOn);
+    calllog.log('CallManagerImpl:setEnableSpeakerphone:', speakerOn, ret);
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   //// IRtcEngineEventHandler //////////////////////////////////////////////////
@@ -1682,12 +1686,10 @@ export class CallManagerImpl
           call.inviter.userHadJoined = true;
           call.inviter.userChannelId = connection.localUid;
         } else {
-          if (call.callType !== CallType.Multi) {
-            const invitee = call.invitees.get(this.userId);
-            if (invitee) {
-              invitee.userHadJoined = true;
-              invitee.userChannelId = connection.localUid;
-            }
+          const invitee = call.invitees.get(this.userId);
+          if (invitee) {
+            invitee.userHadJoined = true;
+            invitee.userChannelId = connection.localUid;
           }
         }
       }
@@ -1918,6 +1920,28 @@ export class CallManagerImpl
       remoteUid,
       muted
     );
+    if (connection.channelId) {
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        let remoteUserId = '';
+        if (call.inviter.userChannelId === remoteUid) {
+          remoteUserId = call.inviter.userId;
+        } else {
+          for (const value of call.invitees) {
+            if (value[1].userChannelId === remoteUid) {
+              remoteUserId = value[1].userId;
+              break;
+            }
+          }
+        }
+        this.listener?.onRemoteUserMuteVideo?.({
+          channelId: call.channelId,
+          userId: remoteUserId,
+          userChannelId: remoteUid,
+          muted: muted,
+        });
+      }
+    }
   }
 
   public onUserMuteAudio(
@@ -1931,6 +1955,28 @@ export class CallManagerImpl
       remoteUid,
       muted
     );
+    if (connection.channelId) {
+      const call = this._getCallByChannelId(connection.channelId);
+      if (call) {
+        let remoteUserId = '';
+        if (call.inviter.userChannelId === remoteUid) {
+          remoteUserId = call.inviter.userId;
+        } else {
+          for (const value of call.invitees) {
+            if (value[1].userChannelId === remoteUid) {
+              remoteUserId = value[1].userId;
+              break;
+            }
+          }
+        }
+        this.listener?.onRemoteUserMuteAudio?.({
+          channelId: call.channelId,
+          userId: remoteUserId,
+          userChannelId: remoteUid,
+          muted: muted,
+        });
+      }
+    }
   }
 
   public onAudioVolumeIndication?(

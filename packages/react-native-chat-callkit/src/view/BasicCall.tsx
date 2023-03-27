@@ -37,6 +37,9 @@ export type BasicCallState = {
   startPreview: boolean;
   selfUid: number;
   setupMode: VideoViewSetupMode;
+  isInSpeaker: boolean;
+  muteMicrophone: boolean;
+  muteCamera: boolean;
 };
 export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
   extends React.Component<Props, State>
@@ -122,6 +125,26 @@ export abstract class BasicCall<Props = BasicCallProps, State = BasicCallState>
     userId: string;
   }): void {
     calllog.log('BasicCall:onSelfLeave:', params);
+    throw new Error('Requires subclass implementation.');
+  }
+
+  onRemoteUserMuteVideo(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('BasicCall:onRemoteUserMuteVideo:', params);
+    throw new Error('Requires subclass implementation.');
+  }
+
+  onRemoteUserMuteAudio(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('BasicCall:onRemoteUserMuteAudio:', params);
     throw new Error('Requires subclass implementation.');
   }
 }
