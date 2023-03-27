@@ -37,7 +37,6 @@ export class CallTimeoutHandler {
   }): void {
     this._listener = params.listener;
     this._timeout = params.timeout;
-    this._timeout = 10000; // TODO: for test
   }
 
   public unInit(): void {

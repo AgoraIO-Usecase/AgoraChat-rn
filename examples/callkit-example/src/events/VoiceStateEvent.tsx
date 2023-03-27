@@ -75,6 +75,7 @@ export function handleVoiceStateEvent(params: {
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
               onClose={() => {
+                console.log('test:stateEvent.onClose');
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
@@ -83,6 +84,7 @@ export function handleVoiceStateEvent(params: {
                 });
               }}
               onHangUp={() => {
+                console.log('test:stateEvent.onHangUp');
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
@@ -91,6 +93,7 @@ export function handleVoiceStateEvent(params: {
                 });
               }}
               onCancel={() => {
+                console.log('test:stateEvent.onCancel');
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
@@ -99,6 +102,7 @@ export function handleVoiceStateEvent(params: {
                 });
               }}
               onRefuse={() => {
+                console.log('test:stateEvent.onRefuse');
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
@@ -107,6 +111,7 @@ export function handleVoiceStateEvent(params: {
                 });
               }}
               onError={() => {
+                console.log('test:stateEvent.onError');
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',

@@ -103,9 +103,6 @@ export class CallManagerImpl
   }
 
   public init(params: {
-    // userId: string;
-    // userNickName: string;
-    // userAvatarUrl?: string;
     option: CallOption;
     listener?: CallViewListener;
     enableLog?: boolean;
@@ -146,14 +143,6 @@ export class CallManagerImpl
       params.option,
       params.enableLog
     );
-    // this._client = ChatClient.getInstance();
-    // this._client.chatManager.addMessageListener(this._sig);
-    // this._userId = params.userId;
-    // this._setUser({
-    //   userId: params.userId,
-    //   userNickName: params.userNickName,
-    //   userAvatarUrl: params.userAvatarUrl ?? '', // TODO:
-    // });
     this._option = {
       appKey: params.option.appKey,
       agoraAppId: params.option.agoraAppId,
@@ -164,11 +153,6 @@ export class CallManagerImpl
     this._requestRTCToken = params.requestRTCToken;
     this._requestUserMap = params.requestUserMap;
     this._requestCurrentUser = params.requestCurrentUser;
-    // this._timer.init({
-    //   listener: this,
-    //   timeout: params.option.callTimeout ?? K.KeyTimeout,
-    // });
-    // this._sig.init({ listener: this });
     this._device.init((dt) => {
       this._deviceToken = dt;
       i2 = true;
@@ -176,12 +160,6 @@ export class CallManagerImpl
         params.onResult?.();
       }
     });
-    // this._engine = createAgoraRtcEngine();
-    // this._engine.initialize({
-    //   appId: this._option.agoraAppId,
-    //   channelProfile: ChannelProfileType.ChannelProfileLiveBroadcasting,
-    // });
-    // this._engine.registerEventHandler(this);
     this.initListener();
     i1 = true;
     if (i1 && i2) {
@@ -196,22 +174,17 @@ export class CallManagerImpl
       this._isInit = false;
     }
     this._clear();
-    // this._client?.chatManager.removeMessageListener(this._sig);
     this._userId = '';
     this._listener = undefined;
     this._requestUserMap = undefined;
     this._requestRTCToken = undefined;
-    // this._timer.unInit();
-    // this._sig.unInit();
-    // this._engine?.unregisterEventHandler(this);
-    // this._engine?.release();
     this.unInitListener();
   }
 
   private initListener(): void {
     this._timer.init({
       listener: this,
-      timeout: K.KeyTimeout,
+      timeout: this._option.callTimeout ?? K.KeyTimeout,
     });
     this._client = ChatClient.getInstance();
     this.client?.chatManager.addMessageListener(this._sig);
@@ -275,14 +248,10 @@ export class CallManagerImpl
 
   public addListener(listener: CallListener): void {
     calllog.log('CallManagerImpl:addListener:');
-    // this.client?.chatManager.addMessageListener(this._sig);
-    // this.initListener();
     this._userListener = listener;
   }
   public removeListener(_: CallListener): void {
     calllog.log('CallManagerImpl:removeListener:');
-    // this.client?.chatManager.removeMessageListener(this._sig);
-    // this.unInitListener();
     this._userListener = undefined;
   }
 
