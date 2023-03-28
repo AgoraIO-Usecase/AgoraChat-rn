@@ -12,11 +12,13 @@ import {
   BasicCallState,
   BottomButtonType,
 } from './BasicCall';
+import { AudioTabs, AudioUser } from './components/AudioTabs';
 import { Avatar } from './components/Avatar';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import type { IconName } from './components/LocalIcon';
 import { MiniButton } from './components/MiniButton';
+import { VideoTabs, VideoUser } from './components/VideoTabs';
 
 const StateBarHeight = 44;
 const VideoMaxCount = 18;
@@ -30,12 +32,21 @@ type User = {
   isSelf: boolean;
 };
 
+export type InviteeListProps = {
+  userIds: string[];
+  onClose: (added: string[]) => void;
+};
+
 export type MultiCallProps = BasicCallProps & {
   isMinimize?: boolean;
   elapsed: number; // ms unit
   isInviter: boolean;
   inviteeIds: string[];
   callState?: CallState;
+  inviteeList?: {
+    InviteeList: (props: InviteeListProps) => JSX.Element;
+    props?: InviteeListProps;
+  };
   onHangUp?: () => void;
   onCancel?: () => void;
   onRefuse?: () => void;
@@ -54,6 +65,7 @@ export type MultiCallState = BasicCallState & {
   users: User[];
   isFullVideo: boolean;
   usersCount: number;
+  showInvite: boolean;
 };
 
 export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
@@ -96,6 +108,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }),
       isFullVideo: false,
       usersCount: 0,
+      showInvite: false,
     };
   }
 
@@ -376,6 +389,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   };
   inviteUser = () => {
     calllog.log('MultiCall:inviteUser:');
+    this.setState({ showInvite: true });
   };
 
   //////////////////////////////////////////////////////////////////////////////
@@ -477,12 +491,74 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
   protected renderAudio(): React.ReactNode {
     calllog.log('MultiCall:renderAudio:');
-    return null;
+    const users = [] as AudioUser[];
+    users.push({
+      userId: this.props.currentId,
+      userName: this.props.currentName,
+      // userAvatar: this.props.currentUrl,
+      // muteAudio: true,
+      // talking: true,
+    } as AudioUser);
+    users.push(
+      ...this.state.users.map((user) => {
+        return {
+          userId: user.userId,
+          userName: user.userId,
+          // muteAudio: false,
+          // talking: false,
+        } as AudioUser;
+      })
+    );
+    return (
+      <View
+        style={{
+          flex: 1,
+          position: 'absolute',
+          height: Dimensions.get('screen').height,
+          width: '100%',
+        }}
+      >
+        <View style={{ height: StateBarHeight + 44 }} />
+        <AudioTabs users={users} />
+        <View style={{ height: ContentBottom + 44 }} />
+      </View>
+    );
   }
 
   protected renderVideo(): React.ReactNode {
     calllog.log('MultiCall:renderVideo:');
-    return null;
+    const users = [] as AudioUser[];
+    users.push({
+      userId: this.props.currentId,
+      userName: this.props.currentName,
+      // userAvatar: this.props.currentUrl,
+      // muteAudio: true,
+      // talking: true,
+    } as VideoUser);
+    users.push(
+      ...this.state.users.map((user) => {
+        return {
+          userId: user.userId,
+          userName: user.userId,
+          // muteAudio: false,
+          // talking: false,
+        } as VideoUser;
+      })
+    );
+    return (
+      <View
+        style={{
+          flex: 1,
+          position: 'absolute',
+          height: Dimensions.get('screen').height,
+          width: '100%',
+        }}
+      >
+        <View style={{ height: StateBarHeight }} />
+        <VideoTabs users={users} />
+        <View style={{ height: ContentBottom }} />
+      </View>
+    );
   }
 
   protected renderTopBar(): React.ReactNode {
@@ -662,6 +738,37 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       </View>
     );
   }
+  protected renderInviteeList(): React.ReactNode {
+    const { showInvite } = this.state;
+    const { inviteeList } = this.props;
+    const InviteeList = inviteeList?.InviteeList;
+    const inviteeListProps = inviteeList?.props;
+    if (showInvite === false) {
+      return null;
+    }
+    return (
+      <View
+        style={{
+          flex: 1,
+          // backgroundColor: 'blue',
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        {InviteeList ? (
+          <InviteeList
+            {...inviteeListProps}
+            userIds={['xxx']}
+            onClose={(added) => {
+              calllog.log('added:', added);
+              this.setState({ showInvite: false });
+            }}
+          />
+        ) : null}
+      </View>
+    );
+  }
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
       Dimensions.get('screen');
@@ -682,6 +789,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         {this.renderTopBar()}
         {this.renderContent()}
         {this.renderBottomMenu()}
+        {this.renderInviteeList()}
       </View>
     );
   }

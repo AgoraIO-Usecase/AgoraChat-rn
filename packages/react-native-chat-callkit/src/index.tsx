@@ -44,5 +44,5 @@ export {
   CallType,
 } from './enums';
 export * from './types';
-export { MultiCall, MultiCallProps } from './view/MultiCall';
+export { InviteeListProps, MultiCall, MultiCallProps } from './view/MultiCall';
 export { SingleCall, SingleCallProps } from './view/SingleCall';

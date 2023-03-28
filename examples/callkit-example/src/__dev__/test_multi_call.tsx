@@ -1,14 +1,36 @@
 import * as React from 'react';
-import { CallState, MultiCall } from 'react-native-chat-callkit';
+import { View } from 'react-native';
+import {
+  CallState,
+  InviteeListProps,
+  MultiCall,
+} from 'react-native-chat-callkit';
+import { Button } from 'react-native-chat-uikit';
 
 // import { TestEnum } from '../../../../packages/react-native-chat-callkit/src/view/SingleCall';
+
+const contactList = (props: InviteeListProps) => {
+  console.log('test:contactList:', props);
+  const { onClose, userIds } = props;
+  return (
+    <View style={{ top: 100, width: 100, height: 100, backgroundColor: 'red' }}>
+      <Button
+        onPress={() => {
+          onClose(userIds);
+        }}
+      >
+        close
+      </Button>
+    </View>
+  );
+};
 
 export function test_all() {
   const isMinimize = false; // for test
   const elapsed = 10000; // for test
   const isInviter = true; // !!! must
   const callState = CallState.Calling; // for test
-  const callType = 'audio'; // !!! must
+  const callType = 'video'; // !!! must
   const bottomButtonType = 'invitee-video-init'; // for test
   const muteVideo = false; // for test
   const appKey = 'sdf';
@@ -16,6 +38,8 @@ export function test_all() {
   const currentId = 'wo';
   const isTest = true;
   const agoraAppId = 'xxx';
+  const inviteeIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  // const inviteeIds = ['1', '2', '3', '4', '5', '6', '7'];
   return (
     <MultiCall
       isMinimize={isMinimize}
@@ -48,7 +72,10 @@ export function test_all() {
       }}
       isTest={isTest}
       agoraAppId={agoraAppId}
-      inviteeIds={[]}
+      inviteeIds={inviteeIds}
+      inviteeList={{
+        InviteeList: contactList,
+      }}
     />
   );
 }
