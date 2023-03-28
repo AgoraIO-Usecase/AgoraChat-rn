@@ -1,7 +1,8 @@
 export enum CallType {
   Audio1v1,
   Video1v1,
-  Multi,
+  VideoMulti,
+  AudioMulti,
 }
 
 export enum CallState {

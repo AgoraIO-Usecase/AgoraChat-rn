@@ -205,7 +205,7 @@ export class CallManagerImpl
   protected get ship() {
     return this._ship;
   }
-  protected get userId() {
+  public get userId() {
     return this._userId;
   }
   protected get deviceToken() {
@@ -356,7 +356,7 @@ export class CallManagerImpl
    * - extension: any.
    * - onResult: Returns `callId` on success, `error` on failure. The `callId` property is highly recommended for preservation.
    */
-  public startMultiCall(params: {
+  public startMultiVideoCall(params: {
     inviteeIds: string[];
     channelId: string;
     extension?: any;
@@ -365,28 +365,20 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:startMultiCall:', params);
     this._startCall({
       ...params,
-      callType: CallType.Multi,
+      callType: CallType.VideoMulti,
     });
   }
-
-  setUserMap(params: {
+  public startMultiAudioCall(params: {
+    inviteeIds: string[];
     channelId: string;
-    userId: string;
-    userChannelId: number;
+    extension?: any;
+    onResult: (params: { callId?: string; error?: CallError }) => void;
   }): void {
-    calllog.log('CallManagerImpl:setUser:', params);
-    const call = this._getCallByChannelId(params.channelId);
-    if (call) {
-      if (call.isInviter) {
-        call.inviter.userChannelId = params.userChannelId;
-        call.inviter.userHadJoined = true; // TODO:
-      } else {
-        const invitee = call.invitees.get(params.userId);
-        if (invitee) {
-          invitee.userChannelId = params.userChannelId;
-        }
-      }
-    }
+    calllog.log('CallManagerImpl:startMultiCall:', params);
+    this._startCall({
+      ...params,
+      callType: CallType.AudioMulti,
+    });
   }
 
   /**
@@ -845,7 +837,10 @@ export class CallManagerImpl
     onResult: (params: { callId?: string; error?: CallError }) => void;
   }): void {
     calllog.log('CallManagerImpl:_startCall:', params);
-    if (params.callType !== CallType.Multi) {
+    if (
+      params.callType !== CallType.VideoMulti &&
+      params.callType !== CallType.AudioMulti
+    ) {
       if (params.inviteeIds.length === 0) {
         params.onResult({
           callId: undefined,
@@ -961,7 +956,10 @@ export class CallManagerImpl
         return;
       }
 
-      if (call.callType === CallType.Multi) {
+      if (
+        params.callType === CallType.VideoMulti ||
+        params.callType === CallType.AudioMulti
+      ) {
         this._onRequestJoin({ callId: call.callId });
       }
 
@@ -980,7 +978,10 @@ export class CallManagerImpl
               this.timer.stopTiming({ callId, userId: id });
               const call = this._getCall(callId);
               if (call) {
-                if (call.callType !== CallType.Multi) {
+                if (
+                  params.callType !== CallType.VideoMulti &&
+                  params.callType !== CallType.AudioMulti
+                ) {
                   this._clear();
                   this._onCallEnded({
                     channelId: call.channelId,
@@ -1012,7 +1013,10 @@ export class CallManagerImpl
         new: CallSignalingState.InviterInviting,
       });
 
-      if (call.callType === CallType.Multi) {
+      if (
+        params.callType === CallType.VideoMulti ||
+        params.callType === CallType.AudioMulti
+      ) {
         this._onRequestJoin({ callId: call.callId });
       }
 
@@ -1032,7 +1036,10 @@ export class CallManagerImpl
               this.timer.stopTiming({ callId, userId: id });
               const call = this._getCall(callId);
               if (call) {
-                if (call.callType !== CallType.Multi) {
+                if (
+                  params.callType !== CallType.VideoMulti &&
+                  params.callType !== CallType.AudioMulti
+                ) {
                   this._clear();
                   this._onCallEnded({
                     channelId: call.channelId,
@@ -1072,7 +1079,10 @@ export class CallManagerImpl
           // TODO: Ignore the result.
         },
       });
-      if (call.callType !== CallType.Multi) {
+      if (
+        call.callType !== CallType.VideoMulti &&
+        call.callType !== CallType.AudioMulti
+      ) {
         // TODO: End the call and notify the user.
         this._clear();
         this._onCallEnded({
@@ -1304,7 +1314,10 @@ export class CallManagerImpl
     if (call && call.inviter.userDeviceToken === params.inviterDeviceToken) {
       const invitee = call.invitees.get(params.inviteeId);
       if (invitee) {
-        if (call.callType !== CallType.Multi) {
+        if (
+          params.callType !== CallType.VideoMulti &&
+          params.callType !== CallType.AudioMulti
+        ) {
           this._changeState({
             callId: params.callId,
             new: CallSignalingState.InviterInviteConfirming,
@@ -1331,7 +1344,10 @@ export class CallManagerImpl
               this.timer.stopTiming({ callId, userId: params.inviteeId });
               const call = this._getCall(callId);
               if (call) {
-                if (call.callType !== CallType.Multi) {
+                if (
+                  params.callType !== CallType.VideoMulti &&
+                  params.callType !== CallType.AudioMulti
+                ) {
                   this._clear();
                   this._onCallEnded({
                     channelId: call.channelId,
@@ -1443,7 +1459,10 @@ export class CallManagerImpl
             callId: params.callId,
             userId: params.inviteeId,
           });
-          if (params.callType !== CallType.Multi) {
+          if (
+            params.callType !== CallType.VideoMulti &&
+            params.callType !== CallType.AudioMulti
+          ) {
             if (params.reply === 'accept') {
               this._changeState({
                 callId: params.callId,
@@ -1479,7 +1498,10 @@ export class CallManagerImpl
               if (error) {
                 const call = this._getCall(callId);
                 if (call) {
-                  if (call.callType !== CallType.Multi) {
+                  if (
+                    params.callType !== CallType.VideoMulti &&
+                    params.callType !== CallType.AudioMulti
+                  ) {
                     this._clear();
                     this._onCallEnded({
                       channelId: call.channelId,
@@ -1719,7 +1741,10 @@ export class CallManagerImpl
           remoteUid = call.inviter.userChannelId;
           remoteUserId = call.inviter.userId;
         } else {
-          if (call.callType !== CallType.Multi) {
+          if (
+            call.callType !== CallType.VideoMulti &&
+            call.callType !== CallType.AudioMulti
+          ) {
             const invitee = call.invitees.get(this.userId);
             if (invitee) {
               invitee.userHadJoined = false;
@@ -1835,7 +1860,10 @@ export class CallManagerImpl
             }
           }
         }
-        if (call.callType !== CallType.Multi) {
+        if (
+          call.callType !== CallType.VideoMulti &&
+          call.callType !== CallType.AudioMulti
+        ) {
           this._onCallEnded({
             channelId: call.channelId,
             callType: call.callType,

@@ -6,29 +6,18 @@ import type { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallEndReason, CallState, CallType } from '../enums';
-import { BasicCall, BasicCallProps, BasicCallState } from './BasicCall';
-import { Avatar } from './components/Avatar';
 import {
-  BottomMenuButton,
-  BottomMenuButtonType,
-} from './components/BottomMenuButton';
+  BasicCall,
+  BasicCallProps,
+  BasicCallState,
+  BottomButtonType,
+} from './BasicCall';
+import { Avatar } from './components/Avatar';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
 
 const StateBarHeight = 44;
-const BottomBarHeight = 60;
-
-type BottomButtonType =
-  | 'inviter-video'
-  | 'inviter-audio'
-  | 'inviter-timeout'
-  | 'invitee-video-init'
-  | 'invitee-video-loading'
-  | 'invitee-video-calling'
-  | 'invitee-audio-init'
-  | 'invitee-audio-loading'
-  | 'invitee-audio-calling';
 
 export type SingleCallProps = BasicCallProps & {
   isMinimize?: boolean;
@@ -36,9 +25,6 @@ export type SingleCallProps = BasicCallProps & {
   isInviter: boolean;
   inviteeId: string;
   callState?: CallState;
-  callType: 'video' | 'audio';
-  bottomButtonType?: BottomButtonType;
-  muteVideo?: boolean;
   onHangUp?: () => void;
   onCancel?: () => void;
   onRefuse?: () => void;
@@ -49,9 +35,6 @@ export type SingleCallProps = BasicCallProps & {
 export type SingleCallState = BasicCallState & {
   isMinimize: boolean;
   callState: CallState;
-  callType: 'video' | 'audio';
-  bottomButtonType: BottomButtonType;
-  muteVideo: boolean;
   peerJoinChannelSuccess: boolean;
   elapsed: number; // ms unit
   peerUid: number;
@@ -65,7 +48,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     this.state = {
       isMinimize: props.isMinimize ?? false,
       callState: props.callState ?? CallState.Connecting,
-      callType: props.callType,
       bottomButtonType:
         props.bottomButtonType ??
         (props.isInviter
@@ -402,7 +384,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     muted: boolean;
   }): void {
     calllog.log('SingleCall:onRemoteUserMuteVideo:', params);
-    this.setState({ muteVideo: params.muted });
   }
 
   onRemoteUserMuteAudio(params: {
@@ -412,7 +393,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     muted: boolean;
   }): void {
     calllog.log('SingleCall:onRemoteUserMuteAudio:', params);
-    this.setState({ muteMicrophone: params.muted });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -581,8 +561,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     );
   }
   protected renderAvatar(): React.ReactNode {
-    const { elapsed } = this.props;
-    const { callType, callState } = this.state;
+    const { elapsed, callType } = this.props;
+    const { callState } = this.state;
     return (
       <View
         style={{
@@ -622,133 +602,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     );
   }
 
-  protected renderBottomMenu(): React.ReactNode {
-    const { bottomButtonType, isInSpeaker, muteMicrophone, muteVideo } =
-      this.state;
-    calllog.log('test:renderBottomMenu', bottomButtonType);
-    const disabled = true;
-    let ret = <></>;
-    const speaker = (): BottomMenuButtonType => {
-      return isInSpeaker ? 'mute-speaker' : 'speaker';
-    };
-    const microphone = (): BottomMenuButtonType => {
-      return muteMicrophone ? 'mute-microphone' : 'microphone';
-    };
-    const video = (): BottomMenuButtonType => {
-      return muteVideo ? 'mute-video' : 'video';
-    };
-    const Container = (props: React.PropsWithChildren<{}>) => {
-      const { children } = props;
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            position: 'absolute',
-            bottom: BottomBarHeight,
-            width: '100%',
-          }}
-        >
-          {children}
-        </View>
-      );
-    };
-    switch (bottomButtonType) {
-      case 'inviter-audio':
-        ret = (
-          <Container>
-            <BottomMenuButton name={speaker()} onPress={this.onClickSpeaker} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'inviter-video':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'inviter-timeout':
-        ret = (
-          <Container>
-            <BottomMenuButton name="recall" onPress={this.onClickRecall} />
-            <BottomMenuButton name="close" onPress={this.onClickClose} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-init':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-loading':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accepting" disabled={disabled} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-calling':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-init':
-        ret = (
-          <Container>
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-loading':
-        ret = (
-          <Container>
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accepting" disabled={disabled} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-calling':
-        ret = (
-          <Container>
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-
-      default:
-        break;
-    }
-    return ret;
-  }
   protected renderFloatAudio(): React.ReactNode {
     const { elapsed } = this.props;
     const { callState } = this.state;
@@ -794,6 +647,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       </Pressable>
     );
   }
+
   protected renderFloatVideo(): React.ReactNode {
     const { elapsed } = this.props;
     const { callState, isMinimize, muteVideo } = this.state;
@@ -902,7 +756,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
   protected renderContent(): React.ReactNode {
-    const { callType, callState } = this.state;
+    const { callType } = this.props;
+    const { callState } = this.state;
     let content = null;
     if (callState === CallState.Calling) {
       if (callType === 'audio') {
@@ -934,7 +789,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
       Dimensions.get('screen');
-    const { isMinimize, callType } = this.state;
+    const { callType } = this.props;
+    const { isMinimize } = this.state;
     if (isMinimize) {
       if (callType === 'audio') {
         return this.renderFloatAudio();

@@ -1,6 +1,15 @@
 // This file is generated automatically. Please do not edit it manually. If necessary, you can run the 'scripts/bundle-icons.js' script to generate it again.
 
 export const ICON_ASSETS = {
+  arrows_2_pointing: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/arrows_2_pointing_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/arrows_2_pointing_2x.png');
+    } else {
+      return require('./icons/arrows_2_pointing.png');
+    }
+  },
   camera_spin: (size: string) => {
     if (size === '3x') {
       return require('./icons/camera_spin_3x.png');
@@ -53,6 +62,24 @@ export const ICON_ASSETS = {
       return require('./icons/mic_slash_2x.png');
     } else {
       return require('./icons/mic_slash.png');
+    }
+  },
+  person_add: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/person_add_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/person_add_2x.png');
+    } else {
+      return require('./icons/person_add.png');
+    }
+  },
+  person_ban: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/person_ban_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/person_ban_2x.png');
+    } else {
+      return require('./icons/person_ban.png');
     }
   },
   phone_answer: (size: string) => {

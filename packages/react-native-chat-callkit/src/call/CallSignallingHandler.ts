@@ -144,7 +144,7 @@ export class CallSignallingHandler implements ChatMessageEventListener {
       ret = 'voice';
     } else if (callType === CallType.Video1v1) {
       ret = 'video';
-    } else if (callType === CallType.Multi) {
+    } else {
       ret = 'conference';
     }
     return ret;

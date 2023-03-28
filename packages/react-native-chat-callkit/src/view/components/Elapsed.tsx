@@ -3,9 +3,10 @@ import { Text, View } from 'react-native';
 
 type ElapsedProps = {
   timer: number; // second unit
+  color?: string;
 };
 export const ElapsedInternal = (props: ElapsedProps): JSX.Element => {
-  const { timer } = props;
+  const { timer, color } = props;
   const [elapsed, setElapsed] = React.useState(timer);
   const elapsedRef = React.useRef(elapsed);
   const updateTime = React.useCallback(() => {
@@ -52,6 +53,7 @@ export const ElapsedInternal = (props: ElapsedProps): JSX.Element => {
           lineHeight: 22,
           fontWeight: '400',
           textAlign: 'center',
+          color: color ?? 'black',
         }}
       >
         {format(elapsed)}
