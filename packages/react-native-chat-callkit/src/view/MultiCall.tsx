@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Dimensions, Pressable, Text, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import { VideoViewSetupMode } from 'react-native-agora';
 
 import type { CallError } from '../call';
@@ -14,6 +14,7 @@ import {
 } from './BasicCall';
 import { AudioTabs, AudioUser } from './components/AudioTabs';
 import { Avatar } from './components/Avatar';
+import Draggable from './components/Draggable';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import type { IconName } from './components/LocalIcon';
@@ -663,44 +664,49 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     const { callState } = this.state;
     const content = 'Calling...';
     return (
-      <Pressable
-        style={{
-          width: 76,
-          height: 76,
-          position: 'absolute',
-          backgroundColor: 'grey',
-          right: 10,
-          top: 54,
-          borderRadius: 12,
-        }}
-        onPress={() => {
+      <Draggable
+        x={Dimensions.get('screen').width - 86}
+        y={54}
+        onShortPressRelease={() => {
           this.setState({ isMinimize: false });
         }}
       >
         <View
           style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: 76,
+            height: 76,
+            // position: 'absolute',
+            backgroundColor: 'grey',
+            // right: 10,
+            // top: 54,
+            borderRadius: 12,
           }}
         >
-          <Avatar uri="" size={36} />
-          {callState === CallState.Calling ? (
-            <Elapsed timer={elapsed} />
-          ) : (
-            <Text
-              style={{
-                fontSize: 14,
-                lineHeight: 18,
-                fontWeight: '400',
-                textAlign: 'center',
-              }}
-            >
-              {content}
-            </Text>
-          )}
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar uri="" size={36} />
+            {callState === CallState.Calling ? (
+              <Elapsed timer={elapsed} />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 14,
+                  lineHeight: 18,
+                  fontWeight: '400',
+                  textAlign: 'center',
+                }}
+              >
+                {content}
+              </Text>
+            )}
+          </View>
         </View>
-      </Pressable>
+      </Draggable>
     );
   }
 

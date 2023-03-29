@@ -13,6 +13,7 @@ import {
   BottomButtonType,
 } from './BasicCall';
 import { Avatar } from './components/Avatar';
+import Draggable from './components/Draggable';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
@@ -607,18 +608,15 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { callState } = this.state;
     const content = 'Calling...';
     return (
-      <Pressable
+      <View
         style={{
           width: 76,
           height: 76,
-          position: 'absolute',
+          // position: 'absolute',
           backgroundColor: 'grey',
-          right: 10,
-          top: 54,
+          // right: 10,
+          // top: 54,
           borderRadius: 12,
-        }}
-        onPress={() => {
-          this.setState({ isMinimize: false });
         }}
       >
         <View
@@ -644,7 +642,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             </Text>
           )}
         </View>
-      </Pressable>
+      </View>
     );
   }
 
@@ -655,17 +653,14 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     calllog.log('renderFloatVideo:', isMinimize);
     if (isMinimize === true) {
       return (
-        <Pressable
-          onPress={() => {
-            this.setState({ isMinimize: false });
-          }}
+        <View
           style={{
             width: callState === CallState.Calling ? 90 : 76,
             height: callState === CallState.Calling ? 160 : 76,
-            position: 'absolute',
+            // position: 'absolute',
             backgroundColor: 'grey',
-            right: 10,
-            top: 54,
+            // right: 10,
+            // top: 54,
             borderRadius: 12,
           }}
         >
@@ -704,7 +699,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               </Text>
             </View>
           )}
-        </Pressable>
+        </View>
       );
     } else {
       return (
@@ -792,11 +787,23 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { callType } = this.props;
     const { isMinimize } = this.state;
     if (isMinimize) {
+      let ret = undefined;
       if (callType === 'audio') {
-        return this.renderFloatAudio();
+        ret = this.renderFloatAudio();
       } else {
-        return this.renderFloatVideo();
+        ret = this.renderFloatVideo();
       }
+      return (
+        <Draggable
+          x={Dimensions.get('screen').width - (callType === 'audio' ? 86 : 100)}
+          y={54}
+          onShortPressRelease={() => {
+            this.setState({ isMinimize: false });
+          }}
+        >
+          {ret}
+        </Draggable>
+      );
     }
     return (
       <View

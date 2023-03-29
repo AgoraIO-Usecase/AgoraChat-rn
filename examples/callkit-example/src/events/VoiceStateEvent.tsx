@@ -137,7 +137,7 @@ export function handleVoiceStateEvent(params: {
               }}
             />
           ),
-          pointerEvents: 'box-none',
+          // pointerEvents: 'box-none',
         });
       }
       break;
