@@ -44,7 +44,7 @@ type DataType = {
   userId: string;
   userName?: string;
   isSelected?: boolean;
-  onChecked?: ((checked: boolean) => void) | undefined;
+  onChecked?: ((checked: boolean) => boolean) | undefined;
 };
 const FlatListRenderItem = (
   info: ListRenderItemInfo<DataType>
@@ -53,8 +53,8 @@ const FlatListRenderItem = (
   return (
     <View
       style={{
-        height: 30,
-        backgroundColor: '#e6e6fa',
+        height: 40,
+        backgroundColor: '#f5f5f5',
         marginHorizontal: 20,
         justifyContent: 'center',
         marginVertical: 1,

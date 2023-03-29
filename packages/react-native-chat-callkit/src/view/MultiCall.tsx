@@ -34,8 +34,9 @@ type User = {
 };
 
 export type InviteeListProps = {
-  userIds: string[];
-  onClose: (added: string[]) => void;
+  selectedIds: string[];
+  maxCount: number;
+  onClose: (addedIds: string[]) => void;
 };
 
 export type MultiCallProps = BasicCallProps & {
@@ -746,7 +747,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
   protected renderInviteeList(): React.ReactNode {
     const { showInvite } = this.state;
-    const { inviteeList } = this.props;
+    const { inviteeList, callType } = this.props;
     const InviteeList = inviteeList?.InviteeList;
     const inviteeListProps = inviteeList?.props;
     if (showInvite === false) {
@@ -765,9 +766,10 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         {InviteeList ? (
           <InviteeList
             {...inviteeListProps}
-            userIds={['xxx']}
-            onClose={(added) => {
-              calllog.log('added:', added);
+            selectedIds={['du005']}
+            maxCount={callType === 'audio' ? AudioMaxCount : VideoMaxCount}
+            onClose={(addedIds) => {
+              calllog.log('added:', addedIds);
               this.setState({ showInvite: false });
             }}
           />

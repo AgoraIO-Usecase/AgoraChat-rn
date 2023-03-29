@@ -10,7 +10,8 @@ export type RadioButtonProps = {
   disabledColor?: string;
   borderColor?: string;
   checked?: boolean;
-  onChecked?: (checked: boolean) => void;
+  onChecked?: (checked: boolean) => boolean;
+  disabled?: boolean;
 };
 
 const sf = getScaleFactor();
@@ -25,6 +26,7 @@ export default function RadioButton(props: RadioButtonProps): JSX.Element {
     borderColor,
     checked,
     onChecked,
+    disabled,
   } = props;
   const [_checked, setChecked] = React.useState(checked ?? false);
   // console.log('test:RadioButton:', _checked);
@@ -53,20 +55,33 @@ export default function RadioButton(props: RadioButtonProps): JSX.Element {
   const cc = React.useMemo(() => {
     return {
       paddingColor: paddingColor ? paddingColor : 'rgba(5, 95, 255, 0.1)',
-      enabledColor: enabledColor ? enabledColor : 'blue',
+      enabledColor:
+        disabled === true
+          ? disabledColor
+            ? disabledColor
+            : 'grey'
+          : enabledColor
+          ? enabledColor
+          : 'blue',
       disabledColor: disabledColor ? disabledColor : 'grey',
       borderColor: borderColor ? borderColor : 'white',
     };
-  }, [paddingColor, enabledColor, disabledColor, borderColor]);
+  }, [paddingColor, disabled, disabledColor, enabledColor, borderColor]);
 
   const onCheck = () => {
     const c = !_checked;
-    setChecked(c);
-    onChecked?.(c);
+    if (onChecked) {
+      if (onChecked(c) === true) {
+        setChecked(c);
+      }
+    } else {
+      setChecked(c);
+    }
   };
 
   return (
     <Pressable
+      disabled={disabled}
       style={[
         {
           padding: cv.container.padding,
