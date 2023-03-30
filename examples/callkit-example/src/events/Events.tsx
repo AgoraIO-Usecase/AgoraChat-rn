@@ -46,7 +46,8 @@ export type StateActionEventType =
   | UikitStateActionEventType
   | 'state_'
   | 'show_single_call'
-  | 'hide_single_call';
+  | 'show_multi_call'
+  | 'hide_call';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// StateActionEventType //////////////////////////////////////////////////////

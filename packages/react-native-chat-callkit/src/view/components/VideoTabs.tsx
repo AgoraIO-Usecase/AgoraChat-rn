@@ -1,30 +1,23 @@
 import { Tab, TabView } from '@rneui/themed';
 import * as React from 'react';
-import { Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { calllog } from '../../call/CallConst';
+import type { User } from '../../types';
 import { Avatar } from './Avatar';
 import { LocalIcon } from './LocalIcon';
 
 const PageCount = 4;
 
-export type VideoUser = {
-  userId: string;
-  userName: string;
-  userAvatar?: string;
-  muteAudio?: boolean;
-  muteVideo?: boolean;
-  talking?: boolean;
-};
-
-type VideoTabProps = {
-  subUsers: VideoUser[];
+type VideoTabProp = {
+  subUsers: User[];
   index: number;
+  onPress?: (params: { userId: string; userChannelId?: number }) => void;
 };
 
-export function VideoTab(props: VideoTabProps): JSX.Element {
+export function VideoTab(props: VideoTabProp): JSX.Element {
   // calllog.log('VideoTab:', props);
-  const { subUsers, index } = props;
+  const { subUsers, index, onPress } = props;
   const { width: screenWidth } = useWindowDimensions();
   return (
     <TabView.Item
@@ -45,7 +38,13 @@ export function VideoTab(props: VideoTabProps): JSX.Element {
       >
         {subUsers.map((user) => {
           return (
-            <View
+            <Pressable
+              onPress={() => {
+                onPress?.({
+                  userId: user.userId,
+                  userChannelId: user.userChannelId,
+                });
+              }}
               key={user.userId}
               style={{
                 width: '50%',
@@ -96,7 +95,7 @@ export function VideoTab(props: VideoTabProps): JSX.Element {
                     paddingLeft: 5,
                   }}
                 >
-                  {user.userName}
+                  {user.userName ?? user.userId}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <View
@@ -114,7 +113,7 @@ export function VideoTab(props: VideoTabProps): JSX.Element {
                   ) : null}
                 </View>
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </View>
@@ -140,15 +139,16 @@ export function VideoTab(props: VideoTabProps): JSX.Element {
 // }
 
 type VideoTabsProps = {
-  users: VideoUser[];
+  users: User[];
+  onPress?: (params: { userId: string; userChannelId?: number }) => void;
 };
 
 export function VideoTabs(props: VideoTabsProps): JSX.Element {
-  calllog.log('VideoTabs:');
-  const { users } = props;
+  calllog.log('VideoTabs:', props);
+  const { users, onPress } = props;
   const [index, setIndex] = React.useState(0);
   const initUsers = () => {
-    const tu = [] as VideoUser[][];
+    const tu = [] as User[][];
     const pageCount = Math.ceil(users.length / PageCount);
     for (let index = 0; index < pageCount; index++) {
       tu[index] = [];
@@ -166,7 +166,7 @@ export function VideoTabs(props: VideoTabsProps): JSX.Element {
     return [pageCount, tu];
   };
   const ret = initUsers();
-  const [tabUsers] = React.useState(ret[1] as VideoUser[][]);
+  const [tabUsers] = React.useState(ret[1] as User[][]);
   // const [pageCount, setPageCount] = React.useState(ret[0] as number);
   // calllog.log('test:', ret[0], tabUsers);
   const onIndex = (value: number) => {
@@ -178,7 +178,14 @@ export function VideoTabs(props: VideoTabsProps): JSX.Element {
       <TabView value={index} onChange={onIndex}>
         {tabUsers.map((users, i) => {
           // console.log('test:users:', users[0]?.userId);
-          return <VideoTab key={users[0]?.userId} index={i} subUsers={users} />;
+          return (
+            <VideoTab
+              key={users[0]?.userId}
+              index={i}
+              subUsers={users}
+              onPress={onPress}
+            />
+          );
         })}
       </TabView>
 

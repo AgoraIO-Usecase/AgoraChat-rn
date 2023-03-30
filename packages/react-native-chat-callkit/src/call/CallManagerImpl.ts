@@ -837,33 +837,22 @@ export class CallManagerImpl
     onResult: (params: { callId?: string; error?: CallError }) => void;
   }): void {
     calllog.log('CallManagerImpl:_startCall:', params);
+    if (params.inviteeIds.length === 0) {
+      params.onResult({
+        callId: undefined,
+        error: new CallError({
+          code: CallErrorCode.InvalidParams,
+          description: 'Please add invitees.',
+        }),
+      });
+      return;
+    }
     if (
       params.callType !== CallType.VideoMulti &&
       params.callType !== CallType.AudioMulti
     ) {
-      if (params.inviteeIds.length === 0) {
-        params.onResult({
-          callId: undefined,
-          error: new CallError({
-            code: CallErrorCode.InvalidParams,
-            description: 'Please add invitees.',
-          }),
-        });
-        return;
-      }
       const inviteeId = params.inviteeIds[0];
       if (inviteeId === undefined || inviteeId.trim().length === 0) {
-        params.onResult({
-          callId: undefined,
-          error: new CallError({
-            code: CallErrorCode.InvalidParams,
-            description: 'Please add invitees.',
-          }),
-        });
-        return;
-      }
-    } else {
-      if (params.inviteeIds.length === 0) {
         params.onResult({
           callId: undefined,
           error: new CallError({
@@ -878,11 +867,36 @@ export class CallManagerImpl
     let call: CallObject | undefined;
     call = this._getCallByChannelId(params.channelId); // !!! _getCallByChannelId
     if (call) {
+      // TODO: Only multiple people can enter here
+      // TODO: Is it the inviter
+      // TODO: If it is an inviter: the status remains unchanged (whether you have joined the channel or not), send the invitation and start timing separately, and update the list of invitees
+      // TODO: If it is an invitee: it can only be idle or joined. If it is impossible before the bell rings, it can only be continued after the bell rings, and then click Accept. The status is unchanged. Send invitations and start timing separately, update invitee list, move yourself from invitee to inviter. There may be multiple invitees. Multiple invitees are no problem.
+
       calllog.log(
         'CallManagerImpl:_startCall:re:',
         call.isInviter,
         call.inviter.userId
       );
+      if (
+        call.callType !== CallType.AudioMulti &&
+        call.callType !== CallType.VideoMulti
+      ) {
+        params.onResult({
+          callId: call.callId,
+          error: new CallError({
+            code: CallErrorCode.ExceptionState,
+            description: 'Individual calls cannot be invited again.',
+          }),
+        });
+        return;
+      }
+
+      const addedIds = [] as string[];
+      for (const id of params.inviteeIds) {
+        if (call.invitees.get(id) === undefined) {
+          addedIds.push(id);
+        }
+      }
       if (call.isInviter === false) {
         if (
           call.state !== CallSignalingState.Idle &&
@@ -893,77 +907,29 @@ export class CallManagerImpl
             error: new CallError({
               code: CallErrorCode.ExceptionState,
               description:
-                'Invitees can invite others only when they are in a call.',
-              type: CallErrorType.Signaling,
+                'Invitees need to be connected to invite again.A solo call cannot be invited again.',
             }),
           });
           return;
         }
-        this.ship.currentCall = undefined;
-        call = this._createInviterCall({
-          callType: params.callType,
-          channelId: params.channelId,
-          inviteeIds: params.inviteeIds,
-        });
-      } else {
-        if (
-          call.state !== CallSignalingState.Idle &&
-          call.state !== CallSignalingState.Joined
-        ) {
+
+        const invitee = call.invitees.get(this.userId);
+        if (invitee === undefined) {
           params.onResult({
             callId: call.callId,
             error: new CallError({
               code: CallErrorCode.ExceptionState,
-              description:
-                'The inviter can only invite again after joining the channel.',
-              type: CallErrorType.Signaling,
+              description: 'No invitees found.',
             }),
           });
           return;
         }
-      }
-      this._changeState({
-        callId: call.callId,
-        new: CallSignalingState.InviterInviting,
-      });
-      const toAdd = [] as string[];
-      for (const id of params.inviteeIds) {
-        const invitee = call.invitees.get(id);
-        if (invitee === undefined || invitee.userHadJoined === false) {
-          toAdd.push(id);
-        }
-      }
-      if (toAdd.length > 0) {
-        this._addInvitee(
-          call.callId,
-          toAdd.map((id) => {
-            return {
-              userId: id,
-              userHadJoined: false,
-            } as CallInvitee;
-          })
-        );
-      } else {
-        params.onResult({
-          callId: call.callId,
-          error: new CallError({
-            code: CallErrorCode.ExceptionState,
-            description:
-              'Please do not select people who have already joined the channel.',
-            type: CallErrorType.Signaling,
-          }),
-        });
-        return;
+        call.inviter = invitee;
+        call.invitees.delete(this.userId);
+        call.isInviter = true;
       }
 
-      if (
-        params.callType === CallType.VideoMulti ||
-        params.callType === CallType.AudioMulti
-      ) {
-        this._onRequestJoin({ callId: call.callId });
-      }
-
-      for (const id of toAdd) {
+      for (const id of addedIds) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
         this.signalling.sendInvite({
           inviteeId: id,
@@ -982,6 +948,9 @@ export class CallManagerImpl
                   params.callType !== CallType.VideoMulti &&
                   params.callType !== CallType.AudioMulti
                 ) {
+                  calllog.warn(
+                    'CallManagerImpl:sendInvite:sendInvite:Impossible to get in here.'
+                  );
                   this._clear();
                   this._onCallEnded({
                     channelId: call.channelId,
@@ -989,7 +958,11 @@ export class CallManagerImpl
                     endReason: CallEndReason.NoResponse,
                   });
                 } else {
-                  // TODO: Remove the invitee.
+                  this._onRemoveRemoteUser({
+                    channelId: call.channelId,
+                    userId: id,
+                    reason: CallEndReason.NoResponse,
+                  });
                 }
               }
             }
@@ -1047,7 +1020,11 @@ export class CallManagerImpl
                     endReason: CallEndReason.NoResponse,
                   });
                 } else {
-                  // TODO: Remove the invitee.
+                  this._onRemoveRemoteUser({
+                    channelId: call.channelId,
+                    userId: id,
+                    reason: CallEndReason.NoResponse,
+                  });
                 }
               }
             }
@@ -1083,7 +1060,6 @@ export class CallManagerImpl
         call.callType !== CallType.VideoMulti &&
         call.callType !== CallType.AudioMulti
       ) {
-        // TODO: End the call and notify the user.
         this._clear();
         this._onCallEnded({
           channelId: call.channelId,
@@ -1091,7 +1067,11 @@ export class CallManagerImpl
           endReason: CallEndReason.RemoteNoResponse,
         });
       } else {
-        // TODO: Remove the invitee.
+        this._onRemoveRemoteUser({
+          channelId: call.channelId,
+          userId: params.userId,
+          reason: CallEndReason.NoResponse,
+        });
       }
     }
   }
@@ -1121,6 +1101,16 @@ export class CallManagerImpl
   //// CallViewListener ////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
+  protected _onRemoveRemoteUser(params: {
+    channelId: string;
+    userChannelId?: number;
+    userId: string;
+    reason?: CallEndReason;
+  }): void {
+    calllog.log('CallManagerImpl:_onRemoveRemoteUser', params);
+    this.listener?.onRemoveRemoteUser?.(params);
+  }
+
   protected _onCallEnded(params: {
     channelId: string;
     callType: CallType;
@@ -1142,6 +1132,10 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:onRequestJoin', params);
     const call = this._getCall(params.callId);
     if (call) {
+      this._changeState({
+        callId: call.callId,
+        new: CallSignalingState.InviterJoining,
+      });
       this.requestRTCToken?.({
         appKey: this.option.appKey,
         channelId: call.channelId,
@@ -1315,8 +1309,8 @@ export class CallManagerImpl
       const invitee = call.invitees.get(params.inviteeId);
       if (invitee) {
         if (
-          params.callType !== CallType.VideoMulti &&
-          params.callType !== CallType.AudioMulti
+          call.callType !== CallType.VideoMulti &&
+          call.callType !== CallType.AudioMulti
         ) {
           this._changeState({
             callId: params.callId,
@@ -1345,8 +1339,8 @@ export class CallManagerImpl
               const call = this._getCall(callId);
               if (call) {
                 if (
-                  params.callType !== CallType.VideoMulti &&
-                  params.callType !== CallType.AudioMulti
+                  call.callType !== CallType.VideoMulti &&
+                  call.callType !== CallType.AudioMulti
                 ) {
                   this._clear();
                   this._onCallEnded({
@@ -1355,7 +1349,11 @@ export class CallManagerImpl
                     endReason: CallEndReason.NoResponse,
                   });
                 } else {
-                  // TODO: Remove the invitee.
+                  this._onRemoveRemoteUser({
+                    channelId: call.channelId,
+                    userId: params.inviteeId,
+                    reason: CallEndReason.NoResponse,
+                  });
                 }
               }
             }
@@ -1460,14 +1458,10 @@ export class CallManagerImpl
             userId: params.inviteeId,
           });
           if (
-            params.callType !== CallType.VideoMulti &&
-            params.callType !== CallType.AudioMulti
+            call.callType !== CallType.VideoMulti &&
+            call.callType !== CallType.AudioMulti
           ) {
             if (params.reply === 'accept') {
-              this._changeState({
-                callId: params.callId,
-                new: CallSignalingState.InviterJoining,
-              });
               this._onRequestJoin({ callId: call.callId });
             } else {
               this._onCallEnded({
@@ -1478,7 +1472,11 @@ export class CallManagerImpl
             }
           } else {
             if (params.reply !== 'accept') {
-              // TODO: Remove the invitee.
+              this._onRemoveRemoteUser({
+                channelId: call.channelId,
+                userId: params.inviteeId,
+                reason: CallEndReason.NoResponse,
+              });
             }
           }
         }
@@ -1499,8 +1497,8 @@ export class CallManagerImpl
                 const call = this._getCall(callId);
                 if (call) {
                   if (
-                    params.callType !== CallType.VideoMulti &&
-                    params.callType !== CallType.AudioMulti
+                    call.callType !== CallType.VideoMulti &&
+                    call.callType !== CallType.AudioMulti
                   ) {
                     this._clear();
                     this._onCallEnded({
@@ -1509,7 +1507,11 @@ export class CallManagerImpl
                       endReason: CallEndReason.NoResponse,
                     });
                   } else {
-                    // TODO: Remove the invitee.
+                    this._onRemoveRemoteUser({
+                      channelId: call.channelId,
+                      userId: params.inviteeId,
+                      reason: CallEndReason.NoResponse,
+                    });
                   }
                 }
               }
@@ -1532,7 +1534,7 @@ export class CallManagerImpl
     channelId: string;
     ts: number;
   }): void {
-    calllog.log('CallManagerImpl:onInviteReply:onInviteReplyConfirm:', params);
+    calllog.log('CallManagerImpl:onInviteReplyConfirm:', params);
     const call = this._getCall(params.callId);
     if (call && call.inviter.userDeviceToken === params.inviterDeviceToken) {
       const invitee = call.invitees.get(this.userId);
@@ -1543,10 +1545,6 @@ export class CallManagerImpl
         });
         if (invitee.userDeviceToken === params.inviteeDeviceToken) {
           if (params.reply === 'accept') {
-            this._changeState({
-              callId: params.callId,
-              new: CallSignalingState.InviteeJoining,
-            });
             this._onRequestJoin({ callId: call.callId });
           } else {
             this._onCallEnded({
@@ -1870,13 +1868,12 @@ export class CallManagerImpl
             endReason: CallEndReason.RemoteNoResponse,
           });
         } else {
-          // TODO: Remove the invitee.
+          this.listener?.onRemoteUserOffline?.({
+            channelId: call.channelId,
+            userChannelId: remoteUid ?? 0,
+            userId: userId ?? '',
+          });
         }
-        this.listener?.onRemoteUserOffline?.({
-          channelId: call.channelId,
-          userChannelId: remoteUid ?? 0,
-          userId: userId ?? '',
-        });
       }
     }
   }
@@ -2023,12 +2020,45 @@ export class CallManagerImpl
     if (connection.channelId) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
+        const ret = [] as {
+          userId: string;
+          userChannelId: number;
+          totalVolume: number;
+        }[];
         for (const speaker of speakers) {
-          if (speaker.volume && speaker.volume > 5) {
-            // TODO:
-          } else {
-            // TODO:
+          if (speaker.volume && speaker.volume > 3) {
+            if (
+              call.inviter.userChannelId &&
+              call.inviter.userChannelId === speaker.uid
+            ) {
+              ret.push({
+                userId: call.inviter.userId,
+                userChannelId: call.inviter.userChannelId,
+                totalVolume: speaker.volume,
+              });
+            } else {
+              for (const kv of call.invitees) {
+                const invitee = kv[1];
+                if (
+                  invitee.userChannelId &&
+                  invitee.userChannelId === speaker.uid
+                ) {
+                  ret.push({
+                    userId: invitee.userId,
+                    userChannelId: invitee.userChannelId,
+                    totalVolume: speaker.volume,
+                  });
+                }
+              }
+            }
           }
+        }
+        if (ret.length > 0) {
+          this.listener?.onAudioVolumeIndication?.({
+            channelId: call.channelId,
+            speakerNumber: speakerNumber,
+            speakers: ret,
+          });
         }
       }
     }

@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ListRenderItemInfo, Text, View } from 'react-native';
+import { ListRenderItemInfo, StyleSheet, Text, View } from 'react-native';
 import {
   CallEndReason,
   CallError,
@@ -74,12 +74,12 @@ const FlatListRenderItem = (
   );
 };
 type ContactListRef = {
-  showSingleCall: (params: {
+  showCall: (params: {
     callType: CallType;
     isInviter: boolean;
     inviterId?: string;
   }) => void;
-  hideSingleCall: () => void;
+  hideCall: () => void;
 };
 type ContactListProps = {
   propsRef?: React.RefObject<ContactListRef>;
@@ -93,12 +93,12 @@ const ContactList = React.memo((props: ContactListProps) => {
   const [_data, setData] = React.useState(data);
 
   if (propsRef?.current) {
-    propsRef.current.showSingleCall = (params: {
+    propsRef.current.showCall = (params: {
       callType: CallType;
       isInviter: boolean;
       inviterId?: string;
     }) => {
-      console.log('test:showSingleCall:', params);
+      console.log('test:showCall:', params);
       const l = [] as string[];
       for (const i of _data) {
         if (i.isSelected === true) {
@@ -107,7 +107,11 @@ const ContactList = React.memo((props: ContactListProps) => {
       }
       sendHomeEvent({
         eventType: 'VoiceStateEvent',
-        action: 'show_single_call',
+        action:
+          params.callType === CallType.Audio1v1 ||
+          params.callType === CallType.Video1v1
+            ? 'show_single_call'
+            : 'show_multi_call',
         params: {
           appKey: client.options?.appKey ?? '',
           agoraAppId: agoraAppId,
@@ -119,10 +123,10 @@ const ContactList = React.memo((props: ContactListProps) => {
         },
       });
     };
-    propsRef.current.hideSingleCall = () => {
+    propsRef.current.hideCall = () => {
       sendHomeEvent({
         eventType: 'VoiceStateEvent',
-        action: 'hide_single_call',
+        action: 'hide_call',
         params: {},
       });
     };
@@ -136,17 +140,15 @@ const ContactList = React.memo((props: ContactListProps) => {
         console.log('test:ContactList:init:result:', result);
         data.length = 0;
         for (const i of result) {
-          data.push({
+          const user = {
             userId: i,
             userName: i,
             onChecked: (checked: boolean) => {
-              for (const j of data) {
-                if (j.userId === i) {
-                  j.isSelected = checked;
-                }
-              }
+              user.isSelected = checked;
+              return true;
             },
-          } as DataType);
+          } as DataType;
+          data.push(user);
         }
         setData([...data]);
       })
@@ -188,7 +190,7 @@ export default function HomeScreen({
         extension?: any;
       }) => {
         console.log('onCallReceived:', params);
-        contactListRef.current.showSingleCall({
+        contactListRef.current.showCall({
           callType: params.callType,
           isInviter: false,
           inviterId: params.inviterId,
@@ -244,15 +246,15 @@ export default function HomeScreen({
       <View
         style={{
           flexDirection: 'row',
-          justifyContent: 'space-evenly',
+          justifyContent: 'flex-start',
           marginVertical: 20,
           flexWrap: 'wrap',
         }}
       >
         <Button
-          style={{ height: 40, width: 100 }}
+          style={style.button}
           onPress={() => {
-            contactListRef.current.showSingleCall({
+            contactListRef.current.showCall({
               callType: CallType.Video1v1,
               isInviter: true,
             });
@@ -261,9 +263,9 @@ export default function HomeScreen({
           singleV
         </Button>
         <Button
-          style={{ height: 40, width: 100 }}
+          style={style.button}
           onPress={() => {
-            contactListRef.current.showSingleCall({
+            contactListRef.current.showCall({
               callType: CallType.Audio1v1,
               isInviter: true,
             });
@@ -271,11 +273,33 @@ export default function HomeScreen({
         >
           singleA
         </Button>
-        <Button>multi</Button>
-        <Button>navi</Button>
         <Button
+          style={style.button}
           onPress={() => {
-            contactListRef.current.hideSingleCall();
+            contactListRef.current.showCall({
+              callType: CallType.VideoMulti,
+              isInviter: true,
+            });
+          }}
+        >
+          multiV
+        </Button>
+        <Button
+          style={style.button}
+          onPress={() => {
+            contactListRef.current.showCall({
+              callType: CallType.AudioMulti,
+              isInviter: true,
+            });
+          }}
+        >
+          multiA
+        </Button>
+        <Button style={style.button}>navi</Button>
+        <Button
+          style={style.button}
+          onPress={() => {
+            contactListRef.current.hideCall();
           }}
         >
           close
@@ -304,3 +328,12 @@ export default function HomeScreen({
     </View>
   );
 }
+
+const style = StyleSheet.create({
+  button: {
+    height: 40,
+    width: 100,
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+});

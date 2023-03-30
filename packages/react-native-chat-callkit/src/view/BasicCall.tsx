@@ -38,13 +38,13 @@ export type BasicCallProps = {
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;
   callType: 'audio' | 'video';
-  requestRTCToken: (params: {
+  requestRTCToken?: (params: {
     appKey: string;
     channelId: string;
     userId: string;
     onResult: (params: { data: any; error?: any }) => void;
   }) => void;
-  requestUserMap: (params: {
+  requestUserMap?: (params: {
     appKey: string;
     channelId: string;
     userId: string;
@@ -322,5 +322,17 @@ export abstract class BasicCall<
   }): void {
     calllog.log('BasicCall:onRemoteUserMuteAudio:', params);
     throw new Error('Requires subclass implementation.');
+  }
+
+  onAudioVolumeIndication(params: {
+    channelId: string;
+    speakerNumber: number;
+    speakers: {
+      userId: string;
+      userChannelId: number;
+      totalVolume: number;
+    }[];
+  }): void {
+    calllog.log('BasicCall:onAudioVolumeIndication:', params);
   }
 }

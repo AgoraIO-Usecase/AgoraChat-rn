@@ -31,7 +31,7 @@ export interface CallViewListener {
    */
   onCallOccurError?: (params: { channelId: string; error: CallError }) => void;
   /**
-   * Notifications when other invitees join.
+   * Notifications when other remote user join.
    *
    * **Note** Users need to obtain the mapping relationship between user id and channel user id through app server. And notify the Callkit SDK.
    *
@@ -45,10 +45,33 @@ export interface CallViewListener {
     userChannelId: number;
     userId: string;
   }) => void;
+  /**
+   * Notifications when other remote user leave.
+   *
+   * @param -
+   * - channelId: Call channel ID.
+   * - userChannelId: The ID of the user who joined the channel.
+   * - userId: the user ID.
+   */
   onRemoteUserOffline?: (params: {
     channelId: string;
     userChannelId: number;
     userId: string;
+  }) => void;
+  /**
+   * Notifications when remove remote user for error.
+   *
+   * @param -
+   * - channelId: Call channel ID.
+   * - userChannelId: The ID of the user who joined the channel.
+   * - userId: the user ID.
+   * - reason: The reason why the user leaves.
+   */
+  onRemoveRemoteUser?: (params: {
+    channelId: string;
+    userChannelId?: number;
+    userId: string;
+    reason?: CallEndReason;
   }) => void;
   /**
    * Notifications when you join a channel.
@@ -67,6 +90,14 @@ export interface CallViewListener {
     userId: string;
     elapsed: number;
   }) => void;
+  /**
+   * Notifications when you leave a channel.
+   *
+   * @param -
+   * - channelId: Call channel ID.
+   * - userChannelId: The ID of the user who joined the channel.
+   * - userId: the user ID.
+   */
   onSelfLeave?: (params: {
     channelId: string;
     userChannelId: number;
@@ -119,5 +150,26 @@ export interface CallViewListener {
     userId: string;
     userChannelId: number;
     muted: boolean;
+  }) => void;
+
+  /**
+   * Reports the volume information of users. By default, this callback is disabled. You can enable it by calling enableAudioVolumeIndication .
+   *
+   * @param params -
+   * - channelId: Call channel ID.
+   * - speakerNumber: The total number of users.
+   * - speakers:
+   * - - userId: the user ID.
+   * - - userChannelId: the user channel ID.
+   * - - totalVolume: The volume of the speaker.
+   */
+  onAudioVolumeIndication?: (params: {
+    channelId: string;
+    speakerNumber: number;
+    speakers: {
+      userId: string;
+      userChannelId: number;
+      totalVolume: number;
+    }[];
   }) => void;
 }

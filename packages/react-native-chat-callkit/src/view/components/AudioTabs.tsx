@@ -3,25 +3,18 @@ import * as React from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 
 import { calllog } from '../../call/CallConst';
+import type { User } from '../../types';
 import { Avatar } from './Avatar';
 import { LocalIcon } from './LocalIcon';
 
 const PageCount = 9;
 
-export type AudioUser = {
-  userId: string;
-  userName: string;
-  userAvatar?: string;
-  muteAudio?: boolean;
-  talking?: boolean;
-};
-
-type AudioTabProps = {
-  subUsers: AudioUser[];
+type AudioTabProp = {
+  subUsers: User[];
   index: number;
 };
 
-export function AudioTab(props: AudioTabProps): JSX.Element {
+export function AudioTab(props: AudioTabProp): JSX.Element {
   // calllog.log('AudioTab:', props);
   const { subUsers, index } = props;
   const { width: screenWidth } = useWindowDimensions();
@@ -74,7 +67,7 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
                   color: 'white',
                 }}
               >
-                {user.userName}
+                {user.userName ?? user.userId}
               </Text>
               <View
                 style={{
@@ -126,7 +119,7 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
 // }
 
 type AudioTabsProps = {
-  users: AudioUser[];
+  users: User[];
 };
 
 export function AudioTabs(props: AudioTabsProps): JSX.Element {
@@ -134,7 +127,7 @@ export function AudioTabs(props: AudioTabsProps): JSX.Element {
   const { users } = props;
   const [index, setIndex] = React.useState(0);
   const initUsers = () => {
-    const tu = [] as AudioUser[][];
+    const tu = [] as User[][];
     const pageCount = Math.ceil(users.length / PageCount);
     for (let index = 0; index < pageCount; index++) {
       tu[index] = [];
@@ -152,7 +145,7 @@ export function AudioTabs(props: AudioTabsProps): JSX.Element {
     return [pageCount, tu];
   };
   const ret = initUsers();
-  const [tabUsers] = React.useState(ret[1] as AudioUser[][]);
+  const [tabUsers] = React.useState(ret[1] as User[][]);
   // const [pageCount, setPageCount] = React.useState(ret[0] as number);
   // calllog.log('test:', ret[0], tabUsers);
   const onIndex = (value: number) => {

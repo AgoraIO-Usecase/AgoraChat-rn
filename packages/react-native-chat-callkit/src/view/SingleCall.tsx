@@ -811,7 +811,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           position: 'absolute',
           width: screenWidth,
           height: screenHeight,
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'rgb(199, 197, 208)',
         }}
       >
         {this.renderFullVideo()}

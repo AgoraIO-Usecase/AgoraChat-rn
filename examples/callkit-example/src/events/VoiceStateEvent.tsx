@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CallType, SingleCall } from 'react-native-chat-callkit';
+import { CallType, MultiCall, SingleCall } from 'react-native-chat-callkit';
 import type {
   ExtraDataType,
   VoiceStateContextType,
@@ -79,7 +79,7 @@ export function handleVoiceStateEvent(params: {
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
-                  action: 'hide_single_call',
+                  action: 'hide_call',
                   params: {},
                 });
               }}
@@ -88,7 +88,7 @@ export function handleVoiceStateEvent(params: {
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
-                  action: 'hide_single_call',
+                  action: 'hide_call',
                   params: {},
                 });
               }}
@@ -97,7 +97,7 @@ export function handleVoiceStateEvent(params: {
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
-                  action: 'hide_single_call',
+                  action: 'hide_call',
                   params: {},
                 });
               }}
@@ -106,7 +106,7 @@ export function handleVoiceStateEvent(params: {
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
-                  action: 'hide_single_call',
+                  action: 'hide_call',
                   params: {},
                 });
               }}
@@ -115,7 +115,7 @@ export function handleVoiceStateEvent(params: {
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
-                  action: 'hide_single_call',
+                  action: 'hide_call',
                   params: {},
                 });
               }}
@@ -137,11 +137,95 @@ export function handleVoiceStateEvent(params: {
               }}
             />
           ),
-          // pointerEvents: 'box-none',
+          pointerEvents: 'box-none',
         });
       }
       break;
-    case 'hide_single_call':
+    case 'show_multi_call':
+      {
+        console.log('test:stateEvent.params:multi:', stateEvent.params);
+        const {
+          inviterId,
+          isInviter,
+          callType,
+          currentId,
+          inviteeIds,
+          appKey,
+          agoraAppId,
+        } = stateEvent.params as {
+          appKey: string;
+          agoraAppId: string;
+          isInviter: boolean;
+          inviterId: string;
+          currentId: string;
+          inviteeIds: string[];
+          callType: CallType;
+        };
+        params.voiceState.showState({
+          children: (
+            <MultiCall
+              appKey={appKey}
+              agoraAppId={agoraAppId}
+              inviterId={inviterId}
+              inviterName={inviterId}
+              currentId={currentId}
+              currentName={currentId}
+              callType={callType === CallType.AudioMulti ? 'audio' : 'video'}
+              elapsed={0}
+              isInviter={isInviter}
+              inviteeIds={inviteeIds}
+              onClose={() => {
+                console.log('test:stateEvent.onClose');
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_call',
+                  params: {},
+                });
+              }}
+              onHangUp={() => {
+                console.log('test:stateEvent.onHangUp');
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_call',
+                  params: {},
+                });
+              }}
+              onCancel={() => {
+                console.log('test:stateEvent.onCancel');
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_call',
+                  params: {},
+                });
+              }}
+              onRefuse={() => {
+                console.log('test:stateEvent.onRefuse');
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_call',
+                  params: {},
+                });
+              }}
+              onError={() => {
+                console.log('test:stateEvent.onError');
+                sendEventFromState({
+                  eventType: 'VoiceStateEvent',
+                  eventBizType: 'others',
+                  action: 'hide_call',
+                  params: {},
+                });
+              }}
+            />
+          ),
+          pointerEvents: 'box-none',
+        });
+      }
+      break;
+    case 'hide_call':
       params.voiceState.hideState();
       break;
     default:

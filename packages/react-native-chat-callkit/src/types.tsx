@@ -19,3 +19,15 @@ export interface CallkitSdkContextType {
     onResult: (params: { user: CallUser; error?: any }) => void;
   }) => void;
 }
+
+export type User = {
+  userId: string;
+  userChannelId?: number;
+  userHadJoined: boolean;
+  isSelf: boolean;
+  userName?: string;
+  userAvatar?: string;
+  muteAudio?: boolean;
+  muteVideo?: boolean;
+  talking?: boolean;
+};
