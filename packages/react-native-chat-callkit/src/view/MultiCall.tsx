@@ -66,8 +66,10 @@ export type MultiCallState = BasicCallState & {
 
 export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   private _inviteeTimer?: NodeJS.Timeout;
+  private _videoTabRef?: React.RefObject<VideoTabs>;
   constructor(props: MultiCallProps) {
     super(props);
+    this._videoTabRef = React.createRef<VideoTabs>();
     const l = [] as User[];
     l.push({
       userId: props.inviterId,
@@ -112,7 +114,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       inviteeIds: props.inviteeIds,
       users: l,
       isFullVideo: false,
-      usersCount: 0,
+      usersCount: l.length,
       showInvite: false,
     };
   }
@@ -284,6 +286,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.setState({
       users: [...users],
     });
+    // this._videoTabRef?.current?.update(users);
   }
 
   private updateUsers(
@@ -318,6 +321,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }
     }
     this.setState({ usersCount: users.length, users: [...users] });
+    // this._videoTabRef?.current?.update(users);
   }
 
   private removeUser(params: {
@@ -341,6 +345,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     if (isExisted) {
       this.setState({ usersCount: users.length });
       this.setState({ users: [...users] });
+      // this._videoTabRef?.current?.update(users);
     }
   }
 
@@ -599,7 +604,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         }}
       >
         <View style={{ height: StateBarHeight }} />
-        <VideoTabs users={users} onPress={() => {}} />
+        <VideoTabs ref={this._videoTabRef} users={users} onPress={() => {}} />
         <View style={{ height: ContentBottom }} />
         {isFullVideo ? (
           <View style={{ flex: 1, backgroundColor: 'green' }} />

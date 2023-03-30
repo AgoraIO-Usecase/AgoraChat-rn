@@ -1,21 +1,41 @@
 import * as React from 'react';
 import { View } from 'react-native';
+import { Button } from 'react-native-chat-uikit';
 
-import {
-  AudioTabs,
-  AudioUser,
-} from '../../../../packages/react-native-chat-callkit/src/view/components/AudioTabs';
+import type { User } from '../../../../packages/react-native-chat-callkit/src/types';
+import { AudioTabs } from '../../../../packages/react-native-chat-callkit/src/view/components/AudioTabs';
 
-export function test() {
-  const users = [] as AudioUser[];
-  for (let index = 0; index < 16; index++) {
-    users.push({
-      userId: `id_{${index}}`,
-      userName: `name_${index}`,
-    });
-  }
+let count = 0;
+export function Test() {
+  const users = React.useMemo(() => [] as User[], []);
+  const [, setValue] = React.useState(0);
+  // for (let index = 0; index < 2; index++) {
+  //   users.push({
+  //     userId: `id_{${index}}`,
+  //     userName: `name_${index}`,
+  //     userHadJoined: false,
+  //     isSelf: false,
+  //   });
+  //   count = index + 1;
+  // }
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, top: 100 }}>
+      <Button
+        onPress={() => {
+          users.push({
+            userId: `id_{${count}}`,
+            userName: `name_${count}`,
+            userHadJoined: false,
+            isSelf: false,
+          });
+          ++count;
+          setValue(count);
+          console.log('test:1:', count, users.length);
+        }}
+      >
+        update
+      </Button>
+      {/* <Text>{value}</Text> */}
       <AudioTabs users={users} />
     </View>
   );
@@ -23,5 +43,5 @@ export function test() {
 }
 
 export default function TestTabAudio() {
-  return test();
+  return Test();
 }

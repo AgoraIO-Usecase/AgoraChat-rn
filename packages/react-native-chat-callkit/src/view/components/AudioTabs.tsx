@@ -9,12 +9,12 @@ import { LocalIcon } from './LocalIcon';
 
 const PageCount = 9;
 
-type AudioTabProp = {
+type AudioTabProps = {
   subUsers: User[];
   index: number;
 };
 
-export function AudioTab(props: AudioTabProp): JSX.Element {
+export function AudioTab(props: AudioTabProps): JSX.Element {
   // calllog.log('AudioTab:', props);
   const { subUsers, index } = props;
   const { width: screenWidth } = useWindowDimensions();
@@ -123,7 +123,7 @@ type AudioTabsProps = {
 };
 
 export function AudioTabs(props: AudioTabsProps): JSX.Element {
-  calllog.log('AudioTabs:');
+  calllog.log('AudioTabs:', props);
   const { users } = props;
   const [index, setIndex] = React.useState(0);
   const initUsers = () => {
@@ -145,13 +145,15 @@ export function AudioTabs(props: AudioTabsProps): JSX.Element {
     return [pageCount, tu];
   };
   const ret = initUsers();
-  const [tabUsers] = React.useState(ret[1] as User[][]);
+  const tabUsers = ret[1] as User[][];
+  // const [tabUsers] = React.useState(ret[1] as User[][]);
   // const [pageCount, setPageCount] = React.useState(ret[0] as number);
   // calllog.log('test:', ret[0], tabUsers);
   const onIndex = (value: number) => {
     // calllog.log('test:value:', value);
     setIndex(value);
   };
+  // calllog.log('AudioTabs:', props);
   return (
     <>
       <TabView value={index} onChange={onIndex}>

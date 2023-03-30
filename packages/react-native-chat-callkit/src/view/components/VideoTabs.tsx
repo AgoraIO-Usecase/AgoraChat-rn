@@ -1,6 +1,6 @@
 import { Tab, TabView } from '@rneui/themed';
 import * as React from 'react';
-import { Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { Dimensions, Pressable, Text, View } from 'react-native';
 
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
@@ -9,145 +9,213 @@ import { LocalIcon } from './LocalIcon';
 
 const PageCount = 4;
 
-type VideoTabProp = {
-  subUsers: User[];
+type VideoTabProps = {
+  users: User[];
   index: number;
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
 };
 
-export function VideoTab(props: VideoTabProp): JSX.Element {
-  // calllog.log('VideoTab:', props);
-  const { subUsers, index, onPress } = props;
-  const { width: screenWidth } = useWindowDimensions();
-  return (
-    <TabView.Item
-      key={index.toString()}
-      style={{
-        // backgroundColor: 'red',
-        width: '100%',
-      }}
-    >
-      <View
+type VideoTabState = {
+  subUsers: User[];
+};
+
+export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
+  constructor(props: VideoTabProps) {
+    calllog.log('VideoTab:constructor:', props);
+    super(props);
+    this.state = {
+      subUsers: props.users,
+    };
+  }
+
+  componentDidMount?(): void {
+    calllog.log('VideoTab:componentDidMount:');
+  }
+
+  shouldComponentUpdate?(
+    nextProps: Readonly<VideoTabProps>,
+    _: Readonly<VideoTabState>,
+    __: any
+  ): boolean {
+    calllog.log('VideoTab:shouldComponentUpdate:', nextProps, this.props);
+    if (this.compare(nextProps) === false) {
+      this.update(nextProps.users);
+      return false;
+    }
+    return true;
+  }
+
+  componentWillUnmount?(): void {
+    calllog.log('VideoTab:componentWillUnmount:');
+  }
+
+  private compare(nextProps: Readonly<VideoTabProps>): boolean {
+    return JSON.stringify(nextProps) === JSON.stringify(this.props);
+  }
+
+  public update(users: User[]): void {
+    this.setState({ subUsers: [...users] });
+  }
+
+  public render(): React.ReactNode {
+    const { index, onPress, users } = this.props;
+    // const { subUsers } = this.state;
+    const screenWidth = Dimensions.get('screen').width;
+    return (
+      <TabView.Item
+        key={index.toString()}
         style={{
-          flex: 1,
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignContent: 'center',
-          width: screenWidth,
+          // backgroundColor: 'red',
+          width: '100%',
         }}
       >
-        {subUsers.map((user) => {
-          return (
-            <Pressable
-              onPress={() => {
-                onPress?.({
-                  userId: user.userId,
-                  userChannelId: user.userChannelId,
-                });
-              }}
-              key={user.userId}
-              style={{
-                width: '50%',
-                height: '50%',
-                // backgroundColor: 'green',
-                // margin: 1,
-                // justifyContent: 'center',
-                alignItems: 'center',
-                borderColor: 'white', // for test
-                borderWidth: 1,
-              }}
-            >
-              {user.muteVideo ? (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            width: screenWidth,
+          }}
+        >
+          {users.map((user) => {
+            return (
+              <Pressable
+                onPress={() => {
+                  onPress?.({
+                    userId: user.userId,
+                    userChannelId: user.userChannelId,
+                  });
+                }}
+                key={user.userId}
+                style={{
+                  width: '50%',
+                  height: '50%',
+                  // backgroundColor: 'green',
+                  // margin: 1,
+                  // justifyContent: 'center',
+                  alignItems: 'center',
+                  borderColor: 'white', // for test
+                  borderWidth: 1,
+                }}
+              >
+                {user.muteVideo ? (
+                  <View
+                    style={{
+                      height: '100%',
+                      position: 'absolute',
+                    }}
+                  >
+                    <View style={{ flex: 1 }} />
+                    <View
+                      style={{
+                        backgroundColor: '#14FF72',
+                        padding: 5,
+                        borderRadius: 105,
+                      }}
+                    >
+                      <Avatar uri="" size={100} radius={100} />
+                    </View>
+                    <View style={{ flex: 2 }} />
+                  </View>
+                ) : null}
+
                 <View
                   style={{
-                    height: '100%',
                     position: 'absolute',
+                    flexDirection: 'row',
+                    bottom: 0,
+                    paddingBottom: 5,
                   }}
                 >
+                  <Text
+                    style={{
+                      fontWeight: '600',
+                      lineHeight: 18,
+                      fontSize: 14,
+                      color: 'white',
+                      paddingLeft: 5,
+                    }}
+                  >
+                    {user.userName ?? user.userId}
+                  </Text>
                   <View style={{ flex: 1 }} />
                   <View
                     style={{
-                      backgroundColor: '#14FF72',
-                      padding: 5,
-                      borderRadius: 105,
+                      flexDirection: 'row',
+                      paddingRight: 5,
                     }}
                   >
-                    <Avatar uri="" size={100} radius={100} />
+                    {user.muteVideo ? (
+                      <LocalIcon name="video_slash" color="white" size={20} />
+                    ) : null}
+                    <View style={{ width: 5 }} />
+                    {user.muteAudio ? (
+                      <LocalIcon name="mic_slash" color="white" size={20} />
+                    ) : null}
                   </View>
-                  <View style={{ flex: 2 }} />
                 </View>
-              ) : null}
-
-              <View
-                style={{
-                  position: 'absolute',
-                  flexDirection: 'row',
-                  bottom: 0,
-                  paddingBottom: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: '600',
-                    lineHeight: 18,
-                    fontSize: 14,
-                    color: 'white',
-                    paddingLeft: 5,
-                  }}
-                >
-                  {user.userName ?? user.userId}
-                </Text>
-                <View style={{ flex: 1 }} />
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    paddingRight: 5,
-                  }}
-                >
-                  {user.muteVideo ? (
-                    <LocalIcon name="video_slash" color="white" size={20} />
-                  ) : null}
-                  <View style={{ width: 5 }} />
-                  {user.muteAudio ? (
-                    <LocalIcon name="mic_slash" color="white" size={20} />
-                  ) : null}
-                </View>
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
-    </TabView.Item>
-  );
+              </Pressable>
+            );
+          })}
+        </View>
+      </TabView.Item>
+    );
+  }
 }
-
-// type VideoTabBarProps = {};
-
-// export function VideoTabBar(props: VideoTabBarProps): JSX.Element {
-//   calllog.log('VideoTabBar:', props);
-//   return (
-//     <Tab.Item
-//       active={true}
-//       titleStyle={{}}
-//       containerStyle={{ width: '10%' }}
-//       buttonStyle={{ height: '10%' }}
-//       iconPosition="bottom"
-//       dense={true}
-//       style={{ height: 1, backgroundColor: '#D8D8D8' }}
-//     />
-//   );
-// }
 
 type VideoTabsProps = {
   users: User[];
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
 };
 
-export function VideoTabs(props: VideoTabsProps): JSX.Element {
-  calllog.log('VideoTabs:', props);
-  const { users, onPress } = props;
-  const [index, setIndex] = React.useState(0);
-  const initUsers = () => {
+type VideoTabsState = {
+  tabUsers: User[][];
+  index: number;
+};
+
+export class VideoTabs extends React.Component<VideoTabsProps, VideoTabsState> {
+  constructor(props: VideoTabsProps) {
+    calllog.log('VideoTabs:constructor:', props);
+    super(props);
+    this.state = {
+      tabUsers: this.initUsers(props.users)[1] as User[][],
+      index: 0,
+    };
+  }
+
+  componentDidMount?(): void {
+    calllog.log('VideoTabs:componentDidMount:');
+  }
+
+  shouldComponentUpdate?(
+    nextProps: Readonly<VideoTabsProps>,
+    _: Readonly<VideoTabsState>,
+    __: any
+  ): boolean {
+    calllog.log('VideoTabs:shouldComponentUpdate:', nextProps, this.props);
+    if (this.compare(nextProps) === false) {
+      // this.update(nextProps.users);
+      return false;
+    }
+    return true;
+  }
+
+  componentWillUnmount?(): void {
+    calllog.log('VideoTabs:componentWillUnmount:');
+  }
+
+  private compare(nextProps: Readonly<VideoTabsProps>): boolean {
+    return JSON.stringify(nextProps) === JSON.stringify(this.props);
+  }
+
+  public update(users: User[]): void {
+    calllog.log('VideoTabs:update:', users.length);
+    this.setState({ tabUsers: this.initUsers(users)[1] as User[][] });
+  }
+
+  private initUsers = (users: User[]) => {
+    calllog.log('VideoTabs:initUsers:', users.length);
     const tu = [] as User[][];
     const pageCount = Math.ceil(users.length / PageCount);
     for (let index = 0; index < pageCount; index++) {
@@ -165,49 +233,51 @@ export function VideoTabs(props: VideoTabsProps): JSX.Element {
     }
     return [pageCount, tu];
   };
-  const ret = initUsers();
-  const [tabUsers] = React.useState(ret[1] as User[][]);
-  // const [pageCount, setPageCount] = React.useState(ret[0] as number);
-  // calllog.log('test:', ret[0], tabUsers);
-  const onIndex = (value: number) => {
-    // calllog.log('test:value:', value);
-    setIndex(value);
-  };
-  return (
-    <>
-      <TabView value={index} onChange={onIndex}>
-        {tabUsers.map((users, i) => {
-          // console.log('test:users:', users[0]?.userId);
-          return (
-            <VideoTab
-              key={users[0]?.userId}
-              index={i}
-              subUsers={users}
-              onPress={onPress}
-            />
-          );
-        })}
-      </TabView>
 
-      <Tab
-        value={index}
-        onChange={(e: any) => onIndex(e)}
-        indicatorStyle={{
-          backgroundColor: 'white',
-          height: 3,
-        }}
-        variant="primary"
-      >
-        {tabUsers.map((users) => {
-          // console.log('test:users:2', users[0]?.userId);
-          return (
-            <Tab.Item
-              key={users[0]?.userId}
-              style={{ height: 1, backgroundColor: '#D8D8D8' }}
-            />
-          );
-        })}
-      </Tab>
-    </>
-  );
+  private onIndex = (index: number) => {
+    this.setState({ index });
+  };
+
+  public render(): React.ReactNode {
+    const { onPress, users } = this.props;
+    const { index } = this.state;
+    const tabUsersP = this.initUsers(users)[1] as User[][];
+    return (
+      <>
+        <TabView value={index} onChange={this.onIndex}>
+          {tabUsersP.map((users, i) => {
+            calllog.log('VideoTabs:render:map:', users[0]?.userId, i);
+            return (
+              <VideoTab
+                key={users[0]?.userId}
+                index={i}
+                users={users}
+                onPress={onPress}
+              />
+            );
+          })}
+        </TabView>
+
+        <Tab
+          value={index}
+          onChange={(e: any) => this.onIndex(e)}
+          indicatorStyle={{
+            backgroundColor: 'white',
+            height: 3,
+          }}
+          variant="primary"
+        >
+          {tabUsersP.map((users) => {
+            calllog.log('VideoTabs:render:map:', users[0]?.userId);
+            return (
+              <Tab.Item
+                key={users[0]?.userId}
+                style={{ height: 1, backgroundColor: '#D8D8D8' }}
+              />
+            );
+          })}
+        </Tab>
+      </>
+    );
+  }
 }
