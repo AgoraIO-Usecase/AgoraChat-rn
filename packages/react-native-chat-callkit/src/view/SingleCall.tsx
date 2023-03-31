@@ -31,7 +31,6 @@ export type SingleCallProps = BasicCallProps & {
   onRefuse?: () => void;
   onClose?: () => void;
   onError?: () => void;
-  isTest?: boolean;
 };
 export type SingleCallState = BasicCallState & {
   isMinimize: boolean;

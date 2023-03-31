@@ -15,6 +15,7 @@ type VideoTabProps = {
   index: number;
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
   setupMode: VideoViewSetupMode;
+  isTest?: boolean;
 };
 
 type VideoTabState = {
@@ -23,7 +24,7 @@ type VideoTabState = {
 
 export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
   constructor(props: VideoTabProps) {
-    calllog.log('VideoTab:constructor:', props);
+    calllog.log('VideoTab:constructor:', props, props.isTest);
     super(props);
     this.state = {
       subUsers: props.users,
@@ -183,6 +184,7 @@ type VideoTabsProps = {
   users: User[];
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
   setupMode: VideoViewSetupMode;
+  isTest?: boolean;
 };
 
 type VideoTabsState = {
@@ -272,6 +274,7 @@ export class VideoTabs extends React.Component<VideoTabsProps, VideoTabsState> {
                 users={users}
                 onPress={onPress}
                 setupMode={this.props.setupMode}
+                isTest={this.props.isTest}
               />
             );
           })}

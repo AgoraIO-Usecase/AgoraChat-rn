@@ -31,6 +31,7 @@ export type InviteeListProps = {
   selectedIds: string[];
   maxCount: number;
   onClose: (addedIds: string[]) => void;
+  onCancel: () => void;
 };
 
 export type MultiCallProps = BasicCallProps & {
@@ -48,7 +49,6 @@ export type MultiCallProps = BasicCallProps & {
   onRefuse?: () => void;
   onClose?: () => void;
   onError?: () => void;
-  isTest?: boolean;
 };
 export type MultiCallState = BasicCallState & {
   isMinimize: boolean;
@@ -123,6 +123,15 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
   protected init(): void {
     if (this.props.isTest === true) {
+      // this.manager?.initRTC();
+
+      // if (this.props.callType === 'audio') {
+      //   this.manager?.enableAudio();
+      // } else {
+      //   this.manager?.enableVideo();
+      //   this.manager?.startPreview();
+      //   this.setState({ startPreview: true });
+      // }
       return;
     }
     this.manager = createManagerImpl();
@@ -157,6 +166,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
   protected unInit(): void {
     if (this.props.isTest === true) {
+      // this.manager?.unInitRTC();
       return;
     }
     if (this.props.callType === 'audio') {
@@ -680,6 +690,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             });
           }}
           setupMode={setupMode}
+          isTest={this.props.isTest}
         />
         {/* <View style={{ height: ContentBottom }} /> */}
         {isFullVideo === true && fullId && fullChannelId ? (
@@ -893,13 +904,23 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     );
   }
   protected renderInviteeList(): React.ReactNode {
-    const { showInvite } = this.state;
+    const { showInvite, users } = this.state;
     const { inviteeList, callType } = this.props;
     const InviteeList = inviteeList?.InviteeList;
     const inviteeListProps = inviteeList?.props;
-    if (showInvite === false) {
+    calllog.log(
+      'MultiCall:renderInviteeList:',
+      showInvite,
+      InviteeList === undefined
+    );
+    if (showInvite === false || InviteeList === undefined) {
       return null;
     }
+    const getSelectedIds = () => {
+      return users.map((user) => {
+        return user.userId;
+      });
+    };
     return (
       <View
         style={{
@@ -910,18 +931,20 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           height: '100%',
         }}
       >
-        {InviteeList ? (
-          <InviteeList
-            {...inviteeListProps}
-            selectedIds={['du005']}
-            maxCount={callType === 'audio' ? AudioMaxCount : VideoMaxCount}
-            onClose={(addedIds) => {
-              calllog.log('added:', addedIds);
-              this.setState({ showInvite: false });
-              this.onInviteCall(addedIds);
-            }}
-          />
-        ) : null}
+        <InviteeList
+          {...inviteeListProps}
+          selectedIds={getSelectedIds()}
+          maxCount={callType === 'audio' ? AudioMaxCount : VideoMaxCount}
+          onClose={(addedIds) => {
+            calllog.log('added:', addedIds);
+            this.setState({ showInvite: false });
+            this.onInviteCall(addedIds);
+          }}
+          onCancel={() => {
+            calllog.log('onCancel:');
+            this.setState({ showInvite: false });
+          }}
+        />
       </View>
     );
   }

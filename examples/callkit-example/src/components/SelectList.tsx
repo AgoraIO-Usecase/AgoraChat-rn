@@ -6,7 +6,8 @@ import {
   TextInput as RNTextInput,
   View,
 } from 'react-native';
-import { RadioButton, SearchBar } from 'react-native-chat-uikit';
+import type { InviteeListProps } from 'react-native-chat-callkit';
+import { Button, RadioButton, SearchBar } from 'react-native-chat-uikit';
 
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 
@@ -59,7 +60,7 @@ type SelectListProps = {
 export function SelectList(props: SelectListProps): JSX.Element {
   console.log('test:SelectList:', props);
   const { selectedIds, maxCount, onChangeCount, onAddedIds } = props;
-  const { client } = useAppChatSdkContext();
+  const { client, currentId } = useAppChatSdkContext();
   const data = React.useMemo(() => [] as DataType[], []);
   const [_data, setData] = React.useState(data);
   const enableClear = true;
@@ -126,6 +127,15 @@ export function SelectList(props: SelectListProps): JSX.Element {
           } as DataType;
           data.push(user);
         }
+
+        // add self
+        data.push({
+          userId: currentId,
+          userName: currentId,
+          isSelected: true,
+          enable: false,
+        } as DataType);
+
         for (const d of data) {
           for (const id of selectedIds) {
             if (d.userId === id) {
@@ -142,6 +152,7 @@ export function SelectList(props: SelectListProps): JSX.Element {
     return () => {};
   }, [
     client.contactManager,
+    currentId,
     data,
     maxCount,
     onChangeCount,
@@ -200,3 +211,58 @@ export function SelectList(props: SelectListProps): JSX.Element {
 }
 
 export const SelectListMemo = React.memo(SelectList);
+
+export const ContactList = (props: InviteeListProps): JSX.Element => {
+  console.log('test:contactList:');
+  const { onClose, onCancel, selectedIds, maxCount } = props;
+  const [count, setCount] = React.useState<number>(selectedIds.length);
+  const addedIdsRef = React.useRef<string[]>([]);
+  const content = () => {
+    return `(${count}/${maxCount})`;
+  };
+  return (
+    <View
+      style={{
+        flex: 1,
+        top: 44,
+        width: '100%',
+        // height: 100,
+        backgroundColor: 'white',
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Button
+          style={{ height: 40, width: 80 }}
+          onPress={() => {
+            onClose(addedIdsRef.current);
+          }}
+        >
+          done
+        </Button>
+        <View style={{ width: 10 }} />
+        <Button
+          style={{ height: 40, width: 80 }}
+          onPress={() => {
+            onCancel();
+          }}
+        >
+          cancel
+        </Button>
+        <View style={{ width: 10 }} />
+        <View>
+          <Text>{content()}</Text>
+        </View>
+      </View>
+      <SelectListMemo
+        selectedIds={selectedIds}
+        maxCount={maxCount}
+        onChangeCount={(c) => {
+          setCount(c);
+        }}
+        onAddedIds={(ids: string[]) => {
+          addedIdsRef.current = ids;
+        }}
+      />
+    </View>
+  );
+};

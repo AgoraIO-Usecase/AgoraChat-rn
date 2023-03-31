@@ -38,6 +38,7 @@ export type BasicCallProps = {
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;
   callType: 'audio' | 'video';
+  isTest?: boolean;
   requestRTCToken?: (params: {
     appKey: string;
     channelId: string;

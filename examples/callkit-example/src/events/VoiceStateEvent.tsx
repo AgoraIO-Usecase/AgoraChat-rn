@@ -5,6 +5,7 @@ import type {
   VoiceStateContextType,
 } from 'react-native-chat-uikit';
 
+import { ContactList } from '../components/SelectList';
 import type { StateActionEventType } from './Events';
 import { sendEvent, sendEventProps } from './sendEvent';
 import type { BizEventType } from './types';
@@ -174,6 +175,7 @@ export function handleVoiceStateEvent(params: {
               elapsed={0}
               isInviter={isInviter}
               inviteeIds={inviteeIds}
+              inviteeList={{ InviteeList: ContactList }}
               onClose={() => {
                 console.log('test:stateEvent.onClose');
                 sendEventFromState({

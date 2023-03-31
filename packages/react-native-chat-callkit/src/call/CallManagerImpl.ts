@@ -929,6 +929,16 @@ export class CallManagerImpl
         call.isInviter = true;
       }
 
+      this._addInvitee(
+        call.callId,
+        addedIds.map((id) => {
+          return {
+            userId: id,
+            userHadJoined: false,
+          } as CallInvitee;
+        })
+      );
+
       for (const id of addedIds) {
         // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
         this.signalling.sendInvite({
