@@ -295,6 +295,15 @@ export abstract class BasicCall<
     calllog.log('BasicCall:onRemoteUserOffline:', params);
     throw new Error('Requires subclass implementation.');
   }
+  onRemoveRemoteUser(params: {
+    channelId: string;
+    userChannelId?: number;
+    userId: string;
+    reason?: CallEndReason;
+  }): void {
+    calllog.log('BasicCall:onRemoveRemoteUser:', params);
+    throw new Error('Requires subclass implementation.');
+  }
   onSelfLeave(params: {
     channelId: string;
     userChannelId: number;

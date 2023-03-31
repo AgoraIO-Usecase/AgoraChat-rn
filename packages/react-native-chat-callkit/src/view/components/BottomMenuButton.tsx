@@ -37,7 +37,7 @@ function getButtonBackgroundColor(name: BottomMenuButtonType): string {
     default:
       break;
   }
-  return 'rgba(0,0,0,0.2)';
+  return 'rgba(255, 255, 255, 0.2)';
 }
 
 function buttonNameConvertToIconName(name: BottomMenuButtonType): IconName {

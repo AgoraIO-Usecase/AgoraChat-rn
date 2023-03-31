@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
+import { VideoViewSetupMode } from 'react-native-agora';
 import { Button } from 'react-native-chat-uikit';
 
 import type { User } from '../../../../packages/react-native-chat-callkit/src/types';
@@ -37,7 +38,11 @@ export function Test() {
       >
         update
       </Button>
-      <VideoTabs ref={ref} users={users} />
+      <VideoTabs
+        ref={ref}
+        users={users}
+        setupMode={VideoViewSetupMode.VideoViewSetupAdd}
+      />
     </View>
   );
   // return <AudioTabs users={users} />;

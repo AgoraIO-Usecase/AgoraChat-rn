@@ -32,7 +32,7 @@ function rr(call: CallManagerImpl): void {
               channelId,
               appKey,
               userId: value,
-              onResult: (params: { data: any; error?: any }) => {
+              onResult: (params: { data?: any; error?: any }) => {
                 console.log(params);
               },
             });
@@ -49,7 +49,7 @@ function rr(call: CallManagerImpl): void {
               channelId,
               appKey,
               userId,
-              onResult: (params: { data: any; error?: any }) => {
+              onResult: (params: { data?: any; error?: any }) => {
                 console.log(params);
               },
             });
@@ -75,7 +75,7 @@ function rm(call: CallManagerImpl): void {
               channelId,
               appKey,
               userId: value,
-              onResult: (params: { data: any; error?: any }) => {
+              onResult: (params: { data?: any; error?: any }) => {
                 console.log(params);
               },
             });
@@ -92,7 +92,7 @@ function rm(call: CallManagerImpl): void {
               channelId,
               appKey,
               userId,
-              onResult: (params: { data: any; error?: any }) => {
+              onResult: (params: { data?: any; error?: any }) => {
                 console.log(params);
               },
             });

@@ -1,6 +1,7 @@
 import { Tab, TabView } from '@rneui/themed';
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
+import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
@@ -13,6 +14,7 @@ type VideoTabProps = {
   users: User[];
   index: number;
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
+  setupMode: VideoViewSetupMode;
 };
 
 type VideoTabState = {
@@ -78,7 +80,8 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
             width: screenWidth,
           }}
         >
-          {users.map((user) => {
+          {users.map((user, i) => {
+            const count = users.length;
             return (
               <Pressable
                 onPress={() => {
@@ -89,14 +92,17 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                 }}
                 key={user.userId}
                 style={{
-                  width: '50%',
-                  height: '50%',
+                  width:
+                    count === 1 || count === 2 || (count === 3 && i === 2)
+                      ? '100%'
+                      : '50%',
+                  height: count === 1 ? '100%' : '50%',
                   // backgroundColor: 'green',
                   // margin: 1,
                   // justifyContent: 'center',
                   alignItems: 'center',
                   borderColor: 'white', // for test
-                  borderWidth: 1,
+                  // borderWidth: 1,
                 }}
               >
                 {user.muteVideo ? (
@@ -118,6 +124,15 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                     </View>
                     <View style={{ flex: 2 }} />
                   </View>
+                ) : user.userHadJoined === true ? (
+                  <RtcSurfaceView
+                    style={{ flex: 1, width: '100%', height: '100%' }}
+                    canvas={{
+                      uid: user.isSelf === true ? 0 : user.userChannelId,
+                      setupMode: this.props.setupMode,
+                    }}
+                    key={user.userChannelId}
+                  />
                 ) : null}
 
                 <View
@@ -167,6 +182,7 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
 type VideoTabsProps = {
   users: User[];
   onPress?: (params: { userId: string; userChannelId?: number }) => void;
+  setupMode: VideoViewSetupMode;
 };
 
 type VideoTabsState = {
@@ -241,7 +257,9 @@ export class VideoTabs extends React.Component<VideoTabsProps, VideoTabsState> {
   public render(): React.ReactNode {
     const { onPress, users } = this.props;
     const { index } = this.state;
-    const tabUsersP = this.initUsers(users)[1] as User[][];
+    const ret = this.initUsers(users);
+    const tabUsersP = ret[1] as User[][];
+    const pageCount = ret[0] as number;
     return (
       <>
         <TabView value={index} onChange={this.onIndex}>
@@ -253,30 +271,33 @@ export class VideoTabs extends React.Component<VideoTabsProps, VideoTabsState> {
                 index={i}
                 users={users}
                 onPress={onPress}
+                setupMode={this.props.setupMode}
               />
             );
           })}
         </TabView>
 
-        <Tab
-          value={index}
-          onChange={(e: any) => this.onIndex(e)}
-          indicatorStyle={{
-            backgroundColor: 'white',
-            height: 3,
-          }}
-          variant="primary"
-        >
-          {tabUsersP.map((users) => {
-            calllog.log('VideoTabs:render:map:', users[0]?.userId);
-            return (
-              <Tab.Item
-                key={users[0]?.userId}
-                style={{ height: 1, backgroundColor: '#D8D8D8' }}
-              />
-            );
-          })}
-        </Tab>
+        {pageCount < 2 ? null : (
+          <Tab
+            value={index}
+            onChange={(e: any) => this.onIndex(e)}
+            indicatorStyle={{
+              backgroundColor: 'white',
+              height: 3,
+            }}
+            variant="primary"
+          >
+            {tabUsersP.map((users) => {
+              calllog.log('VideoTabs:render:map:', users[0]?.userId);
+              return (
+                <Tab.Item
+                  key={users[0]?.userId}
+                  style={{ height: 1, backgroundColor: '#D8D8D8' }}
+                />
+              );
+            })}
+          </Tab>
+        )}
       </>
     );
   }

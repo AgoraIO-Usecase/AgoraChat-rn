@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dimensions, Text, View } from 'react-native';
-import { VideoViewSetupMode } from 'react-native-agora';
+import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
 import type { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
@@ -62,6 +62,8 @@ export type MultiCallState = BasicCallState & {
   isFullVideo: boolean;
   usersCount: number;
   showInvite: boolean;
+  fullId?: string;
+  fullChannelId?: number;
 };
 
 export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
@@ -326,15 +328,22 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
   private removeUser(params: {
     channelId: string;
-    userChannelId: number;
+    userChannelId?: number;
     userId: string;
   }): void {
     calllog.log('MultiCall:remoteUser:', params);
-    const { users } = this.state;
+    const { users, fullId } = this.state;
     calllog.log('MultiCall:remoteUser:users:', users);
     let isExisted = false;
     for (let index = 0; index < users.length; index++) {
       const user = users[index];
+      if (fullId === params.userId) {
+        this.setState({
+          fullId: undefined,
+          fullChannelId: undefined,
+          isFullVideo: false,
+        });
+      }
       if (user?.userId === params.userId) {
         users.splice(index, 1);
         isExisted = true;
@@ -528,6 +537,16 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.removeUser(params);
   }
 
+  onRemoveRemoteUser(params: {
+    channelId: string;
+    userChannelId?: number;
+    userId: string;
+    reason?: CallEndReason;
+  }): void {
+    calllog.log('MultiCall:onRemoveRemoteUser:', params);
+    this.removeUser(params);
+  }
+
   onSelfLeave(params: {
     channelId: string;
     userChannelId: number;
@@ -545,6 +564,14 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteVideo:', params);
+    const { users } = this.state;
+    for (const user of users) {
+      if (user.userId === params.userId) {
+        user.muteVideo = params.muted;
+        this.setState({ users: [...users] });
+        break;
+      }
+    }
   }
 
   onRemoteUserMuteAudio(params: {
@@ -554,6 +581,14 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteAudio:', params);
+    const { users } = this.state;
+    for (const user of users) {
+      if (user.userId === params.userId) {
+        user.muteAudio = params.muted;
+        this.setState({ users: [...users] });
+        break;
+      }
+    }
   }
 
   onAudioVolumeIndication(params: {
@@ -566,6 +601,32 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }[];
   }): void {
     calllog.log('MultiCall:onAudioVolumeIndication:', params);
+    const tmp = this.cloneUsers();
+    for (const user of tmp) {
+      for (const speaker of params.speakers) {
+        if (user.userId === speaker.userId) {
+          user.talking = speaker.totalVolume > 10;
+        }
+      }
+    }
+    if (this.compareUsers(tmp) === false) {
+      this.setState({ users: tmp });
+    }
+  }
+
+  private cloneUsers(): User[] {
+    const { users } = this.state;
+    const ret = [] as User[];
+    for (const user of users) {
+      ret.push({
+        ...user,
+      });
+    }
+    return ret;
+  }
+
+  private compareUsers(other: User[]): boolean {
+    return JSON.stringify(other) === JSON.stringify(this.state.users);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -592,7 +653,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
 
   protected renderVideo(): React.ReactNode {
-    const { isFullVideo, users } = this.state;
+    const { isFullVideo, users, setupMode, fullId, fullChannelId } = this.state;
     calllog.log('MultiCall:renderVideo:', users);
     return (
       <View
@@ -603,11 +664,43 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           width: '100%',
         }}
       >
-        <View style={{ height: StateBarHeight }} />
-        <VideoTabs ref={this._videoTabRef} users={users} onPress={() => {}} />
-        <View style={{ height: ContentBottom }} />
-        {isFullVideo ? (
-          <View style={{ flex: 1, backgroundColor: 'green' }} />
+        {/* <View style={{ height: StateBarHeight }} /> */}
+        <VideoTabs
+          ref={this._videoTabRef}
+          users={users}
+          onPress={(params: {
+            userId: string;
+            userChannelId?: number | undefined;
+          }) => {
+            calllog.log('MultiCall:renderVideo:onPress:', params);
+            this.setState({
+              isFullVideo: true,
+              fullId: params.userId,
+              fullChannelId: params.userChannelId,
+            });
+          }}
+          setupMode={setupMode}
+        />
+        {/* <View style={{ height: ContentBottom }} /> */}
+        {isFullVideo === true && fullId && fullChannelId ? (
+          <View
+            style={{
+              flex: 1,
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              // backgroundColor: 'red',
+            }}
+          >
+            <RtcSurfaceView
+              style={{ flex: 1 }}
+              canvas={{
+                uid: fullId === this.props.currentId ? 0 : fullChannelId,
+                setupMode: setupMode,
+              }}
+              key={fullChannelId}
+            />
+          </View>
         ) : null}
       </View>
     );
@@ -652,10 +745,14 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             backgroundColor="rgba(0, 0, 0, 0.0)"
             size={28}
             onPress={() => {
-              if (isFullVideo) {
-                // TODO:
-              } else {
+              if (isFullVideo === false) {
                 this.setState({ isMinimize: true });
+              } else {
+                this.setState({
+                  isFullVideo: false,
+                  fullId: undefined,
+                  fullChannelId: undefined,
+                });
               }
             }}
           />
@@ -841,7 +938,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           position: 'absolute',
           width: screenWidth,
           height: screenHeight,
-          backgroundColor: 'rgb(199, 197, 208)',
+          backgroundColor: 'black',
         }}
       >
         {callType === 'audio' ? this.renderAudio() : this.renderVideo()}

@@ -369,6 +369,15 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     this.setState({ peerJoinChannelSuccess: false });
   }
 
+  onRemoveRemoteUser(params: {
+    channelId: string;
+    userChannelId?: number;
+    userId: string;
+    reason?: CallEndReason;
+  }): void {
+    calllog.log('SingleCall:onRemoveRemoteUser:', params);
+  }
+
   onSelfLeave(params: {
     channelId: string;
     userChannelId: number;
