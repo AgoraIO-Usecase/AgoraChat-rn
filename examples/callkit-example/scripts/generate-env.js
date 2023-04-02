@@ -17,5 +17,6 @@ export const id = '';
 export const ps = '';
 export const accountType = ''; // agora or easemob
 export const agoraAppId = '';
+export const fcmSenderId = '';
 `;
 fs.writeFileSync(file, content, 'utf-8');

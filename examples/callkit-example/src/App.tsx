@@ -20,7 +20,7 @@ import {
   CallUser,
   GlobalContainer as CallkitContainer,
 } from 'react-native-chat-callkit';
-import { ChatClient } from 'react-native-chat-sdk';
+import { ChatClient, ChatPushConfig } from 'react-native-chat-sdk';
 import {
   createStringSetEn2,
   DarkTheme,
@@ -49,6 +49,12 @@ import LoginScreen from './screens/Login';
 import { SplashScreen } from './screens/Splash';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
 import { AppServerClient } from './utils/AppServer';
+import {
+  checkApplicationPermission,
+  requestFcmToken,
+  requestUserPermission,
+  setBackgroundMessageHandler,
+} from './utils/fcm';
 
 if (Platform.OS === 'web') {
   console.error('web platforms are not supported.');
@@ -60,18 +66,25 @@ const __KEY__ = '__KEY__';
 let __TEST__ = true;
 let appKey = '';
 let agoraAppId = '';
+let fcmSenderId: string | undefined;
 
 try {
   const env = require('./env');
   __TEST__ = env.test ?? false;
   appKey = env.appKey;
   agoraAppId = env.agoraAppId;
+  // fcmSenderId = env.fcmSenderId;
 } catch (e) {
   console.warn('test:', e);
 }
 
 console.log('DEV:', __DEV__);
 console.log('TEST:', __TEST__);
+
+// let fcmToken = '';
+// if (fcmSenderId && fcmSenderId.length > 0) {
+//   fcmToken = await requestFcmToken();
+// }
 
 export default function App() {
   updateScaleFactor(createAppScaleFactor());
@@ -133,11 +146,33 @@ export default function App() {
   }, [isReady, storage]);
   console.log('test:App:isReady:', isReady);
 
-  const onInitApp = React.useCallback(() => {
+  const onInitApp = React.useCallback(async () => {
     console.log('test:onInitApp:', isOnInitialized, isOnReady);
     if (isOnInitialized.current === false || isOnReady.current === false) {
       return;
     }
+    if ((await checkApplicationPermission()) === false) {
+      const ret = await requestUserPermission();
+      if (ret === false) {
+        console.warn('Permission request failed. Procedure');
+        return;
+      }
+    }
+
+    setBackgroundMessageHandler();
+    try {
+      const fcmToken = await requestFcmToken();
+      console.log('test:requestFcmToken:', fcmToken);
+      ChatClient.getInstance().updatePushConfig(
+        new ChatPushConfig({
+          deviceId: fcmSenderId,
+          deviceToken: fcmToken,
+        })
+      );
+    } catch (error) {
+      console.warn('test:requestFcmToken:error', error);
+    }
+
     console.log('test:onInitApp:');
     sendEvent({
       eventType: 'DataEvent',
@@ -178,6 +213,13 @@ export default function App() {
           appKey: appKey,
           autoLogin: autoLogin.current,
           debugModel: true,
+          pushConfig:
+            fcmSenderId && fcmSenderId.length > 0
+              ? new ChatPushConfig({
+                  deviceId: fcmSenderId,
+                  deviceToken: '',
+                })
+              : undefined,
         }}
         onInitialized={() => {
           isOnInitialized.current = true;

@@ -5,7 +5,7 @@ import en from 'date-fns/locale/en-US';
 import * as React from 'react';
 import { Text } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
-import { ChatClient, ChatOptions } from 'react-native-chat-sdk';
+import { ChatClient, ChatOptions, ChatPushConfig } from 'react-native-chat-sdk';
 import CreateThumbnail from 'react-native-create-thumbnail';
 import * as DocumentPicker from 'react-native-document-picker';
 import * as FileAccess from 'react-native-file-access';
@@ -55,6 +55,7 @@ export type GlobalContainerProps = React.PropsWithChildren<{
     appKey: string;
     autoLogin: boolean;
     debugModel?: boolean;
+    pushConfig?: ChatPushConfig;
   };
   localization?: StringSetContextType | undefined;
   theme?: ThemeContextType | undefined;
@@ -222,6 +223,7 @@ export function GlobalContainer({
           autoLogin: option.autoLogin,
           appKey: option.appKey,
           debugModel: option.debugModel ?? false,
+          pushConfig: option.pushConfig,
         })
       )
       .then(async () => {
