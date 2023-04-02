@@ -670,6 +670,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             // right: 10,
             // top: 54,
             borderRadius: 12,
+            overflow: 'hidden',
           }}
         >
           {this.renderMiniVideo()}
@@ -710,6 +711,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         </View>
       );
     } else {
+      if (this.state.peerJoinChannelSuccess === false) {
+        return null;
+      }
       return (
         <Pressable
           onPress={this.onSwitchVideo}
@@ -721,6 +725,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             right: 10,
             top: 10,
             borderRadius: 12,
+            overflow: 'hidden',
           }}
         >
           {this.renderMiniVideo()}
