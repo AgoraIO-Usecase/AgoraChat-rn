@@ -1613,8 +1613,8 @@ export class CallManagerImpl
   }
 
   public enableAudio(): void {
-    calllog.log('CallManagerImpl:enableAudio:');
-    this.engine?.enableAudio();
+    const ret = this.engine?.enableAudio();
+    calllog.log('CallManagerImpl:enableAudio:', ret);
   }
   public disableAudio(): void {
     const ret = this.engine?.disableAudio();

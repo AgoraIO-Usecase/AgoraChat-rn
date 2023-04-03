@@ -2,7 +2,7 @@ import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
 
-export async function requestUserPermission() {
+export async function requestFCMPermission() {
   const authStatus = await messaging().requestPermission({
     announcement: true,
   });
@@ -16,7 +16,7 @@ export async function requestUserPermission() {
   return enabled;
 }
 
-export async function checkApplicationPermission() {
+export async function checkFCMPermission() {
   const authorizationStatus = await messaging().requestPermission();
 
   if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {

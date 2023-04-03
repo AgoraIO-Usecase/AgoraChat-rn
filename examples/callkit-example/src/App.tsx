@@ -50,11 +50,12 @@ import { SplashScreen } from './screens/Splash';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
 import { AppServerClient } from './utils/AppServer';
 import {
-  checkApplicationPermission,
+  checkFCMPermission,
+  requestFCMPermission,
   requestFcmToken,
-  requestUserPermission,
   setBackgroundMessageHandler,
 } from './utils/fcm';
+import { requestAndroidVideo } from './utils/permission';
 
 if (Platform.OS === 'web') {
   console.error('web platforms are not supported.');
@@ -73,7 +74,7 @@ try {
   __TEST__ = env.test ?? false;
   appKey = env.appKey;
   agoraAppId = env.agoraAppId;
-  // fcmSenderId = env.fcmSenderId;
+  fcmSenderId = env.fcmSenderId;
 } catch (e) {
   console.warn('test:', e);
 }
@@ -151,18 +152,22 @@ export default function App() {
     if (isOnInitialized.current === false || isOnReady.current === false) {
       return;
     }
-    if ((await checkApplicationPermission()) === false) {
-      const ret = await requestUserPermission();
+    if ((await checkFCMPermission()) === false) {
+      const ret = await requestFCMPermission();
       if (ret === false) {
-        console.warn('Permission request failed. Procedure');
+        console.warn('Firebase Cloud Message Permission request failed.');
         return;
       }
+    }
+    if (false === (await requestAndroidVideo())) {
+      console.warn('Video and Audio Permission request failed.');
+      return;
     }
 
     setBackgroundMessageHandler();
     try {
       const fcmToken = await requestFcmToken();
-      console.log('test:requestFcmToken:', fcmToken);
+      console.log('test:requestFcmToken:', fcmSenderId, fcmToken);
       ChatClient.getInstance().updatePushConfig(
         new ChatPushConfig({
           deviceId: fcmSenderId,
