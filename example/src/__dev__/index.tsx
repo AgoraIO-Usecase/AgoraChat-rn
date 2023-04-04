@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DevApp from './test_native_view';
+import DevApp from './test_responder';
 
 export default function dev(): JSX.Element {
   return (

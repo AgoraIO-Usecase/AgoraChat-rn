@@ -1,3 +1,4 @@
+// from: https://blog.csdn.net/qq_30053399/article/details/77776049?ops_request_misc=&request_id=&biz_id=102&utm_term=react%20native%20%E4%BA%8B%E4%BB%B6%E5%93%8D%E5%BA%94&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-0-77776049.142^v81^insert_down38,201^v4^add_ask,239^v2^insert_chatgpt&spm=1018.2226.3001.4187
 import * as React from 'react';
 import {
   GestureResponderEvent,

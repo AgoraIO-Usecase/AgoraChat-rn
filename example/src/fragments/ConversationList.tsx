@@ -432,7 +432,17 @@ export default function ConversationListFragment(
   );
 
   const standardizedData = React.useCallback(
-    (item: Omit<ItemDataType, 'onLongPress' | 'onPress'>): ItemDataType => {
+    (
+      item: Omit<
+        ItemDataType,
+        | 'onLongPress'
+        | 'onPress'
+        | 'timestampS'
+        | 'convContent'
+        | 'type'
+        | 'timestamp'
+      >
+    ): ItemDataType => {
       const time = item.lastMsg ? item.lastMsg.serverTime : timestamp();
       const r = {
         ...item,
@@ -493,7 +503,7 @@ export default function ConversationListFragment(
               convType: conv.convType,
               lastMsg: msg,
               count: getConvCount(conv.convId, msg),
-            } as ItemDataType);
+            } as Omit<ItemDataType, 'onLongPress' | 'onPress' | 'timestampS' | 'convContent' | 'type' | 'timestamp'>);
           } else {
             return standardizedData({
               key: conv.convId,
