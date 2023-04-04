@@ -10,6 +10,15 @@ export const ICON_ASSETS = {
       return require('./icons/arrows_2_pointing.png');
     }
   },
+  bg: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/bg.png');
+    } else if (size === '2x') {
+      return require('./icons/bg.png');
+    } else {
+      return require('./icons/bg.png');
+    }
+  },
   camera_spin: (size: string) => {
     if (size === '3x') {
       return require('./icons/camera_spin_3x.png');

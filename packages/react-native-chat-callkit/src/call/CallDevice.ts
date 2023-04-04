@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
+import { uuid } from '../utils/utils';
 import { calllog } from './CallConst';
 
 export class CallDevice {
@@ -13,7 +14,12 @@ export class CallDevice {
       .then((dt) => {
         const sub = dt.substring(0, 31);
         const os = Platform.OS;
-        this._deviceToken = `rn_${os}_${sub}`;
+        if (sub === 'unknown') {
+          const uid = uuid();
+          this._deviceToken = `rn_${os}_${uid}`;
+        } else {
+          this._deviceToken = `rn_${os}_${sub}`;
+        }
         result(this._deviceToken);
       })
       .catch((error) => {

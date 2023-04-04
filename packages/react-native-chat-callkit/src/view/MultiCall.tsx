@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
-import type { CallError } from '../call';
+import { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
-import { CallEndReason, CallState, CallType } from '../enums';
+import { CallEndReason, CallErrorCode, CallState, CallType } from '../enums';
 import type { User } from '../types';
 import {
   BasicCall,
@@ -195,7 +195,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       return;
     }
     const list = [] as {
-      channelId: string;
       userChannelId?: number;
       userId: string;
       isSelf: boolean;
@@ -203,14 +202,24 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }[];
     for (const id of addedIds) {
       list.push({
-        channelId: this.state.channelId,
         userId: id,
         isSelf: false,
         userHadJoined: false,
       });
     }
+    let channelId = this.state.channelId;
+    if (this.state.channelId === '') {
+      channelId = this.manager?.getCurrentChannelId() ?? '';
+      if (channelId === '') {
+        throw new CallError({
+          code: CallErrorCode.ExceptionState,
+          description: 'channelId not found.',
+        });
+      }
+      this.setState({ channelId: channelId });
+    }
     this.updateUsers(list);
-    this.startCall(addedIds, this.state.channelId); // TODO:
+    this.startCall(addedIds, channelId); // TODO:
   }
 
   private startCall(inviteeIds: string[], channelId: string) {
@@ -303,7 +312,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
   private updateUsers(
     userList: {
-      channelId: string;
       userChannelId?: number;
       userId: string;
       isSelf: boolean;

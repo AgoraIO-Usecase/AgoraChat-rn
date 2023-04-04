@@ -292,6 +292,10 @@ export class CallManagerImpl
     return this.ship.currentCall?.callId;
   }
 
+  public getCurrentChannelId(): string | undefined {
+    return this.ship.currentCall?.channelId;
+  }
+
   /**
    * An invitation to start a 1v1 audio call. The result of this operation is returned by `onResult`, if it is successful, it returns `callId`, otherwise it returns `error`.
    *
@@ -636,6 +640,11 @@ export class CallManagerImpl
   }
 
   private _isBusy(): boolean {
+    calllog.log(
+      'test:_isBusy:',
+      this.ship.currentCall?.state,
+      this.ship.receiveCallList.size
+    );
     if (this.ship.currentCall) {
       if (this.ship.currentCall.state !== CallSignalingState.Idle) {
         return true;
@@ -829,6 +838,13 @@ export class CallManagerImpl
     }
   }
 
+  private _removeInvitee(callId: string, inviteeId: string): void {
+    const call = this._getCall(callId);
+    if (call) {
+      call.invitees.delete(inviteeId);
+    }
+  }
+
   private _startCall(params: {
     inviteeIds: string[];
     callType: CallType;
@@ -893,7 +909,8 @@ export class CallManagerImpl
 
       const addedIds = [] as string[];
       for (const id of params.inviteeIds) {
-        if (call.invitees.get(id) === undefined) {
+        const invitee = call.invitees.get(id);
+        if (invitee === undefined || invitee?.userHadJoined === false) {
           addedIds.push(id);
         }
       }
@@ -925,7 +942,7 @@ export class CallManagerImpl
           return;
         }
         call.inviter = invitee;
-        call.invitees.delete(this.userId);
+        this._removeInvitee(call.callId, this.userId);
         call.isInviter = true;
       }
 
@@ -1118,6 +1135,10 @@ export class CallManagerImpl
     reason?: CallEndReason;
   }): void {
     calllog.log('CallManagerImpl:_onRemoveRemoteUser', params);
+    const call = this._getCallByChannelId(params.channelId);
+    if (call) {
+      this._removeInvitee(call.callId, params.userId);
+    }
     this.listener?.onRemoveRemoteUser?.(params);
   }
 
@@ -1802,6 +1823,14 @@ export class CallManagerImpl
                   if (invitee) {
                     invitee.userChannelId = parseInt(value[0]);
                     invitee.userHadJoined = true;
+                  } else {
+                    this._addInvitee(call.callId, [
+                      {
+                        userId: value[1],
+                        userChannelId: parseInt(value[0]),
+                        userHadJoined: true,
+                      } as CallInvitee,
+                    ]);
                   }
                 }
               });

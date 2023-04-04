@@ -52,7 +52,7 @@ import { AppServerClient } from './utils/AppServer';
 import {
   checkFCMPermission,
   requestFCMPermission,
-  requestFcmToken,
+  // requestFcmToken,
   setBackgroundMessageHandler,
 } from './utils/fcm';
 import { requestAndroidVideo } from './utils/permission';
@@ -165,18 +165,18 @@ export default function App() {
     }
 
     setBackgroundMessageHandler();
-    try {
-      const fcmToken = await requestFcmToken();
-      console.log('test:requestFcmToken:', fcmSenderId, fcmToken);
-      ChatClient.getInstance().updatePushConfig(
-        new ChatPushConfig({
-          deviceId: fcmSenderId,
-          deviceToken: fcmToken,
-        })
-      );
-    } catch (error) {
-      console.warn('test:requestFcmToken:error', error);
-    }
+    // try {
+    //   const fcmToken = await requestFcmToken();
+    //   console.log('test:requestFcmToken:', fcmSenderId, fcmToken);
+    //   ChatClient.getInstance().updatePushConfig(
+    //     new ChatPushConfig({
+    //       deviceId: fcmSenderId,
+    //       deviceToken: fcmToken,
+    //     })
+    //   );
+    // } catch (error) {
+    //   console.warn('test:requestFcmToken:error', error);
+    // }
 
     console.log('test:onInitApp:');
     sendEvent({

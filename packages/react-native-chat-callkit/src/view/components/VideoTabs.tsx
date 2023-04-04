@@ -40,7 +40,7 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
     _: Readonly<VideoTabState>,
     __: any
   ): boolean {
-    calllog.log('VideoTab:shouldComponentUpdate:', nextProps, this.props);
+    // calllog.log('VideoTab:shouldComponentUpdate:', nextProps, this.props);
     if (this.compare(nextProps) === false) {
       this.update(nextProps.users);
       return false;
@@ -211,7 +211,7 @@ export class VideoTabs extends React.Component<VideoTabsProps, VideoTabsState> {
     _: Readonly<VideoTabsState>,
     __: any
   ): boolean {
-    calllog.log('VideoTabs:shouldComponentUpdate:', nextProps, this.props);
+    // calllog.log('VideoTabs:shouldComponentUpdate:', nextProps, this.props);
     if (this.compare(nextProps) === false) {
       // this.update(nextProps.users);
       return false;

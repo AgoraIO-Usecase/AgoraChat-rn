@@ -448,6 +448,8 @@ PODS:
     - AgoraIrisRTC_iOS (= 4.1.0-rc.2)
     - AgoraRtcEngine_iOS (= 4.1.0)
     - React-Core
+  - react-native-blur (4.3.0):
+    - React-Core
   - react-native-cameraroll (5.2.0):
     - React-Core
   - react-native-chat-callkit (0.1.0):
@@ -658,6 +660,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../../node_modules/react-native/ReactCommon/logger`)
   - react-native-agora (from `../../../node_modules/react-native-agora`)
+  - "react-native-blur (from `../../../node_modules/@react-native-community/blur`)"
   - "react-native-cameraroll (from `../../../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-chat-callkit (from `../../../packages/react-native-chat-callkit`)
   - react-native-chat-sdk (from `../../../node_modules/react-native-chat-sdk`)
@@ -823,6 +826,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/logger"
   react-native-agora:
     :path: "../../../node_modules/react-native-agora"
+  react-native-blur:
+    :path: "../../../node_modules/@react-native-community/blur"
   react-native-cameraroll:
     :path: "../../../node_modules/@react-native-camera-roll/camera-roll"
   react-native-chat-callkit:
@@ -968,6 +973,7 @@ SPEC CHECKSUMS:
   React-jsinspector: eb202e43b3879aba9a14f3f65788aec85d4e1ea9
   React-logger: 98f663b292a60967ebbc6d803ae96c1381183b6d
   react-native-agora: 23e08e4a386714bb477effb01014966029e84fee
+  react-native-blur: 50c9feabacbc5f49b61337ebc32192c6be7ec3c3
   react-native-cameraroll: 0ff04cc4e0ff5f19a94ff4313e5c8bc4503cd86d
   react-native-chat-callkit: 459e79ac8d0db690ed9180ebd07bc0809d7c7e3c
   react-native-chat-sdk: 78d34f81e33776d2c732dcc566dbadb6bbf68e56

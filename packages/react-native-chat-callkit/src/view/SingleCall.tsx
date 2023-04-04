@@ -570,7 +570,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     );
   }
   protected renderAvatar(): React.ReactNode {
-    const { elapsed, callType } = this.props;
+    const { elapsed, callType, isInviter } = this.props;
     const { callState } = this.state;
     return (
       <View
@@ -604,7 +604,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               textAlign: 'center',
             }}
           >
-            {callType === 'audio' ? 'Audio Call' : 'Video Call'}
+            {isInviter === true
+              ? 'Calling'
+              : callType === 'audio'
+              ? 'Audio Call'
+              : 'Video Call'}
           </Text>
         )}
       </View>
@@ -764,21 +768,16 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
   protected renderContent(): React.ReactNode {
-    const { callType } = this.props;
+    const { callType, isInviter } = this.props;
     const { callState } = this.state;
     let content = null;
-    if (callState === CallState.Calling) {
-      if (callType === 'audio') {
-        content = this.renderAvatar();
-      } else {
-        content = this.renderFloatVideo();
-      }
+    if (
+      callType === 'audio' ||
+      (isInviter === true && callState !== CallState.Calling)
+    ) {
+      content = this.renderAvatar();
     } else {
-      if (callType === 'audio') {
-        content = this.renderAvatar();
-      } else {
-        content = this.renderFloatVideo();
-      }
+      content = this.renderFloatVideo();
     }
     return (
       <View

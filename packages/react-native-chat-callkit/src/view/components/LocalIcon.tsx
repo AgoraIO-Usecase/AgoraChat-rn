@@ -2,7 +2,6 @@
 import * as React from 'react';
 import {
   ColorValue,
-  Image,
   ImageStyle,
   StyleProp,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 
 import { ICON_ASSETS } from '../../../assets/icons';
+import Image from './Image';
 
 export enum IconSize {
   ICON_NORMAL,
@@ -128,3 +128,5 @@ const sizeStyles = StyleSheet.create({
     height: 256,
   },
 });
+
+export const LocalIconMemo = React.memo(LocalIcon);
