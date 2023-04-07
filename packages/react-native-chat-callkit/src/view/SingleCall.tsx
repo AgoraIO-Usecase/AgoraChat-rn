@@ -1,6 +1,10 @@
 import * as React from 'react';
-import { Dimensions, Pressable, Text, View } from 'react-native';
-import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
+import { Dimensions, Platform, Pressable, Text, View } from 'react-native';
+import {
+  RtcSurfaceView,
+  RtcTextureView,
+  VideoViewSetupMode,
+} from 'react-native-agora';
 
 import type { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
@@ -314,16 +318,29 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     if (startPreview !== true && joinChannelSuccess !== true) {
       return null;
     }
-    return (
-      <RtcSurfaceView
-        style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}
-        canvas={{
-          uid: 0,
-          setupMode,
-        }}
-        key={selfUid}
-      />
-    );
+    if (Platform.OS === 'android') {
+      return (
+        <RtcTextureView
+          style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}
+          canvas={{
+            uid: 0,
+            setupMode,
+          }}
+          key={selfUid}
+        />
+      );
+    } else {
+      return (
+        <RtcSurfaceView
+          style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}
+          canvas={{
+            uid: 0,
+            setupMode,
+          }}
+          key={selfUid}
+        />
+      );
+    }
   }
 
   protected renderPeerVideo(): React.ReactNode {
@@ -339,16 +356,29 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     if (peerJoinChannelSuccess !== true) {
       return null;
     }
-    return (
-      <RtcSurfaceView
-        style={{ flex: 1 }}
-        canvas={{
-          uid: peerUid,
-          setupMode,
-        }}
-        key={peerUid}
-      />
-    );
+    if (Platform.OS === 'android') {
+      return (
+        <RtcTextureView
+          style={{ flex: 1 }}
+          canvas={{
+            uid: peerUid,
+            setupMode,
+          }}
+          key={peerUid}
+        />
+      );
+    } else {
+      return (
+        <RtcSurfaceView
+          style={{ flex: 1 }}
+          canvas={{
+            uid: peerUid,
+            setupMode,
+          }}
+          key={peerUid}
+        />
+      );
+    }
   }
 
   protected renderMiniVideo(): React.ReactNode {

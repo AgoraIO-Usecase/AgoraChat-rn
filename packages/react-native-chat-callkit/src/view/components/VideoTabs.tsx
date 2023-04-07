@@ -88,10 +88,12 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
             return (
               <Pressable
                 onPress={() => {
-                  onPress?.({
-                    userId: user.userId,
-                    userChannelId: user.userChannelId,
-                  });
+                  if (user.userHadJoined === true) {
+                    onPress?.({
+                      userId: user.userId,
+                      userChannelId: user.userChannelId,
+                    });
+                  }
                 }}
                 key={user.userId}
                 style={{
