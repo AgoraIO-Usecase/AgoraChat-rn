@@ -1,3 +1,4 @@
+import { BlurView } from '@react-native-community/blur';
 import * as React from 'react';
 import { View } from 'react-native';
 import type { VideoViewSetupMode } from 'react-native-agora';
@@ -6,11 +7,13 @@ import { calllog } from '../call/CallConst';
 import type { CallError } from '../call/CallError';
 import type { CallManagerImpl } from '../call/CallManagerImpl';
 import type { CallViewListener } from '../call/CallViewListener';
-import type { CallEndReason, CallType } from '../enums';
+import { CallEndReason, CallState, CallType } from '../enums';
 import {
   type BottomMenuButtonType,
   BottomMenuButton,
 } from './components/BottomMenuButton';
+import Image from './components/Image';
+import { IconSize, localLocalIcon } from './components/LocalIcon';
 
 const BottomBarHeight = 60;
 
@@ -38,6 +41,10 @@ export type BasicCallProps = {
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;
   callType: 'audio' | 'video';
+  isInviter: boolean;
+  callState?: CallState;
+  isMinimize?: boolean;
+  elapsed: number; // ms unit
   isTest?: boolean;
   requestRTCToken?: (params: {
     appKey: string;
@@ -51,6 +58,11 @@ export type BasicCallProps = {
     userId: string;
     onResult: (params: { data: any; error?: any }) => void;
   }) => void;
+  onHangUp?: () => void;
+  onCancel?: () => void;
+  onRefuse?: () => void;
+  onClose?: () => void;
+  onError?: () => void;
 };
 export type BasicCallState = {
   channelId: string;
@@ -64,6 +76,9 @@ export type BasicCallState = {
   muteCamera: boolean;
   bottomButtonType: BottomButtonType;
   muteVideo: boolean;
+  callState: CallState;
+  isMinimize: boolean;
+  elapsed: number; // ms unit
 };
 export abstract class BasicCall<
     Props extends BasicCallProps,
@@ -72,6 +87,8 @@ export abstract class BasicCall<
   extends React.Component<Props, State>
   implements CallViewListener
 {
+  // eslint-disable-next-line react/sort-comp
+  protected _inviteeTimer?: NodeJS.Timeout;
   constructor(props: Props) {
     super(props);
     this.setState({
@@ -92,13 +109,117 @@ export abstract class BasicCall<
   protected abstract init(): void;
   protected abstract unInit(): void;
 
-  protected abstract onClickHangUp: () => void;
-  protected abstract onClickSpeaker: () => void;
-  protected abstract onClickMicrophone: () => void;
-  protected abstract onClickVideo: () => void;
-  protected abstract onClickRecall: () => void;
-  protected abstract onClickClose: () => void;
-  protected abstract onClickAccept: () => void;
+  onClickHangUp = () => {
+    const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
+    const { callState } = this.state;
+    const callId = this.manager?.getCurrentCallId();
+    if (callId === undefined) {
+      calllog.warn('BasicCall:onClickHangUp:hangUpCall:', 'call id is empty.');
+      return;
+    }
+    this.setState({ callId: callId });
+    if (isInviter === true) {
+      if (callState === CallState.Calling) {
+        this.manager?.hangUpCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('BasicCall:onClickHangUp:hangUpCall:', params);
+          },
+        });
+        onHangUp?.();
+      } else {
+        this.manager?.cancelCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('BasicCall:onClickHangUp:cancelCall:', params);
+          },
+        });
+        onCancel?.();
+      }
+    } else {
+      clearTimeout(this._inviteeTimer);
+      this._inviteeTimer = undefined;
+      if (callState === CallState.Calling) {
+        this.manager?.hangUpCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('BasicCall:onClickHangUp:hangUpCall:', params);
+          },
+        });
+        onHangUp?.();
+      } else {
+        this.manager?.refuseCall({
+          callId: callId,
+          onResult: (params: {
+            callId?: string | undefined;
+            error?: CallError | undefined;
+          }) => {
+            calllog.log('BasicCall:onClickHangUp:refuseCall:', params);
+          },
+        });
+        onRefuse?.();
+      }
+    }
+  };
+  onClickSpeaker = () => {
+    const isIn = this.state.isInSpeaker;
+    calllog.log('BasicCall:onClickSpeaker:', isIn);
+    this.setState({ isInSpeaker: !isIn });
+    this.manager?.setEnableSpeakerphone(!isIn);
+  };
+  onClickMicrophone = () => {
+    const mute = this.state.muteMicrophone;
+    calllog.log('BasicCall:onClickMicrophone:', mute);
+    this.setState({ muteMicrophone: !mute });
+    this.manager?.enableLocalAudio(mute);
+  };
+  onClickVideo = () => {
+    const mute = this.state.muteVideo;
+    calllog.log('BasicCall:onClickVideo:');
+    this.setState({ muteVideo: !mute });
+    this.manager?.enableLocalVideo(mute);
+  };
+  onClickRecall = () => {};
+  onClickClose = () => {
+    this.setState({ callState: CallState.Idle });
+    const { onClose } = this.props;
+    onClose?.();
+  };
+  onClickAccept = () => {
+    clearTimeout(this._inviteeTimer);
+    this._inviteeTimer = undefined;
+    if (this.props.callType === 'audio') {
+      this.setState({ bottomButtonType: 'invitee-audio-loading' });
+    } else {
+      this.setState({ bottomButtonType: 'invitee-video-loading' });
+    }
+    const callId = this.manager?.getCurrentCallId();
+    if (callId) {
+      this.setState({ callId });
+      this.manager?.acceptCall({
+        callId: callId,
+        onResult: (params: {
+          callId?: string | undefined;
+          error?: CallError | undefined;
+        }) => {
+          calllog.log('BasicCall:onClickAccept:acceptCall:', params);
+        },
+      });
+    }
+  };
+  switchCamera = () => {
+    calllog.log('BasicCall:switchCamera:');
+    this.manager?.switchCamera();
+  };
 
   //////////////////////////////////////////////////////////////////////////////
   //// Render //////////////////////////////////////////////////////////////////
@@ -108,9 +229,31 @@ export abstract class BasicCall<
     throw new Error('Requires subclass implementation.');
   }
 
-  // eslint-disable-next-line react/sort-comp
   render(): React.ReactNode {
     return this.renderBody();
+  }
+
+  protected renderBackground(): React.ReactNode {
+    return (
+      <View style={{ flex: 1 }}>
+        <Image
+          resizeMode="contain"
+          source={localLocalIcon('bg', IconSize.ICON_MAX)}
+          style={{}}
+        />
+        <BlurView
+          style={{
+            position: 'absolute',
+            flex: 1,
+            height: '100%',
+            width: '100%',
+          }}
+          blurType="light" // Values = dark, light, xlight .
+          blurAmount={10}
+          reducedTransparencyFallbackColor="white"
+        />
+      </View>
+    );
   }
 
   protected renderBottomMenu(): React.ReactNode {

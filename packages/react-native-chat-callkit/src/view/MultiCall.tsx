@@ -35,27 +35,14 @@ export type InviteeListProps = {
 };
 
 export type MultiCallProps = BasicCallProps & {
-  isMinimize?: boolean;
-  elapsed: number; // ms unit
-  isInviter: boolean;
   inviteeIds: string[];
-  callState?: CallState;
   inviteeList?: {
     InviteeList: (props: InviteeListProps) => JSX.Element;
     props?: InviteeListProps;
   };
-  onHangUp?: () => void;
-  onCancel?: () => void;
-  onRefuse?: () => void;
-  onClose?: () => void;
-  onError?: () => void;
 };
 export type MultiCallState = BasicCallState & {
-  isMinimize: boolean;
-  callState: CallState;
-  callType: 'video' | 'audio';
   remoteUsersJoinChannelSuccess: Map<string, boolean>;
-  elapsed: number; // ms unit
   remoteUsersUid: Map<string, number>;
   inviteeIds: string[];
   users: User[];
@@ -67,7 +54,6 @@ export type MultiCallState = BasicCallState & {
 };
 
 export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
-  private _inviteeTimer?: NodeJS.Timeout;
   private _videoTabRef?: React.RefObject<VideoTabs>;
   constructor(props: MultiCallProps) {
     super(props);
@@ -90,7 +76,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.state = {
       isMinimize: props.isMinimize ?? false,
       callState: props.callState ?? CallState.Connecting,
-      callType: props.callType,
       bottomButtonType:
         props.bottomButtonType ??
         (props.isInviter
@@ -349,9 +334,9 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userChannelId?: number;
     userId: string;
   }): void {
-    calllog.log('MultiCall:remoteUser:', params);
+    calllog.log('MultiCall:removeUser:', params);
     const { users, fullId } = this.state;
-    calllog.log('MultiCall:remoteUser:users:', users);
+    calllog.log('MultiCall:removeUser:users:', users);
     let isExisted = false;
     for (let index = 0; index < users.length; index++) {
       const user = users[index];
@@ -368,7 +353,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         break;
       }
     }
-    calllog.log('MultiCall:remoteUser:users:', users, isExisted);
+    calllog.log('MultiCall:removeUser:users:', users, isExisted);
     if (isExisted) {
       this.setState({ usersCount: users.length });
       this.setState({ users: [...users] });
@@ -380,111 +365,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   //// OnButton ////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  onClickHangUp = () => {
-    const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
-    const { callState, callId } = this.state;
-    if (isInviter === true) {
-      if (callState === CallState.Calling) {
-        this.manager?.hangUpCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('MultiCall:onClickHangUp:hangUpCall:', params);
-          },
-        });
-        onHangUp?.();
-      } else {
-        this.manager?.cancelCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('MultiCall:onClickHangUp:cancelCall:', params);
-          },
-        });
-        onCancel?.();
-      }
-    } else {
-      clearTimeout(this._inviteeTimer);
-      this._inviteeTimer = undefined;
-      if (callState === CallState.Calling) {
-        this.manager?.hangUpCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('MultiCall:onClickHangUp:hangUpCall:', params);
-          },
-        });
-        onHangUp?.();
-      } else {
-        this.manager?.refuseCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('MultiCall:onClickHangUp:refuseCall:', params);
-          },
-        });
-        onRefuse?.();
-      }
-    }
-  };
-  onClickSpeaker = () => {
-    const isIn = this.state.isInSpeaker;
-    calllog.log('MultiCall:onClickSpeaker:', isIn);
-    this.setState({ isInSpeaker: !isIn });
-    this.manager?.setEnableSpeakerphone(!isIn);
-  };
-  onClickMicrophone = () => {
-    const mute = this.state.muteMicrophone;
-    calllog.log('MultiCall:onClickMicrophone:', mute);
-    this.setState({ muteMicrophone: !mute });
-    this.manager?.enableLocalAudio(mute);
-  };
-  onClickVideo = () => {
-    const mute = this.state.muteVideo;
-    calllog.log('MultiCall:onClickVideo:');
-    this.setState({ muteVideo: !mute });
-    this.manager?.enableLocalVideo(mute);
-  };
-  onClickRecall = () => {};
-  onClickClose = () => {
-    this.setState({ callState: CallState.Idle });
-    const { onClose } = this.props;
-    onClose?.();
-  };
-  onClickAccept = () => {
-    clearTimeout(this._inviteeTimer);
-    this._inviteeTimer = undefined;
-    if (this.props.callType === 'audio') {
-      this.setState({ bottomButtonType: 'invitee-audio-loading' });
-    } else {
-      this.setState({ bottomButtonType: 'invitee-video-loading' });
-    }
-    const callId = this.manager?.getCurrentCallId();
-    if (callId) {
-      this.setState({ callId });
-      this.manager?.acceptCall({
-        callId: callId,
-        onResult: (params: {
-          callId?: string | undefined;
-          error?: CallError | undefined;
-        }) => {
-          calllog.log('MultiCall:onClickAccept:acceptCall:', params);
-        },
-      });
-    }
-  };
-  switchCamera = () => {
-    calllog.log('MultiCall:switchCamera:');
-    this.manager?.switchCamera();
-  };
   inviteUser = () => {
     calllog.log('MultiCall:inviteUser:');
     this.setState({ showInvite: true });
@@ -501,11 +381,13 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     elapsed: number;
   }): void {
     calllog.log('MultiCall:onCallEnded:', params);
+    this.manager?.leaveChannel();
     this.onClickClose();
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
     calllog.log('MultiCall:onCallOccurError:', params);
+    this.manager?.leaveChannel();
     this.onClickClose();
   }
 
@@ -659,7 +541,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         style={{
           flex: 1,
           position: 'absolute',
-          height: Dimensions.get('screen').height,
+          height: Dimensions.get('window').height,
           width: '100%',
         }}
       >
@@ -678,7 +560,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         style={{
           flex: 1,
           position: 'absolute',
-          height: Dimensions.get('screen').height,
+          height: Dimensions.get('window').height,
           width: '100%',
         }}
       >
@@ -726,7 +608,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
 
   protected renderTopBar(): React.ReactNode {
-    const { isFullVideo, callType, usersCount } = this.state;
+    const { callType } = this.props;
+    const { isFullVideo, usersCount } = this.state;
     const inviteName = (): IconName => {
       if (callType === 'audio') {
         if (usersCount === AudioMaxCount) {
@@ -832,7 +715,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     const content = 'Calling...';
     return (
       <Draggable
-        x={Dimensions.get('screen').width - 86}
+        x={Dimensions.get('window').width - 86}
         y={54}
         onShortPressRelease={() => {
           this.setState({ isMinimize: false });
@@ -879,7 +762,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
   protected renderContent(): React.ReactNode {
     calllog.log('renderContent:');
-    if (this.state.callType === 'video') {
+    if (this.props.callType === 'video') {
       return null;
     }
     if (this.state.callState !== CallState.Calling) {
@@ -958,8 +841,9 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
-      Dimensions.get('screen');
-    const { isMinimize, callType } = this.state;
+      Dimensions.get('window');
+    const { callType } = this.props;
+    const { isMinimize } = this.state;
     if (isMinimize) {
       return this.renderFloat();
     }
@@ -969,7 +853,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           position: 'absolute',
           width: screenWidth,
           height: screenHeight,
-          backgroundColor: 'black',
+          backgroundColor: 'grey',
         }}
       >
         {callType === 'audio' ? this.renderAudio() : this.renderVideo()}

@@ -13,10 +13,10 @@ export class AppServerClient {
     from: 'requestToken' | 'requestUserMap';
     onResult: (p: { data?: any; error?: any }) => void;
   }): Promise<void> {
-    console.log('AppServerClient:req:', params);
+    // console.log('AppServerClient:req:', params);
     try {
       const accessToken = await ChatClient.getInstance().getAccessToken();
-      console.log('AppServerClient:req:', accessToken);
+      // console.log('AppServerClient:req:', accessToken);
       const json = params.kvs as {
         userAccount: string;
         channelName: string;
@@ -27,7 +27,7 @@ export class AppServerClient {
       )}&channelName=${encodeURIComponent(
         json.channelName
       )}&userAccount=${encodeURIComponent(json.userAccount)}`;
-      console.log('AppServerClient:req:', url);
+      // console.log('AppServerClient:req:', url);
       const response = await fetch(url, {
         method: params.method,
         headers: {
@@ -36,7 +36,7 @@ export class AppServerClient {
         },
       });
       const value = await response.json();
-      console.log('AppServerClient:req:', value);
+      // console.log('AppServerClient:req:', value);
       if (value.code !== 'RES_0K') {
         params.onResult({ error: { code: value.code } });
       } else {

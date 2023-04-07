@@ -30,7 +30,7 @@ export interface CallSignallingListener {
    */
   onAlert: (params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviteeId: string;
     inviterDeviceToken: string;
     inviteeDeviceToken: string;
@@ -42,7 +42,7 @@ export interface CallSignallingListener {
    */
   onAlertConfirm: (params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     isValid: boolean;
     inviterId: string;
     inviteeDeviceToken: string;
@@ -55,7 +55,7 @@ export interface CallSignallingListener {
    */
   onInviteCancel: (params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviterId: string;
     inviterDeviceToken: string;
     channelId: string;
@@ -66,7 +66,7 @@ export interface CallSignallingListener {
    */
   onInviteReply: (params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviteeId: string;
     reply:
       | typeof K.KeyBusyResult
@@ -82,7 +82,7 @@ export interface CallSignallingListener {
    */
   onInviteReplyConfirm: (params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviterId: string;
     reply:
       | typeof K.KeyBusyResult
@@ -112,6 +112,60 @@ export class CallSignallingHandler implements ChatMessageEventListener {
     this._listener = undefined;
   }
 
+  protected parseCallType(
+    callType: string | number | undefined
+  ): CallType | undefined {
+    let ret;
+    if (callType && Number.isNaN(callType) === false) {
+      let c: number = NaN;
+      if (typeof callType === 'number') {
+        if (Number.isInteger(callType) === false) {
+          c = Math.round(callType);
+        } else {
+          c = callType;
+        }
+      } else {
+        c = parseInt(callType);
+      }
+
+      switch (c) {
+        case 0:
+          ret = CallType.Audio1v1;
+          break;
+        case 1:
+          ret = CallType.Video1v1;
+          break;
+        case 2:
+          ret = CallType.VideoMulti;
+          break;
+        case 3:
+          ret = CallType.AudioMulti;
+          break;
+
+        default:
+          throw new CallError({
+            code: CallErrorCode.InvalidParams,
+            description: 'wrong type of callType.',
+          });
+      }
+    }
+
+    return ret;
+  }
+
+  protected parseTs(ts: string | number): number | undefined {
+    let ret = undefined;
+    if (Number.isNaN(ts) === false) {
+      if (typeof ts === 'number') {
+        ret = parseFloat(ts.toString());
+      } else {
+        ret = parseFloat(ts);
+      }
+    }
+    calllog.log('test:345:', ret);
+    return ret;
+  }
+
   protected send(
     callId: string,
     msg: ChatMessage,
@@ -119,7 +173,8 @@ export class CallSignallingHandler implements ChatMessageEventListener {
   ): void {
     ChatClient.getInstance()
       .chatManager.sendMessage(msg, {
-        onError: (_: string, __: ChatError): void => {
+        onError: (localMsgId: string, error: ChatError): void => {
+          calllog.log('send:onError:', localMsgId, error);
           onResult({
             callId,
             error: new CallError({
@@ -363,68 +418,70 @@ export class CallSignallingHandler implements ChatMessageEventListener {
           | typeof K.KeyRefuseResult;
         [K.KeyTs]: number;
       };
+      const callType = this.parseCallType(attr.type);
+      const ts = this.parseTs(attr.ts) ?? 0;
       if (attr[K.KeyMsgType] === K.KeyMsgTypeValue) {
         if (attr[K.KeyAction] === K.KeyInviteAction) {
           // const inviteAttr = msg.attributes as {};
           this._listener?.onInvite({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType ?? 0,
             inviterId: msg.from,
             inviterDeviceToken: attr.callerDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         } else if (attr[K.KeyAction] === K.KeyAlertAction) {
           this._listener?.onAlert({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType,
             inviteeId: msg.from,
             inviterDeviceToken: attr.callerDevId,
             inviteeDeviceToken: attr.calleeDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         } else if (attr[K.KeyAction] === K.KeyConfirmRingAction) {
           this._listener?.onAlertConfirm({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType,
             isValid: attr.status,
             inviterId: msg.from,
             inviterDeviceToken: attr.callerDevId,
             inviteeDeviceToken: attr.calleeDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         } else if (attr[K.KeyAction] === K.KeyCancelCallAction) {
           this._listener?.onInviteCancel({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType,
             inviterId: msg.from,
             inviterDeviceToken: attr.callerDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         } else if (attr[K.KeyAction] === K.KeyAnswerCallAction) {
           this._listener?.onInviteReply({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType,
             inviteeId: msg.from,
             reply: attr.result,
             inviterDeviceToken: attr.callerDevId,
             inviteeDeviceToken: attr.calleeDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         } else if (attr[K.KeyAction] === K.KeyConfirmCalleeAction) {
           this._listener?.onInviteReplyConfirm({
             callId: attr.callId,
-            callType: attr.type,
+            callType: callType,
             inviterId: msg.from,
             reply: attr.result,
             inviterDeviceToken: attr.callerDevId,
             inviteeDeviceToken: attr.calleeDevId,
             channelId: attr.channelName,
-            ts: attr.ts,
+            ts: ts,
           });
         }
       }

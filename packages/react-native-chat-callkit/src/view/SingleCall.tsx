@@ -21,28 +21,15 @@ import { MiniButton } from './components/MiniButton';
 const StateBarHeight = 44;
 
 export type SingleCallProps = BasicCallProps & {
-  isMinimize?: boolean;
-  elapsed: number; // ms unit
-  isInviter: boolean;
   inviteeId: string;
-  callState?: CallState;
-  onHangUp?: () => void;
-  onCancel?: () => void;
-  onRefuse?: () => void;
-  onClose?: () => void;
-  onError?: () => void;
 };
 export type SingleCallState = BasicCallState & {
-  isMinimize: boolean;
-  callState: CallState;
   peerJoinChannelSuccess: boolean;
-  elapsed: number; // ms unit
   peerUid: number;
   isSwitchVideo: boolean;
 };
 
 export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
-  private _inviteeTimer?: NodeJS.Timeout;
   constructor(props: SingleCallProps) {
     super(props);
     this.state = {
@@ -188,117 +175,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   //// OnButton ////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
 
-  onClickHangUp = () => {
-    const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
-    const { callState, callId } = this.state;
-    if (isInviter === true) {
-      if (callState === CallState.Calling) {
-        this.manager?.hangUpCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('SingleCall:onClickHangUp:hangUpCall:', params);
-          },
-        });
-        onHangUp?.();
-      } else {
-        this.manager?.cancelCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('SingleCall:onClickHangUp:cancelCall:', params);
-          },
-        });
-        onCancel?.();
-      }
-    } else {
-      clearTimeout(this._inviteeTimer);
-      this._inviteeTimer = undefined;
-      if (callState === CallState.Calling) {
-        this.manager?.hangUpCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('SingleCall:onClickHangUp:hangUpCall:', params);
-          },
-        });
-        onHangUp?.();
-      } else {
-        this.manager?.refuseCall({
-          callId: callId,
-          onResult: (params: {
-            callId?: string | undefined;
-            error?: CallError | undefined;
-          }) => {
-            calllog.log('SingleCall:onClickHangUp:refuseCall:', params);
-          },
-        });
-        onRefuse?.();
-      }
-    }
-  };
-  onClickSpeaker = () => {
-    const isIn = this.state.isInSpeaker;
-    calllog.log('SingleCall:onClickSpeaker:', isIn);
-    this.setState({ isInSpeaker: !isIn });
-    this.manager?.setEnableSpeakerphone(!isIn);
-  };
-  onClickMicrophone = () => {
-    const mute = this.state.muteMicrophone;
-    calllog.log('SingleCall:onClickMicrophone:', mute);
-    this.setState({ muteMicrophone: !mute });
-    this.manager?.enableLocalAudio(mute);
-  };
-  onClickVideo = () => {
-    const mute = this.state.muteVideo;
-    calllog.log('SingleCall:onClickVideo:');
-    this.setState({ muteVideo: !mute });
-    this.manager?.enableLocalVideo(mute);
-  };
-  onClickRecall = () => {};
-  onClickClose = () => {
-    this.setState({ callState: CallState.Idle });
-    const { onClose } = this.props;
-    onClose?.();
-  };
-  onClickAccept = () => {
-    clearTimeout(this._inviteeTimer);
-    this._inviteeTimer = undefined;
-    if (this.props.callType === 'audio') {
-      this.setState({ bottomButtonType: 'invitee-audio-loading' });
-    } else {
-      this.setState({ bottomButtonType: 'invitee-video-loading' });
-    }
-    const callId = this.manager?.getCurrentCallId();
-    if (callId) {
-      this.setState({ callId });
-      this.manager?.acceptCall({
-        callId: callId,
-        onResult: (params: {
-          callId?: string | undefined;
-          error?: CallError | undefined;
-        }) => {
-          calllog.log('SingleCall:onClickAccept:acceptCall:', params);
-        },
-      });
-    }
-  };
   onSwitchVideo = () => {
     calllog.log(
       'SingleCall:onClickAccept:onSwitchVideo:',
       this.state.isSwitchVideo
     );
     this.setState({ isSwitchVideo: !this.state.isSwitchVideo });
-  };
-  switchCamera = () => {
-    calllog.log('SingleCall:switchCamera:');
-    this.manager?.switchCamera();
   };
 
   //////////////////////////////////////////////////////////////////////////////
@@ -312,11 +194,13 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     elapsed: number;
   }): void {
     calllog.log('SingleCall:onCallEnded:', params);
+    this.manager?.leaveChannel();
     this.onClickClose();
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
     calllog.log('SingleCall:onCallOccurError:', params);
+    this.manager?.leaveChannel();
     this.onClickClose();
   }
 
@@ -432,7 +316,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
     return (
       <RtcSurfaceView
-        style={{ flex: 1 }}
+        style={{ flex: 1, borderRadius: 12, overflow: 'hidden' }}
         canvas={{
           uid: 0,
           setupMode,
@@ -795,7 +679,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
-      Dimensions.get('screen');
+      Dimensions.get('window');
     const { callType } = this.props;
     const { isMinimize } = this.state;
     if (isMinimize) {
@@ -807,7 +691,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       }
       return (
         <Draggable
-          x={Dimensions.get('screen').width - (callType === 'audio' ? 86 : 100)}
+          x={Dimensions.get('window').width - (callType === 'audio' ? 86 : 100)}
           y={54}
           onShortPressRelease={() => {
             this.setState({ isMinimize: false });

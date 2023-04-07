@@ -914,6 +914,7 @@ export class CallManagerImpl
           addedIds.push(id);
         }
       }
+      calllog.log('test:12345:', addedIds, call.invitees);
       if (call.isInviter === false) {
         if (
           call.state !== CallSignalingState.Idle &&
@@ -966,7 +967,7 @@ export class CallManagerImpl
           callId: call.callId,
           ext: params.extension,
           onResult: ({ callId, error }) => {
-            console.log('CallManagerImpl:sendInvite:', callId);
+            console.log('CallManagerImpl:sendInvite:', callId, error);
             if (error) {
               this.timer.stopTiming({ callId, userId: id });
               const call = this._getCall(callId);
@@ -1327,7 +1328,7 @@ export class CallManagerImpl
   }
   onAlert(params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviteeId: string;
     inviterDeviceToken: string;
     inviteeDeviceToken: string;
@@ -1395,7 +1396,7 @@ export class CallManagerImpl
   }
   onAlertConfirm(params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     isValid: boolean;
     inviterId: string;
     inviterDeviceToken: string;
@@ -1430,7 +1431,7 @@ export class CallManagerImpl
   }
   onInviteCancel(params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviterId: string;
     inviterDeviceToken: string;
     channelId: string;
@@ -1466,7 +1467,7 @@ export class CallManagerImpl
   }
   onInviteReply(params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviteeId: string;
     reply:
       | typeof K.KeyBusyResult
@@ -1554,7 +1555,7 @@ export class CallManagerImpl
   }
   onInviteReplyConfirm(params: {
     callId: string;
-    callType: CallType;
+    callType?: CallType;
     inviterId: string;
     reply:
       | typeof K.KeyBusyResult
@@ -1816,21 +1817,27 @@ export class CallManagerImpl
               let remoteUserId;
               Object.entries(p.data.result).forEach((value: [string, any]) => {
                 if (call.inviter.userId === value[1]) {
-                  call.inviter.userChannelId = parseInt(value[0]);
-                  call.inviter.userHadJoined = true;
+                  if (remoteUid === parseInt(value[0])) {
+                    call.inviter.userChannelId = remoteUid;
+                    call.inviter.userHadJoined = true;
+                  }
                 } else {
                   const invitee = call.invitees.get(value[1]);
                   if (invitee) {
-                    invitee.userChannelId = parseInt(value[0]);
-                    invitee.userHadJoined = true;
+                    if (remoteUid === parseInt(value[0])) {
+                      invitee.userChannelId = remoteUid;
+                      invitee.userHadJoined = true;
+                    }
                   } else {
-                    this._addInvitee(call.callId, [
-                      {
-                        userId: value[1],
-                        userChannelId: parseInt(value[0]),
-                        userHadJoined: true,
-                      } as CallInvitee,
-                    ]);
+                    if (remoteUid === parseInt(value[0])) {
+                      this._addInvitee(call.callId, [
+                        {
+                          userId: value[1],
+                          userChannelId: remoteUid,
+                          userHadJoined: true,
+                        } as CallInvitee,
+                      ]);
+                    }
                   }
                 }
               });

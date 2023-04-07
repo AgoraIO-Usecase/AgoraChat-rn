@@ -6,7 +6,7 @@ import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
 import { Avatar } from './Avatar';
-import { LocalIcon } from './LocalIcon';
+import { IconName, LocalIcon } from './LocalIcon';
 
 const PageCount = 4;
 
@@ -63,7 +63,9 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
   public render(): React.ReactNode {
     const { index, onPress, users } = this.props;
     // const { subUsers } = this.state;
-    const screenWidth = Dimensions.get('screen').width;
+    const windowWidth = Dimensions.get('window').width;
+    const windowHeight = Dimensions.get('window').height;
+    const name = 'default_avatar' as IconName;
     return (
       <TabView.Item
         key={index.toString()}
@@ -78,7 +80,7 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
             flexDirection: 'row',
             flexWrap: 'wrap',
             alignContent: 'center',
-            width: screenWidth,
+            width: windowWidth,
           }}
         >
           {users.map((user, i) => {
@@ -97,13 +99,13 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                     count === 1 || count === 2 || (count === 3 && i === 2)
                       ? '100%'
                       : '50%',
-                  height: count === 1 ? '100%' : '50%',
+                  height: count === 1 ? windowHeight : windowHeight * 0.5,
                   // backgroundColor: 'green',
                   // margin: 1,
                   // justifyContent: 'center',
                   alignItems: 'center',
                   borderColor: 'white', // for test
-                  // borderWidth: 1,
+                  borderWidth: 1,
                 }}
               >
                 {user.muteVideo ? (
@@ -121,7 +123,7 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                         borderRadius: 105,
                       }}
                     >
-                      <Avatar uri="" size={100} radius={100} />
+                      <Avatar uri={name} size={100} radius={100} />
                     </View>
                     <View style={{ flex: 2 }} />
                   </View>

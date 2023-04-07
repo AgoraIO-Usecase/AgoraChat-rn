@@ -1,18 +1,18 @@
 export enum CallType {
-  Audio1v1,
+  Audio1v1 = 0,
   Video1v1,
   VideoMulti,
   AudioMulti,
 }
 
 export enum CallState {
-  Idle,
+  Idle = 0,
   Connecting,
   Calling,
 }
 
 export enum CallEndReason {
-  HungUp,
+  HungUp = 0,
   Cancel,
   RemoteCancel,
   RemoteRefuse,
@@ -26,7 +26,7 @@ export enum CallErrorType {
   /**
    * Real-Time Communications error type.
    */
-  RTC,
+  RTC = 0,
   /**
    * The signaling error type.
    */

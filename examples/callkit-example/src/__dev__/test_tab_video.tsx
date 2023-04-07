@@ -21,7 +21,7 @@ export function Test() {
   //   });
   // }
   return (
-    <View style={{ flex: 1, top: 44 }}>
+    <View style={{ flex: 1 }}>
       <Button
         onPress={() => {
           users.push({

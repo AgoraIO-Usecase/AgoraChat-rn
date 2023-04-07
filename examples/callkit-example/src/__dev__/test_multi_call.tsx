@@ -68,8 +68,8 @@ export function test_all() {
   const currentId = 'wo';
   const isTest = true;
   const agoraAppId = 'xxx';
-  // const inviteeIds = ['1', '2', '3', '4', '5', '6'];
-  const inviteeIds = ['1'];
+  const inviteeIds = ['1', '2', '3', '4', '5', '6'];
+  // const inviteeIds = ['1'];
   return (
     <MultiCall
       isMinimize={isMinimize}
