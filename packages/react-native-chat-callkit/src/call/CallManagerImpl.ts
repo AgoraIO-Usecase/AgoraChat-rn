@@ -1643,6 +1643,11 @@ export class CallManagerImpl
     calllog.log('CallManagerImpl:disableAudio:', ret);
   }
 
+  public enableAudioVolumeIndication(): void {
+    const ret = this.engine?.enableAudioVolumeIndication(400, 5, true);
+    calllog.log('CallManagerImpl:enableAudioVolumeIndication:', ret);
+  }
+
   public startPreview(): void {
     const ret = this.engine?.startPreview();
     calllog.log('CallManagerImpl:startPreview:', ret);

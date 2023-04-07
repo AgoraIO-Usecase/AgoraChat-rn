@@ -51,7 +51,8 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
             >
               <View
                 style={{
-                  backgroundColor: '#14FF72',
+                  backgroundColor:
+                    user.talking === true ? '#14FF72' : undefined,
                   padding: 5,
                   borderRadius: 85,
                 }}
@@ -69,30 +70,32 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
               >
                 {user.userName ?? user.userId}
               </Text>
-              <View
-                style={{
-                  position: 'absolute',
-                  overflow: 'hidden',
-                  borderRadius: 30,
-                  backgroundColor: 'grey',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  bottom: 35,
-                  right: 12,
-                  width: 30,
-                  height: 30,
-                }}
-              >
+              {user.muteAudio === true ? (
                 <View
                   style={{
+                    position: 'absolute',
                     overflow: 'hidden',
-                    backgroundColor: 'white',
-                    borderRadius: 24,
+                    borderRadius: 30,
+                    backgroundColor: 'grey',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    bottom: 35,
+                    right: 12,
+                    width: 30,
+                    height: 30,
                   }}
                 >
-                  <LocalIcon name="mic_slash" color="black" size={24} />
+                  <View
+                    style={{
+                      overflow: 'hidden',
+                      backgroundColor: 'white',
+                      borderRadius: 24,
+                    }}
+                  >
+                    <LocalIcon name="mic_slash" color="black" size={24} />
+                  </View>
                 </View>
-              </View>
+              ) : null}
             </View>
           );
         })}
@@ -158,30 +161,30 @@ export function AudioTabs(props: AudioTabsProps): JSX.Element {
     <>
       <TabView value={index} onChange={onIndex}>
         {tabUsers.map((users, i) => {
-          console.log('test:users:', users[0]?.userId);
           return <AudioTab key={users[0]?.userId} index={i} subUsers={users} />;
         })}
       </TabView>
 
-      <Tab
-        value={index}
-        onChange={(e: any) => onIndex(e)}
-        indicatorStyle={{
-          backgroundColor: 'white',
-          height: 3,
-        }}
-        variant="primary"
-      >
-        {tabUsers.map((users) => {
-          console.log('test:users:2', users[0]?.userId);
-          return (
-            <Tab.Item
-              key={users[0]?.userId}
-              style={{ height: 1, backgroundColor: '#D8D8D8' }}
-            />
-          );
-        })}
-      </Tab>
+      {users.length > 1 ? (
+        <Tab
+          value={index}
+          onChange={(e: any) => onIndex(e)}
+          indicatorStyle={{
+            backgroundColor: 'white',
+            height: 3,
+          }}
+          variant="primary"
+        >
+          {tabUsers.map((users) => {
+            return (
+              <Tab.Item
+                key={users[0]?.userId}
+                style={{ height: 1, backgroundColor: '#D8D8D8' }}
+              />
+            );
+          })}
+        </Tab>
+      ) : null}
     </>
   );
 }
