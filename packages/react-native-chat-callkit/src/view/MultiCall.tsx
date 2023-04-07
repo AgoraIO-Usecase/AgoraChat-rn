@@ -132,7 +132,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
     if (this.props.callType === 'audio') {
       this.manager?.enableAudio();
-      // this.manager?.enableAudioVolumeIndication();
+      this.manager?.enableAudioVolumeIndication();
     } else {
       this.manager?.enableVideo();
       this.manager?.startPreview();

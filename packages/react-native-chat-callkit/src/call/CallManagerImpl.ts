@@ -2064,10 +2064,13 @@ export class CallManagerImpl
     calllog.log(
       'CallManagerImpl:onAudioVolumeIndication:',
       connection,
-      speakers.length,
+      speakers,
       speakerNumber,
       totalVolume
     );
+    if (speakers === null || speakers === undefined) {
+      return;
+    }
     if (connection.channelId) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {

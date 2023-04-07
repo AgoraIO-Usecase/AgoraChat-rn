@@ -60,7 +60,7 @@ export function test_all() {
   const elapsed = 10000; // for test
   const isInviter = true; // !!! must
   const callState = CallState.Calling; // for test
-  const callType = 'video'; // !!! must
+  const callType = 'audio'; // !!! must
   const bottomButtonType = 'invitee-video-init'; // for test
   const muteVideo = false; // for test
   const appKey = 'sdf';
