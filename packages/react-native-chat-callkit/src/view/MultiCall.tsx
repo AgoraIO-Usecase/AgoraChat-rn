@@ -46,6 +46,7 @@ export type MultiCallState = BasicCallState & {
   remoteUsersUid: Map<string, number>;
   inviteeIds: string[];
   users: User[];
+  cache: Map<number, User>;
   isFullVideo: boolean;
   usersCount: number;
   showInvite: boolean;
@@ -103,6 +104,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       isFullVideo: false,
       usersCount: l.length,
       showInvite: false,
+      cache: new Map(),
     };
   }
 
@@ -269,7 +271,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userHadJoined?: boolean;
   }): void {
     calllog.log('MultiCall:updateUser:', params);
-    const { users } = this.state;
+    const { users, cache } = this.state;
     let isExisted = false;
     for (const user of users) {
       if (user.userId === params.userId) {
@@ -277,16 +279,44 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         user.userHadJoined = params.userHadJoined ?? true;
         user.isSelf = params.isSelf;
         isExisted = true;
+        if (params.userChannelId) {
+          const u = cache.get(params.userChannelId);
+          if (u) {
+            if (u.muteAudio) {
+              user.muteAudio = u.muteAudio;
+            }
+            if (u.muteVideo) {
+              user.muteVideo = u.muteVideo;
+            }
+            cache.delete(params.userChannelId);
+          }
+        }
         break;
       }
     }
     if (isExisted === false) {
+      let muteAudio: boolean | undefined;
+      let muteVideo: boolean | undefined;
+      if (params.userChannelId) {
+        const u = cache.get(params.userChannelId);
+        if (u) {
+          if (u.muteAudio) {
+            muteAudio = u.muteAudio;
+          }
+          if (u.muteVideo) {
+            muteVideo = u.muteVideo;
+          }
+          cache.delete(params.userChannelId);
+        }
+      }
       users.push({
         userId: params.userId,
         userChannelId: params.userChannelId,
         userHadJoined: params.userHadJoined ?? true,
         isSelf: params.isSelf,
-      });
+        muteAudio,
+        muteVideo,
+      } as User);
       this.setState({ usersCount: users.length });
     }
     this.setState({
@@ -304,7 +334,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }[]
   ): void {
     calllog.log('MultiCall:updateUsers:', userList.length);
-    const { users } = this.state;
+    const { users, cache } = this.state;
     for (const userP of userList) {
       let isExisted = false;
       for (const user of users) {
@@ -313,16 +343,44 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           user.userHadJoined = userP.userHadJoined ?? true;
           user.isSelf = userP.isSelf;
           isExisted = true;
+          if (userP.userChannelId) {
+            const u = cache.get(userP.userChannelId);
+            if (u) {
+              if (u.muteAudio) {
+                user.muteAudio = u.muteAudio;
+              }
+              if (u.muteVideo) {
+                user.muteVideo = u.muteVideo;
+              }
+              cache.delete(userP.userChannelId);
+            }
+          }
           break;
         }
       }
       if (isExisted === false) {
+        let muteAudio: boolean | undefined;
+        let muteVideo: boolean | undefined;
+        if (userP.userChannelId) {
+          const u = cache.get(userP.userChannelId);
+          if (u) {
+            if (u.muteAudio) {
+              muteAudio = u.muteAudio;
+            }
+            if (u.muteVideo) {
+              muteVideo = u.muteVideo;
+            }
+            cache.delete(userP.userChannelId);
+          }
+        }
         users.push({
           userId: userP.userId,
           userChannelId: userP.userChannelId,
           userHadJoined: userP.userHadJoined ?? true,
           isSelf: userP.isSelf,
-        });
+          muteAudio,
+          muteVideo,
+        } as User);
       }
     }
     this.setState({ usersCount: users.length, users: [...users] });
@@ -335,7 +393,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userId: string;
   }): void {
     calllog.log('MultiCall:removeUser:', params);
-    const { users, fullId } = this.state;
+    const { users, fullId, cache } = this.state;
     calllog.log('MultiCall:removeUser:users:', users);
     let isExisted = false;
     for (let index = 0; index < users.length; index++) {
@@ -358,6 +416,9 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       this.setState({ usersCount: users.length });
       this.setState({ users: [...users] });
       // this._videoTabRef?.current?.update(users);
+    }
+    if (params.userChannelId) {
+      cache.delete(params.userChannelId);
     }
   }
 
@@ -464,12 +525,23 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteVideo:', params);
-    const { users } = this.state;
+    const { users, cache } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteVideo = params.muted;
         this.setState({ users: [...users] });
         break;
+      }
+    }
+    if (params.userId === '') {
+      const user = cache.get(params.userChannelId);
+      if (user) {
+        user.muteVideo = params.muted;
+      } else {
+        cache.set(params.userChannelId, {
+          userId: params.userId,
+          muteVideo: params.muted,
+        } as User);
       }
     }
   }
@@ -481,12 +553,23 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteAudio:', params);
-    const { users } = this.state;
+    const { users, cache } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteAudio = params.muted;
         this.setState({ users: [...users] });
         break;
+      }
+    }
+    if (params.userId === '') {
+      const user = cache.get(params.userChannelId);
+      if (user) {
+        user.muteAudio = params.muted;
+      } else {
+        cache.set(params.userChannelId, {
+          userId: params.userId,
+          muteAudio: params.muted,
+        } as User);
       }
     }
   }
