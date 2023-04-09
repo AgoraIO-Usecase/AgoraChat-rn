@@ -1027,6 +1027,33 @@ export const ICON_ASSETS = {
       return require('./icons/Global/mic.png');
     }
   },
+  'msg_recv_audio01': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/msg_recv_audio01_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/msg_recv_audio01_3x.png');
+    } else {
+      return require('./icons/Global/msg_recv_audio01_3x.png');
+    }
+  },
+  'msg_recv_audio02': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/msg_recv_audio02_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/msg_recv_audio02_3x.png');
+    } else {
+      return require('./icons/Global/msg_recv_audio02_3x.png');
+    }
+  },
+  'msg_recv_audio': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/msg_recv_audio_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/msg_recv_audio_3x.png');
+    } else {
+      return require('./icons/Global/msg_recv_audio_3x.png');
+    }
+  },
   'nav_chat_right_bar': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/nav_chat_right_bar_3x.png');
