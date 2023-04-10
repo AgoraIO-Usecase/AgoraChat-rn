@@ -140,6 +140,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }
 
     this.manager?.addViewListener(this);
+    this.props?.onInitialized?.();
     if (this.props.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         const channelId = this.manager.createChannelId();
@@ -444,7 +445,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }): void {
     calllog.log('MultiCall:onCallEnded:', params);
     this.manager?.leaveChannel();
-    this.onClickClose();
+    this.onClickClose(params.elapsed);
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
@@ -488,6 +489,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.setState({ callState: CallState.Calling });
     this.updateBottomButtons();
     this.updateUser({ ...params, isSelf: true });
+    this.props?.onSelfJoined?.();
   }
 
   onRemoteUserOffline(params: {

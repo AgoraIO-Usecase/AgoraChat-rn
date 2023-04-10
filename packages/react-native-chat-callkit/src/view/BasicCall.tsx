@@ -61,8 +61,10 @@ export type BasicCallProps = {
   onHangUp?: () => void;
   onCancel?: () => void;
   onRefuse?: () => void;
-  onClose?: () => void;
+  onClose: (elapsed?: number) => void;
   onError?: () => void;
+  onInitialized?: () => void;
+  onSelfJoined?: () => void;
 };
 export type BasicCallState = {
   channelId: string;
@@ -189,10 +191,10 @@ export abstract class BasicCall<
     this.manager?.enableLocalVideo(mute);
   };
   onClickRecall = () => {};
-  onClickClose = () => {
+  onClickClose = (elapsed?: number) => {
     this.setState({ callState: CallState.Idle });
     const { onClose } = this.props;
-    onClose?.();
+    onClose(elapsed);
   };
   onClickAccept = () => {
     clearTimeout(this._inviteeTimer);
@@ -316,7 +318,7 @@ export abstract class BasicCall<
         ret = (
           <Container>
             <BottomMenuButton name="recall" onPress={this.onClickRecall} />
-            <BottomMenuButton name="close" onPress={this.onClickClose} />
+            <BottomMenuButton name="close" onPress={this.onClickClose as any} />
           </Container>
         );
         break;

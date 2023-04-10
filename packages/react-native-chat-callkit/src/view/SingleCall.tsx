@@ -26,6 +26,7 @@ const StateBarHeight = 44;
 
 export type SingleCallProps = BasicCallProps & {
   inviteeId: string;
+  onPeerJoined?: () => void;
 };
 export type SingleCallState = BasicCallState & {
   peerJoinChannelSuccess: boolean;
@@ -87,6 +88,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
 
     this.manager?.addViewListener(this);
+    this.props.onInitialized?.();
     if (this.props.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         this.startCall();
@@ -199,7 +201,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }): void {
     calllog.log('SingleCall:onCallEnded:', params);
     this.manager?.leaveChannel();
-    this.onClickClose();
+    this.onClickClose(params.elapsed);
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
@@ -229,6 +231,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       peerUid: params.userChannelId,
     });
     this.updateBottomButtons();
+    this.props.onPeerJoined?.();
   }
 
   onSelfJoined(params: {
@@ -245,6 +248,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     });
     this.setState({ callState: CallState.Calling });
     this.updateBottomButtons();
+    this.props?.onSelfJoined?.();
   }
 
   onRemoteUserOffline(params: {
