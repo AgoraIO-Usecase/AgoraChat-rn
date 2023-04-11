@@ -1,3 +1,4 @@
+import { BlurView } from '@react-native-community/blur';
 import * as React from 'react';
 import { Dimensions, Platform, Pressable, Text, View } from 'react-native';
 import {
@@ -15,14 +16,13 @@ import {
   BasicCallProps,
   BasicCallState,
   BottomButtonType,
+  StateBarHeight,
 } from './BasicCall';
-import { Avatar } from './components/Avatar';
+import { DefaultAvatar, DefaultAvatarMemo } from './components/Avatar';
 import Draggable from './components/Draggable';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
-
-const StateBarHeight = 44;
 
 export type SingleCallProps = BasicCallProps & {
   inviteeId: string;
@@ -30,6 +30,8 @@ export type SingleCallProps = BasicCallProps & {
 };
 export type SingleCallState = BasicCallState & {
   peerJoinChannelSuccess: boolean;
+  peerMuteVideo: boolean;
+  peerMuteAudio: boolean;
   peerUid: number;
   isSwitchVideo: boolean;
 };
@@ -60,9 +62,10 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       peerUid: 1,
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
       isSwitchVideo: false,
-      muteCamera: false,
       muteMicrophone: false,
       isInSpeaker: true,
+      peerMuteVideo: false,
+      peerMuteAudio: false,
     };
   }
 
@@ -108,11 +111,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     } else {
       // this.manager?.disableVideo();
       // this.manager?.stopPreview();
-      this.setState({
-        startPreview: false,
-        joinChannelSuccess: false,
-        peerJoinChannelSuccess: false,
-      });
+      // this.setState({
+      //   startPreview: false,
+      //   joinChannelSuccess: false,
+      //   peerJoinChannelSuccess: false,
+      // });
     }
 
     this.manager?.unInitRTC();
@@ -175,6 +178,37 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         this.setState({ bottomButtonType: s });
       }
     }
+  }
+
+  protected renderMiniVideoIsSelf(): boolean | null {
+    calllog.log('SingleCall:renderMiniVideoIsSelf:');
+    if (this.props.callType === 'audio') {
+      return null;
+    }
+    const { isSwitchVideo, isMinimize, callState } = this.state;
+    let ret = null;
+    if (callState === CallState.Calling) {
+      if (isMinimize === true) {
+        ret = false;
+      } else {
+        if (isSwitchVideo === true) {
+          ret = false;
+        } else {
+          ret = true;
+        }
+      }
+    } else {
+      if (isMinimize === true) {
+        ret = false;
+      } else {
+        if (isSwitchVideo === true) {
+          ret = true;
+        } else {
+          ret = false;
+        }
+      }
+    }
+    return ret;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -285,6 +319,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     muted: boolean;
   }): void {
     calllog.log('SingleCall:onRemoteUserMuteVideo:', params);
+    this.setState({ peerMuteVideo: params.muted });
   }
 
   onRemoteUserMuteAudio(params: {
@@ -294,6 +329,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     muted: boolean;
   }): void {
     calllog.log('SingleCall:onRemoteUserMuteAudio:', params);
+    this.setState({ peerMuteAudio: params.muted });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -308,6 +344,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       joinChannelSuccess,
       callState,
       selfUid,
+      muteVideo,
     } = this.state;
     calllog.log('SingleCall:renderSelfVideo:', selfUid);
     if (isMinimize === true) {
@@ -320,6 +357,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       return null;
     }
     if (startPreview !== true && joinChannelSuccess !== true) {
+      return null;
+    }
+    if (muteVideo === true) {
       return null;
     }
     if (Platform.OS === 'android') {
@@ -348,8 +388,13 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected renderPeerVideo(): React.ReactNode {
-    const { peerUid, setupMode, peerJoinChannelSuccess, callState } =
-      this.state;
+    const {
+      peerUid,
+      peerMuteVideo,
+      setupMode,
+      peerJoinChannelSuccess,
+      callState,
+    } = this.state;
     calllog.log('SingleCall:renderPeerVideo:', peerUid);
     if (this.props.callType === 'audio') {
       return null;
@@ -358,6 +403,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       return null;
     }
     if (peerJoinChannelSuccess !== true) {
+      return null;
+    }
+    if (peerMuteVideo === true) {
       return null;
     }
     if (Platform.OS === 'android') {
@@ -387,33 +435,15 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected renderMiniVideo(): React.ReactNode {
     calllog.log('SingleCall:renderMiniVideo:');
-    if (this.props.callType === 'audio') {
+    const ret = this.renderMiniVideoIsSelf();
+    if (ret === null) {
       return null;
     }
-    const { isSwitchVideo, isMinimize, callState } = this.state;
-    let ret = null;
-    if (callState === CallState.Calling) {
-      if (isMinimize === true) {
-        ret = this.renderPeerVideo();
-      } else {
-        if (isSwitchVideo === true) {
-          ret = this.renderPeerVideo();
-        } else {
-          ret = this.renderSelfVideo();
-        }
-      }
+    if (ret === true) {
+      return this.renderSelfVideo();
     } else {
-      if (isMinimize === true) {
-        ret = this.renderPeerVideo();
-      } else {
-        if (isSwitchVideo === true) {
-          ret = this.renderSelfVideo();
-        } else {
-          ret = this.renderPeerVideo();
-        }
-      }
+      return this.renderPeerVideo();
     }
-    return ret;
   }
 
   protected renderFullVideo(): React.ReactNode {
@@ -488,8 +518,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     );
   }
   protected renderAvatar(): React.ReactNode {
-    const { elapsed, callType, isInviter } = this.props;
-    const { callState } = this.state;
+    const { callType, isInviter, inviteeId, inviterId, currentId } = this.props;
+    const { callState, elapsed } = this.state;
     return (
       <View
         style={{
@@ -498,7 +528,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         }}
       >
         <View style={{ height: 60 }} />
-        <Avatar uri="" size={100} radius={100} />
+        <DefaultAvatar
+          userId={currentId === inviterId ? inviteeId : inviterId}
+          size={100}
+          radius={100}
+        />
         <View style={{ marginVertical: 10 }}>
           <Text
             style={{
@@ -506,13 +540,14 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               lineHeight: 28.64,
               fontWeight: '600',
               textAlign: 'center',
+              color: 'white',
             }}
           >
-            Monika
+            {currentId === inviterId ? inviteeId : inviterId}
           </Text>
         </View>
         {callState === CallState.Calling ? (
-          <Elapsed timer={elapsed} />
+          <Elapsed timer={elapsed} color="white" />
         ) : (
           <Text
             style={{
@@ -520,6 +555,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               lineHeight: 22,
               fontWeight: '400',
               textAlign: 'center',
+              color: 'white',
             }}
           >
             {isInviter === true
@@ -534,8 +570,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected renderFloatAudio(): React.ReactNode {
-    const { elapsed } = this.props;
-    const { callState } = this.state;
+    const { inviterId, inviteeId, currentId } = this.props;
+    const { elapsed, callState } = this.state;
     const content = 'Calling...';
     return (
       <View
@@ -556,7 +592,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             alignItems: 'center',
           }}
         >
-          <Avatar uri="" size={36} />
+          <DefaultAvatar
+            userId={currentId === inviterId ? inviteeId : inviterId}
+            size={36}
+            radius={36}
+          />
           {callState === CallState.Calling ? (
             <Elapsed timer={elapsed} />
           ) : (
@@ -577,16 +617,27 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected renderFloatVideo(): React.ReactNode {
-    const { elapsed } = this.props;
-    const { callState, isMinimize, muteVideo } = this.state;
+    const { currentId, inviteeId, inviterId } = this.props;
+    const { elapsed, isMinimize, muteVideo, peerMuteVideo } = this.state;
     const content = 'Calling...';
-    calllog.log('renderFloatVideo:', isMinimize);
+
+    const _isRenderVideo = () => {
+      const isRenderSelf = this.renderMiniVideoIsSelf();
+      if (isRenderSelf === true) {
+        return muteVideo === false ? true : false;
+      } else if (isRenderSelf === false) {
+        return peerMuteVideo === false ? true : false;
+      } else {
+        return false;
+      }
+    };
+
     if (isMinimize === true) {
       return (
         <View
           style={{
-            width: callState === CallState.Calling ? 90 : 76,
-            height: callState === CallState.Calling ? 160 : 76,
+            width: _isRenderVideo() === true ? 90 : 76,
+            height: _isRenderVideo() === true ? 160 : 76,
             // position: 'absolute',
             backgroundColor: 'grey',
             // right: 10,
@@ -596,7 +647,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           }}
         >
           {this.renderMiniVideo()}
-          {callState === CallState.Calling ? (
+          {_isRenderVideo() === true ? (
             <View
               style={{
                 flex: 1,
@@ -617,7 +668,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
                 alignItems: 'center',
               }}
             >
-              <Avatar uri="" size={36} />
+              <DefaultAvatar
+                userId={currentId === inviterId ? inviteeId : inviterId}
+                size={36}
+                radius={36}
+              />
               <Text
                 style={{
                   fontSize: 14,
@@ -640,8 +695,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         <Pressable
           onPress={this.onSwitchVideo}
           style={{
-            width: muteVideo === false ? 90 : 76,
-            height: muteVideo === false ? 160 : 76,
+            width: _isRenderVideo() === true ? 90 : 76,
+            height: _isRenderVideo() === true ? 160 : 76,
             position: 'absolute',
             backgroundColor: 'grey',
             right: 10,
@@ -651,7 +706,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           }}
         >
           {this.renderMiniVideo()}
-          {muteVideo === false ? null : (
+          {_isRenderVideo() === true ? null : (
             <View
               style={{
                 flex: 1,
@@ -661,7 +716,11 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
                 borderRadius: 12,
               }}
             >
-              <Avatar uri="" size={36} />
+              <DefaultAvatar
+                userId={currentId === inviterId ? inviteeId : inviterId}
+                size={36}
+                radius={36}
+              />
               <View
                 style={{
                   position: 'absolute',
@@ -711,6 +770,38 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       </View>
     );
   }
+  protected renderBlur(): React.ReactNode {
+    const { callType, currentId, inviteeId, inviterId } = this.props;
+    const { isMinimize } = this.state;
+    const { height, width } = Dimensions.get('window');
+    if (isMinimize === false && callType === 'audio') {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            flex: 1,
+            height,
+            width,
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          <DefaultAvatarMemo
+            userId={currentId === inviterId ? inviteeId : inviterId}
+            size={height > width ? height : width}
+          />
+          <BlurView
+            style={{ position: 'absolute', flex: 1, height, width }}
+            blurType="dark" // Values = dark, light, xlight .
+            blurAmount={10}
+            reducedTransparencyFallbackColor="red"
+          />
+        </View>
+      );
+    }
+    return null;
+  }
   protected renderBody(): React.ReactNode {
     const { width: screenWidth, height: screenHeight } =
       Dimensions.get('window');
@@ -746,8 +837,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       >
         {this.renderFullVideo()}
         {/* <View style={{ flex: 1, backgroundColor: 'blue' }} /> */}
-        {this.renderTopBar()}
+        {this.renderBlur()}
         {this.renderContent()}
+        {this.renderTopBar()}
         {this.renderBottomMenu()}
       </View>
     );

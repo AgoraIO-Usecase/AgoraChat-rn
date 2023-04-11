@@ -1,6 +1,114 @@
 // This file is generated automatically. Please do not edit it manually. If necessary, you can run the 'scripts/bundle-icons.js' script to generate it again.
 
 export const ICON_ASSETS = {
+  agora_avatar_1: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_1.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_1.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_1.png');
+    }
+  },
+  agora_avatar_10: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_10.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_10.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_10.png');
+    }
+  },
+  agora_avatar_11: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_11.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_11.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_11.png');
+    }
+  },
+  agora_avatar_12: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_12.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_12.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_12.png');
+    }
+  },
+  agora_avatar_2: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_2.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_2.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_2.png');
+    }
+  },
+  agora_avatar_3: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_3.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_3.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_3.png');
+    }
+  },
+  agora_avatar_4: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_4.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_4.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_4.png');
+    }
+  },
+  agora_avatar_5: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_5.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_5.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_5.png');
+    }
+  },
+  agora_avatar_6: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_6.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_6.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_6.png');
+    }
+  },
+  agora_avatar_7: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_7.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_7.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_7.png');
+    }
+  },
+  agora_avatar_8: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_8.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_8.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_8.png');
+    }
+  },
+  agora_avatar_9: (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Avatar/agora_avatar_9.png');
+    } else if (size === '2x') {
+      return require('./icons/Avatar/agora_avatar_9.png');
+    } else {
+      return require('./icons/Avatar/agora_avatar_9.png');
+    }
+  },
   arrows_2_pointing: (size: string) => {
     if (size === '3x') {
       return require('./icons/arrows_2_pointing_3x.png');

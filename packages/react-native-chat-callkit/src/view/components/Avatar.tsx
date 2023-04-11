@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
+import { hashCode } from '../../utils/utils';
 import Image from './Image';
-import { IconName, LocalIcon } from './LocalIcon';
+import { IconName, LocalIcon, localLocalIcon } from './LocalIcon';
 
 type SubComponents = {};
 
 const AVATAR_SIZE = 56;
 
 type AvatarProps = {
-  uri: string;
+  uri: string | number;
   uriOnError?: IconName | undefined;
   size?: number | undefined;
   radius?: number | undefined;
@@ -24,6 +25,7 @@ export const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
   containerStyle,
 }): JSX.Element => {
   const [loadDefault, setLoadDefault] = React.useState(false);
+  const uriS = typeof uri === 'number' ? uri : { uri: uri };
 
   return (
     <View
@@ -43,7 +45,7 @@ export const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
       ) : (
         <Image
           onError={() => setLoadDefault(true)}
-          source={{ uri }}
+          source={uriS}
           resizeMode="cover"
           style={[StyleSheet.absoluteFill, { width: size, height: size }]}
         />
@@ -59,3 +61,35 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
+
+export const AvatarMemo = React.memo(Avatar);
+
+const avatarNames = [
+  'agora_avatar_1',
+  'agora_avatar_2',
+  'agora_avatar_3',
+  'agora_avatar_4',
+  'agora_avatar_5',
+  'agora_avatar_6',
+  'agora_avatar_7',
+  'agora_avatar_8',
+  'agora_avatar_9',
+  'agora_avatar_10',
+  'agora_avatar_11',
+  'agora_avatar_12',
+] as IconName[];
+const avatarNamesCount = avatarNames.length;
+
+export function DefaultAvatar(
+  props: Omit<AvatarProps, 'uri' | 'uriOnError'> & { userId: string }
+): JSX.Element {
+  const { userId, ...others } = props;
+  const i = hashCode(userId);
+  const index = i % avatarNamesCount;
+  const name = avatarNames[index] as IconName;
+  const source = localLocalIcon(name) as number;
+  console.log('test:DefaultAvatar:', props, i, index, name, source);
+  return <Avatar uri={source} {...others} />;
+}
+
+export const DefaultAvatarMemo = React.memo(DefaultAvatar);

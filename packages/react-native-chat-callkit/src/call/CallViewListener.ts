@@ -153,6 +153,38 @@ export interface CallViewListener {
   }) => void;
 
   /**
+   * Notification for local user disable/enable video.
+   *
+   * @param params -
+   * - channelId: Call channel ID.
+   * - userId: the user ID.
+   * - userChannelId: the user channel ID.
+   * - muted: Whether the remote user stops publishing the video stream:true: The remote user stops publishing the video stream.false: The remote user resumes publishing the video stream.
+   */
+  onLocalVideoStateChanged?: (params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }) => void;
+
+  /**
+   * Notification for local user disable/enable audio.
+   *
+   * @param params -
+   * - channelId: Call channel ID.
+   * - userId: the user ID.
+   * - userChannelId: the user channel ID.
+   * - muted: Whether the remote user stops publishing the audio stream:true: The remote user stops publishing the audio stream.false: The remote user resumes publishing the audio stream.
+   */
+  onLocalAudioStateChanged?: (params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }) => void;
+
+  /**
    * Reports the volume information of users. By default, this callback is disabled. You can enable it by calling enableAudioVolumeIndication .
    *
    * @param params -

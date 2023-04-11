@@ -1,6 +1,6 @@
 import { BlurView } from '@react-native-community/blur';
 import * as React from 'react';
-import { View } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import type { VideoViewSetupMode } from 'react-native-agora';
 
 import { calllog } from '../call/CallConst';
@@ -15,6 +15,7 @@ import {
 import Image from './components/Image';
 import { IconSize, localLocalIcon } from './components/LocalIcon';
 
+export const StateBarHeight = StatusBar.currentHeight ?? 44;
 const BottomBarHeight = 60;
 
 export type BottomButtonType =
@@ -75,7 +76,6 @@ export type BasicCallState = {
   setupMode: VideoViewSetupMode;
   isInSpeaker: boolean;
   muteMicrophone: boolean;
-  muteCamera: boolean;
   bottomButtonType: BottomButtonType;
   muteVideo: boolean;
   callState: CallState;
@@ -91,12 +91,6 @@ export abstract class BasicCall<
 {
   // eslint-disable-next-line react/sort-comp
   protected _inviteeTimer?: NodeJS.Timeout;
-  constructor(props: Props) {
-    super(props);
-    this.setState({
-      channelId: 'magic',
-    });
-  }
   componentDidMount(): void {
     calllog.log('BasicCall:componentDidMount:');
     this.init();
@@ -232,6 +226,7 @@ export abstract class BasicCall<
   }
 
   render(): React.ReactNode {
+    console.log('test:123:', StateBarHeight, StatusBar.currentHeight);
     return this.renderBody();
   }
 
@@ -261,7 +256,6 @@ export abstract class BasicCall<
   protected renderBottomMenu(): React.ReactNode {
     const { bottomButtonType, isInSpeaker, muteMicrophone, muteVideo } =
       this.state;
-    calllog.log('test:renderBottomMenu', bottomButtonType);
     const disabled = true;
     let ret = <></>;
     const speaker = (): BottomMenuButtonType => {
@@ -489,5 +483,23 @@ export abstract class BasicCall<
     }[];
   }): void {
     calllog.log('BasicCall:onAudioVolumeIndication:', params);
+  }
+
+  onLocalVideoStateChanged(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('BasicCall:onLocalVideoStateChanged:', params);
+  }
+
+  onLocalAudioStateChanged(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('BasicCall:onLocalAudioStateChanged:', params);
   }
 }

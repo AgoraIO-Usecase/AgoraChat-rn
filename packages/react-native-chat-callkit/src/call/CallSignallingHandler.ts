@@ -162,7 +162,6 @@ export class CallSignallingHandler implements ChatMessageEventListener {
         ret = parseFloat(ts);
       }
     }
-    calllog.log('test:345:', ret);
     return ret;
   }
 

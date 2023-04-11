@@ -12,9 +12,10 @@ import {
   BasicCallProps,
   BasicCallState,
   BottomButtonType,
+  StateBarHeight,
 } from './BasicCall';
 import { AudioTabs } from './components/AudioTabs';
-import { Avatar } from './components/Avatar';
+import { DefaultAvatar } from './components/Avatar';
 import Draggable from './components/Draggable';
 import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
@@ -22,7 +23,6 @@ import type { IconName } from './components/LocalIcon';
 import { MiniButton } from './components/MiniButton';
 import { VideoTabs } from './components/VideoTabs';
 
-const StateBarHeight = 44;
 const VideoMaxCount = 18;
 const AudioMaxCount = 128;
 const ContentBottom = 148;
@@ -94,7 +94,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       elapsed: props.elapsed ?? 0,
       selfUid: 0,
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
-      muteCamera: false,
       muteMicrophone: false,
       isInSpeaker: true,
       remoteUsersJoinChannelSuccess: new Map(),
@@ -163,13 +162,13 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     } else {
       // this.manager?.disableVideo();
       // this.manager?.stopPreview();
-      this.setState({
-        startPreview: false,
-        joinChannelSuccess: false,
-        remoteUsersJoinChannelSuccess: new Map(),
-        remoteUsersUid: new Map(),
-        users: [],
-      });
+      // this.setState({
+      //   startPreview: false,
+      //   joinChannelSuccess: false,
+      //   remoteUsersJoinChannelSuccess: new Map(),
+      //   remoteUsersUid: new Map(),
+      //   users: [],
+      // });
     }
 
     this.manager?.unInitRTC();
@@ -600,6 +599,62 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }
   }
 
+  onLocalVideoStateChanged(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('MultiCall:onLocalVideoStateChanged:', params);
+    const { users, cache } = this.state;
+    for (const user of users) {
+      if (user.userId === params.userId) {
+        user.muteVideo = params.muted;
+        this.setState({ users: [...users] });
+        break;
+      }
+    }
+    if (params.userId === '') {
+      const user = cache.get(params.userChannelId);
+      if (user) {
+        user.muteVideo = params.muted;
+      } else {
+        cache.set(params.userChannelId, {
+          userId: params.userId,
+          muteVideo: params.muted,
+        } as User);
+      }
+    }
+  }
+
+  onLocalAudioStateChanged(params: {
+    channelId: string;
+    userId: string;
+    userChannelId: number;
+    muted: boolean;
+  }): void {
+    calllog.log('BasicCall:onLocalAudioStateChanged:', params);
+    const { users, cache } = this.state;
+    for (const user of users) {
+      if (user.userId === params.userId) {
+        user.muteAudio = params.muted;
+        this.setState({ users: [...users] });
+        break;
+      }
+    }
+    if (params.userId === '') {
+      const user = cache.get(params.userChannelId);
+      if (user) {
+        user.muteAudio = params.muted;
+      } else {
+        cache.set(params.userChannelId, {
+          userId: params.userId,
+          muteAudio: params.muted,
+        } as User);
+      }
+    }
+  }
+
   private cloneUsers(): User[] {
     const { users } = this.state;
     const ret = [] as User[];
@@ -825,7 +880,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
               alignItems: 'center',
             }}
           >
-            <Avatar uri="" size={36} />
+            <DefaultAvatar userId="" size={36} />
             {callState === CallState.Calling ? (
               <Elapsed timer={elapsed} />
             ) : (

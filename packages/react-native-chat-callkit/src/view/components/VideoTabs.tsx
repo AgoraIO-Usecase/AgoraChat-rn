@@ -1,3 +1,4 @@
+import { BlurView } from '@react-native-community/blur';
 import { Tab, TabView } from '@rneui/themed';
 import * as React from 'react';
 import { Dimensions, Pressable, Text, View } from 'react-native';
@@ -5,8 +6,8 @@ import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
-import { Avatar } from './Avatar';
-import { IconName, LocalIcon } from './LocalIcon';
+import { Avatar, DefaultAvatar, DefaultAvatarMemo } from './Avatar';
+import { LocalIcon } from './LocalIcon';
 
 const PageCount = 4;
 
@@ -60,12 +61,46 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
     this.setState({ subUsers: [...users] });
   }
 
+  protected renderBlur(params: {
+    user: User;
+    height: number;
+    width: number;
+  }): React.ReactNode {
+    const { user, width, height } = params;
+    if (user.muteVideo === true) {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            flex: 1,
+            height,
+            width,
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'hidden',
+          }}
+        >
+          <DefaultAvatarMemo
+            userId={user.userId}
+            size={height > width ? height : width}
+          />
+          <BlurView
+            style={{ position: 'absolute', flex: 1, height, width }}
+            blurType="dark" // Values = dark, light, xlight .
+            blurAmount={10}
+            reducedTransparencyFallbackColor="red"
+          />
+        </View>
+      );
+    }
+    return null;
+  }
+
   public render(): React.ReactNode {
     const { index, onPress, users } = this.props;
     // const { subUsers } = this.state;
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
-    const name = 'default_avatar' as IconName;
     return (
       <TabView.Item
         key={index.toString()}
@@ -85,6 +120,11 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
         >
           {users.map((user, i) => {
             const count = users.length;
+            const width =
+              count === 1 || count === 2 || (count === 3 && i === 2)
+                ? '100%'
+                : '50%';
+            const height = count === 1 ? windowHeight : windowHeight * 0.5;
             return (
               <Pressable
                 onPress={() => {
@@ -97,11 +137,8 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                 }}
                 key={user.userId}
                 style={{
-                  width:
-                    count === 1 || count === 2 || (count === 3 && i === 2)
-                      ? '100%'
-                      : '50%',
-                  height: count === 1 ? windowHeight : windowHeight * 0.5,
+                  width,
+                  height,
                   // backgroundColor: 'green',
                   // margin: 1,
                   // justifyContent: 'center',
@@ -110,6 +147,11 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                   borderWidth: 1,
                 }}
               >
+                {this.renderBlur({
+                  user,
+                  height,
+                  width: width === '50%' ? windowWidth * 0.5 : windowWidth,
+                })}
                 {user.muteVideo ? (
                   <View
                     style={{
@@ -120,12 +162,20 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                     <View style={{ flex: 1 }} />
                     <View
                       style={{
-                        backgroundColor: '#14FF72',
+                        // backgroundColor: '#14FF72',
                         padding: 5,
                         borderRadius: 105,
                       }}
                     >
-                      <Avatar uri={name} size={100} radius={100} />
+                      {user.userAvatar ? (
+                        <Avatar uri={user.userAvatar} size={100} radius={100} />
+                      ) : (
+                        <DefaultAvatar
+                          userId={user.userId}
+                          size={100}
+                          radius={100}
+                        />
+                      )}
                     </View>
                     <View style={{ flex: 2 }} />
                   </View>

@@ -8,6 +8,8 @@ import {
   ErrorCodeType,
   IRtcEngine,
   IRtcEngineEventHandler,
+  LocalAudioStreamError,
+  LocalAudioStreamState,
   LocalVideoStreamError,
   LocalVideoStreamState,
   RemoteAudioStats,
@@ -472,7 +474,8 @@ export class CallManagerImpl
             onResult: ({ callId, error }) => {
               calllog.log(
                 'CallManagerImpl:refuseCall:sendInviteReply:',
-                params
+                callId,
+                error
               );
               if (error) {
                 this.timer.stopTiming({ callId, userId: call.inviter.userId });
@@ -519,8 +522,9 @@ export class CallManagerImpl
             reply: 'accept',
             onResult: ({ callId, error }) => {
               calllog.log(
-                'CallManagerImpl:refuseCall:sendInviteReply:',
-                params
+                'CallManagerImpl:acceptCall:sendInviteReply:',
+                callId,
+                error
               );
               if (error) {
                 this.timer.stopTiming({ callId, userId: call.inviter.userId });
@@ -914,7 +918,6 @@ export class CallManagerImpl
           addedIds.push(id);
         }
       }
-      calllog.log('test:12345:', addedIds, call.invitees);
       if (call.isInviter === false) {
         if (
           call.state !== CallSignalingState.Idle &&
@@ -1257,7 +1260,7 @@ export class CallManagerImpl
         inviterDeviceToken: params.inviterDeviceToken,
         reply: 'busy',
         onResult: (params: { callId: string; error?: CallError }) => {
-          calllog.log('CallManagerImpl:refuseCall:sendInviteReply:', params);
+          calllog.log('CallManagerImpl:onInvite:sendInviteReply:', params);
           // TODO: ignore.
         },
       });
@@ -1512,44 +1515,42 @@ export class CallManagerImpl
             }
           }
         }
-        if (params.reply === 'accept' || params.reply === 'refuse') {
-          this.signalling.sendInviteReplyConfirm({
-            callId: params.callId,
-            inviteeId: params.inviteeId,
-            inviteeDeviceToken: invitee.userDeviceToken,
-            inviterDeviceToken: params.inviterDeviceToken,
-            reply: params.reply,
-            onResult: ({ callId, error }) => {
-              calllog.log(
-                'CallManagerImpl:onInviteReply:sendInviteReplyConfirm:',
-                callId,
-                error
-              );
-              if (error) {
-                const call = this._getCall(callId);
-                if (call) {
-                  if (
-                    call.callType !== CallType.VideoMulti &&
-                    call.callType !== CallType.AudioMulti
-                  ) {
-                    this._clear();
-                    this._onCallEnded({
-                      channelId: call.channelId,
-                      callType: call.callType,
-                      endReason: CallEndReason.NoResponse,
-                    });
-                  } else {
-                    this._onRemoveRemoteUser({
-                      channelId: call.channelId,
-                      userId: params.inviteeId,
-                      reason: CallEndReason.NoResponse,
-                    });
-                  }
+        this.signalling.sendInviteReplyConfirm({
+          callId: params.callId,
+          inviteeId: params.inviteeId,
+          inviteeDeviceToken: invitee.userDeviceToken,
+          inviterDeviceToken: params.inviterDeviceToken,
+          reply: params.reply,
+          onResult: ({ callId, error }) => {
+            calllog.log(
+              'CallManagerImpl:onInviteReply:sendInviteReplyConfirm:',
+              callId,
+              error
+            );
+            if (error) {
+              const call = this._getCall(callId);
+              if (call) {
+                if (
+                  call.callType !== CallType.VideoMulti &&
+                  call.callType !== CallType.AudioMulti
+                ) {
+                  this._clear();
+                  this._onCallEnded({
+                    channelId: call.channelId,
+                    callType: call.callType,
+                    endReason: CallEndReason.NoResponse,
+                  });
+                } else {
+                  this._onRemoveRemoteUser({
+                    channelId: call.channelId,
+                    userId: params.inviteeId,
+                    reason: CallEndReason.NoResponse,
+                  });
                 }
               }
-            },
-          });
-        }
+            }
+          },
+        });
       }
     }
   }
@@ -1959,6 +1960,67 @@ export class CallManagerImpl
     );
     const call = this.ship.currentCall;
     if (call) {
+      if (call.inviter.userId === this.userId) {
+        this.listener?.onLocalVideoStateChanged?.({
+          channelId: call.channelId,
+          userId: this.userId,
+          userChannelId: call.inviter.userChannelId ?? 0,
+          muted:
+            state === LocalVideoStreamState.LocalVideoStreamStateFailed ||
+            state === LocalVideoStreamState.LocalVideoStreamStateStopped,
+        });
+      } else {
+        const invitee = call.invitees.get(this.userId);
+        if (invitee) {
+          this.listener?.onLocalVideoStateChanged?.({
+            channelId: call.channelId,
+            userId: invitee.userId,
+            userChannelId: invitee.userChannelId ?? 0,
+            muted:
+              state === LocalVideoStreamState.LocalVideoStreamStateFailed ||
+              state === LocalVideoStreamState.LocalVideoStreamStateStopped,
+          });
+        }
+      }
+      call.videoToAudio = true;
+    }
+  }
+
+  public onLocalAudioStateChanged(
+    connection: RtcConnection,
+    state: LocalAudioStreamState,
+    error: LocalAudioStreamError
+  ) {
+    calllog.log(
+      'CallManagerImpl:onLocalAudioStateChanged:',
+      connection,
+      state,
+      error
+    );
+    const call = this.ship.currentCall;
+    if (call) {
+      if (call.inviter.userId === this.userId) {
+        this.listener?.onLocalAudioStateChanged?.({
+          channelId: call.channelId,
+          userId: this.userId,
+          userChannelId: call.inviter.userChannelId ?? 0,
+          muted:
+            state === LocalAudioStreamState.LocalAudioStreamStateFailed ||
+            state === LocalAudioStreamState.LocalAudioStreamStateStopped,
+        });
+      } else {
+        const invitee = call.invitees.get(this.userId);
+        if (invitee) {
+          this.listener?.onLocalAudioStateChanged?.({
+            channelId: call.channelId,
+            userId: invitee.userId,
+            userChannelId: invitee.userChannelId ?? 0,
+            muted:
+              state === LocalAudioStreamState.LocalAudioStreamStateFailed ||
+              state === LocalAudioStreamState.LocalAudioStreamStateStopped,
+          });
+        }
+      }
       call.videoToAudio = true;
     }
   }

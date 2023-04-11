@@ -4,8 +4,8 @@ import { Text, useWindowDimensions, View } from 'react-native';
 
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
-import { Avatar } from './Avatar';
-import { IconName, LocalIcon } from './LocalIcon';
+import { Avatar, DefaultAvatar } from './Avatar';
+import { LocalIcon } from './LocalIcon';
 
 const PageCount = 9;
 
@@ -18,7 +18,6 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
   // calllog.log('AudioTab:', props);
   const { subUsers, index } = props;
   const { width: screenWidth } = useWindowDimensions();
-  const name = 'default_avatar' as IconName;
   return (
     <TabView.Item
       key={index.toString()}
@@ -63,7 +62,11 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
                       user.talking === true ? '#14FF72' : undefined,
                   }}
                 >
-                  <Avatar uri={name} size={80} radius={80} />
+                  {user.userAvatar ? (
+                    <Avatar uri={user.userAvatar} size={80} radius={80} />
+                  ) : (
+                    <DefaultAvatar userId={user.userId} size={80} radius={80} />
+                  )}
                 </View>
               </View>
               <View style={{ height: 5 }} />

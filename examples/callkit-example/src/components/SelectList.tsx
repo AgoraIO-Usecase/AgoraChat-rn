@@ -58,7 +58,6 @@ type SelectListProps = {
   onAddedIds?: (ids: string[]) => void;
 };
 export function SelectList(props: SelectListProps): JSX.Element {
-  console.log('test:SelectList:', props);
   const { selectedIds, maxCount, onChangeCount, onAddedIds } = props;
   const { client, currentId } = useAppChatSdkContext();
   const data = React.useMemo(() => [] as DataType[], []);
@@ -213,7 +212,6 @@ export function SelectList(props: SelectListProps): JSX.Element {
 export const SelectListMemo = React.memo(SelectList);
 
 export const ContactList = (props: InviteeListProps): JSX.Element => {
-  console.log('test:contactList:');
   const { onClose, onCancel, selectedIds, maxCount } = props;
   const [count, setCount] = React.useState<number>(selectedIds.length);
   const addedIdsRef = React.useRef<string[]>([]);
@@ -256,12 +254,12 @@ export const ContactList = (props: InviteeListProps): JSX.Element => {
       <SelectListMemo
         selectedIds={selectedIds}
         maxCount={maxCount}
-        onChangeCount={(c) => {
+        onChangeCount={React.useCallback((c) => {
           setCount(c);
-        }}
-        onAddedIds={(ids: string[]) => {
+        }, [])}
+        onAddedIds={React.useCallback((ids: string[]) => {
           addedIdsRef.current = ids;
-        }}
+        }, [])}
       />
     </View>
   );
