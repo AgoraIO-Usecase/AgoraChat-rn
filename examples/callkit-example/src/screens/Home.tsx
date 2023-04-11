@@ -295,7 +295,14 @@ export default function HomeScreen({
         >
           multiA
         </Button>
-        <Button style={style.button}>navi</Button>
+        <Button
+          style={style.button}
+          onPress={() => {
+            navigation.push('Test', { params: {} });
+          }}
+        >
+          navi
+        </Button>
         <Button
           style={style.button}
           onPress={() => {

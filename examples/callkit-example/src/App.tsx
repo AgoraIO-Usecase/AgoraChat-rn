@@ -47,6 +47,7 @@ import type { RootParamsList, RootParamsName } from './routes';
 import HomeScreen from './screens/Home';
 import LoginScreen from './screens/Login';
 import { SplashScreen } from './screens/Splash';
+import { TestScreen } from './screens/Test';
 import { createAppScaleFactor } from './styles/createAppScaleFactor';
 import { AppServerClient } from './utils/AppServer';
 import {
@@ -379,6 +380,15 @@ export default function App() {
                     };
                   }}
                   component={HomeScreen}
+                />
+                <Root.Screen
+                  name="Test"
+                  options={() => {
+                    return {
+                      headerShown: true,
+                    };
+                  }}
+                  component={TestScreen}
                 />
               </Root.Navigator>
             </NavigationContainer>
