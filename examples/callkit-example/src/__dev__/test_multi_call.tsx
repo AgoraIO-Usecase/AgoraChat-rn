@@ -57,7 +57,7 @@ const ContactList = (props: InviteeListProps): JSX.Element => {
 
 export function test_all() {
   const isMinimize = false; // for test
-  const elapsed = 10000; // for test
+  // const elapsed = 10000; // for test
   const isInviter = true; // !!! must
   const callState = CallState.Calling; // for test
   const callType = 'audio'; // !!! must
@@ -73,7 +73,6 @@ export function test_all() {
   return (
     <MultiCall
       isMinimize={isMinimize}
-      elapsed={elapsed}
       isInviter={isInviter}
       callState={callState}
       callType={callType}
@@ -106,6 +105,7 @@ export function test_all() {
       inviteeList={{
         InviteeList: ContactList,
       }}
+      onClose={() => {}}
     />
   );
 }

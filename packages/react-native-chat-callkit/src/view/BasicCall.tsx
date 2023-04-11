@@ -232,7 +232,6 @@ export abstract class BasicCall<
   }
 
   render(): React.ReactNode {
-    console.log('test:123:', StateBarHeight, StatusBar.currentHeight);
     return this.renderBody();
   }
 

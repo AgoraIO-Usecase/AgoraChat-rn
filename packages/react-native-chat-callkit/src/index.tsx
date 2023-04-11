@@ -10,7 +10,7 @@
 //   const r = ChatClient.getInstance().init(
 //     new ChatOptions({ appKey: 'test', autoLogin: false })
 //   );
-//   console.log('test:', r);
+//   calllog.log('test:', r);
 //   return Promise.resolve(a * b);
 // }
 // const LINKING_ERROR =

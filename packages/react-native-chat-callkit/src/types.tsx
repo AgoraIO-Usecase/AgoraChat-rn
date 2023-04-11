@@ -3,6 +3,7 @@ import type { CallOption, CallUser } from './call';
 export interface CallkitSdkContextType {
   option: CallOption;
   enableLog?: boolean;
+  logHandler?: (message?: any, ...optionalParams: any[]) => void;
   requestRTCToken: (params: {
     appKey: string;
     channelId: string;

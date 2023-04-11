@@ -88,7 +88,6 @@ export function DefaultAvatar(
   const index = i % avatarNamesCount;
   const name = avatarNames[index] as IconName;
   const source = localLocalIcon(name) as number;
-  console.log('test:DefaultAvatar:', props, i, index, name, source);
   return <Avatar uri={source} {...others} />;
 }
 

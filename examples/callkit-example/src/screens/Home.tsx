@@ -1,6 +1,12 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ListRenderItemInfo, StyleSheet, Text, View } from 'react-native';
+import {
+  DeviceEventEmitter,
+  ListRenderItemInfo,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {
   CallEndReason,
   CallError,
@@ -165,6 +171,107 @@ const ContactList = React.memo((props: ContactListProps) => {
   );
 });
 
+type LogType = {
+  index: number;
+  content: string;
+  level?: number;
+};
+const LogListRenderItem = (
+  info: ListRenderItemInfo<LogType>
+): React.ReactElement | null => {
+  const { item } = info;
+  return (
+    <View
+      style={{
+        // height: 40,
+        backgroundColor: '#f5f5f5',
+        // marginHorizontal: 10,
+        // justifyContent: 'center',
+        marginVertical: 1,
+      }}
+    >
+      <Text
+        style={{
+          flexWrap: 'wrap',
+          marginHorizontal: 10,
+        }}
+      >
+        {item.content}
+      </Text>
+    </View>
+  );
+};
+type LogListRef = {
+  start: () => void;
+  stop: () => void;
+  clear: () => void;
+};
+type LogListProps = {
+  propsRef?: React.RefObject<LogListRef>;
+};
+function LogList(props: LogListProps): JSX.Element {
+  console.log('test:LogList:p', props);
+  const { propsRef } = props;
+  const { call } = useCallkitSdkContext();
+  const index = React.useRef(0);
+  const [_data, setData] = React.useState([] as LogType[]);
+  const init = React.useCallback(
+    (enableLog: boolean) => {
+      console.log('test:LogList:init');
+      if (enableLog) {
+        const log = async (message?: any, ...optionalParams: any[]) => {
+          const arr = [message, ...optionalParams];
+          let str = '';
+          for (const a of arr) {
+            if (a?.toString) {
+              str += a.toString();
+            }
+          }
+          console.log('demo:123:', str);
+          _data.push({ index: index.current, content: str });
+          index.current += 1;
+          // queueMicrotask(() => {
+          //   setData([..._data]);
+          // });
+          // DeviceEventEmitter.emit('log', '');
+        };
+        call.setLogHandler(log);
+      } else {
+        call.setLogHandler(undefined);
+      }
+    },
+    [_data, call]
+  );
+  React.useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('log', () => {
+      console.log('test:234:');
+      setData([..._data]);
+    });
+    init(true);
+    return () => {
+      sub.remove();
+    };
+  }, [_data, init]);
+
+  if (propsRef) {
+    if (propsRef.current) {
+      propsRef.current.clear = () => {
+        setData([]);
+      };
+      propsRef.current.stop = () => {
+        init(false);
+      };
+      propsRef.current.stop = () => {
+        init(true);
+      };
+    }
+  }
+
+  return (
+    <FlatList data={_data} extraData={_data} renderItem={LogListRenderItem} />
+  );
+}
+
 export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<RootParamsList, 'Home'>): JSX.Element {
@@ -172,6 +279,7 @@ export default function HomeScreen({
   const contactListRef = React.useRef<ContactListRef>({} as any);
   const { currentId, logout: logoutAction } = useAppChatSdkContext();
   const { call } = useCallkitSdkContext();
+  const [enableLog, setEnableLog] = React.useState(false);
 
   const addListener = React.useCallback(() => {
     const listener = {
@@ -306,10 +414,10 @@ export default function HomeScreen({
         <Button
           style={style.button}
           onPress={() => {
-            contactListRef.current.hideCall();
+            setEnableLog(!enableLog);
           }}
         >
-          close
+          log
         </Button>
       </View>
     );
@@ -319,7 +427,8 @@ export default function HomeScreen({
       <View
         style={{
           flex: 1,
-          marginBottom: 100,
+          borderColor: 'grey',
+          borderWidth: 1,
           // backgroundColor: 'red',
         }}
       >
@@ -327,11 +436,25 @@ export default function HomeScreen({
       </View>
     );
   };
+  const log = () => {
+    return enableLog ? (
+      <View
+        style={{
+          flexGrow: 5,
+          backgroundColor: 'red',
+          height: 400,
+        }}
+      >
+        <LogList />
+      </View>
+    ) : null;
+  };
   return (
     <View style={{ top: 44, flex: 1 }}>
       {info()}
       {tools()}
       {list()}
+      {log()}
     </View>
   );
 }

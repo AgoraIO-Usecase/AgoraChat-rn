@@ -276,6 +276,13 @@ export class CallManagerImpl
     this._userListener = undefined;
   }
 
+  public setLogHandler(
+    handler: ((message?: any, ...optionalParams: any[]) => void) | undefined
+  ): void {
+    calllog.log('CallManagerImpl:setLogHandler:', handler);
+    calllog.handler = handler;
+  }
+
   public addViewListener(listener: CallViewListener): void {
     this._listener = listener;
   }
@@ -665,7 +672,7 @@ export class CallManagerImpl
 
   private _isBusy(): boolean {
     calllog.log(
-      'test:_isBusy:',
+      'CallManagerImpl:_isBusy:',
       this.ship.currentCall?.state,
       this.ship.receiveCallList.size
     );
@@ -703,7 +710,7 @@ export class CallManagerImpl
           inviteeId: invitee?.userId,
           inviterDeviceToken: call.inviter.userDeviceToken!,
           onResult: ({ callId, error }) => {
-            console.log(
+            calllog.log(
               'CallManagerImpl:_cancelCall:sendInviteCancel:',
               callId,
               error
@@ -986,7 +993,7 @@ export class CallManagerImpl
           callId: call.callId,
           ext: params.extension,
           onResult: ({ callId, error }) => {
-            console.log('CallManagerImpl:sendInvite:', callId, error);
+            calllog.log('CallManagerImpl:sendInvite:', callId, error);
             if (error) {
               this.timer.stopTiming({ callId, userId: id });
               const call = this._getCall(callId);
@@ -1055,7 +1062,7 @@ export class CallManagerImpl
           callId: call.callId,
           ext: params.extension,
           onResult: ({ callId, error }) => {
-            console.log('CallManagerImpl:sendInvite:', callId);
+            calllog.log('CallManagerImpl:sendInvite:', callId);
             if (error) {
               // TODO: Could be a network problem. Could be on a blacklist.
               this.timer.stopTiming({ callId, userId: id });
@@ -1100,7 +1107,7 @@ export class CallManagerImpl
         inviteeId: params.userId,
         inviterDeviceToken: call.inviter.userDeviceToken!,
         onResult: ({ callId, error }) => {
-          console.log(
+          calllog.log(
             'CallManagerImpl:_inviteTimeout:sendInviteCancel:',
             callId,
             error

@@ -15,7 +15,6 @@ function getImageComponent(): ImageComponent {
     try {
       return require('./FastImage').default;
     } catch (e) {
-      console.warn('getImageComponent:', e);
       return require('./Image').default;
     }
   } else {
