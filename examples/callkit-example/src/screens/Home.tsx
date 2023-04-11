@@ -197,7 +197,7 @@ export default function HomeScreen({
         });
       },
       onCallOccurError: (params: { channelId: string; error: CallError }) => {
-        console.log('onCallOccurError:', params);
+        console.warn('onCallOccurError:', params);
       },
     } as CallListener;
     call.addListener(listener);

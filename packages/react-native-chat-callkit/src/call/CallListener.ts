@@ -1,4 +1,5 @@
 import type { CallType } from '../enums';
+import type { CallError } from './CallError';
 
 /**
  * The call notification
@@ -21,4 +22,13 @@ export interface CallListener {
     callType: CallType;
     extension?: any;
   }) => void;
+
+  /**
+   * Notification that an error occurred.
+   *
+   * @param -
+   * - channelId: Call channel ID.
+   * - error: An error occurred during a call or signaling process. {@link CallError}
+   */
+  onCallOccurError?: (params: { channelId: string; error: CallError }) => void;
 }

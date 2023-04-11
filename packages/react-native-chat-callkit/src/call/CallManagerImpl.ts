@@ -722,9 +722,10 @@ export class CallManagerImpl
     inviteeIds: string[];
     timestamp?: number;
     ext?: any;
-  }): CallObject {
+  }): CallObject | CallError {
     if (this.ship.currentCall) {
-      throw new CallError({
+      calllog.warn('_createInviterCall:', params);
+      return new CallError({
         code: CallErrorCode.ExceptionState,
         description: 'The `Call` object has been created.',
       });
@@ -766,15 +767,10 @@ export class CallManagerImpl
     };
     timestamp?: number;
     ext?: any;
-  }): CallObject {
-    if (this.ship.currentCall) {
-      throw new CallError({
-        code: CallErrorCode.ExceptionState,
-        description: 'The `Call` object has been created.',
-      });
-    }
-    if (this.ship.receiveCallList.get(params.callId)) {
-      throw new CallError({
+  }): CallObject | CallError {
+    if (this.ship.currentCall || this.ship.receiveCallList.get(params.callId)) {
+      calllog.warn('_createInviteeCall:', params);
+      return new CallError({
         code: CallErrorCode.ExceptionState,
         description: 'The `Call` object has been created.',
       });
@@ -1007,11 +1003,16 @@ export class CallManagerImpl
       }
     } else {
       // The case of a brand new invitation.
-      call = this._createInviterCall({
+      const ret = this._createInviterCall({
         callType: params.callType,
         channelId: params.channelId,
         inviteeIds: params.inviteeIds,
       });
+      if (ret instanceof CallError) {
+        params.onResult({ error: ret });
+        return;
+      }
+      call = ret;
       this._changeState({
         callId: call.callId,
         new: CallSignalingState.InviterInviting,
@@ -1267,7 +1268,7 @@ export class CallManagerImpl
       return;
     }
     const onInviteInternal = () => {
-      const call = this._createInviteeCall({
+      const ret = this._createInviteeCall({
         callId: params.callId,
         callType: params.callType,
         channelId: params.channelId,
@@ -1278,6 +1279,32 @@ export class CallManagerImpl
         timestamp: params.ts,
         ext: params.ext,
       });
+      if (ret instanceof CallError) {
+        calllog.warn(
+          'CallManagerImpl:onInviteInternal:error:',
+          params,
+          this.ship
+        );
+        this.signalling.sendInviteReply({
+          callId: params.callId,
+          inviterId: params.inviterId,
+          inviteeDeviceToken: this.deviceToken,
+          inviterDeviceToken: params.inviterDeviceToken,
+          reply: 'busy',
+          onResult: (params: { callId: string; error?: CallError }) => {
+            calllog.log(
+              'CallManagerImpl:onInviteInternal:sendInviteReply:',
+              params
+            );
+          },
+        });
+        this.userListener?.onCallOccurError?.({
+          channelId: params.channelId,
+          error: ret,
+        });
+        return;
+      }
+      const call = ret;
       const invitee = call.invitees.get(this.userId);
       if (invitee) {
         this._changeState({
@@ -1318,9 +1345,12 @@ export class CallManagerImpl
             this._setUser(user);
             onInviteInternal();
           } else {
-            throw new CallError({
-              code: CallErrorCode.ExceptionState,
-              description: 'The current logged-in user cannot be obtained.',
+            this.userListener?.onCallOccurError?.({
+              channelId: params.channelId,
+              error: new CallError({
+                code: CallErrorCode.Others,
+                description: 'The current logged-in user cannot be obtained.',
+              }),
             });
           }
         },

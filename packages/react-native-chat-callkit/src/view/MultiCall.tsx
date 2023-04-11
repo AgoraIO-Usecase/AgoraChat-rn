@@ -199,9 +199,12 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     if (this.state.channelId === '') {
       channelId = this.manager?.getCurrentChannelId() ?? '';
       if (channelId === '') {
-        throw new CallError({
-          code: CallErrorCode.ExceptionState,
-          description: 'channelId not found.',
+        this.onCallOccurError({
+          channelId: '',
+          error: new CallError({
+            code: CallErrorCode.ExceptionState,
+            description: 'channelId not found.',
+          }),
         });
       }
       this.setState({ channelId: channelId });
@@ -220,7 +223,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             onResult: (params) => {
               calllog.log('MultiCall:startMultiAudioCall:', params);
               if (params.error) {
-                throw params.error;
+                this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
                 this.setState({ callId: params.callId });
@@ -235,7 +238,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             onResult: (params) => {
               calllog.log('MultiCall:startMultiVideoCall:', params);
               if (params.error) {
-                throw params.error;
+                this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
                 this.setState({ callId: params.callId });

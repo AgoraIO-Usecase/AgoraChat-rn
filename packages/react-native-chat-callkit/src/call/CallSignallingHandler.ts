@@ -143,10 +143,7 @@ export class CallSignallingHandler implements ChatMessageEventListener {
           break;
 
         default:
-          throw new CallError({
-            code: CallErrorCode.InvalidParams,
-            description: 'wrong type of callType.',
-          });
+          break;
       }
     }
 

@@ -136,7 +136,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             onResult: (params) => {
               calllog.log('SingleCall:startSingleAudioCall:', params);
               if (params.error) {
-                throw params.error;
+                this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
                 this.setState({ callId: params.callId });
@@ -151,7 +151,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             onResult: (params) => {
               calllog.log('SingleCall:startSingleVideoCall:', params);
               if (params.error) {
-                throw params.error;
+                this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
                 this.setState({ callId: params.callId });
