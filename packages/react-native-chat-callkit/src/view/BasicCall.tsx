@@ -62,8 +62,8 @@ export type BasicCallProps = {
   onHangUp?: () => void;
   onCancel?: () => void;
   onRefuse?: () => void;
-  onClose: (elapsed?: number) => void;
-  onError?: () => void;
+  onClose: (elapsed: number, reason?: CallEndReason) => void;
+  onError?: (error: CallError) => void;
   onInitialized?: () => void;
   onSelfJoined?: () => void;
 };
@@ -81,6 +81,8 @@ export type BasicCallState = {
   callState: CallState;
   isMinimize: boolean;
   elapsed: number; // ms unit
+  reason?: CallEndReason;
+  error?: CallError;
 };
 export abstract class BasicCall<
     Props extends BasicCallProps,
@@ -185,10 +187,15 @@ export abstract class BasicCall<
     this.manager?.enableLocalVideo(mute);
   };
   onClickRecall = () => {};
-  onClickClose = (elapsed?: number) => {
+  onClickClose = () => {
     this.setState({ callState: CallState.Idle });
-    const { onClose } = this.props;
-    onClose(elapsed);
+    const { onClose, onError } = this.props;
+    const { elapsed, reason, error } = this.state;
+    if (error) {
+      onError?.(error);
+    } else {
+      onClose(elapsed, reason);
+    }
   };
   onClickAccept = () => {
     clearTimeout(this._inviteeTimer);
@@ -391,12 +398,16 @@ export abstract class BasicCall<
     elapsed: number;
   }): void {
     calllog.log('BasicCall:onCallEnded:', params);
-    throw new Error('Requires subclass implementation.');
+    this.manager?.leaveChannel();
+    this.setState({ reason: params.endReason, elapsed: params.elapsed });
+    this.onClickClose();
   }
 
   onCallOccurError(params: { channelId: string; error: CallError }): void {
     calllog.log('BasicCall:onCallOccurError:', params);
-    throw new Error('Requires subclass implementation.');
+    this.manager?.leaveChannel();
+    this.setState({ error: params.error, elapsed: 0 });
+    this.onClickClose();
   }
 
   onRemoteUserJoined(params: {

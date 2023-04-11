@@ -5,7 +5,7 @@ import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 import { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
-import { CallEndReason, CallErrorCode, CallState, CallType } from '../enums';
+import { CallEndReason, CallErrorCode, CallState } from '../enums';
 import type { User } from '../types';
 import {
   BasicCall,
@@ -438,23 +438,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   //////////////////////////////////////////////////////////////////////////////
   //// CallViewListener ////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  onCallEnded(params: {
-    channelId: string;
-    callType: CallType;
-    endReason: CallEndReason;
-    elapsed: number;
-  }): void {
-    calllog.log('MultiCall:onCallEnded:', params);
-    this.manager?.leaveChannel();
-    this.onClickClose(params.elapsed);
-  }
-
-  onCallOccurError(params: { channelId: string; error: CallError }): void {
-    calllog.log('MultiCall:onCallOccurError:', params);
-    this.manager?.leaveChannel();
-    this.onClickClose();
-  }
 
   onRequestJoin(params: {
     channelId: string;

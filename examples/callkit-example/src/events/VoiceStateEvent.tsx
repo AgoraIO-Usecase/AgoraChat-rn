@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { CallType, MultiCall, SingleCall } from 'react-native-chat-callkit';
+import {
+  CallType,
+  formatElapsed,
+  MultiCall,
+  SingleCall,
+} from 'react-native-chat-callkit';
 import type {
   ExtraDataType,
   VoiceStateContextType,
@@ -75,13 +80,19 @@ export function handleVoiceStateEvent(params: {
               elapsed={0}
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
-              onClose={() => {
-                console.log('test:stateEvent.onClose');
+              onClose={(elapsed, reason) => {
+                console.log('test:stateEvent.onClose', elapsed, reason);
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
                   action: 'hide_call',
                   params: {},
+                });
+                sendEventFromState({
+                  eventType: 'ToastEvent',
+                  eventBizType: 'others',
+                  action: 'toast_',
+                  params: `Call End: ${elapsed}`,
                 });
               }}
               onHangUp={() => {
@@ -111,13 +122,19 @@ export function handleVoiceStateEvent(params: {
                   params: {},
                 });
               }}
-              onError={() => {
-                console.log('test:stateEvent.onError');
+              onError={(error) => {
+                console.log('test:stateEvent.onError', error);
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
                   action: 'hide_call',
                   params: {},
+                });
+                sendEventFromState({
+                  eventType: 'ToastEvent',
+                  eventBizType: 'others',
+                  action: 'toast_',
+                  params: JSON.stringify(error),
                 });
               }}
               requestRTCToken={function (params: {
@@ -176,13 +193,19 @@ export function handleVoiceStateEvent(params: {
               isInviter={isInviter}
               inviteeIds={inviteeIds}
               inviteeList={{ InviteeList: ContactList }}
-              onClose={() => {
-                console.log('test:stateEvent.onClose');
+              onClose={(elapsed, reason) => {
+                console.log('test:stateEvent.onClose', elapsed, reason);
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
                   action: 'hide_call',
                   params: {},
+                });
+                sendEventFromState({
+                  eventType: 'ToastEvent',
+                  eventBizType: 'others',
+                  action: 'toast_',
+                  params: `Call End: ${formatElapsed(elapsed)}`,
                 });
               }}
               onHangUp={() => {
@@ -212,13 +235,19 @@ export function handleVoiceStateEvent(params: {
                   params: {},
                 });
               }}
-              onError={() => {
-                console.log('test:stateEvent.onError');
+              onError={(error) => {
+                console.log('test:stateEvent.onError', error);
                 sendEventFromState({
                   eventType: 'VoiceStateEvent',
                   eventBizType: 'others',
                   action: 'hide_call',
                   params: {},
+                });
+                sendEventFromState({
+                  eventType: 'ToastEvent',
+                  eventBizType: 'others',
+                  action: 'toast_',
+                  params: JSON.stringify(error),
                 });
               }}
             />

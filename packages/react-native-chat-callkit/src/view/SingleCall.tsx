@@ -7,10 +7,9 @@ import {
   VideoViewSetupMode,
 } from 'react-native-agora';
 
-import type { CallError } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
-import { CallEndReason, CallState, CallType } from '../enums';
+import { CallEndReason, CallState } from '../enums';
 import {
   BasicCall,
   BasicCallProps,
@@ -226,23 +225,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   //////////////////////////////////////////////////////////////////////////////
   //// CallViewListener ////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
-
-  onCallEnded(params: {
-    channelId: string;
-    callType: CallType;
-    endReason: CallEndReason;
-    elapsed: number;
-  }): void {
-    calllog.log('SingleCall:onCallEnded:', params);
-    this.manager?.leaveChannel();
-    this.onClickClose(params.elapsed);
-  }
-
-  onCallOccurError(params: { channelId: string; error: CallError }): void {
-    calllog.log('SingleCall:onCallOccurError:', params);
-    this.manager?.leaveChannel();
-    this.onClickClose();
-  }
 
   onRequestJoin(params: {
     channelId: string;
