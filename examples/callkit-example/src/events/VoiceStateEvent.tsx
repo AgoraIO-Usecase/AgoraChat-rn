@@ -77,7 +77,6 @@ export function handleVoiceStateEvent(params: {
               currentId={currentId}
               currentName={currentId}
               inviteeId={inviteeIds[0] ?? ''}
-              elapsed={0}
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
               onClose={(elapsed, reason) => {
@@ -189,7 +188,6 @@ export function handleVoiceStateEvent(params: {
               currentId={currentId}
               currentName={currentId}
               callType={callType === CallType.AudioMulti ? 'audio' : 'video'}
-              elapsed={0}
               isInviter={isInviter}
               inviteeIds={inviteeIds}
               inviteeList={{ InviteeList: ContactList }}

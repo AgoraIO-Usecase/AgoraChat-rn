@@ -87,9 +87,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           ? 'invitee-audio-init'
           : 'invitee-video-init'),
       muteVideo: props.muteVideo ?? false,
-      channelId: '',
-      callId: '',
-      startPreview: false,
       joinChannelSuccess: false,
       elapsed: 0,
       selfUid: 0,
@@ -135,7 +132,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     } else {
       this.manager?.enableVideo();
       this.manager?.startPreview();
-      this.setState({ startPreview: true });
+      this._startPreview = true;
     }
 
     this.manager?.addViewListener(this);
@@ -143,7 +140,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     if (this.props.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         const channelId = this.manager.createChannelId();
-        this.setState({ channelId });
+        this.channelId = channelId;
         this.startCall(this.props.inviteeIds, channelId);
       }
     } else {
@@ -195,8 +192,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         userHadJoined: false,
       });
     }
-    let channelId = this.state.channelId;
-    if (this.state.channelId === '') {
+    let channelId = this.channelId;
+    if (this.channelId === '') {
       channelId = this.manager?.getCurrentChannelId() ?? '';
       if (channelId === '') {
         this.onCallOccurError({
@@ -207,7 +204,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           }),
         });
       }
-      this.setState({ channelId: channelId });
+      this.channelId = channelId;
     }
     this.updateUsers(list);
     this.startCall(addedIds, channelId); // TODO:
@@ -226,7 +223,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
                 this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
-                this.setState({ callId: params.callId });
+                this.callId = params.callId;
               }
             },
           });
@@ -241,7 +238,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
                 this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
-                this.setState({ callId: params.callId });
+                this.callId = params.callId;
               }
             },
           });

@@ -733,6 +733,23 @@ export class CallManagerImpl
     const call = this.ship.currentCall;
     if (call) {
       if (call.state === CallSignalingState.Joined) {
+        for (const kv of call.invitees) {
+          const invitee = kv[1];
+          if (invitee && invitee.userHadJoined === false) {
+            this.signalling.sendInviteCancel({
+              callId: call.callId,
+              inviteeId: invitee?.userId,
+              inviterDeviceToken: call.inviter.userDeviceToken!,
+              onResult: ({ callId, error }) => {
+                calllog.log(
+                  'CallManagerImpl:_hangUpCall:sendInviteCancel:',
+                  callId,
+                  error
+                );
+              },
+            });
+          }
+        }
         this._onCallEnded({
           channelId: call.channelId,
           callType: call.callType,
@@ -1502,6 +1519,7 @@ export class CallManagerImpl
     if (call && call.inviter.userDeviceToken === params.inviterDeviceToken) {
       const invitee = call.invitees.get(this.userId);
       if (invitee) {
+        calllog.log('CallManagerImpl:onInviteCancel:', call);
         if (
           call.state === CallSignalingState.InviteeAlerting ||
           call.state === CallSignalingState.InviteeInviteConfirming ||

@@ -51,9 +51,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           ? 'invitee-audio-init'
           : 'invitee-video-init'),
       muteVideo: props.muteVideo ?? false,
-      channelId: '',
-      callId: '',
-      startPreview: false,
       joinChannelSuccess: false,
       peerJoinChannelSuccess: false,
       elapsed: 0,
@@ -86,7 +83,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     } else {
       this.manager?.enableVideo();
       this.manager?.startPreview();
-      this.setState({ startPreview: true });
+      this._startPreview = true;
     }
 
     this.manager?.addViewListener(this);
@@ -126,7 +123,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   private startCall() {
     if (this.manager) {
       const channelId = this.manager.createChannelId();
-      this.setState({ channelId });
+      this.channelId = channelId;
       switch (this.props.callType) {
         case 'audio':
           this.manager.startSingleAudioCall({
@@ -138,7 +135,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
                 this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
-                this.setState({ callId: params.callId });
+                this.callId = params.callId;
               }
             },
           });
@@ -153,7 +150,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
                 this.onCallOccurError({ channelId, error: params.error });
               }
               if (params.callId) {
-                this.setState({ callId: params.callId });
+                this.callId = params.callId;
               }
             },
           });
@@ -322,7 +319,6 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const {
       isMinimize,
       setupMode,
-      startPreview,
       joinChannelSuccess,
       callState,
       selfUid,
@@ -338,7 +334,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     if (callState === CallState.Idle) {
       return null;
     }
-    if (startPreview !== true && joinChannelSuccess !== true) {
+    if (this._startPreview !== true && joinChannelSuccess !== true) {
       return null;
     }
     if (muteVideo === true) {

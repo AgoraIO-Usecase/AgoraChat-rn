@@ -67,10 +67,7 @@ export type BasicCallProps = {
   onSelfJoined?: () => void;
 };
 export type BasicCallState = {
-  channelId: string;
-  callId: string;
   joinChannelSuccess: boolean;
-  startPreview: boolean;
   selfUid: number;
   setupMode: VideoViewSetupMode;
   isInSpeaker: boolean;
@@ -92,6 +89,17 @@ export abstract class BasicCall<
 {
   // eslint-disable-next-line react/sort-comp
   protected _inviteeTimer?: NodeJS.Timeout;
+  protected _startPreview: boolean;
+  protected channelId: string;
+  protected callId: string;
+
+  constructor(props: Props) {
+    super(props);
+    this._startPreview = true;
+    this.channelId = '';
+    this.callId = '';
+  }
+
   componentDidMount(): void {
     calllog.log('BasicCall:componentDidMount:');
     this.init();
@@ -114,7 +122,7 @@ export abstract class BasicCall<
       calllog.warn('BasicCall:onClickHangUp:hangUpCall:', 'call id is empty.');
       return;
     }
-    this.setState({ callId: callId });
+    this.callId = callId;
     if (isInviter === true) {
       if (callState === CallState.Calling) {
         this.manager?.hangUpCall({
@@ -206,7 +214,7 @@ export abstract class BasicCall<
     }
     const callId = this.manager?.getCurrentCallId();
     if (callId) {
-      this.setState({ callId });
+      this.callId = callId;
       this.manager?.acceptCall({
         callId: callId,
         onResult: (params: {
