@@ -56,7 +56,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       startPreview: false,
       joinChannelSuccess: false,
       peerJoinChannelSuccess: false,
-      elapsed: props.elapsed ?? 0,
+      elapsed: 0,
       selfUid: 0,
       peerUid: 1,
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
@@ -501,7 +501,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
   protected renderAvatar(): React.ReactNode {
     const { callType, isInviter, inviteeId, inviterId, currentId } = this.props;
-    const { callState, elapsed } = this.state;
+    const { callState } = this.state;
     return (
       <View
         style={{
@@ -529,7 +529,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           </Text>
         </View>
         {callState === CallState.Calling ? (
-          <Elapsed timer={elapsed} color="white" />
+          <Elapsed timer={this.manager?.elapsed ?? 0} color="white" />
         ) : (
           <Text
             style={{
@@ -553,7 +553,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected renderFloatAudio(): React.ReactNode {
     const { inviterId, inviteeId, currentId } = this.props;
-    const { elapsed, callState } = this.state;
+    const { callState } = this.state;
     const content = 'Calling...';
     return (
       <View
@@ -580,7 +580,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
             radius={36}
           />
           {callState === CallState.Calling ? (
-            <Elapsed timer={elapsed} />
+            <Elapsed timer={this.manager?.elapsed ?? 0} />
           ) : (
             <Text
               style={{
@@ -600,7 +600,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected renderFloatVideo(): React.ReactNode {
     const { currentId, inviteeId, inviterId } = this.props;
-    const { elapsed, isMinimize, muteVideo, peerMuteVideo } = this.state;
+    const { isMinimize, muteVideo, peerMuteVideo } = this.state;
     const content = 'Calling...';
 
     const _isRenderVideo = () => {
@@ -640,7 +640,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
                 bottom: 7,
               }}
             >
-              <Elapsed timer={elapsed} />
+              <Elapsed timer={this.manager?.elapsed ?? 0} />
             </View>
           ) : (
             <View

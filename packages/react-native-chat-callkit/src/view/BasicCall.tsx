@@ -45,7 +45,6 @@ export type BasicCallProps = {
   isInviter: boolean;
   callState?: CallState;
   isMinimize?: boolean;
-  elapsed: number; // ms unit
   isTest?: boolean;
   requestRTCToken?: (params: {
     appKey: string;

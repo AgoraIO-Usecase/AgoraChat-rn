@@ -91,7 +91,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       callId: '',
       startPreview: false,
       joinChannelSuccess: false,
-      elapsed: props.elapsed ?? 0,
+      elapsed: 0,
       selfUid: 0,
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
       muteMicrophone: false,
@@ -837,7 +837,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
 
   protected renderFloat(): React.ReactNode {
-    const { elapsed } = this.props;
     const { callState } = this.state;
     const content = 'Calling...';
     return (
@@ -868,7 +867,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           >
             <DefaultAvatar userId="" size={36} />
             {callState === CallState.Calling ? (
-              <Elapsed timer={elapsed} />
+              <Elapsed timer={this.manager?.elapsed ?? 0} />
             ) : (
               <Text
                 style={{
@@ -917,7 +916,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             Ongoing Calling
           </Text>
         </View>
-        <Elapsed timer={this.props.elapsed} color="white" />
+        <Elapsed timer={this.manager?.elapsed ?? 0} color="white" />
       </View>
     );
   }

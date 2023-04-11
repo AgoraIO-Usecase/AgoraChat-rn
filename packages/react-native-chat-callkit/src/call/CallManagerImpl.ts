@@ -68,6 +68,8 @@ export class CallManagerImpl
   private _users: Map<string, CallUser>;
   private _device: CallDevice;
   private _userListener?: CallListener;
+  private _elapsed: number;
+  private _intervalId?: NodeJS.Timer;
   private _requestRTCToken?: (params: {
     appKey: string;
     channelId: string;
@@ -97,6 +99,7 @@ export class CallManagerImpl
     this._sig = new CallSignallingHandler();
     this._device = new CallDevice();
     this._isInit = false;
+    this._elapsed = 0;
   }
 
   protected destructor(): void {
@@ -242,6 +245,22 @@ export class CallManagerImpl
 
   public get requestCurrentUser() {
     return this._requestCurrentUser;
+  }
+
+  public get elapsed() {
+    return this._elapsed;
+  }
+
+  public set elapsed(e: number) {
+    this._clearElapsed();
+    this._elapsed = e;
+    this._intervalId = setInterval(() => {
+      this._elapsed += 1000;
+    }, 1000);
+  }
+
+  protected _clearElapsed(): void {
+    clearInterval(this._intervalId);
   }
 
   public createChannelId(): string {
@@ -636,6 +655,7 @@ export class CallManagerImpl
     this._clearShip();
     this.timer.clear();
     this._clearUser();
+    this._clearElapsed();
   }
 
   private _clearShip(): void {
@@ -1153,7 +1173,7 @@ export class CallManagerImpl
     endReason: CallEndReason;
   }): void {
     calllog.log('CallManagerImpl:_onCallEnded', params);
-    this.listener?.onCallEnded?.({ ...params, elapsed: 0 });
+    this.listener?.onCallEnded?.({ ...params, elapsed: this.elapsed });
   }
 
   protected _onCallOccurError(params: {
@@ -1763,6 +1783,7 @@ export class CallManagerImpl
 
   public onJoinChannelSuccess(connection: RtcConnection, elapsed: number) {
     calllog.log('CallManagerImpl:onJoinChannelSuccess:', connection, elapsed);
+    this.elapsed = elapsed;
     if (connection.channelId && connection.localUid) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
@@ -1785,7 +1806,7 @@ export class CallManagerImpl
         channelId: connection.channelId,
         userChannelId: connection.localUid,
         userId: this.userId,
-        elapsed,
+        elapsed: this.elapsed,
       });
     }
   }
@@ -1840,6 +1861,7 @@ export class CallManagerImpl
       remoteUid,
       elapsed
     );
+    this.elapsed = elapsed;
     if (connection.channelId && connection.localUid) {
       const call = this._getCallByChannelId(connection.channelId);
       if (call) {
