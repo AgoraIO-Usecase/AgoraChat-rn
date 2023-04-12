@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Alert, Platform, ToastAndroid } from 'react-native';
 import {
   CallType,
   formatElapsed,
@@ -87,12 +88,25 @@ export function handleVoiceStateEvent(params: {
                   action: 'hide_call',
                   params: {},
                 });
-                sendEventFromState({
-                  eventType: 'ToastEvent',
-                  eventBizType: 'others',
-                  action: 'toast_',
-                  params: `Call End: ${elapsed}`,
-                });
+                if (Platform.OS === 'android') {
+                  if (reason) {
+                    ToastAndroid.show(
+                      `tip: reason: ${JSON.stringify(reason)}`,
+                      ToastAndroid.SHORT
+                    );
+                  } else {
+                    ToastAndroid.show(
+                      `tip: Call End: ${formatElapsed(elapsed)}`,
+                      ToastAndroid.SHORT
+                    );
+                  }
+                } else {
+                  if (reason) {
+                    Alert.alert(`tip: reason: ${JSON.stringify(reason)}`);
+                  } else {
+                    Alert.alert(`tip: Call End: ${formatElapsed(elapsed)}`);
+                  }
+                }
               }}
               onHangUp={() => {
                 console.log('test:stateEvent.onHangUp');
@@ -129,12 +143,11 @@ export function handleVoiceStateEvent(params: {
                   action: 'hide_call',
                   params: {},
                 });
-                sendEventFromState({
-                  eventType: 'ToastEvent',
-                  eventBizType: 'others',
-                  action: 'toast_',
-                  params: JSON.stringify(error),
-                });
+                if (Platform.OS === 'android') {
+                  ToastAndroid.show(`error: ${JSON.stringify(error)}`, 3);
+                } else {
+                  Alert.alert(`error: ${JSON.stringify(error)}`);
+                }
               }}
               requestRTCToken={function (params: {
                 appKey: string;
@@ -199,12 +212,25 @@ export function handleVoiceStateEvent(params: {
                   action: 'hide_call',
                   params: {},
                 });
-                sendEventFromState({
-                  eventType: 'ToastEvent',
-                  eventBizType: 'others',
-                  action: 'toast_',
-                  params: `Call End: ${formatElapsed(elapsed)}`,
-                });
+                if (Platform.OS === 'android') {
+                  if (reason) {
+                    ToastAndroid.show(
+                      `tip: reason: ${JSON.stringify(reason)}`,
+                      ToastAndroid.SHORT
+                    );
+                  } else {
+                    ToastAndroid.show(
+                      `tip: Call End: ${formatElapsed(elapsed)}`,
+                      ToastAndroid.SHORT
+                    );
+                  }
+                } else {
+                  if (reason) {
+                    Alert.alert(`tip: reason: ${JSON.stringify(reason)}`);
+                  } else {
+                    Alert.alert(`tip: Call End: ${formatElapsed(elapsed)}`);
+                  }
+                }
               }}
               onHangUp={() => {
                 console.log('test:stateEvent.onHangUp');
@@ -241,12 +267,11 @@ export function handleVoiceStateEvent(params: {
                   action: 'hide_call',
                   params: {},
                 });
-                sendEventFromState({
-                  eventType: 'ToastEvent',
-                  eventBizType: 'others',
-                  action: 'toast_',
-                  params: JSON.stringify(error),
-                });
+                if (Platform.OS === 'android') {
+                  ToastAndroid.show(`error: ${JSON.stringify(error)}`, 3);
+                } else {
+                  Alert.alert(`error: ${JSON.stringify(error)}`);
+                }
               }}
             />
           ),

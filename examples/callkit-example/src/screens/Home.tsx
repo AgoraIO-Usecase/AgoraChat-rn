@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import {
+  Alert,
   DeviceEventEmitter,
   ListRenderItemInfo,
   StyleSheet,
@@ -110,6 +111,10 @@ const ContactList = React.memo((props: ContactListProps) => {
         if (i.isSelected === true) {
           l.push(i.userId);
         }
+      }
+      if (params.isInviter === true && l.length === 0) {
+        Alert.alert(`error: please add invitee.`);
+        return;
       }
       sendHomeEvent({
         eventType: 'VoiceStateEvent',
