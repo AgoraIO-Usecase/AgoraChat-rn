@@ -100,7 +100,7 @@ export function SelectList(props: SelectListProps): JSX.Element {
             userName: i,
             onChecked: (checked: boolean) => {
               if (checked === true) {
-                // TODO: to add.
+                // Note: to add.
                 if (selectedCount.current < maxCount) {
                   ++selectedCount.current;
                   user.isSelected = checked;
@@ -111,7 +111,7 @@ export function SelectList(props: SelectListProps): JSX.Element {
                   return false;
                 }
               } else {
-                // TODO: to del.
+                // Note: to del.
                 if (selectedCount.current > 0) {
                   --selectedCount.current;
                   user.isSelected = checked;

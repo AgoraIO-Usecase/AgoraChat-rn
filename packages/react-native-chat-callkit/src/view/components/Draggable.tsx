@@ -196,7 +196,7 @@ export default function Draggable(props: IProps) {
     shouldStartDrag,
   ]);
 
-  // TODO Figure out a way to destroy and remove offsetFromStart entirely
+  // Note Figure out a way to destroy and remove offsetFromStart entirely
   React.useEffect(() => {
     const curPan = pan.current; // Using an instance to avoid losing the pointer before the cleanup
     if (!shouldReverse) {

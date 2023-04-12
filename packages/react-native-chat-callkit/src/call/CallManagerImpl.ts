@@ -104,7 +104,7 @@ export class CallManagerImpl
 
   protected destructor(): void {
     calllog.log('CallManagerImpl:destructor:');
-    // TODO: reserve.
+    // Note: reserve.
   }
 
   public init(params: {
@@ -715,7 +715,7 @@ export class CallManagerImpl
               callId,
               error
             );
-            // TODO: Ignore the result.
+            // Note: Ignore the result.
           },
         });
       }
@@ -927,10 +927,10 @@ export class CallManagerImpl
     let call: CallObject | undefined;
     call = this._getCallByChannelId(params.channelId); // !!! _getCallByChannelId
     if (call) {
-      // TODO: Only multiple people can enter here
-      // TODO: Is it the inviter
-      // TODO: If it is an inviter: the status remains unchanged (whether you have joined the channel or not), send the invitation and start timing separately, and update the list of invitees
-      // TODO: If it is an invitee: it can only be idle or joined. If it is impossible before the bell rings, it can only be continued after the bell rings, and then click Accept. The status is unchanged. Send invitations and start timing separately, update invitee list, move yourself from invitee to inviter. There may be multiple invitees. Multiple invitees are no problem.
+      // Note: Only multiple people can enter here
+      // Note: Is it the inviter
+      // Note: If it is an inviter: the status remains unchanged (whether you have joined the channel or not), send the invitation and start timing separately, and update the list of invitees
+      // Note: If it is an invitee: it can only be idle or joined. If it is impossible before the bell rings, it can only be continued after the bell rings, and then click Accept. The status is unchanged. Send invitations and start timing separately, update invitee list, move yourself from invitee to inviter. There may be multiple invitees. Multiple invitees are no problem.
 
       calllog.log(
         'CallManagerImpl:_startCall:re:',
@@ -1001,7 +1001,6 @@ export class CallManagerImpl
       );
 
       for (const id of addedIds) {
-        // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
         this.signalling.sendInvite({
           inviteeId: id,
           channelId: call.channelId,
@@ -1070,7 +1069,6 @@ export class CallManagerImpl
       }
 
       for (const id of params.inviteeIds) {
-        // this.client?.isConnected().then().catch(); // TODO: Solve network problems. Otherwise, timeout is required.
         this.signalling.sendInvite({
           inviteeId: id,
           channelId: call.channelId,
@@ -1081,7 +1079,7 @@ export class CallManagerImpl
           onResult: ({ callId, error }) => {
             calllog.log('CallManagerImpl:sendInvite:', callId);
             if (error) {
-              // TODO: Could be a network problem. Could be on a blacklist.
+              // Note: Could be a network problem. Could be on a blacklist.
               this.timer.stopTiming({ callId, userId: id });
               const call = this._getCall(callId);
               if (call) {
@@ -1129,7 +1127,7 @@ export class CallManagerImpl
             callId,
             error
           );
-          // TODO: Ignore the result.
+          // Note: Ignore the result.
         },
       });
       if (
@@ -1306,7 +1304,7 @@ export class CallManagerImpl
         reply: 'busy',
         onResult: (params: { callId: string; error?: CallError }) => {
           calllog.log('CallManagerImpl:onInvite:sendInviteReply:', params);
-          // TODO: ignore.
+          // Note: ignore.
         },
       });
       return;

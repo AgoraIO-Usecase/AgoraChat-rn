@@ -207,7 +207,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       this.channelId = channelId;
     }
     this.updateUsers(list);
-    this.startCall(addedIds, channelId); // TODO:
+    this.startCall(addedIds, channelId);
   }
 
   private startCall(inviteeIds: string[], channelId: string) {
