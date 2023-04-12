@@ -8,6 +8,13 @@ import type {
 
 import type { ImageComponent, ImageProps } from './index';
 
+let FastImage: (props: FastImageProps) => JSX.Element | null;
+try {
+  FastImage = require('react-native-fast-image') as FastImageComponent;
+} catch (error) {
+  throw new Error('Please install react-native-fast-image');
+}
+
 const convertCache = (
   cache?: 'default' | 'reload' | 'force-cache' | 'only-if-cached' | undefined
 ): 'immutable' | 'web' | 'cacheOnly' => {
@@ -89,14 +96,10 @@ const FastImageWrapper: ImageComponent = ({
   defaultSource,
   ...props
 }) => {
-  const FastImage = React.memo(
-    require('react-native-fast-image') as FastImageComponent
-  );
-
   return (
     <FastImage
       {...props}
-      onLoad={onLoad && ((e) => onLoad(e.nativeEvent))}
+      onLoad={onLoad && ((e: any) => onLoad(e.nativeEvent))}
       onError={
         onError &&
         (() =>
