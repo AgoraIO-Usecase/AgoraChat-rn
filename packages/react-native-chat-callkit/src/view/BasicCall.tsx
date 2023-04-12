@@ -201,7 +201,7 @@ export abstract class BasicCall<
     if (error) {
       onError?.(error);
     } else {
-      onClose(elapsed, reason);
+      onClose(this.manager?.elapsed ?? elapsed, reason);
     }
   };
   onClickAccept = () => {
@@ -269,128 +269,20 @@ export abstract class BasicCall<
   protected renderBottomMenu(): React.ReactNode {
     const { bottomButtonType, isInSpeaker, muteMicrophone, muteVideo } =
       this.state;
-    const disabled = true;
-    let ret = <></>;
-    const speaker = (): BottomMenuButtonType => {
-      return isInSpeaker ? 'mute-speaker' : 'speaker';
+    const params = {
+      bottomButtonType,
+      isInSpeaker,
+      muteMicrophone,
+      muteVideo,
+      onClickSpeaker: this.onClickSpeaker,
+      onClickHangUp: this.onClickHangUp,
+      onClickVideo: this.onClickVideo,
+      onClickRecall: this.onClickRecall,
+      onClickAccept: this.onClickAccept,
+      onClickClose: this.onClickClose,
+      onClickMicrophone: this.onClickMicrophone,
     };
-    const microphone = (): BottomMenuButtonType => {
-      return muteMicrophone ? 'mute-microphone' : 'microphone';
-    };
-    const video = (): BottomMenuButtonType => {
-      return muteVideo ? 'mute-video' : 'video';
-    };
-    const Container = (props: React.PropsWithChildren<{}>) => {
-      const { children } = props;
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            position: 'absolute',
-            bottom: BottomBarHeight,
-            width: '100%',
-          }}
-        >
-          {children}
-        </View>
-      );
-    };
-    switch (bottomButtonType) {
-      case 'inviter-audio':
-        ret = (
-          <Container>
-            <BottomMenuButton name={speaker()} onPress={this.onClickSpeaker} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'inviter-video':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'inviter-timeout':
-        ret = (
-          <Container>
-            <BottomMenuButton name="recall" onPress={this.onClickRecall} />
-            <BottomMenuButton name="close" onPress={this.onClickClose as any} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-init':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-loading':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accepting" disabled={disabled} />
-          </Container>
-        );
-        break;
-      case 'invitee-video-calling':
-        ret = (
-          <Container>
-            <BottomMenuButton name={video()} onPress={this.onClickVideo} />
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-init':
-        ret = (
-          <Container>
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accept" onPress={this.onClickAccept} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-loading':
-        ret = (
-          <Container>
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-            <BottomMenuButton name="accepting" disabled={disabled} />
-          </Container>
-        );
-        break;
-      case 'invitee-audio-calling':
-        ret = (
-          <Container>
-            <BottomMenuButton
-              name={microphone()}
-              onPress={this.onClickMicrophone}
-            />
-            <BottomMenuButton name="hangup" onPress={this.onClickHangUp} />
-          </Container>
-        );
-        break;
-
-      default:
-        break;
-    }
-    return ret;
+    return <RenderBottomMenuMemo {...params} />;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -520,3 +412,143 @@ export abstract class BasicCall<
     calllog.log('BasicCall:onLocalAudioStateChanged:', params);
   }
 }
+type RenderBottomMenuProps = {
+  isInSpeaker: boolean;
+  muteMicrophone: boolean;
+  bottomButtonType: BottomButtonType;
+  muteVideo: boolean;
+  onClickSpeaker: () => void;
+  onClickHangUp: () => void;
+  onClickVideo: () => void;
+  onClickRecall: () => void;
+  onClickAccept: () => void;
+  onClickClose: () => void;
+  onClickMicrophone: () => void;
+};
+function RenderBottomMenu(props: RenderBottomMenuProps): JSX.Element {
+  const {
+    bottomButtonType,
+    isInSpeaker,
+    muteMicrophone,
+    muteVideo,
+    onClickSpeaker,
+    onClickHangUp,
+    onClickVideo,
+    onClickRecall,
+    onClickAccept,
+    onClickClose,
+    onClickMicrophone,
+  } = props;
+  const disabled = true;
+  let ret = <></>;
+  const speaker = (): BottomMenuButtonType => {
+    return isInSpeaker ? 'mute-speaker' : 'speaker';
+  };
+  const microphone = (): BottomMenuButtonType => {
+    return muteMicrophone ? 'mute-microphone' : 'microphone';
+  };
+  const video = (): BottomMenuButtonType => {
+    return muteVideo ? 'mute-video' : 'video';
+  };
+  const Container = (props: React.PropsWithChildren<{}>) => {
+    const { children } = props;
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          position: 'absolute',
+          bottom: BottomBarHeight,
+          width: '100%',
+        }}
+      >
+        {children}
+      </View>
+    );
+  };
+  switch (bottomButtonType) {
+    case 'inviter-audio':
+      ret = (
+        <Container>
+          <BottomMenuButton name={speaker()} onPress={onClickSpeaker} />
+          <BottomMenuButton name={microphone()} onPress={onClickMicrophone} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+        </Container>
+      );
+      break;
+    case 'inviter-video':
+      ret = (
+        <Container>
+          <BottomMenuButton name={video()} onPress={onClickVideo} />
+          <BottomMenuButton name={microphone()} onPress={onClickMicrophone} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+        </Container>
+      );
+      break;
+    case 'inviter-timeout':
+      ret = (
+        <Container>
+          <BottomMenuButton name="recall" onPress={onClickRecall} />
+          <BottomMenuButton name="close" onPress={onClickClose as any} />
+        </Container>
+      );
+      break;
+    case 'invitee-video-init':
+      ret = (
+        <Container>
+          <BottomMenuButton name={video()} onPress={onClickVideo} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+          <BottomMenuButton name="accept" onPress={onClickAccept} />
+        </Container>
+      );
+      break;
+    case 'invitee-video-loading':
+      ret = (
+        <Container>
+          <BottomMenuButton name={video()} onPress={onClickVideo} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+          <BottomMenuButton name="accepting" disabled={disabled} />
+        </Container>
+      );
+      break;
+    case 'invitee-video-calling':
+      ret = (
+        <Container>
+          <BottomMenuButton name={video()} onPress={onClickVideo} />
+          <BottomMenuButton name={microphone()} onPress={onClickMicrophone} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+        </Container>
+      );
+      break;
+    case 'invitee-audio-init':
+      ret = (
+        <Container>
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+          <BottomMenuButton name="accept" onPress={onClickAccept} />
+        </Container>
+      );
+      break;
+    case 'invitee-audio-loading':
+      ret = (
+        <Container>
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+          <BottomMenuButton name="accepting" disabled={disabled} />
+        </Container>
+      );
+      break;
+    case 'invitee-audio-calling':
+      ret = (
+        <Container>
+          <BottomMenuButton name={microphone()} onPress={onClickMicrophone} />
+          <BottomMenuButton name="hangup" onPress={onClickHangUp} />
+        </Container>
+      );
+      break;
+
+    default:
+      break;
+  }
+  return ret;
+}
+
+const RenderBottomMenuMemo = React.memo(RenderBottomMenu);

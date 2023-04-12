@@ -280,6 +280,7 @@ export class CallManagerImpl
     handler: ((message?: any, ...optionalParams: any[]) => void) | undefined
   ): void {
     calllog.log('CallManagerImpl:setLogHandler:', handler);
+    calllog.tag = '[call]';
     calllog.handler = handler;
   }
 

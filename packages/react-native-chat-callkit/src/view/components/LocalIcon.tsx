@@ -2,6 +2,7 @@
 import * as React from 'react';
 import {
   ColorValue,
+  // Image as RNImage,
   ImageStyle,
   StyleProp,
   StyleSheet,

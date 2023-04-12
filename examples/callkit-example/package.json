@@ -9,7 +9,7 @@
     "start": "expo start --dev-client",
     "startr": "expo start --dev-client --clear",
     "android": "expo run:android",
-    "androidi": "expo run:android --device \"MX6\"",
+    "androidi": "expo run:android --device \"Pixel_2\"",
     "androids": "expo run:android --device \"generic_arm64\"",
     "ios": "expo run:ios",
     "iosi": "expo run:ios --device=\"Asterisk’s iPhone\"",
