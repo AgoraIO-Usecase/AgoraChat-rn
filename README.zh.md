@@ -20,7 +20,7 @@ _中文 | [English](./README.md)_
   - Typescript 4.0 或以上版本
   - Nodejs 16.18.0 或以上版本 （推荐使用 brew 安装）
   - yarn 1.22.19 或以上版本 （推荐使用 brew 安装）
-  - React-Native 0.63.5 以上， 0.69.0 以下版本 （更高版本会夸大版本兼容性未知）
+  - React-Native 0.63.5 以上
   - npm 以及相关工具 （**不推荐**，相关问题请自行解决）
   - expo 6.0.0 或以上版本
 
@@ -36,10 +36,11 @@ git clone git@github.com:easemob/react-native-chat-library.git
 
 这是一个多包管理项目，通过 `lerna` 和 `yarn workspace` 实现管理。
 
-- `example`: 示例项目，用于演示和测试开发的包。
+- `example`: 较为完整的示例项目，用于演示和测试开发的包。
+- `examples/uikit-example`: uikit 示例项目（待开发）
+- `examples/callkit-example`: callkit 示例项目，主要针对 `callkit sdk` 进行演示。
 - `packages/react-native-chat-uikit`: uikit 项目
-- `packages/react-native-chat-callkit`: callkit 项目（正在开发中）
-- ...
+- `packages/react-native-chat-callkit`: callkit 项目
 
 **注意** 项目运行的命令一般都是在项目根目录，而不是对应的包目录或者示例目录。
 
@@ -51,8 +52,8 @@ git clone git@github.com:easemob/react-native-chat-library.git
 2. 使用 `terminal` 初始化项目 `yarn`
 3. 如果是第一次项目初始化，还需要执行命令 `yarn run generate-source-env`
 
-**注意** `yarn`是复合命令，对于不了解命令的开发者，需要更多的相关知识才能替换为 `npm` 命令。
-**注意** 在创建该项目的时候，里面已经预置了部分 `yarn` 相关的命令，所以，推荐使用 `yarn`。
+**注意** `yarn` 会执行额外的命令，对于不了解命令的开发者，如果需要使用 `npm` 命令替换，需要了解更加相信的内容。
+**注意** 在创建该项目的时候，脚手架已经预置了部分 `yarn` 相关的命令，所以，推荐使用 `yarn` 完成绝大部分工作。
 
 #### 通用编译
 
@@ -86,8 +87,8 @@ git clone git@github.com:easemob/react-native-chat-library.git
 5. 如果使用真机，真机需要启用开发者模式，工程项目中需要设置 `singing & capabilities` 相关内容
 6. 使用 `Xcode` 工具，执行编译操作。
 
-**注意** 对于不使用 `Xcode` 编译的开发者，可以使用官方推荐的方式编译，但是，出现问题一般的不好查找问题原因。
-**注意** 自动启动额外的服务，由于不是使用 `expo` 直接启动的服务可能会报错，暂时不用管，关闭服务即可。
+**注意** 对于不使用 `Xcode` 编译的开发者，可以使用官方推荐的方式编译，如果出现问题一般的不好查找问题原因。
+**注意** 自动启动的是 `react-native` 原生的服务，而不是 `expo` 服务，会报错。只需要关闭该服务即可。
 
 **<span style="color:orange">运行该项目</span>**
 
@@ -101,7 +102,7 @@ git clone git@github.com:easemob/react-native-chat-library.git
 
 在编译阶段，`Android` 平台需要执行 `sync` 初始化项目。
 
-1. 启动 `as` 工具, 打开工程文件 `example/android`，
+1. 启动 `android studio (as)` 工具, 打开工程文件 `example/android`，
 2. 点击 `sync project with gradle files` 按钮执行 `初始化` 操作，
 3. 如果使用模拟器，请选择或者创建 6.0 版本或以上版本的模拟器，
 4. 如果是真机，需要开启设备的开发者模式，
@@ -115,7 +116,7 @@ git clone git@github.com:easemob/react-native-chat-library.git
 使用 `expo` 工具提供的命令，启动本地服务，参考 `通用运行` 章节。
 
 **注意** 如果运行的应用没有正确加载，需要刷新页面，或者关闭应用重新启动。对于报错问题一般可以通过相应的提示解决。
-**注意** `Android 平台的设备，需要数据转发，该数据转发的命令是 `adb reverse tcp:8081 tcp:8081`。但是，由于使用 `expo` 工具，所以，它帮忙做了，不需要手动操作。
+**注意** `Android 平台的设备，需要数据转发，该数据转发的命令是 `adb reverse tcp:8081 tcp:8081`。由于 `example`使用`expo` 工具，它帮忙做了，所以不需要手动操作。
 
 ## 参数设置
 
@@ -141,7 +142,7 @@ export const accountType = 'agora'; // 'easemob' or 'agora'
 
 使用 `uikit` 的方式主要有这几种：
 
-1. 创建全新项目，集成 `uikit`。 这种情况，需要注意开发环境的问题。可能由于版本跨度非常大导致编译和运行报错。
+1. 创建全新项目，集成 `uikit`。 这种情况，需要注意开发环境的问题。可能由于跨大版本导致编译和运行报错。
 2. 在现有项目中，集成 `uikit`。 这种情况，需要注意现有项目版本 和 `uikit` 项目的版本，以及依赖版本的兼容性。
 3. 修改 `example` 项目，完成产品开发。这种情况，几乎没有开发环境问题，但是需要学习和了解 `example` 的架构思维，才能更好的完成应用开发。
 
@@ -262,7 +263,7 @@ type ChatFragmentProps = {
 2. 使用属性回调通知上层使用者状态的变化
 3. 使用控制器（ref）控制子组件的主动行为
 
-例如：在录制语音消息之后，发送语音消息
+例如：在录制语音之后，发送语音消息
 
 ```typescript
 export default function ChatScreen(): JSX.Element {
@@ -323,12 +324,7 @@ export default function ChatScreen(): JSX.Element {
   }, [addListeners]);
   return (
     <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
-      <ChatFragment
-        screenParams={{ chatId, chatType }}
-        onVoiceRecordEnd={(params) => {
-          chatRef.current.sendVoiceMessage(params);
-        }}
-      />
+      <ChatFragment screenParams={{ chatId, chatType }} />
     </ScreenContainer>
   );
 }
@@ -358,7 +354,7 @@ export default function App() {
 
 当默认聊天气泡不能满足自定义需求的时候，可以自行设计聊天气泡样式。
 
-假设 `MessageBubbleList` 是你自定义的聊天气泡列表组件。
+假设 `MessageBubbleList` 是自定义的聊天气泡列表组件。
 
 ```typescript
 import type { MessageBubbleListProps } from '../fragments/MessageBubbleList';

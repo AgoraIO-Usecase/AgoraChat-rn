@@ -20,7 +20,7 @@ Take you to quickly complete the compilation and operation of the project.
   - Typescript 4.0 or above
   - Nodejs 16.18.0 or above (brew installation is recommended)
   - yarn 1.22.19 or above (brew installation is recommended)
-  - React-Native 0.63.5 or above, 0.69.0 or below (higher versions will exaggerate unknown version compatibility)
+  - React-Native 0.63.5 or above
   - npm and related tools (**not recommended**, please solve related problems by yourself)
   - expo 6.0.0 or above
 
@@ -36,10 +36,11 @@ git clone git@github.com:easemob/react-native-chat-library.git
 
 This is a multi-package management project managed by `lerna` and `yarn workspace`.
 
-- `example`: Example project, used to demonstrate and test the developed package.
-- `packages/react-native-chat-uikit`: uikit project.
-- `packages/react-native-chat-callkit`: callkit project (under development).
-- ...
+- `example`: A relatively complete example project, used for demonstration and test development.
+- `examples/uikit-example`: uikit example project (to be developed)
+- `examples/callkit-example`: callkit example project, mainly for demonstration of `callkit sdk`.
+- `packages/react-native-chat-uikit`: uikit project
+- `packages/react-native-chat-callkit`: callkit project
 
 **Note** The commands run by the project are generally in the project root directory, not the corresponding package directory or example directory.
 
@@ -51,8 +52,8 @@ This is a multi-package management project managed by `lerna` and `yarn workspac
 2. Use `terminal` to initialize the project `yarn`
 3. If this is the first project initialization, run the 'yarn run generate-source-env' command.
 
-**Note** `yarn` is a compound command. For developers who don’t understand the command, more relevant knowledge is needed to replace it with the `npm` command.
-**Note** When creating this project, some commands related to `yarn` have been preset, so it is recommended to use `yarn`.
+**Note** `yarn` will execute additional commands. For developers who do not understand commands, if they need to use `npm` command replacement, they need to understand more reliable content.
+**Note** When creating this project, the scaffolding has preset some commands related to `yarn`, so it is recommended to use `yarn` to complete most of the work.
 
 #### Universal Compilation
 
@@ -86,8 +87,8 @@ In the compilation phase, the `iOS` platform needs to execute the `pod install` 
 5. If you use a real device, the developer mode needs to be enabled on the real device, and `singing & capabilities` related content needs to be set in the project
 6. Use the `Xcode` tool to execute the compile operation.
 
-**Note** For developers who do not use `Xcode` to compile, they can use the officially recommended method to compile, but it is generally difficult to find the cause of the problem if there is a problem.
-**Note** Automatically start additional services. Since services that are not directly started by expo may report errors, don’t worry about it for now, just close the service.
+**Note** For developers who do not use `Xcode` to compile, they can use the official recommended method to compile. If there is a problem, it is generally difficult to find the cause of the problem.
+**Note** The `react-native` native service is automatically started, not the `expo` service, and an error will be reported. Just turn off the service.
 
 **<span style="color:orange">run the project</span>**
 
@@ -101,14 +102,14 @@ Use the command provided by the `expo` tool to start the local service, refer to
 
 During the compilation phase, the `Android` platform needs to execute the `sync` initialization project.
 
-1. Start the `as` tool, open the project file `example/android`,
+1. Start the `android studio (referred to as as)` tool, open the project file `example/android`,
 2. Click the `sync project with gradle files` button to execute the `initialization` operation,
 3. If using an emulator, please select or create an emulator of version 6.0 or above,
 4. If it is a real device, you need to enable the developer mode of the device,
 5. When `sync` is successful, click the `run app` button to compile and run the project.
 
 **Note** If you use `as` for the first time, it may take a lot of downloading and the waiting time will be longer.
-**Note** If you encounter `timeout`, it may be caused by using the `m1/m2` arm64 version of the MacOS device, you need to use `terminal` to execute the `open -a /Applications/Android\ Studio.app` command to start` as`.
+**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example` uses the `expo` tool, it does it for you, so no manual work is required.
 
 **<span style="color:orange">run the project</span>**
 
@@ -141,9 +142,9 @@ export const accountType = 'agora'; // 'easemob' or 'agora'
 
 There are several ways to use `uikit`:
 
-1. Create a new project and integrate `uikit`. In this case, you need to pay attention to the development environment. Compile and run errors may be reported due to a very large version span.
-2. In the existing project, integrate `uikit`. In this case, you need to pay attention to the compatibility between the existing project version and the `uikit` project version, as well as the dependent version.
-3. Modify the `example` project to complete product development. In this case, there are almost no development environment problems, but it is necessary to learn and understand the architectural thinking of `example` in order to better complete application development.
+1. Create a new project and integrate `uikit`. In this case, you need to pay attention to the development environment. Errors may be reported when compiling and running due to cross-version.
+1. In the existing project, integrate `uikit`. In this case, you need to pay attention to the compatibility between the existing project version and the `uikit` project version, as well as the dependent version.
+2. Modify the `example` project to complete product development. In this case, there are almost no development environment problems, but it is necessary to learn and understand the architectural thinking of `example` in order to better complete application development.
 
 The following is the most common way, the introduction of integrating `uikit` in existing projects.
 
@@ -262,7 +263,7 @@ type ChatFragmentProps = {
 2. Use attribute callbacks to notify upper-level users of status changes
 3. Use controllers (ref) to control the active behavior of subcomponents
 
-Example: After recording a voice message, send the voice message
+Example: After recording a voice file, send the voice message
 
 ```typescript
 export default function ChatScreen(): JSX.Element {
@@ -325,9 +326,6 @@ export default function ChatScreen(): JSX.Element {
     <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
       <ChatFragment
         screenParams={{ chatId, chatType }}
-        onVoiceRecordEnd={(params) => {
-          chatRef.current.sendVoiceMessage(params);
-        }}
       />
     </ScreenContainer>
   );
