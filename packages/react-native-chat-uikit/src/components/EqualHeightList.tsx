@@ -184,8 +184,10 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
         }}
         onTouchEnd={(event) => {
           if (
-            event.nativeEvent.locationX === currentX.current &&
-            event.nativeEvent.locationY === currentY.current
+            event.nativeEvent.locationX < currentX.current + 1 &&
+            event.nativeEvent.locationX > currentX.current - 1 &&
+            event.nativeEvent.locationY < currentY.current + 1 &&
+            event.nativeEvent.locationY > currentY.current - 1
           ) {
             _onClicked();
           }
