@@ -25,6 +25,7 @@ import {
 } from 'react-native-chat-uikit';
 
 import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
+import { MyTextMessageBubble } from '../components/MyTextMessageBubble';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
 import { sendEvent, sendEventProps } from '../events/sendEvent';
@@ -65,7 +66,6 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const messageBubbleListRefP = React.useRef<typeof MessageBubbleList>(null);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
   const { client } = useAppChatSdkContext();
-  console.log('test:ChatScreen:123');
 
   const onClickMessageBubble = React.useCallback(
     (data: MessageItemType) => {
@@ -100,7 +100,6 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   );
 
   const onClickInputMoreButton = React.useCallback(() => {
-    console.log('test:234:');
     sendEventFromChat({
       eventType: 'SheetEvent',
       action: 'open_input_extension',
@@ -341,7 +340,10 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         messageBubbleList={{
           MessageBubbleListP: MessageBubbleList,
           MessageBubbleListPropsP: {
-            onPressed: () => {},
+            onPressed: () => {
+              console.log('test:onPressed:', 'click message bubble list');
+            },
+            TextMessageItem: MyTextMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}

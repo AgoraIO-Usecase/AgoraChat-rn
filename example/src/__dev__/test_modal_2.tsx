@@ -27,10 +27,7 @@ export default class ModalDemo extends Component<any, State> {
     this.setState({ modalVisible: visible });
   };
 
-  startShow = () => {
-    // alert('开始显示了');
-    console.log('开始显示了');
-  };
+  startShow = () => {};
 
   render() {
     let modalBackgroundStyle = {

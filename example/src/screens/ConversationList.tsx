@@ -347,6 +347,7 @@ export default function ConversationListScreen({
         }}
         sortPolicy={sortPolicy}
         RenderItem={RenderItem}
+        RenderItemExtraWidth={sf(100)}
       />
     </SafeAreaView>
   );

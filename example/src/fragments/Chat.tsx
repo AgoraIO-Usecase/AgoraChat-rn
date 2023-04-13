@@ -1287,9 +1287,6 @@ const ChatContent = React.memo(
             Keyboard.dismiss();
             _onFace('face');
           }}
-          CustomMessageRenderItem={
-            customMessageBubble?.CustomMessageRenderItemP
-          }
           onRequestHistoryMessage={onRequestHistoryMessage}
         />
       )

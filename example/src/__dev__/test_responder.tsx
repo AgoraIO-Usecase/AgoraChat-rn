@@ -29,9 +29,7 @@ export default function TestResponder() {
     onResponderGrant: (_: GestureResponderEvent) => {
       setColor1('red');
     },
-    onResponderMove: (_: GestureResponderEvent) => {
-      console.log(123);
-    },
+    onResponderMove: (_: GestureResponderEvent) => {},
     onResponderRelease: (_: GestureResponderEvent) => {
       setColor1('cornsilk');
     },
@@ -53,9 +51,7 @@ export default function TestResponder() {
     onResponderGrant: () => {
       setColor2('red');
     },
-    onResponderMove: () => {
-      console.log(123);
-    },
+    onResponderMove: () => {},
     onResponderRelease: () => {
       setColor2('darkseagreen');
     },
@@ -77,9 +73,7 @@ export default function TestResponder() {
     onResponderGrant: () => {
       setColor3('red');
     },
-    onResponderMove: () => {
-      console.log(123);
-    },
+    onResponderMove: () => {},
     onResponderRelease: () => {
       setColor3('deepskyblue');
     },

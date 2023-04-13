@@ -59,7 +59,7 @@ const Item: EqualHeightListItemComponent = (props) => {
   const sf = getScaleFactor();
   const item = props.data as ItemDataType;
   const { width: screenWidth } = useWindowDimensions();
-  const extraWidth = item.sideslip?.width ?? sf(100);
+  const extraWidth = item.sideslip?.width ?? sf(50);
   return (
     <View style={[styles.item, { width: screenWidth + extraWidth }]}>
       <View
@@ -183,6 +183,7 @@ type ConversationListFragmentProps = {
   onUpdateReadCount?: (unreadCount: number) => void;
   sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
   RenderItem?: EqualHeightListItemComponent;
+  RenderItemExtraWidth?: number;
 };
 export default function ConversationListFragment(
   props: ConversationListFragmentProps
@@ -196,6 +197,7 @@ export default function ConversationListFragment(
     onUpdateReadCount,
     sortPolicy,
     RenderItem,
+    RenderItemExtraWidth,
   } = props;
 
   const sf = getScaleFactor();
@@ -441,7 +443,7 @@ export default function ConversationListFragment(
         timestampS: messageTime(time),
         type: 'sideslip',
         sideslip: {
-          width: sf(50),
+          width: RenderItemExtraWidth ?? sf(50),
         },
         onLongPress: (data: ItemDataType) => {
           onLongPress?.(data);
@@ -458,7 +460,14 @@ export default function ConversationListFragment(
       } as ItemDataType;
       return r;
     },
-    [getContent, onLongPress, onPress, removeConversation, sf]
+    [
+      RenderItemExtraWidth,
+      getContent,
+      onLongPress,
+      onPress,
+      removeConversation,
+      sf,
+    ]
   );
 
   const getConv = React.useCallback(

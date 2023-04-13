@@ -70,6 +70,9 @@ export interface CustomMessageItemType extends MessageItemType {
   >;
   SubComponentProps: MessageItemType & { eventType: string; data: any };
 }
+export interface VideoMessageItemType extends MessageItemType {}
+export interface LocationMessageItemType extends MessageItemType {}
+export interface FileMessageItemType extends MessageItemType {}
 // const text1: TextMessageItemType = {
 //   sender: 'zs',
 //   timestamp: timestamp(),
@@ -150,247 +153,266 @@ const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
   }
 });
 
-const TextMessageRenderItem: ListRenderItem<MessageItemType> = React.memo(
-  (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
-    const sf = getScaleFactor();
-    const { width: screenWidth } = useWindowDimensions();
-    const { item } = info;
-    const msg = item as TextMessageItemType;
-    return (
-      <View
-        style={[
-          styles.container,
-          {
-            flexDirection: msg.isSender ? 'row-reverse' : 'row',
-            width: screenWidth * 0.9,
-          },
-        ]}
-      >
+const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+  React.memo(
+    (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const sf = getScaleFactor();
+      const { width: screenWidth } = useWindowDimensions();
+      const { item } = info;
+      const msg = item as TextMessageItemType;
+      return (
         <View
           style={[
-            {
-              marginRight: msg.isSender ? undefined : sf(10),
-              marginLeft: msg.isSender ? sf(10) : undefined,
-            },
-          ]}
-        >
-          <DefaultAvatar size={sf(24)} radius={sf(12)} />
-        </View>
-        <View
-          style={[
-            styles.innerContainer,
-            {
-              borderBottomRightRadius: msg.isSender ? undefined : sf(12),
-              borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
-              maxWidth: screenWidth * 0.7,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.text,
-              {
-                backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
-                color: msg.isSender ? 'white' : '#333333',
-              },
-            ]}
-          >
-            {msg.text}
-          </Text>
-        </View>
-        <View
-          style={[
-            {
-              marginRight: msg.isSender ? sf(10) : undefined,
-              marginLeft: msg.isSender ? undefined : sf(10),
-              opacity: 1,
-            },
-          ]}
-        >
-          <StateLabel state={msg.state} />
-        </View>
-      </View>
-    );
-  }
-);
-// height < 50%, width < 200px,
-const ImageMessageRenderItem: ListRenderItem<MessageItemType> = React.memo(
-  (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
-    const sf = getScaleFactor();
-    const { item } = info;
-    const msg = item as ImageMessageItemType;
-    const url = (msg: ImageMessageItemType): string => {
-      let r: string;
-      if (msg.localThumbPath && msg.localThumbPath.length > 0) {
-        r = msg.localThumbPath;
-      } else if (msg.localPath && msg.localPath.length > 0) {
-        r = msg.localPath;
-      } else {
-        r = msg.remoteUrl ?? '';
-      }
-      r = encodeURI(r);
-      r = r.replace('#', '%23');
-      // return '/var/mobile/Containers/Data/Application/10335732-F30F-46F6-93C1-2C89FC7C3B4E/Library/Application%20Support/HyphenateSDK/appdata/asterisk001/asterisk003/thumb_128dc850-b4b7-11ed-9711-5313982e6d8a';
-      return r;
-    };
-    const [_url] = React.useState(url(msg));
-
-    return (
-      <View
-        style={[
-          styles.container,
-          {
-            flexDirection: msg.isSender ? 'row-reverse' : 'row',
-            width: '80%',
-          },
-        ]}
-      >
-        <View
-          style={[
-            {
-              marginRight: msg.isSender ? undefined : sf(10),
-              marginLeft: msg.isSender ? sf(10) : undefined,
-            },
-          ]}
-        >
-          <DefaultAvatar size={sf(24)} radius={sf(12)} />
-        </View>
-        <View
-          style={{
-            height: sf(200),
-            // flex: 1,
-            flexGrow: 1,
-          }}
-        >
-          <Image
-            source={{
-              uri: _url.includes('file://') ? _url : `file://${_url}`,
-            }}
-            resizeMode="cover"
-            style={{ height: sf(200), borderRadius: sf(10) }}
-            onLoad={(_) => {}}
-            onError={(_) => {}}
-          />
-        </View>
-        <View
-          style={[
-            {
-              marginRight: msg.isSender ? sf(10) : undefined,
-              marginLeft: msg.isSender ? undefined : sf(10),
-              opacity: 1,
-            },
-          ]}
-        >
-          <StateLabel state={msg.state} />
-        </View>
-      </View>
-    );
-  }
-);
-
-const VoiceMessageRenderItem: ListRenderItem<MessageItemType> = React.memo(
-  (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
-    const sf = getScaleFactor();
-    const { item } = info;
-    const { width } = useWindowDimensions();
-    const msg = item as VoiceMessageItemType;
-    const _width = (duration: number) => {
-      if (duration < 0) {
-        throw new Error('The voice length cannot be less than 0.');
-      }
-      let r = width * 0.7 * (1 / 60) * (duration > 60 ? 60 : duration);
-      r = r < 150 ? 150 : r;
-      return r;
-    };
-    return (
-      <View
-        style={[
-          styles.container,
-          {
-            flexDirection: msg.isSender ? 'row-reverse' : 'row',
-            width: _width(msg.duration ?? 1),
-          },
-        ]}
-      >
-        <View
-          style={[
-            {
-              marginRight: msg.isSender ? undefined : sf(10),
-              marginLeft: msg.isSender ? sf(10) : undefined,
-            },
-          ]}
-        >
-          <DefaultAvatar size={sf(24)} radius={sf(12)} />
-        </View>
-        <View
-          style={[
-            styles.innerContainer,
+            styles.container,
             {
               flexDirection: msg.isSender ? 'row-reverse' : 'row',
-              justifyContent: 'space-between',
-              borderBottomRightRadius: msg.isSender ? undefined : sf(12),
-              borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
-              backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+              width: screenWidth * 0.9,
             },
           ]}
         >
-          <LocalIcon
-            name={msg.isSender ? 'wave3_left' : 'wave3_right'}
-            size={sf(22)}
-            color={msg.isSender ? 'white' : '#A9A9A9'}
-            style={{ marginHorizontal: sf(8) }}
-          />
-          <Text
+          <View
             style={[
-              styles.text,
               {
-                color: msg.isSender ? 'white' : 'black',
+                marginRight: msg.isSender ? undefined : sf(10),
+                marginLeft: msg.isSender ? sf(10) : undefined,
+              },
+            ]}
+          >
+            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+          </View>
+          <View
+            style={[
+              styles.innerContainer,
+              {
+                borderBottomRightRadius: msg.isSender ? undefined : sf(12),
+                borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
+                maxWidth: screenWidth * 0.7,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.text,
+                {
+                  backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+                  color: msg.isSender ? 'white' : '#333333',
+                },
+              ]}
+            >
+              {msg.text}
+            </Text>
+          </View>
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? sf(10) : undefined,
+                marginLeft: msg.isSender ? undefined : sf(10),
+                opacity: 1,
+              },
+            ]}
+          >
+            <StateLabel state={msg.state} />
+          </View>
+        </View>
+      );
+    }
+  );
+// height < 50%, width < 200px,
+const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+  React.memo(
+    (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const sf = getScaleFactor();
+      const { item } = info;
+      const msg = item as ImageMessageItemType;
+      const url = (msg: ImageMessageItemType): string => {
+        let r: string;
+        if (msg.localThumbPath && msg.localThumbPath.length > 0) {
+          r = msg.localThumbPath;
+        } else if (msg.localPath && msg.localPath.length > 0) {
+          r = msg.localPath;
+        } else {
+          r = msg.remoteUrl ?? '';
+        }
+        r = encodeURI(r);
+        r = r.replace('#', '%23');
+        // return '/var/mobile/Containers/Data/Application/10335732-F30F-46F6-93C1-2C89FC7C3B4E/Library/Application%20Support/HyphenateSDK/appdata/asterisk001/asterisk003/thumb_128dc850-b4b7-11ed-9711-5313982e6d8a';
+        return r;
+      };
+      const [_url] = React.useState(url(msg));
+
+      return (
+        <View
+          style={[
+            styles.container,
+            {
+              flexDirection: msg.isSender ? 'row-reverse' : 'row',
+              width: '80%',
+            },
+          ]}
+        >
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? undefined : sf(10),
+                marginLeft: msg.isSender ? sf(10) : undefined,
+              },
+            ]}
+          >
+            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+          </View>
+          <View
+            style={{
+              height: sf(200),
+              // flex: 1,
+              flexGrow: 1,
+            }}
+          >
+            <Image
+              source={{
+                uri: _url.includes('file://') ? _url : `file://${_url}`,
+              }}
+              resizeMode="cover"
+              style={{ height: sf(200), borderRadius: sf(10) }}
+              onLoad={(_) => {}}
+              onError={(_) => {}}
+            />
+          </View>
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? sf(10) : undefined,
+                marginLeft: msg.isSender ? undefined : sf(10),
+                opacity: 1,
+              },
+            ]}
+          >
+            <StateLabel state={msg.state} />
+          </View>
+        </View>
+      );
+    }
+  );
+
+const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+  React.memo(
+    (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const sf = getScaleFactor();
+      const { item } = info;
+      const { width } = useWindowDimensions();
+      const msg = item as VoiceMessageItemType;
+      const _width = (duration: number) => {
+        if (duration < 0) {
+          throw new Error('The voice length cannot be less than 0.');
+        }
+        let r = width * 0.7 * (1 / 60) * (duration > 60 ? 60 : duration);
+        r = r < 150 ? 150 : r;
+        return r;
+      };
+      return (
+        <View
+          style={[
+            styles.container,
+            {
+              flexDirection: msg.isSender ? 'row-reverse' : 'row',
+              width: _width(msg.duration ?? 1),
+            },
+          ]}
+        >
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? undefined : sf(10),
+                marginLeft: msg.isSender ? sf(10) : undefined,
+              },
+            ]}
+          >
+            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+          </View>
+          <View
+            style={[
+              styles.innerContainer,
+              {
+                flexDirection: msg.isSender ? 'row-reverse' : 'row',
+                justifyContent: 'space-between',
+                borderBottomRightRadius: msg.isSender ? undefined : sf(12),
+                borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
                 backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
               },
             ]}
           >
-            {Math.round(msg.duration).toString() + "'"}
-          </Text>
+            <LocalIcon
+              name={msg.isSender ? 'wave3_left' : 'wave3_right'}
+              size={sf(22)}
+              color={msg.isSender ? 'white' : '#A9A9A9'}
+              style={{ marginHorizontal: sf(8) }}
+            />
+            <Text
+              style={[
+                styles.text,
+                {
+                  color: msg.isSender ? 'white' : 'black',
+                  backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+                },
+              ]}
+            >
+              {Math.round(msg.duration).toString() + "'"}
+            </Text>
+          </View>
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? sf(10) : undefined,
+                marginLeft: msg.isSender ? undefined : sf(10),
+                opacity: 1,
+              },
+            ]}
+          >
+            <StateLabel state={msg.state} />
+          </View>
         </View>
-        <View
-          style={[
-            {
-              marginRight: msg.isSender ? sf(10) : undefined,
-              marginLeft: msg.isSender ? undefined : sf(10),
-              opacity: 1,
-            },
-          ]}
-        >
-          <StateLabel state={msg.state} />
-        </View>
-      </View>
-    );
-  }
-);
-const CustomMessageRenderItem: ListRenderItem<MessageItemType> = React.memo(
-  (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
-    const { item } = info;
-    const { SubComponent, SubComponentProps } = item as CustomMessageItemType;
-    return <SubComponent {...SubComponentProps} />;
-  }
-);
+      );
+    }
+  );
+const CustomMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+  React.memo(
+    (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const { item } = info;
+      const { SubComponent, SubComponentProps } = item as CustomMessageItemType;
+      return <SubComponent {...SubComponentProps} />;
+    }
+  );
+
+let GTextMessageItem: ListRenderItem<TextMessageItemType> | undefined;
+let GImageMessageItem: ListRenderItem<ImageMessageItemType> | undefined;
+let GVoiceMessageItem: ListRenderItem<VoiceMessageItemType> | undefined;
+let GFileMessageItem: ListRenderItem<FileMessageItemType> | undefined;
+let GLocationMessageItem: ListRenderItem<LocationMessageItemType> | undefined;
+let GVideoMessageItem: ListRenderItem<VideoMessageItemType> | undefined;
+let GCustomMessageItem: ListRenderItem<CustomMessageItemType> | undefined;
 
 const MessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
   // console.log('test:MessageRenderItem:', info);
   const { item } = info;
-  let MessageItem: ListRenderItem<MessageItemType>;
+  let MessageItem: ListRenderItem<MessageItemType> | undefined | null;
   if (item.type === ChatMessageType.TXT) {
-    MessageItem = TextMessageRenderItem;
+    MessageItem = GTextMessageItem ?? (TextMessageRenderItemDefault as any);
   } else if (item.type === ChatMessageType.IMAGE) {
-    MessageItem = ImageMessageRenderItem;
+    MessageItem = GImageMessageItem ?? (ImageMessageRenderItemDefault as any);
   } else if (item.type === ChatMessageType.VOICE) {
-    MessageItem = VoiceMessageRenderItem;
+    MessageItem = GVoiceMessageItem ?? (VoiceMessageRenderItemDefault as any);
   } else if (item.type === ChatMessageType.CUSTOM) {
-    MessageItem = CustomMessageRenderItem;
-  } else {
-    throw new Error('error');
+    MessageItem = GCustomMessageItem ?? (CustomMessageRenderItemDefault as any);
+  } else if (item.type === ChatMessageType.VIDEO) {
+    MessageItem = GVideoMessageItem;
+  } else if (item.type === ChatMessageType.LOCATION) {
+    MessageItem = GLocationMessageItem;
+  } else if (item.type === ChatMessageType.FILE) {
+    MessageItem = GFileMessageItem;
+  }
+  if (MessageItem === null || MessageItem === undefined) {
+    return null;
   }
   return (
     <Pressable
@@ -430,18 +452,33 @@ export type MessageBubbleListRef = {
   }) => void;
 };
 export type MessageBubbleListProps = {
+  /**
+   * Click the message list, not the message item.
+   */
   onPressed?: () => void;
   onRequestHistoryMessage?: (params: { earliestId: string }) => void;
-  CustomMessageRenderItem?: React.FunctionComponent<
-    React.PropsWithChildren<MessageItemType & { eventType: string; data: any }>
-  >;
+  TextMessageItem?: ListRenderItem<TextMessageItemType>;
+  ImageMessageItem?: ListRenderItem<ImageMessageItemType>;
+  VoiceMessageItem?: ListRenderItem<VoiceMessageItemType>;
+  FileMessageItem?: ListRenderItem<FileMessageItemType>;
+  LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
+  VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
+  CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
 };
 const MessageBubbleList = (
   props: MessageBubbleListProps,
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
-  const { onPressed, CustomMessageRenderItem } = props;
-  console.log('test:', CustomMessageRenderItem);
+  const { onPressed } = props;
+
+  GTextMessageItem = props.TextMessageItem;
+  GImageMessageItem = props.ImageMessageItem;
+  GVoiceMessageItem = props.VoiceMessageItem;
+  GFileMessageItem = props.FileMessageItem;
+  GLocationMessageItem = props.LocationMessageItem;
+  GVideoMessageItem = props.VideoMessageItem;
+  GCustomMessageItem = props.CustomMessageItem;
+
   const enableRefresh = true;
   const [refreshing, setRefreshing] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
