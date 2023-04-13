@@ -29,6 +29,7 @@ import {
   getScaleFactor,
   LocalIcon,
   MessageChatSdkEvent,
+  messageTime,
   messageTimestamp,
   queueTask,
   Services,
@@ -66,7 +67,7 @@ const Item: EqualHeightListItemComponent = (props) => {
           flexDirection: 'row',
         }}
       >
-        <DefaultAvatar size={sf(50)} radius={sf(25)} />
+        <DefaultAvatar id={item.convId} size={sf(50)} radius={sf(25)} />
         <View style={[styles.itemText, { justifyContent: 'space-between' }]}>
           <Text style={{ maxWidth: screenWidth * 0.5 }} numberOfLines={1}>
             {item.convName ? item.convName : item.convId}
@@ -82,7 +83,7 @@ const Item: EqualHeightListItemComponent = (props) => {
             flexGrow: 1,
           }}
         >
-          <Text>{messageTimestamp(item.timestamp)}</Text>
+          <Text>{messageTime(item.timestamp)}</Text>
           {item.count > 0 ? (
             <Badge
               count={item.count}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, View } from 'react-native';
 
 import { ICON_ASSETS } from '../../assets/icons';
+import { hashCode } from '../utils/function';
 import { timestamp } from '../utils/generator';
 import Avatar from './Avatar';
 import type { LocalIconName } from './Icon';
@@ -24,10 +25,21 @@ const AVATAR_ASSETS = [
 type AvatarProps = {
   size: number;
   radius: number;
+  id?: string;
 };
 
-export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
-  const index: number = timestamp('second') % AVATAR_ASSETS.length;
+export function getDefaultAvatar({
+  size,
+  radius,
+  id,
+}: AvatarProps): JSX.Element {
+  let index = 0;
+  if (id) {
+    const i = hashCode(id);
+    index = Math.abs(i) % AVATAR_ASSETS.length;
+  } else {
+    index = timestamp('second') % AVATAR_ASSETS.length;
+  }
   const key = AVATAR_ASSETS[index] as LocalIconName;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -46,8 +58,14 @@ export function getDefaultAvatar({ size, radius }: AvatarProps): JSX.Element {
   );
 }
 
-export function DefaultAvatarF({ size, radius }: AvatarProps): JSX.Element {
-  const index: number = timestamp('second') % AVATAR_ASSETS.length;
+export function DefaultAvatarF({ size, radius, id }: AvatarProps): JSX.Element {
+  let index = 0;
+  if (id) {
+    const i = hashCode(id);
+    index = Math.abs(i) % AVATAR_ASSETS.length;
+  } else {
+    index = timestamp('second') % AVATAR_ASSETS.length;
+  }
   const key = AVATAR_ASSETS[index] as LocalIconName;
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>

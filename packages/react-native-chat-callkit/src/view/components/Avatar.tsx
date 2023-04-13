@@ -85,7 +85,7 @@ export function DefaultAvatar(
 ): JSX.Element {
   const { userId, ...others } = props;
   const i = hashCode(userId);
-  const index = i % avatarNamesCount;
+  const index = Math.abs(i) % avatarNamesCount;
   const name = avatarNames[index] as IconName;
   const source = localLocalIcon(name) as number;
   return <Avatar uri={source} {...others} />;

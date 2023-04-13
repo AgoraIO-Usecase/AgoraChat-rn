@@ -95,3 +95,24 @@ export function messageTimestamp(date: Date | number, locale?: Locale): string {
     return format(date, 'p', { locale });
   }
 }
+
+export function messageTime(date: Date | number, locale?: Locale): string {
+  let _date: Date;
+  if (typeof date === 'number') {
+    _date = new Date(date);
+  } else {
+    _date = date;
+  }
+  const r = getDateTimePoint();
+  if (_date < r.yesterYear) {
+    return format(date, 'yyyy', { locale });
+  } else if (r.yesterYear <= _date && _date < r.yesterMonth) {
+    return format(date, 'MM/dd', { locale });
+  } else if (r.yesterMonth <= _date && _date < r.yesterday) {
+    return `yesterday`;
+  } else if (r.yesterday <= _date && _date < r.now) {
+    return format(date, 'hh:mm', { locale });
+  } else {
+    return format(date, 'p', { locale });
+  }
+}
