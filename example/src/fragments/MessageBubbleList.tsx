@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { ChatMessageType } from 'react-native-chat-sdk';
+import { ChatDownloadStatus, ChatMessageType } from 'react-native-chat-sdk';
 import {
   type DynamicHeightListRef,
   type LocalIconName,
@@ -49,19 +49,13 @@ export interface TextMessageItemType extends MessageItemType {
   text: string;
 }
 
-export interface ImageMessageItemType extends MessageItemType {
-  displayName: string;
-  localPath?: string;
+export interface ImageMessageItemType extends FileMessageItemType {
   localThumbPath?: string;
-  remoteUrl?: string;
-  memoSize?: number;
   width?: number;
   height?: number;
 }
-export interface VoiceMessageItemType extends MessageItemType {
+export interface VoiceMessageItemType extends FileMessageItemType {
   duration: number;
-  localPath?: string;
-  remoteUrl?: string;
 }
 export interface CustomMessageItemType extends MessageItemType {
   // SubComponent: (props: React.PropsWithChildren<any>) => React.ReactElement;
@@ -70,9 +64,25 @@ export interface CustomMessageItemType extends MessageItemType {
   >;
   SubComponentProps: MessageItemType & { eventType: string; data: any };
 }
-export interface VideoMessageItemType extends MessageItemType {}
-export interface LocationMessageItemType extends MessageItemType {}
-export interface FileMessageItemType extends MessageItemType {}
+export interface VideoMessageItemType extends FileMessageItemType {
+  duration: number;
+  thumbnailLocalPath?: string;
+  thumbnailRemoteUrl?: string;
+  width?: number;
+  height?: number;
+}
+export interface LocationMessageItemType extends MessageItemType {
+  address: string;
+  latitude: string;
+  longitude: string;
+}
+export interface FileMessageItemType extends MessageItemType {
+  localPath: string;
+  remoteUrl: string;
+  fileSize?: number;
+  displayName?: string;
+  fileStatus: ChatDownloadStatus;
+}
 // const text1: TextMessageItemType = {
 //   sender: 'zs',
 //   timestamp: timestamp(),
@@ -395,7 +405,7 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
 ): React.ReactElement | null => {
   // console.log('test:MessageRenderItem:', info);
   const { item } = info;
-  let MessageItem: ListRenderItem<MessageItemType> | undefined | null;
+  let MessageItem: ListRenderItem<MessageItemType> | undefined;
   if (item.type === ChatMessageType.TXT) {
     MessageItem = GTextMessageItem ?? (TextMessageRenderItemDefault as any);
   } else if (item.type === ChatMessageType.IMAGE) {
@@ -405,11 +415,11 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
   } else if (item.type === ChatMessageType.CUSTOM) {
     MessageItem = GCustomMessageItem ?? (CustomMessageRenderItemDefault as any);
   } else if (item.type === ChatMessageType.VIDEO) {
-    MessageItem = GVideoMessageItem;
+    MessageItem = GVideoMessageItem as any;
   } else if (item.type === ChatMessageType.LOCATION) {
-    MessageItem = GLocationMessageItem;
+    MessageItem = GLocationMessageItem as any;
   } else if (item.type === ChatMessageType.FILE) {
-    MessageItem = GFileMessageItem;
+    MessageItem = GFileMessageItem as any;
   }
   if (MessageItem === null || MessageItem === undefined) {
     return null;

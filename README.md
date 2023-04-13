@@ -203,14 +203,14 @@ export type ChatFragmentRef = {
   sendImageMessage: (params: {
     name: string;
     localPath: string;
-    memoSize: string;
+    fileSize: string;
     imageType: string;
     width: number;
     height: number;
   }) => void;
   sendVoiceMessage: (params: {
     localPath: string;
-    memoSize?: number;
+    fileSize?: number;
     duration?: number;
   }) => void;
 };
