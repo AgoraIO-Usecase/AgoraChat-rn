@@ -12,14 +12,14 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {
-  type AudioSet,
-  AudioEncoderAndroidType,
-  AudioSourceAndroidType,
-  AVEncoderAudioQualityIOSType,
-  AVEncodingOption,
-  AVModeIOSOption,
-} from 'react-native-audio-recorder-player';
+// import {
+//   type AudioSet,
+//   AudioEncoderAndroidType,
+//   AudioSourceAndroidType,
+//   AVEncoderAudioQualityIOSType,
+//   AVEncodingOption,
+//   AVModeIOSOption,
+// } from 'react-native-audio-recorder-player';
 import {
   ChatConversationType,
   ChatCustomMessageBody,
@@ -42,7 +42,7 @@ import {
   createStyleSheet,
   // DataEventType,
   FaceList as ChatFaceList,
-  getFileExtension,
+  // getFileExtension,
   getScaleFactor,
   LocalIcon,
   localUrl,
@@ -61,7 +61,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moji from 'twemoji';
 
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
-import { sendEvent, sendEventProps } from '../events/sendEvent';
+// import { sendEvent, sendEventProps } from '../events/sendEvent';
 import MessageBubbleList, {
   type CustomMessageItemType,
   type ImageMessageItemType,
@@ -130,6 +130,7 @@ type ChatContentProps = BaseProps & {
       MessageItemType & { eventType: string; data: any }
     >;
   };
+  // eslint-disable-next-line react/no-unused-prop-types
   onUpdateReadCount?: (unreadCount: number) => void;
   onClickMessageBubble?: (data: MessageItemType) => void;
   onLongPressMessageBubble?: (data: MessageItemType) => void;
@@ -141,15 +142,15 @@ type ChatContentProps = BaseProps & {
   onVoiceRecordEnd?: (params: { localPath: string; duration: number }) => void;
 };
 
-const sendEventFromChat = (
-  params: Omit<sendEventProps, 'senderId' | 'timestamp' | 'eventBizType'>
-) => {
-  sendEvent({
-    ...params,
-    senderId: 'ChatFragment',
-    eventBizType: 'chat',
-  } as sendEventProps);
-};
+// const sendEventFromChat = (
+//   params: Omit<sendEventProps, 'senderId' | 'timestamp' | 'eventBizType'>
+// ) => {
+//   sendEvent({
+//     ...params,
+//     senderId: 'ChatFragment',
+//     eventBizType: 'chat',
+//   } as sendEventProps);
+// };
 
 const ChatInput = React.memo((props: ChatInputProps) => {
   const {
@@ -157,8 +158,8 @@ const ChatInput = React.memo((props: ChatInputProps) => {
     onSendTextMessage,
     onInit,
     inputRef,
-    chatId,
-    onVoiceRecordEnd,
+    // chatId,
+    // onVoiceRecordEnd,
     onClickInputMoreButton,
     onPressInInputVoiceButton,
     onPressOutInputVoiceButton,
@@ -285,11 +286,11 @@ const ChatInput = React.memo((props: ChatInputProps) => {
                 if (onClickInputMoreButton) {
                   onClickInputMoreButton();
                 } else {
-                  sendEventFromChat({
-                    eventType: 'SheetEvent',
-                    action: 'open_input_extension',
-                    params: {},
-                  });
+                  // sendEventFromChat({
+                  //   eventType: 'SheetEvent',
+                  //   action: 'open_input_extension',
+                  //   params: {},
+                  // });
                 }
               }}
             >
@@ -315,92 +316,87 @@ const ChatInput = React.memo((props: ChatInputProps) => {
               if (onPressInInputVoiceButton) {
                 onPressInInputVoiceButton();
               } else {
-                sendEventFromChat({
-                  eventType: 'VoiceStateEvent',
-                  action: 'enable_voice',
-                  params: {},
-                });
-                Services.ms
-                  .startRecordAudio({
-                    audio: {
-                      AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
-                      AudioSourceAndroid: AudioSourceAndroidType.MIC,
-                      AVModeIOS: AVModeIOSOption.measurement,
-                      AVEncoderAudioQualityKeyIOS:
-                        AVEncoderAudioQualityIOSType.high,
-                      AVNumberOfChannelsKeyIOS: 2,
-                      AVFormatIDKeyIOS: AVEncodingOption.aac,
-                    } as AudioSet,
-                    // url: localPath,
-                    onPosition: (pos) => {
-                      console.log('test:startRecordAudio:pos:', pos);
-                    },
-                    onFailed: (error) => {
-                      console.warn('test:startRecordAudio:onFailed:', error);
-                    },
-                    onFinished: ({ result, path, error }) => {
-                      console.log(
-                        'test:startRecordAudio:onFinished:',
-                        result,
-                        path,
-                        error
-                      );
-                    },
-                  })
-                  .then((result) => {
-                    console.log('test:startRecordAudio:result:', result);
-                  })
-                  .catch((error) => {
-                    console.warn('test:startRecordAudio:error:', error);
-                  });
+                // sendEventFromChat({
+                //   eventType: 'VoiceStateEvent',
+                //   action: 'enable_voice',
+                //   params: {},
+                // });
+                // Services.ms
+                //   .startRecordAudio({
+                //     audio: {
+                //       AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
+                //       AudioSourceAndroid: AudioSourceAndroidType.MIC,
+                //       AVModeIOS: AVModeIOSOption.measurement,
+                //       AVEncoderAudioQualityKeyIOS:
+                //         AVEncoderAudioQualityIOSType.high,
+                //       AVNumberOfChannelsKeyIOS: 2,
+                //       AVFormatIDKeyIOS: AVEncodingOption.aac,
+                //     } as AudioSet,
+                //     // url: localPath,
+                //     onPosition: (pos) => {
+                //       console.log('test:startRecordAudio:pos:', pos);
+                //     },
+                //     onFailed: (error) => {
+                //       console.warn('test:startRecordAudio:onFailed:', error);
+                //     },
+                //     onFinished: ({ result, path, error }) => {
+                //       console.log(
+                //         'test:startRecordAudio:onFinished:',
+                //         result,
+                //         path,
+                //         error
+                //       );
+                //     },
+                //   })
+                //   .then((result) => {
+                //     console.log('test:startRecordAudio:result:', result);
+                //   })
+                //   .catch((error) => {
+                //     console.warn('test:startRecordAudio:error:', error);
+                //   });
               }
             }}
             onPressOut={() => {
               if (onPressOutInputVoiceButton) {
                 onPressOutInputVoiceButton();
               } else {
-                sendEventFromChat({
-                  eventType: 'VoiceStateEvent',
-                  action: 'disable_voice',
-                  params: {},
-                });
-                let localPath = localUrl(
-                  Services.dcs.getFileDir(chatId, uuid())
-                );
-                Services.ms
-                  .stopRecordAudio()
-                  .then((result?: { pos: number; path: string }) => {
-                    if (result?.path) {
-                      const extension = getFileExtension(result.path);
-                      console.log('test:extension:', extension);
-                      localPath = localPath + extension;
-                      Services.ms
-                        .saveFromLocal({
-                          targetPath: localPath,
-                          localPath: result.path,
-                        })
-                        .then(() => {
-                          onVoiceRecordEnd?.({
-                            localPath,
-                            duration: result.pos / 1000,
-                          });
-                          // sendEventFromChat({
-                          //   eventType: 'DataEvent',
-                          //   action: 'send_voice_message',
-                          //   params: { localPath, duration: result.pos / 1000 },
-                          // });
-                        })
-                        .catch((error) => {
-                          console.warn(
-                            'test:startRecordAudio:save:error',
-                            error
-                          );
-                        });
-                    }
-                  })
-                  .catch((error) => {
-                    console.warn('test:stopRecordAudio:error:', error);
-                  });
+                // sendEventFromChat({
+                //   eventType: 'VoiceStateEvent',
+                //   action: 'disable_voice',
+                //   params: {},
+                // });
+                // let localPath = localUrl(
+                //   Services.dcs.getFileDir(chatId, uuid())
+                // );
+                // Services.ms
+                //   .stopRecordAudio()
+                //   .then((result?: { pos: number; path: string }) => {
+                //     if (result?.path) {
+                //       const extension = getFileExtension(result.path);
+                //       console.log('test:extension:', extension);
+                //       localPath = localPath + extension;
+                //       Services.ms
+                //         .saveFromLocal({
+                //           targetPath: localPath,
+                //           localPath: result.path,
+                //         })
+                //         .then(() => {
+                //           onVoiceRecordEnd?.({
+                //             localPath,
+                //             duration: result.pos / 1000,
+                //           });
+                //         })
+                //         .catch((error) => {
+                //           console.warn(
+                //             'test:startRecordAudio:save:error',
+                //             error
+                //           );
+                //         });
+                //     }
+                //   })
+                //   .catch((error) => {
+                //     console.warn('test:stopRecordAudio:error:', error);
+                //   });
               }
             }}
           >
@@ -421,7 +417,7 @@ const ChatContent = React.memo(
     onFace,
     inputRef,
     customMessageBubble,
-    onUpdateReadCount,
+    // onUpdateReadCount,
     onClickMessageBubble,
     onLongPressMessageBubble,
     onClickInputMoreButton,
@@ -584,11 +580,11 @@ const ChatContent = React.memo(
             if (onLongPressMessageBubble) {
               onLongPressMessageBubble(data);
             } else {
-              sendEventFromChat({
-                eventType: 'ActionMenuEvent',
-                action: 'long_press_message_bubble',
-                params: data,
-              });
+              // sendEventFromChat({
+              //   eventType: 'ActionMenuEvent',
+              //   action: 'long_press_message_bubble',
+              //   params: data,
+              // });
             }
           },
           onPress: (data: MessageItemType) => {
@@ -596,11 +592,6 @@ const ChatContent = React.memo(
               onClickMessageBubble(data);
             } else {
               onClickMessageBubbleInternal(data);
-              // sendEventFromChat({
-              //   eventType: 'DataEvent',
-              //   action: 'press_message_bubble',
-              //   params: data,
-              // });
             }
           },
         } as MessageItemType;
@@ -730,15 +721,6 @@ const ChatContent = React.memo(
               );
             },
             onSuccess: (message: ChatMessage): void => {
-              // sendEventFromChat({
-              //   eventType: 'DataEvent',
-              //   action: 'update_message_state',
-              //   params: {
-              //     localMsgId: message.localMsgId,
-              //     result: true,
-              //     item: convertFromMessage(message),
-              //   },
-              // });
               updateMessageState({
                 localMsgId: message.localMsgId,
                 result: true,
@@ -786,21 +768,6 @@ const ChatContent = React.memo(
       [downloadAttachment]
     );
 
-    // const onSendBefore = React.useCallback((msg: ChatMessage) => {
-    //   // sendEventFromChat({
-    //   //   eventType: 'DataEvent',
-    //   //   action: 'on_send_before',
-    //   //   params: { message: msg },
-    //   // });
-    // }, []);
-    // const onSendResult = React.useCallback((msg: ChatMessage) => {
-    //   // sendEventFromChat({
-    //   //   eventType: 'DataEvent',
-    //   //   action: 'on_send_result',
-    //   //   params: { message: msg },
-    //   // });
-    // }, []);
-
     const sendToServer = React.useCallback(
       (msg: ChatMessage) => {
         onSendMessage?.(msg);
@@ -809,26 +776,9 @@ const ChatContent = React.memo(
           .sendMessage(msg, {
             onProgress: (localMsgId: string, progress: number): void => {
               console.log('test:sendToServer:onProgress', localMsgId, progress);
-              // sendEventFromChat({
-              //   eventType: 'DataEvent',
-              //   action: 'on_message_progress',
-              //   params: {
-              //     localMsgId,
-              //     progress,
-              //   },
-              // });
             },
             onError: (localMsgId: string, error: ChatError): void => {
               console.log('test:sendToServer:onError', localMsgId);
-              // sendEventFromChat({
-              //   eventType: 'DataEvent',
-              //   action: 'update_message_state',
-              //   params: {
-              //     localMsgId,
-              //     result: false,
-              //     reason: error,
-              //   },
-              // });
               updateMessageState({
                 localMsgId,
                 result: false,
@@ -846,15 +796,6 @@ const ChatContent = React.memo(
             },
             onSuccess: (message: ChatMessage): void => {
               console.log('test:sendToServer:onSuccess', message.localMsgId);
-              // sendEventFromChat({
-              //   eventType: 'DataEvent',
-              //   action: 'update_message_state',
-              //   params: {
-              //     localMsgId: message.localMsgId,
-              //     result: true,
-              //     item: convertFromMessage(message),
-              //   },
-              // });
               updateMessageState({
                 localMsgId: message.localMsgId,
                 result: true,
@@ -1127,52 +1068,52 @@ const ChatContent = React.memo(
       onFace?.(value);
     };
 
-    const createConversationIfNotExisted = React.useCallback(() => {
-      sendEventFromChat({
-        eventType: 'DataEvent',
-        action: 'exec_create_conversation',
-        params: {
-          convId: chatId,
-          convType: chatType as number as ChatConversationType,
-        },
-      });
-    }, [chatId, chatType]);
+    // const createConversationIfNotExisted = React.useCallback(() => {
+    //   sendEventFromChat({
+    //     eventType: 'DataEvent',
+    //     action: 'exec_create_conversation',
+    //     params: {
+    //       convId: chatId,
+    //       convType: chatType as number as ChatConversationType,
+    //     },
+    //   });
+    // }, [chatId, chatType]);
 
-    const updateAllUnreadCount = React.useCallback(() => {
-      client.chatManager
-        .getUnreadCount()
-        .then((result) => {
-          if (result !== undefined) {
-            onUpdateReadCount?.(result);
-          }
-        })
-        .catch((error) => {
-          console.warn('test:error:', error);
-        });
-    }, [client.chatManager, onUpdateReadCount]);
+    // const updateAllUnreadCount = React.useCallback(() => {
+    //   client.chatManager
+    //     .getUnreadCount()
+    //     .then((result) => {
+    //       if (result !== undefined) {
+    //         onUpdateReadCount?.(result);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.warn('test:error:', error);
+    //     });
+    // }, [client.chatManager, onUpdateReadCount]);
 
-    const clearRead = React.useCallback(() => {
-      client.chatManager
-        .markAllMessagesAsRead(
-          chatId,
-          chatType as number as ChatConversationType
-        )
-        .then(() => {
-          sendEventFromChat({
-            eventType: 'DataEvent',
-            action: 'update_conversation_read_state',
-            params: {
-              convId: chatId,
-              convType: chatType as number as ChatConversationType,
-            },
-          });
+    // const clearRead = React.useCallback(() => {
+    //   client.chatManager
+    //     .markAllMessagesAsRead(
+    //       chatId,
+    //       chatType as number as ChatConversationType
+    //     )
+    //     .then(() => {
+    //       sendEventFromChat({
+    //         eventType: 'DataEvent',
+    //         action: 'update_conversation_read_state',
+    //         params: {
+    //           convId: chatId,
+    //           convType: chatType as number as ChatConversationType,
+    //         },
+    //       });
 
-          updateAllUnreadCount();
-        })
-        .catch((error) => {
-          console.warn('test:error', error);
-        });
-    }, [chatId, chatType, client.chatManager, updateAllUnreadCount]);
+    //       updateAllUnreadCount();
+    //     })
+    //     .catch((error) => {
+    //       console.warn('test:error', error);
+    //     });
+    // }, [chatId, chatType, client.chatManager, updateAllUnreadCount]);
 
     const onFaceInternal = React.useCallback((face: string) => {
       const content = getContentRef.current();
@@ -1257,108 +1198,8 @@ const ChatContent = React.memo(
         }
       );
 
-      // const sub4 = DeviceEventEmitter.addListener(
-      //   'DataEvent' as DataEventType,
-      //   (event) => {
-      //     const { action, params } = event as {
-      //       eventBizType: BizEventType;
-      //       action: DataActionEventType;
-      //       senderId: string;
-      //       params: any;
-      //       timestamp?: number;
-      //     };
-      //     switch (action) {
-      //       // case 'send_image_message':
-      //       //   {
-      //       //     const eventParams = params as any[];
-      //       //     for (const item of eventParams) {
-      //       //       sendImageMessage({
-      //       //         name: item.name,
-      //       //         localPath: item.uri,
-      //       //         memoSize: item.size,
-      //       //         imageType: item.type,
-      //       //         width: item.width,
-      //       //         height: item.height,
-      //       //       })
-      //       //         .then()
-      //       //         .catch((error) => {
-      //       //           console.warn('test:error', error);
-      //       //         });
-      //       //     }
-      //       //   }
-      //       //   break;
-      //       // case 'send_voice_message':
-      //       //   {
-      //       //     const eventParams = params as {
-      //       //       localPath: string;
-      //       //       duration: number;
-      //       //     };
-      //       //     sendVoiceMessage({
-      //       //       localPath: eventParams.localPath,
-      //       //       duration: eventParams.duration,
-      //       //     })
-      //       //       .then()
-      //       //       .catch((error) => {
-      //       //         console.warn('test:sendVoiceMessage:error', error);
-      //       //       });
-      //       //   }
-      //       //   break;
-      //       // case 'press_message_bubble':
-      //       //   {
-      //       //     const eventParams = params as MessageItemType;
-      //       //     if (eventParams.type === ChatMessageType.VOICE) {
-      //       //       const voice = eventParams as VoiceMessageItemType;
-      //       //       if (voice.localPath) {
-      //       //         Services.ms
-      //       //           .playAudio({
-      //       //             url: playUrl(voice.localPath),
-      //       //             onPlay({ isMuted, currentPosition, duration }) {
-      //       //               console.log(
-      //       //                 'test:onPlay',
-      //       //                 isMuted,
-      //       //                 currentPosition,
-      //       //                 duration
-      //       //               );
-      //       //             },
-      //       //           })
-      //       //           .then(() => {
-      //       //             console.log('test:playAudio:finish:');
-      //       //           })
-      //       //           .catch((error) => {
-      //       //             console.warn('test:error:', error);
-      //       //           });
-      //       //       }
-      //       //     } else if (eventParams.type === ChatMessageType.IMAGE) {
-      //       //       onClickMessageBubble?.(eventParams);
-      //       //       // sendEventFromChat({
-      //       //       //   eventType: 'DataEvent',
-      //       //       //   action: 'preview_image',
-      //       //       //   params: eventParams,
-      //       //       // });
-      //       //     }
-      //       //   }
-      //       //   break;
-      //       // case 'preview_image':
-      //       //   onClickMessageBubble?.(params);
-      //       //   break;
-
-      //       // case 'request_history_message':
-      //       //   {
-      //       //     const eventParams = params as {
-      //       //       earliestId: string | undefined;
-      //       //     };
-      //       //     requestHistoryMessage(eventParams.earliestId);
-      //       //   }
-      //       //   break;
-
-      //       default:
-      //         break;
-      //     }
-      //   }
-      // );
       return () => {
         sub2.remove();
-        // sub4.remove();
       };
     }, [chatId, loadMessage]);
 
@@ -1406,8 +1247,8 @@ const ChatContent = React.memo(
         const unsubscribe = addListeners();
         initList();
         initDirs([chatId]);
-        createConversationIfNotExisted();
-        clearRead();
+        // createConversationIfNotExisted();
+        // clearRead();
         return {
           unsubscribe: unsubscribe,
         };
@@ -1418,14 +1259,7 @@ const ChatContent = React.memo(
 
       const res = load();
       return () => unload(res);
-    }, [
-      createConversationIfNotExisted,
-      addListeners,
-      initList,
-      clearRead,
-      initDirs,
-      chatId,
-    ]);
+    }, [addListeners, initList, initDirs, chatId]);
 
     const onRequestHistoryMessage = React.useCallback(
       (params: { earliestId: string }) => {

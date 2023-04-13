@@ -9,7 +9,11 @@ import {
   AVEncodingOption,
   AVModeIOSOption,
 } from 'react-native-audio-recorder-player';
-import { ChatMessage, ChatMessageType } from 'react-native-chat-sdk';
+import {
+  ChatConversationType,
+  ChatMessage,
+  ChatMessageType,
+} from 'react-native-chat-sdk';
 import {
   DataEventType,
   getFileExtension,
@@ -21,6 +25,7 @@ import {
 } from 'react-native-chat-uikit';
 
 import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
+import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
 import { sendEvent, sendEventProps } from '../events/sendEvent';
 import ChatFragment, { ChatFragmentRef } from '../fragments/Chat';
@@ -56,8 +61,10 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const rp = route.params as any;
   const params = rp?.params as { chatId: string; chatType: number };
   const chatId = params.chatId;
+  const chatType = params.chatType as ChatConversationType;
   const messageBubbleListRefP = React.useRef<typeof MessageBubbleList>(null);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
+  const { client } = useAppChatSdkContext();
   console.log('test:ChatScreen:123');
 
   const onClickMessageBubble = React.useCallback(
@@ -258,7 +265,55 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
     });
   }, []);
 
-  const init = React.useCallback(() => {}, []);
+  const createConversationIfNotExisted = React.useCallback(() => {
+    sendEventFromChat({
+      eventType: 'DataEvent',
+      action: 'exec_create_conversation',
+      params: {
+        convId: chatId,
+        convType: chatType as number as ChatConversationType,
+      },
+    });
+  }, [chatId, chatType]);
+
+  const updateAllUnreadCount = React.useCallback(() => {
+    client.chatManager
+      .getUnreadCount()
+      .then((result) => {
+        if (result !== undefined) {
+          onUpdateReadCount?.(result);
+        }
+      })
+      .catch((error) => {
+        console.warn('test:error:', error);
+      });
+  }, [client.chatManager, onUpdateReadCount]);
+
+  const clearRead = React.useCallback(() => {
+    client.chatManager
+      .markAllMessagesAsRead(chatId, chatType as number as ChatConversationType)
+      .then(() => {
+        sendEventFromChat({
+          eventType: 'DataEvent',
+          action: 'update_conversation_read_state',
+          params: {
+            convId: chatId,
+            convType: chatType as number as ChatConversationType,
+          },
+        });
+
+        updateAllUnreadCount();
+      })
+      .catch((error) => {
+        console.warn('test:error', error);
+      });
+  }, [chatId, chatType, client.chatManager, updateAllUnreadCount]);
+
+  const init = React.useCallback(() => {
+    // notify create conversation if not existed.
+    createConversationIfNotExisted();
+    clearRead();
+  }, [clearRead, createConversationIfNotExisted]);
 
   React.useEffect(() => {
     const load = () => {

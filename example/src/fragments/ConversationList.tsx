@@ -30,7 +30,6 @@ import {
   LocalIcon,
   MessageChatSdkEvent,
   messageTime,
-  messageTimestamp,
   queueTask,
   Services,
   timestamp,
@@ -279,40 +278,6 @@ export default function ConversationListFragment(
     [data]
   );
 
-  // const getConvName = React.useCallback(
-  //   (params: {
-  //     convId: string;
-  //     convType: ChatConversationType;
-  //     fromLocal: boolean;
-  //   }) => {
-  //     console.log('test:getConvName:', params);
-  //     if (params.convType === ChatConversationType.PeerChat) {
-  //       client.userManager.fetchUserInfoById([params.convId]).then().catch();
-  //     } else if (params.convType === ChatConversationType.GroupChat) {
-  //       if (params.fromLocal) {
-  //         client.groupManager.getGroupWithId(params.convId).then().catch();
-  //       } else {
-  //         client.groupManager
-  //           .fetchGroupInfoFromServer(params.convId)
-  //           .then()
-  //           .catch();
-  //         // !!! for test
-  //         // promiseWrapper({
-  //         //   f: client.groupManager.fetchGroupInfoFromServer.bind(
-  //         //     client.groupManager
-  //         //   ),
-  //         //   ft: 's',
-  //         //   args: params.convId,
-  //         //   onSuccess: (data) => {
-  //         //     console.log('test:234', data);
-  //         //   },
-  //         // });
-  //       }
-  //     }
-  //   },
-  //   [client.groupManager, client.userManager]
-  // );
-
   const manualRefresh = React.useCallback(
     (params: {
       type: 'init' | 'add' | 'search' | 'del-one' | 'update-one';
@@ -449,7 +414,7 @@ export default function ConversationListFragment(
         ...item,
         convContent: getContent(item.lastMsg),
         timestamp: time,
-        timestampS: messageTimestamp(time),
+        timestampS: messageTime(time),
         type: 'sideslip',
         sideslip: {
           width: sf(50),
@@ -685,69 +650,6 @@ export default function ConversationListFragment(
         }
       }
     );
-
-    // const sub4 = DeviceEventEmitter.addListener(
-    //   'DataEvent' as DataEventType,
-    //   (event) => {
-    //     const { action, params } = event as {
-    //       eventBizType: BizEventType;
-    //       action: DataActionEventType;
-    //       senderId: string;
-    //       params: any;
-    //       timestamp?: number;
-    //     };
-    //     switch (action) {
-    //       case 'on_send_before':
-    //         {
-    //           const eventParams = params as { message: ChatMessage };
-    //           const conv = getConv(eventParams.message.conversationId);
-    //           if (conv === undefined) {
-    //             return;
-    //           }
-    //           manualRefresh({
-    //             type: 'update-one',
-    //             items: [
-    //               standardizedData({
-    //                 ...conv,
-    //                 count: 0,
-    //                 lastMsg: eventParams.message,
-    //               } as ItemDataType),
-    //             ],
-    //           });
-    //         }
-    //         break;
-    //       case 'on_send_result':
-    //         {
-    //           const eventParams = params as { message: ChatMessage };
-    //           const conv = getConv(eventParams.message.conversationId);
-    //           if (conv === undefined) {
-    //             return;
-    //           }
-    //           manualRefresh({
-    //             type: 'update-one',
-    //             items: [
-    //               standardizedData({
-    //                 ...conv,
-    //                 count: 0,
-    //                 lastMsg: eventParams.message,
-    //               } as ItemDataType),
-    //             ],
-    //           });
-    //         }
-    //         break;
-    //       case 'exec_create_conversation':
-    //         createConversation(params);
-    //         break;
-
-    //       case 'update_conversation_read_state':
-    //         conversationRead(params);
-    //         break;
-
-    //       default:
-    //         break;
-    //     }
-    //   }
-    // );
 
     return () => {
       sub2.remove();
