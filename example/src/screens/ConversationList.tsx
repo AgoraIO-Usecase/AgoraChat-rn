@@ -12,11 +12,22 @@ import type {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack/lib/typescript/src/types';
 import * as React from 'react';
-import { DeviceEventEmitter, Pressable, View } from 'react-native';
 import {
+  DeviceEventEmitter,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import {
+  Badge,
+  createStyleSheet,
   DataEventType,
+  DefaultAvatar,
+  EqualHeightListItemComponent,
   getScaleFactor,
   LocalIcon,
+  messageTime,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,6 +37,7 @@ import { type sendEventProps, sendEvent } from '../events/sendEvent';
 import ConversationListFragment, {
   ConversationListFragmentRef,
   ItemDataType as ConversationListItemDataType,
+  ItemDataType,
 } from '../fragments/ConversationList';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
@@ -67,6 +79,112 @@ const sendConversationEvent = (
   } as sendEventProps);
 };
 
+const RenderItem: EqualHeightListItemComponent = (props) => {
+  const sf = getScaleFactor();
+  const item = props.data as ItemDataType;
+  const { width: screenWidth } = useWindowDimensions();
+  const extraWidth = item.sideslip?.width ?? sf(100);
+  return (
+    <View style={[styles.item, { width: screenWidth + extraWidth }]}>
+      <View
+        style={{
+          // width: screenWidth,
+          flexGrow: 1,
+          flexShrink: 1,
+          flexDirection: 'row',
+        }}
+      >
+        <DefaultAvatar id={item.convId} size={sf(50)} radius={sf(25)} />
+        <View style={[styles.itemText, { justifyContent: 'space-between' }]}>
+          <Text style={{ maxWidth: screenWidth * 0.5 }} numberOfLines={1}>
+            {item.convName ? item.convName : item.convId}
+          </Text>
+          <Text style={{ maxWidth: screenWidth * 0.6 }} numberOfLines={1}>
+            {item.convContent}
+          </Text>
+        </View>
+        <View
+          style={{
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            flexGrow: 1,
+          }}
+        >
+          <Text>{messageTime(item.timestamp)}</Text>
+          {item.count > 0 ? (
+            <Badge
+              count={item.count}
+              badgeColor="rgba(255, 20, 204, 1)"
+              size="default"
+            />
+          ) : null}
+        </View>
+      </View>
+      <View
+        style={{
+          // flexGrow: 1,
+          width: extraWidth, // ??? why
+          height: sf(60),
+          flexDirection: 'row',
+          // backgroundColor: 'green',
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+        }}
+      >
+        <View style={{ width: sf(20) }} />
+        <Pressable
+          style={{
+            height: sf(30),
+            width: sf(30),
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#F2F2F2',
+            overflow: 'hidden',
+            borderRadius: sf(30),
+          }}
+          onPress={() => {
+            item.actions?.onMute?.(item);
+          }}
+        >
+          <LocalIcon name="bell_slash" size={20} color="#666666" />
+        </Pressable>
+        <View style={{ width: sf(15) }} />
+        <Pressable
+          style={{
+            height: sf(30),
+            width: sf(30),
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 20, 204, 1)',
+            overflow: 'hidden',
+            borderRadius: sf(30),
+          }}
+          onPress={() => {
+            item.actions?.onDelete?.(item);
+          }}
+          onStartShouldSetResponder={(_) => {
+            return true;
+          }}
+          onStartShouldSetResponderCapture={(_) => {
+            return true;
+          }}
+          onMoveShouldSetResponder={(_) => {
+            return true;
+          }}
+          onResponderEnd={(_) => {
+            return true;
+          }}
+          onResponderGrant={(_) => {
+            return true;
+          }}
+        >
+          <LocalIcon name="trash" size={sf(20)} color="white" />
+        </Pressable>
+      </View>
+    </View>
+  );
+};
+
 export default function ConversationListScreen({
   navigation,
 }: Props): JSX.Element {
@@ -100,6 +218,19 @@ export default function ConversationListScreen({
       },
       [sf]
     );
+
+  const sortPolicy = React.useCallback(
+    (a: ConversationListItemDataType, b: ConversationListItemDataType) => {
+      if (a.key > b.key) {
+        return 1;
+      } else if (a.key < b.key) {
+        return -1;
+      } else {
+        return 0;
+      }
+    },
+    []
+  );
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -214,7 +345,30 @@ export default function ConversationListScreen({
             senderId: 'ConversationList',
           });
         }}
+        sortPolicy={sortPolicy}
+        RenderItem={RenderItem}
       />
     </SafeAreaView>
   );
 }
+
+const styles = createStyleSheet({
+  item: {
+    // flex: 1,
+    // backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 0,
+    marginHorizontal: 0,
+    height: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemText: {
+    marginLeft: 10,
+  },
+  blank: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+});

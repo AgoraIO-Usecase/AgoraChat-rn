@@ -102,21 +102,6 @@ const DefaultItemContainer: ItemContainerComponent = (
       onPress={() => {
         props.data?.onPress?.(props.data);
       }}
-      // onStartShouldSetResponder={(_) => {
-      //   return false;
-      // }}
-      // onStartShouldSetResponderCapture={(_) => {
-      //   return false;
-      // }}
-      // onMoveShouldSetResponder={(_) => {
-      //   return false;
-      // }}
-      // onResponderEnd={(_) => {
-      //   return false;
-      // }}
-      // onResponderGrant={(_) => {
-      //   return false;
-      // }}
     >
       {props.children}
     </Pressable>
@@ -317,6 +302,7 @@ export type ListItemUpdateType = {
   data?: ItemData[];
   enableSort?: boolean;
   sortDirection?: 'asc' | 'dsc';
+  sortPolicy?: (a: ItemData, b: ItemData) => number;
 };
 
 export type EqualHeightListRef = {
@@ -598,6 +584,9 @@ export const EqualHeightList: (
         (item.type === 'add' || item.type === 'update')
       ) {
         data.sort((a, b) => {
+          if (item.sortPolicy) {
+            return item.sortPolicy(a.itemProps.data, b.itemProps.data);
+          }
           if (a.itemProps.data.key > b.itemProps.data.key) {
             return item.sortDirection === 'asc' ? 1 : -1;
           } else if (a.itemProps.data.key < b.itemProps.data.key) {

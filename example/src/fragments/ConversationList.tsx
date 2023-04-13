@@ -49,6 +49,10 @@ export type ItemDataType = EqualHeightListItemData & {
     onMute?: (data: ItemDataType) => void;
     onDelete?: (data: ItemDataType) => void;
   };
+  /**
+   * json object. Typical application: conversation sticking to the top.
+   */
+  ext?: any;
 };
 
 const Item: EqualHeightListItemComponent = (props) => {
@@ -164,6 +168,11 @@ export type ConversationListFragmentRef = {
     convId: string;
     convType: ChatConversationType;
   }) => void;
+  updateExtension: (params: {
+    convId: string;
+    convType: ChatConversationType;
+    ext?: any; // json object.
+  }) => void;
 };
 
 type ConversationListFragmentProps = {
@@ -172,12 +181,22 @@ type ConversationListFragmentProps = {
   onPress?: (data?: ItemDataType) => void;
   onData?: (data: ItemDataType[]) => void;
   onUpdateReadCount?: (unreadCount: number) => void;
+  sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
+  RenderItem?: EqualHeightListItemComponent;
 };
 export default function ConversationListFragment(
   props: ConversationListFragmentProps
 ): JSX.Element {
   console.log('test:ConversationListFragment:', props);
-  const { propsRef, onLongPress, onPress, onData, onUpdateReadCount } = props;
+  const {
+    propsRef,
+    onLongPress,
+    onPress,
+    onData,
+    onUpdateReadCount,
+    sortPolicy,
+    RenderItem,
+  } = props;
 
   const sf = getScaleFactor();
   const { client, getCurrentId } = useChatSdkContext();
@@ -301,6 +320,7 @@ export default function ConversationListFragment(
             data: params.items as EqualHeightListItemData[],
             enableSort: true,
             sortDirection: 'asc',
+            sortPolicy: sortPolicy as any,
           },
         ]);
         data.push(...params.items);
@@ -314,6 +334,7 @@ export default function ConversationListFragment(
             data: params.items as EqualHeightListItemData[],
             enableSort: true,
             sortDirection: 'asc',
+            sortPolicy: sortPolicy as any,
           },
         ]);
       } else if (params.type === 'add') {
@@ -323,6 +344,7 @@ export default function ConversationListFragment(
             data: params.items as EqualHeightListItemData[],
             enableSort: true,
             sortDirection: 'asc',
+            sortPolicy: sortPolicy as any,
           },
         ]);
         data.push(...params.items);
@@ -355,6 +377,7 @@ export default function ConversationListFragment(
             data: params.items as EqualHeightListItemData[],
             enableSort: true,
             sortDirection: 'asc',
+            sortPolicy: sortPolicy as any,
           },
         ]);
         let hadUpdated = false;
@@ -362,7 +385,8 @@ export default function ConversationListFragment(
           const element = data[index];
           for (const item of params.items) {
             if (element && item.key === element.key) {
-              data[index] = item;
+              const old = data[index];
+              data[index] = (old ? { ...old, ...item } : item) as ItemDataType;
               hadUpdated = true;
               break;
             }
@@ -377,7 +401,7 @@ export default function ConversationListFragment(
       setIsEmpty(data.length === 0);
       onData?.(data);
     },
-    [data, getCurrentId, onData]
+    [data, getCurrentId, onData, sortPolicy]
   );
 
   const removeConversation = React.useCallback(
@@ -469,6 +493,7 @@ export default function ConversationListFragment(
               convType: conv.convType,
               lastMsg: msg,
               count: getConvCount(conv.convId, msg),
+              ext: conv.ext,
             } as Omit<ItemDataType, 'onLongPress' | 'onPress' | 'timestampS' | 'convContent' | 'type' | 'timestamp'>);
           } else {
             return standardizedData({
@@ -477,6 +502,7 @@ export default function ConversationListFragment(
               convType: conv.convType,
               lastMsg: undefined,
               count: 0,
+              ext: conv.ext,
             } as ItemDataType);
           }
         } else {
@@ -558,6 +584,7 @@ export default function ConversationListFragment(
               convType: convType,
               lastMsg: msg,
               count: getConvCount(convId, msg),
+              ext: conv.ext,
             } as ItemDataType),
           ],
         });
@@ -592,6 +619,33 @@ export default function ConversationListFragment(
     [getConv, manualRefresh, standardizedData]
   );
 
+  const updateExtension = React.useCallback(
+    (params: { convId: string; convType: ChatConversationType; ext?: any }) => {
+      const conv = getConv(params.convId);
+      if (conv === undefined) {
+        return;
+      }
+
+      client.chatManager
+        .setConversationExtension(conv.convId, conv.convType, params.ext)
+        .then(() => {
+          manualRefresh({
+            type: 'update-one',
+            items: [
+              standardizedData({
+                ...conv,
+                ext: params.ext,
+              } as ItemDataType),
+            ],
+          });
+        })
+        .catch((error) => {
+          console.warn('test:error:', error);
+        });
+    },
+    [client.chatManager, getConv, manualRefresh, standardizedData]
+  );
+
   if (propsRef?.current) {
     propsRef.current.create = (params: {
       convId: string;
@@ -619,6 +673,13 @@ export default function ConversationListFragment(
       convType: ChatConversationType;
     }) => {
       conversationRead(params);
+    };
+    propsRef.current.updateExtension = (params: {
+      convId: string;
+      convType: ChatConversationType;
+      ext?: any;
+    }) => {
+      updateExtension(params);
     };
   }
 
@@ -706,6 +767,7 @@ export default function ConversationListFragment(
               lastMsg: msg,
               convContent: '',
               count: count,
+              ext: value.ext,
             } as ItemDataType);
           });
           const rr = [] as ItemDataType[];
@@ -768,6 +830,7 @@ export default function ConversationListFragment(
                 type: 'add',
                 data: r,
                 enableSort: true,
+                sortPolicy: sortPolicy as any,
               },
             ]);
           });
@@ -777,7 +840,7 @@ export default function ConversationListFragment(
         parentName="ConversationList"
         ref={listRef}
         items={data}
-        ItemFC={Item}
+        ItemFC={RenderItem ?? Item}
         enableAlphabet={enableAlphabet}
         enableRefresh={enableRefresh}
         enableHeader={enableHeader}
