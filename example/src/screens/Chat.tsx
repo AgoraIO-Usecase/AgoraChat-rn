@@ -15,13 +15,20 @@ import {
   ChatMessageType,
 } from 'react-native-chat-sdk';
 import {
+  ChatFragment,
+  ChatFragmentRef,
   DataEventType,
   getFileExtension,
+  ImageMessageItemType,
   localUrl,
+  MessageBubbleListFragment,
+  MessageBubbleListProps,
+  MessageItemType,
   playUrl,
   ScreenContainer,
   Services,
   uuid,
+  VoiceMessageItemType,
 } from 'react-native-chat-uikit';
 
 import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
@@ -30,14 +37,14 @@ import { MyVideoMessageBubble } from '../components/MyVideoMessageBubble';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
 import { sendEvent, sendEventProps } from '../events/sendEvent';
-import ChatFragment, { ChatFragmentRef } from '../fragments/Chat';
-import type {
-  ImageMessageItemType,
-  MessageBubbleListProps,
-  MessageItemType,
-  VoiceMessageItemType,
-} from '../fragments/MessageBubbleList';
-import MessageBubbleList from '../fragments/MessageBubbleList';
+// import ChatFragment, { ChatFragmentRef } from '../fragments/Chat';
+// import type {
+//   ImageMessageItemType,
+//   MessageBubbleListProps,
+//   MessageItemType,
+//   VoiceMessageItemType,
+// } from '../fragments/MessageBubbleListFragment';
+// import MessageBubbleListFragment from '../fragments/MessageBubbleListFragment';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;
@@ -64,7 +71,8 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const params = rp?.params as { chatId: string; chatType: number };
   const chatId = params.chatId;
   const chatType = params.chatType as ChatConversationType;
-  const messageBubbleListRefP = React.useRef<typeof MessageBubbleList>(null);
+  const messageBubbleListRefP =
+    React.useRef<typeof MessageBubbleListFragment>(null);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
   const { client } = useAppChatSdkContext();
 
@@ -339,7 +347,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         propsRef={chatRef}
         screenParams={route.params as any}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleList,
+          MessageBubbleListP: MessageBubbleListFragment,
           MessageBubbleListPropsP: {
             onPressed: () => {
               console.log('test:onPressed:', 'click message bubble list');

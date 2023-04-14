@@ -83,8 +83,7 @@ export { default as Toast } from './components/Toast';
 export * from './containers';
 export * from './contexts';
 export * from './events';
-export * from './nativeEvents';
-// export * from './fragments';
+export * from './fragments';
 export { useAsyncTask, useDeferredValue, useForceUpdate } from './hooks';
 export { createStringSetEn, createStringSetFEn } from './I18n/StringSet.en';
 export { CreateStringSet, StringSetOptions } from './I18n/StringSet.type';
@@ -97,6 +96,7 @@ export {
   CreateStringSet as CreateStringSet2,
   StringSetOptions as StringSetOptions2,
 } from './I18n2/CStringSet.type';
+export * from './nativeEvents';
 export { default as DevDebug } from './screens/DevDebug';
 export { default as Placeholder } from './screens/Placeholder';
 export * from './services';

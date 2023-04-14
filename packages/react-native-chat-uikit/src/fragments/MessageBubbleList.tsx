@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Image,
   // DeviceEventEmitter,
   // Image as RNImage,
   ListRenderItem,
@@ -10,19 +11,29 @@ import {
   View,
 } from 'react-native';
 import { ChatDownloadStatus, ChatMessageType } from 'react-native-chat-sdk';
-import {
+
+import { DefaultAvatar } from '../components/DefaultAvatars';
+import DynamicHeightList, {
   type DynamicHeightListRef,
-  type LocalIconName,
-  createStyleSheet,
-  // DataEventType,
-  DefaultAvatar,
-  DynamicHeightList,
-  getScaleFactor,
-  Image,
-  Loading,
-  LocalIcon,
-  wait,
-} from 'react-native-chat-uikit';
+} from '../components/DynamicHeightList';
+import { type LocalIconName, LocalIcon } from '../components/Icon';
+import Loading from '../components/Loading';
+import { getScaleFactor } from '../styles/createScaleFactor';
+import createStyleSheet from '../styles/createStyleSheet';
+import { wait } from '../utils/function';
+// import {
+//   type DynamicHeightListRef,
+//   type LocalIconName,
+//   createStyleSheet,
+//   // DataEventType,
+//   DefaultAvatar,
+//   DynamicHeightList,
+//   getScaleFactor,
+//   Image,
+//   Loading,
+//   LocalIcon,
+//   wait,
+// } from 'react-native-chat-uikit';
 
 export type MessageItemStateType =
   | 'unread'

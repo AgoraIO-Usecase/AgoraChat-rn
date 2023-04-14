@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Animated,
+  // Button,
   // Button as RNButton,
   DeviceEventEmitter,
   Keyboard,
@@ -40,31 +41,46 @@ import {
   ChatVideoMessageBody,
   ChatVoiceMessageBody,
 } from 'react-native-chat-sdk';
-import {
-  type LocalIconName,
-  type MessageChatSdkEventType,
-  Button,
-  createStyleSheet,
-  // DataEventType,
-  FaceList as ChatFaceList,
-  // getFileExtension,
-  getScaleFactor,
-  LocalIcon,
-  localUrl,
-  MessageChatSdkEvent,
-  playUrl,
-  removeFileHeader,
-  seqId,
-  Services,
-  TextInput,
-  timeoutTask,
-  timestamp,
-  useI18nContext,
-  uuid,
-} from 'react-native-chat-uikit';
+// import {
+//   type LocalIconName,
+//   type MessageChatSdkEventType,
+//   Button,
+//   createStyleSheet,
+//   // DataEventType,
+//   FaceList as ChatFaceList,
+//   // getFileExtension,
+//   getScaleFactor,
+//   LocalIcon,
+//   localUrl,
+//   MessageChatSdkEvent,
+//   playUrl,
+//   removeFileHeader,
+//   seqId,
+//   Services,
+//   TextInput,
+//   timeoutTask,
+//   timestamp,
+//   useI18nContext,
+//   uuid,
+// } from 'react-native-chat-uikit';
 import moji from 'twemoji';
 
-import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
+import Button from '../components/Button';
+import { FaceList } from '../components/FaceList';
+import { type LocalIconName, LocalIcon } from '../components/Icon';
+import TextInput from '../components/TextInput';
+import { useChatSdkContext, useI18nContext } from '../contexts';
+import {
+  type MessageChatSdkEventType,
+  MessageChatSdkEvent,
+} from '../nativeEvents';
+import { Services } from '../services';
+import { getScaleFactor } from '../styles/createScaleFactor';
+import createStyleSheet from '../styles/createStyleSheet';
+import { timeoutTask } from '../utils/function';
+import { seqId, timestamp, uuid } from '../utils/generator';
+import { localUrl, playUrl, removeFileHeader } from '../utils/platform';
+// import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 // import { sendEvent, sendEventProps } from '../events/sendEvent';
 import MessageBubbleList, {
   type CustomMessageItemType,
@@ -506,7 +522,7 @@ const ChatContent = React.memo(
     const setTestRef = React.useRef(() => {});
     const faceHeight = sf(300);
     const faceHeightRef = React.useRef(new Animated.Value(0)).current;
-    const { client } = useAppChatSdkContext();
+    const { client } = useChatSdkContext();
 
     const getMsgListRef = React.useCallback(() => {
       if (messageBubbleList) {
@@ -1653,7 +1669,7 @@ const ChatContent = React.memo(
               onPressOutInputVoiceButton={onPressOutInputVoiceButton}
             />
           </TouchableWithoutFeedback>
-          <ChatFaceList height={faceHeightRef} onFace={onFaceInternal} />
+          <FaceList height={faceHeightRef} onFace={onFaceInternal} />
         </KeyboardAvoidingView>
       </View>
     );
@@ -1731,7 +1747,7 @@ export type ChatFragmentRef = {
 /**
  * ChatFragment properties
  */
-type ChatFragmentProps = {
+export type ChatFragmentProps = {
   /**
    * ChatFragment controller
    */

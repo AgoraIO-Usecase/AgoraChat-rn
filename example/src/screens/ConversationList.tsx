@@ -11,7 +11,6 @@ import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack/lib/typescript/src/types';
-import type { IconName } from 'packages/react-native-chat-uikit/src/components/Icon/LocalIcon';
 import * as React from 'react';
 import {
   DeviceEventEmitter,
@@ -22,12 +21,16 @@ import {
 } from 'react-native';
 import {
   Badge,
+  ConversationItemDataType as ItemDataType,
+  ConversationListFragment,
+  ConversationListFragmentRef,
   createStyleSheet,
   DataEventType,
   DefaultAvatar,
   EqualHeightListItemComponent,
   getScaleFactor,
   LocalIcon,
+  LocalIconName as IconName,
   messageTime,
 } from 'react-native-chat-uikit';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,11 +38,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeHeaderTitle from '../components/HomeHeaderTitle';
 import type { BizEventType, DataActionEventType } from '../events';
 import { type sendEventProps, sendEvent } from '../events/sendEvent';
-import ConversationListFragment, {
-  ConversationListFragmentRef,
-  ItemDataType as ConversationListItemDataType,
-  ItemDataType,
-} from '../fragments/ConversationList';
+// import ConversationListFragment, {
+//   ConversationListFragmentRef,
+//   ItemDataType as ItemDataType,
+//   ItemDataType,
+// } from '../fragments/ConversationList';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabParamsList,
@@ -70,6 +73,8 @@ export type NavigationProp = CompositeNavigationProp<
   >
 >;
 
+const ExtraWidth = 100;
+
 const sendConversationEvent = (
   params: Omit<sendEventProps, 'senderId' | 'timestamp' | 'eventBizType'>
 ) => {
@@ -84,13 +89,13 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
   const sf = getScaleFactor();
   const item = props.data as ItemDataType;
   const { width: screenWidth } = useWindowDimensions();
-  const extraWidth = item.sideslip?.width ?? sf(100);
+  const extraWidth = item.sideslip?.width ?? ExtraWidth;
   const name =
     item.ext?.muted === undefined || item.ext?.muted === 'false'
       ? ('bell_c' as IconName)
       : ('bell_slash' as IconName);
   return (
-    <View style={[styles.item, { width: screenWidth + extraWidth }]}>
+    <View style={[styles.item, { width: sf(screenWidth + extraWidth) }]}>
       <View
         style={{
           // width: screenWidth,
@@ -210,8 +215,6 @@ export default function ConversationListScreen({
   navigation,
 }: Props): JSX.Element {
   const sf = getScaleFactor();
-  // let data: ConversationListItemDataType[] = React.useMemo(() => [], []); // for search
-  const [, setData] = React.useState([] as ConversationListItemDataType[]); // for search
   const convRef = React.useRef<ConversationListFragmentRef>({} as any);
 
   const NavigationHeaderRight: React.FunctionComponent<HeaderButtonProps> =
@@ -240,18 +243,15 @@ export default function ConversationListScreen({
       [sf]
     );
 
-  const sortPolicy = React.useCallback(
-    (a: ConversationListItemDataType, b: ConversationListItemDataType) => {
-      if (a.key > b.key) {
-        return 1;
-      } else if (a.key < b.key) {
-        return -1;
-      } else {
-        return 0;
-      }
-    },
-    []
-  );
+  const sortPolicy = React.useCallback((a: ItemDataType, b: ItemDataType) => {
+    if (a.key > b.key) {
+      return 1;
+    } else if (a.key < b.key) {
+      return -1;
+    } else {
+      return 0;
+    }
+  }, []);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -342,23 +342,23 @@ export default function ConversationListScreen({
     >
       <ConversationListFragment
         propsRef={convRef}
-        onLongPress={(_?: ConversationListItemDataType) => {
+        onLongPress={(_?: ItemDataType) => {
           sendConversationEvent({
             eventType: 'SheetEvent',
             action: 'sheet_conversation_list',
             params: {},
           });
         }}
-        onPress={(data?: ConversationListItemDataType) => {
+        onPress={(data?: ItemDataType) => {
           if (data) {
-            const d = data as ConversationListItemDataType;
+            const d = data as ItemDataType;
             navigation.navigate('Chat', {
               params: { chatId: d.convId, chatType: d.convType },
             });
           }
         }}
         onData={(d) => {
-          setData(d);
+          console.log('test:', d.length);
         }}
         onUpdateReadCount={(unreadCount) => {
           sendEvent({
@@ -371,7 +371,7 @@ export default function ConversationListScreen({
         }}
         sortPolicy={sortPolicy}
         RenderItem={RenderItem}
-        RenderItemExtraWidth={sf(100)}
+        RenderItemExtraWidth={sf(ExtraWidth)}
       />
     </SafeAreaView>
   );

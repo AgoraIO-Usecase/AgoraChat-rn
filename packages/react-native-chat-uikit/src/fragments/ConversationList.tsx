@@ -13,30 +13,54 @@ import {
   ChatMessageType,
   ChatTextMessageBody,
 } from 'react-native-chat-sdk';
-import {
-  type EqualHeightListItemComponent,
-  type EqualHeightListItemData,
-  type EqualHeightListRef,
-  type MessageChatSdkEventType,
-  autoFocus,
-  Badge,
-  Blank,
-  createStyleSheet,
-  DefaultAvatar,
-  DefaultListItemSeparator,
-  DefaultListSearchHeader,
-  EqualHeightList as ConversationList,
-  getScaleFactor,
-  LocalIcon,
-  MessageChatSdkEvent,
-  messageTime,
-  queueTask,
-  Services,
-  timestamp,
-  useChatSdkContext,
-} from 'react-native-chat-uikit';
 
-export type ItemDataType = EqualHeightListItemData & {
+import Badge from '../components/Badge';
+import Blank from '../components/Blank';
+import { DefaultAvatar } from '../components/DefaultAvatars';
+import EqualHeightList, {
+  EqualHeightListRef,
+  ItemComponent,
+  ItemData,
+} from '../components/EqualHeightList';
+import { LocalIcon } from '../components/Icon';
+import { ListItemSeparator } from '../components/ListItemSeparator';
+import { ListSearchHeader } from '../components/ListSearchHeader';
+import { useChatSdkContext } from '../contexts';
+import {
+  type MessageChatSdkEventType,
+  MessageChatSdkEvent,
+} from '../nativeEvents';
+import { Services } from '../services';
+import { getScaleFactor } from '../styles/createScaleFactor';
+import createStyleSheet from '../styles/createStyleSheet';
+import { messageTime } from '../utils/format';
+import { queueTask } from '../utils/function';
+import { timestamp } from '../utils/generator';
+import { autoFocus } from '../utils/platform';
+// import {
+//   type EqualHeightListItemComponent,
+//   type EqualHeightListItemData,
+//   type EqualHeightListRef,
+//   type MessageChatSdkEventType,
+//   autoFocus,
+//   Badge,
+//   Blank,
+//   createStyleSheet,
+//   DefaultAvatar,
+//   DefaultListItemSeparator,
+//   DefaultListSearchHeader,
+//   EqualHeightList as ConversationList,
+//   getScaleFactor,
+//   LocalIcon,
+//   MessageChatSdkEvent,
+//   messageTime,
+//   queueTask,
+//   Services,
+//   timestamp,
+//   useChatSdkContext,
+// } from 'react-native-chat-uikit';
+
+export type ItemDataType = ItemData & {
   convId: string;
   convName?: string;
   convType: ChatConversationType;
@@ -55,7 +79,7 @@ export type ItemDataType = EqualHeightListItemData & {
   ext?: any;
 };
 
-const Item: EqualHeightListItemComponent = (props) => {
+const Item: ItemComponent = (props) => {
   const sf = getScaleFactor();
   const item = props.data as ItemDataType;
   const { width: screenWidth } = useWindowDimensions();
@@ -175,14 +199,14 @@ export type ConversationListFragmentRef = {
   }) => void;
 };
 
-type ConversationListFragmentProps = {
+export type ConversationListFragmentProps = {
   propsRef?: React.RefObject<ConversationListFragmentRef>;
   onLongPress?: (data?: ItemDataType) => void;
   onPress?: (data?: ItemDataType) => void;
   onData?: (data: ItemDataType[]) => void;
   onUpdateReadCount?: (unreadCount: number) => void;
   sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
-  RenderItem?: EqualHeightListItemComponent;
+  RenderItem?: ItemComponent;
   RenderItemExtraWidth?: number;
 };
 export default function ConversationListFragment(
@@ -319,7 +343,7 @@ export default function ConversationListFragment(
           },
           {
             type: 'add',
-            data: params.items as EqualHeightListItemData[],
+            data: params.items as ItemData[],
             enableSort: true,
             sortDirection: 'asc',
             sortPolicy: sortPolicy as any,
@@ -333,7 +357,7 @@ export default function ConversationListFragment(
           },
           {
             type: 'add',
-            data: params.items as EqualHeightListItemData[],
+            data: params.items as ItemData[],
             enableSort: true,
             sortDirection: 'asc',
             sortPolicy: sortPolicy as any,
@@ -343,7 +367,7 @@ export default function ConversationListFragment(
         listRef.current?.manualRefresh([
           {
             type: 'add',
-            data: params.items as EqualHeightListItemData[],
+            data: params.items as ItemData[],
             enableSort: true,
             sortDirection: 'asc',
             sortPolicy: sortPolicy as any,
@@ -354,7 +378,7 @@ export default function ConversationListFragment(
         listRef.current?.manualRefresh([
           {
             type: 'del',
-            data: params.items as EqualHeightListItemData[],
+            data: params.items as ItemData[],
             enableSort: false,
           },
         ]);
@@ -376,7 +400,7 @@ export default function ConversationListFragment(
         listRef.current?.manualRefresh([
           {
             type: 'update',
-            data: params.items as EqualHeightListItemData[],
+            data: params.items as ItemData[],
             enableSort: true,
             sortDirection: 'asc',
             sortPolicy: sortPolicy as any,
@@ -821,7 +845,7 @@ export default function ConversationListFragment(
 
   return (
     <React.Fragment>
-      <DefaultListSearchHeader
+      <ListSearchHeader
         autoFocus={autoFocus()}
         onChangeText={(text) => {
           queueTask(() => {
@@ -845,8 +869,8 @@ export default function ConversationListFragment(
           });
         }}
       />
-      <ConversationList
-        parentName="ConversationList"
+      <EqualHeightList
+        parentName="EqualHeightList"
         ref={listRef}
         items={data}
         ItemFC={RenderItem ?? Item}
@@ -863,7 +887,7 @@ export default function ConversationListFragment(
             borderRadius: sf(8),
           },
         }}
-        ItemSeparatorComponent={DefaultListItemSeparator}
+        ItemSeparatorComponent={ListItemSeparator}
         onRefresh={(type) => {
           if (type === 'started') {
             initList();
