@@ -159,6 +159,7 @@ type ChatContentRef = {
     latitude: string;
     longitude: string;
   }) => void;
+  loadHistoryMessage: (msgs: ChatMessage[]) => void;
 };
 type ChatContentProps = BaseProps & {
   propsRef?: React.RefObject<ChatContentRef>;
@@ -1467,6 +1468,9 @@ const ChatContent = React.memo(
       propsRef.current.sendLocationMessage = (params) => {
         sendLocationMessage(params);
       };
+      propsRef.current.loadHistoryMessage = (params) => {
+        loadHistoryMessage(params);
+      };
     }
 
     const addListeners = React.useCallback(() => {
@@ -1560,9 +1564,17 @@ const ChatContent = React.memo(
 
     const onRequestHistoryMessage = React.useCallback(
       (params: { earliestId: string }) => {
-        requestHistoryMessage(params.earliestId);
+        if (
+          messageBubbleList?.MessageBubbleListPropsP.onRequestHistoryMessage
+        ) {
+          messageBubbleList?.MessageBubbleListPropsP.onRequestHistoryMessage({
+            earliestId: params.earliestId,
+          });
+        } else {
+          requestHistoryMessage(params.earliestId);
+        }
       },
-      [requestHistoryMessage]
+      [messageBubbleList?.MessageBubbleListPropsP, requestHistoryMessage]
     );
 
     const ChatMessageBubbleList = React.memo(() =>
@@ -1742,6 +1754,11 @@ export type ChatFragmentRef = {
     latitude: string;
     longitude: string;
   }) => void;
+
+  /**
+   * load history messages.
+   */
+  loadHistoryMessage: (msgs: ChatMessage[]) => void;
 };
 
 /**
@@ -1863,6 +1880,9 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     };
     propsRef.current.sendLocationMessage = (params) => {
       chatContentRef?.current.sendLocationMessage(params);
+    };
+    propsRef.current.loadHistoryMessage = (params) => {
+      chatContentRef?.current.loadHistoryMessage(params);
     };
   }
   return (
