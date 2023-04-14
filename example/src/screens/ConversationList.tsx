@@ -11,6 +11,7 @@ import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack/lib/typescript/src/types';
+import type { IconName } from 'packages/react-native-chat-uikit/src/components/Icon/LocalIcon';
 import * as React from 'react';
 import {
   DeviceEventEmitter,
@@ -84,6 +85,10 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
   const { width: screenWidth } = useWindowDimensions();
   const extraWidth = item.sideslip?.width ?? sf(100);
+  const name =
+    item.ext?.muted === undefined || item.ext?.muted === 'false'
+      ? ('bell_c' as IconName)
+      : ('bell_slash' as IconName);
   return (
     <View style={[styles.item, { width: screenWidth + extraWidth }]}>
       <View
@@ -144,9 +149,25 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
           }}
           onPress={() => {
             item.actions?.onMute?.(item);
+            const ext = {} as any;
+            if (item.ext?.muted === undefined) {
+              ext.muted = 'false';
+            } else {
+              ext.muted = item.ext.muted;
+              ext.muted = ext.muted === 'false' ? 'true' : 'false';
+            }
+            sendConversationEvent({
+              eventType: 'DataEvent',
+              action: 'update_conversation_mute',
+              params: {
+                convId: item.convId,
+                convTyp: item.convType,
+                ext: ext,
+              },
+            });
           }}
         >
-          <LocalIcon name="bell_slash" size={20} color="#666666" />
+          <LocalIcon name={name} size={20} color="#666666" />
         </Pressable>
         <View style={{ width: sf(15) }} />
         <Pressable
@@ -296,6 +317,9 @@ export default function ConversationListScreen({
 
           case 'update_conversation_read_state':
             convRef.current?.updateRead(params);
+            break;
+          case 'update_conversation_mute':
+            convRef.current?.updateExtension(params);
             break;
 
           default:

@@ -122,7 +122,8 @@ export type DataActionEventType =
   | 'create_group_result'
   | 'chat_open_camera'
   | 'chat_open_media_library'
-  | 'chat_open_document';
+  | 'chat_open_document'
+  | 'update_conversation_mute';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////
