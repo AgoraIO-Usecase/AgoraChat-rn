@@ -8,7 +8,9 @@ const DESIGNED_DEVICE_WIDTH = 375;
 
 function createScaleFactor(deviceWidth = DESIGNED_DEVICE_WIDTH) {
   const ratio = Math.min(width, height) / deviceWidth;
-  const rangedRatio = Math.min(Math.max(0.85, ratio), 1.25);
+  let rangedRatio = Math.min(Math.max(0.85, ratio), 1.25);
+  console.log('createScaleFactor:', ratio, rangedRatio);
+  rangedRatio = 1;
   return {
     scaleFactor: (dp: number) =>
       PixelRatio.roundToNearestPixel(dp * rangedRatio),

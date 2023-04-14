@@ -8,6 +8,7 @@ import {
   Platform,
   TextInput as RNTextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   // TouchableWithoutFeedback,
   useWindowDimensions,
   View,
@@ -61,7 +62,6 @@ import {
   useI18nContext,
   uuid,
 } from 'react-native-chat-uikit';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import moji from 'twemoji';
 
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
@@ -204,18 +204,21 @@ const ChatInput = React.memo((props: ChatInputProps) => {
   // const content = React.useRef('');
   const [isInput, setIsInput] = React.useState(false);
   const { width } = useWindowDimensions();
-  if (others === undefined) console.log('test:', others);
+  if (others === undefined) console.log('test:', width);
 
   const onContent = (text: string) => {
     setContent(text);
+    if (text.length === 0) {
+      setIsInput(false);
+    } else {
+      setIsInput(true);
+    }
   };
 
-  const calculateInputWidth = React.useCallback(
-    (width: number, isInput: boolean) => {
-      return sf(width - 15 * 2 - 28 - 12 * 2 - 18 - 14 - (isInput ? 66 : 28));
-    },
-    [sf]
-  );
+  const calculateInputWidth = React.useCallback(() => {
+    console.log('test:123123123123:');
+    return sf(width - 15 * 2 - 28 - 15 * 2 - (isInput === true ? 66 : 28));
+  }, [isInput, sf, width]);
 
   const _onFace = (value?: 'face' | 'key') => {
     setFace(value);
@@ -237,7 +240,12 @@ const ChatInput = React.memo((props: ChatInputProps) => {
   return (
     <View style={styles.inputContainer}>
       <TouchableOpacity
-        style={{ justifyContent: 'center' }}
+        style={{
+          justifyContent: 'center',
+          width: sf(28),
+          height: sf(28),
+          marginHorizontal: sf(15),
+        }}
         onPress={() => {
           setWave(wave === 'wave_in_circle' ? waves[1] : waves[0]);
           Keyboard.dismiss();
@@ -250,14 +258,24 @@ const ChatInput = React.memo((props: ChatInputProps) => {
       {wave === 'wave_in_circle' ? (
         <React.Fragment>
           <View style={styles.inputContainer2}>
-            <View style={styles.inputContainer3}>
+            <View
+              style={[
+                styles.inputContainer3,
+                {
+                  maxWidth: calculateInputWidth(),
+                },
+              ]}
+            >
               <TextInput
                 ref={inputRef}
+                containerStyle={{
+                  flex: 1,
+                  maxWidth: calculateInputWidth(),
+                  paddingLeft: sf(8),
+                  alignSelf: 'center',
+                }}
                 style={{
-                  flexGrow: 1,
                   backgroundColor: 'white',
-                  paddingLeft: sf(12),
-                  width: calculateInputWidth(width, isInput),
                 }}
                 onChangeText={(text) => {
                   onContent(text);
@@ -276,7 +294,10 @@ const ChatInput = React.memo((props: ChatInputProps) => {
               />
 
               <TouchableOpacity
-                style={{ justifyContent: 'center' }}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
                 onPress={() => {
                   _onFace(face === 'face' ? faces[1] : faces[0]);
                   Keyboard.dismiss();
@@ -294,7 +315,12 @@ const ChatInput = React.memo((props: ChatInputProps) => {
           </View>
 
           {isInput ? (
-            <View style={{ justifyContent: 'center' }}>
+            <View
+              style={{
+                justifyContent: 'center',
+                marginHorizontal: sf(15),
+              }}
+            >
               <Button
                 style={{
                   height: sf(36),
@@ -310,6 +336,9 @@ const ChatInput = React.memo((props: ChatInputProps) => {
             </View>
           ) : (
             <TouchableOpacity
+              style={{
+                marginHorizontal: sf(15),
+              }}
               onPress={() => {
                 if (onClickInputMoreButton) {
                   onClickInputMoreButton();
@@ -327,7 +356,11 @@ const ChatInput = React.memo((props: ChatInputProps) => {
           )}
         </React.Fragment>
       ) : (
-        <View style={{ flexDirection: 'row' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+          }}
+        >
           <Button
             color={{
               enabled: {
@@ -339,7 +372,14 @@ const ChatInput = React.memo((props: ChatInputProps) => {
                 background: '#E6E6E6',
               },
             }}
-            style={[styles.talk, { width: sf(width - 24 - 28 - 20) }]}
+            style={[
+              styles.talk,
+              {
+                maxWidth: calculateInputWidth() + sf(30),
+                flexGrow: 1,
+                marginHorizontal: 0,
+              },
+            ]}
             onPressIn={() => {
               if (onPressInInputVoiceButton) {
                 onPressInInputVoiceButton();
@@ -734,6 +774,7 @@ const ChatContent = React.memo(
                 r.thumbnailRemoteUrl = body.thumbnailRemotePath;
                 r.width = body.width;
                 r.height = body.height;
+                r.displayName = body.displayName;
                 r.type = ChatMessageType.VIDEO;
               }
               break;
@@ -1546,6 +1587,10 @@ const ChatContent = React.memo(
       [sendVoiceMessage]
     );
 
+    const keyboardVerticalOffset = sf(
+      Platform.select({ ios: 100, android: 0 })!
+    );
+
     return (
       <View style={{ flex: 1 }}>
         <View
@@ -1556,47 +1601,60 @@ const ChatContent = React.memo(
         >
           <ChatMessageBubbleList />
         </View>
-
-        <ChatInput
-          inputRef={inputRef ? inputRef : TextInputRef}
-          chatId={chatId}
-          chatType={chatType}
-          onFace={_onFace}
-          onSendTextMessage={({ content }) => {
-            const test = true;
-            if (test) sendTextMessage(content);
-            else
-              sendCustomMessage({
-                data: {
-                  sender: chatId,
-                  timestamp: timestamp(),
-                  isSender: true,
-                  key: seqId('ml').toString(),
-                  type: ChatMessageType.CUSTOM,
-                  state: 'sending',
-                  SubComponentProps: {
-                    data: content,
-                    eventType: 'test',
-                  },
-                } as CustomMessageItemType,
-              });
-            setTestRef.current();
-          }}
-          onInit={({ setIsInput, exeTest, getContent, setContent }) => {
-            setIsInputRef.current = setIsInput;
-            setTestRef.current = exeTest;
-            setContentRef.current = setContent;
-            getContentRef.current = getContent;
-          }}
-          onVoiceRecordEnd={
-            onVoiceRecordEnd ? onVoiceRecordEnd : onVoiceRecordEndInternal
-          }
-          onClickInputMoreButton={onClickInputMoreButton}
-          onPressInInputVoiceButton={onPressInInputVoiceButton}
-          onPressOutInputVoiceButton={onPressOutInputVoiceButton}
-        />
-
-        <ChatFaceList height={faceHeightRef} onFace={onFaceInternal} />
+        <KeyboardAvoidingView
+          pointerEvents="box-none"
+          // style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={keyboardVerticalOffset}
+        >
+          <TouchableWithoutFeedback
+            onPress={() => {
+              // keyboardVerticalOffset = sf(0);
+              Keyboard.dismiss();
+              _onFace('face');
+            }}
+          >
+            <ChatInput
+              inputRef={inputRef ? inputRef : TextInputRef}
+              chatId={chatId}
+              chatType={chatType}
+              onFace={_onFace}
+              onSendTextMessage={({ content }) => {
+                const test = true;
+                if (test) sendTextMessage(content);
+                else
+                  sendCustomMessage({
+                    data: {
+                      sender: chatId,
+                      timestamp: timestamp(),
+                      isSender: true,
+                      key: seqId('ml').toString(),
+                      type: ChatMessageType.CUSTOM,
+                      state: 'sending',
+                      SubComponentProps: {
+                        data: content,
+                        eventType: 'test',
+                      },
+                    } as CustomMessageItemType,
+                  });
+                setTestRef.current();
+              }}
+              onInit={({ setIsInput, exeTest, getContent, setContent }) => {
+                setIsInputRef.current = setIsInput;
+                setTestRef.current = exeTest;
+                setContentRef.current = setContent;
+                getContentRef.current = getContent;
+              }}
+              onVoiceRecordEnd={
+                onVoiceRecordEnd ? onVoiceRecordEnd : onVoiceRecordEndInternal
+              }
+              onClickInputMoreButton={onClickInputMoreButton}
+              onPressInInputVoiceButton={onPressInInputVoiceButton}
+              onPressOutInputVoiceButton={onPressOutInputVoiceButton}
+            />
+          </TouchableWithoutFeedback>
+          <ChatFaceList height={faceHeightRef} onFace={onFaceInternal} />
+        </KeyboardAvoidingView>
       </View>
     );
   }
@@ -1763,14 +1821,11 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     chatId: string;
     chatType: number;
   };
-  const sf = getScaleFactor();
-  const { bottom } = useSafeAreaInsets();
+
   const chatId = params.chatId;
   const chatType = params.chatType;
   const chatContentRef = React.useRef<ChatContentRef>({} as any);
-  let keyboardVerticalOffset = sf(
-    bottom + Platform.select({ ios: 50, android: 70 })!
-  );
+
   if (propsRef?.current) {
     propsRef.current.sendImageMessage = (params) => {
       chatContentRef?.current.sendImageMessage(params);
@@ -1796,42 +1851,39 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
   }
   return (
     <React.Fragment>
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         pointerEvents="box-none"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={keyboardVerticalOffset}
         style={{
           flex: 1,
         }}
-      >
-        {/* <TouchableWithoutFeedback
+      > */}
+      {/* <TouchableWithoutFeedback
     onPress={() => {
       keyboardVerticalOffset = sf(0);
       Keyboard.dismiss();
       _onFace('face');
     }}
   > */}
-        <ChatContent
-          propsRef={chatContentRef}
-          chatId={chatId}
-          chatType={chatType}
-          messageBubbleList={messageBubbleList}
-          customMessageBubble={customMessageBubble}
-          onUpdateReadCount={onUpdateReadCount}
-          onClickMessageBubble={onClickMessageBubble}
-          onLongPressMessageBubble={onLongPressMessageBubble}
-          onClickInputMoreButton={onClickInputMoreButton}
-          onPressInInputVoiceButton={onPressInInputVoiceButton}
-          onPressOutInputVoiceButton={onPressOutInputVoiceButton}
-          onSendMessage={onSendMessage}
-          onSendMessageEnd={onSendMessageEnd}
-          onVoiceRecordEnd={onVoiceRecordEnd}
-          // customMessageBubble={{
-          //   CustomMessageRenderItemP: CustomMessageRenderItem,
-          // }}
-        />
-        {/* </TouchableWithoutFeedback> */}
-      </KeyboardAvoidingView>
+      <ChatContent
+        propsRef={chatContentRef}
+        chatId={chatId}
+        chatType={chatType}
+        messageBubbleList={messageBubbleList}
+        customMessageBubble={customMessageBubble}
+        onUpdateReadCount={onUpdateReadCount}
+        onClickMessageBubble={onClickMessageBubble}
+        onLongPressMessageBubble={onLongPressMessageBubble}
+        onClickInputMoreButton={onClickInputMoreButton}
+        onPressInInputVoiceButton={onPressInInputVoiceButton}
+        onPressOutInputVoiceButton={onPressOutInputVoiceButton}
+        onSendMessage={onSendMessage}
+        onSendMessageEnd={onSendMessageEnd}
+        onVoiceRecordEnd={onVoiceRecordEnd}
+      />
+      {/* </TouchableWithoutFeedback> */}
+      {/* </KeyboardAvoidingView> */}
     </React.Fragment>
   );
 }
@@ -1840,26 +1892,24 @@ const styles = createStyleSheet({
   inputContainer: {
     height: 60,
     flexDirection: 'row',
-    paddingHorizontal: 15,
     alignItems: 'center',
   },
   inputContainer2: {
-    flexGrow: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    flexDirection: 'row',
+    paddingVertical: 14,
   },
   inputContainer3: {
     flexDirection: 'row',
-    flexGrow: 1,
-    borderRadius: 24,
+    flex: 1,
+    borderRadius: 18,
     overflow: 'hidden',
     borderColor: '#A5A7A6',
     borderWidth: 1,
+    height: 36,
   },
   talk: {
     height: 36,
     marginHorizontal: 12,
     borderRadius: 18,
-    // flexGrow: 1,
   },
 });

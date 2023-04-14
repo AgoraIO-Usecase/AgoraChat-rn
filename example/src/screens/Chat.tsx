@@ -26,6 +26,7 @@ import {
 
 import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
 import { MyTextMessageBubble } from '../components/MyTextMessageBubble';
+import { MyVideoMessageBubble } from '../components/MyVideoMessageBubble';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
 import { sendEvent, sendEventProps } from '../events/sendEvent';
@@ -344,6 +345,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
               console.log('test:onPressed:', 'click message bubble list');
             },
             TextMessageItem: MyTextMessageBubble,
+            VideoMessageItem: MyVideoMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}

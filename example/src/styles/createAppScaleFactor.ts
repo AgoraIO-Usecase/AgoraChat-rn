@@ -6,7 +6,9 @@ const { width, height } = Dimensions.get('window');
 const DESIGNED_DEVICE_WIDTH = 375;
 
 export function createAppScaleFactor(deviceWidth = DESIGNED_DEVICE_WIDTH) {
-  const ratio = Math.min(width, height) / deviceWidth;
+  let ratio = Math.min(width, height) / deviceWidth;
+  console.log('createAppScaleFactor:', ratio);
+  ratio = 1;
   return {
     scaleFactor: (dp: number) => PixelRatio.roundToNearestPixel(dp * ratio),
     ratio: ratio,
