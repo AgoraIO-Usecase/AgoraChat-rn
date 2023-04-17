@@ -1,6 +1,6 @@
 {
-  "name": "example",
-  "version": "1.0.0",
+  "name": "uikit-example",
+  "version": "0.1.0",
   "scripts": {
     "lint": "yarn run eslint \"src/**/*.{js,ts,tsx}\"",
     "gse": "node scripts/generate-env.js",

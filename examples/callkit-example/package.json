@@ -1,6 +1,6 @@
 {
   "name": "callkit-example",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "lint": "yarn run eslint \"src/**/*.{js,ts,tsx}\"",
