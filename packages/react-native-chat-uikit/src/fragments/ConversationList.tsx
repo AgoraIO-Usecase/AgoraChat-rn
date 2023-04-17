@@ -207,6 +207,9 @@ export type ConversationListFragmentProps = {
   onUpdateReadCount?: (unreadCount: number) => void;
   sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
   RenderItem?: ItemComponent;
+  /**
+   * If `RenderItem` is a custom component and uses side-slip mode, you need to inform the width of the side-slide component.
+   */
   RenderItemExtraWidth?: number;
 };
 export default function ConversationListFragment(

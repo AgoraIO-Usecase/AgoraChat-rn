@@ -176,8 +176,7 @@ yarn add react-native-chat-uikit
 
 ```typescript
 import * as React from 'react';
-import ChatFragment from '../fragments/Chat';
-import { ScreenContainer } from 'react-native-chat-uikit';
+import { ChatFragment, ScreenContainer } from 'react-native-chat-uikit';
 export default function ChatScreen(): JSX.Element {
   const chatId = 'xxx';
   const chatType = 0;
@@ -193,32 +192,56 @@ export default function ChatScreen(): JSX.Element {
 
 聊天组件带有很多参数和配置，可以更具需要进行设置，达到需要的效果。 对于更多更高的自定义可以参考源码实现。
 
-#### 聊天组件控制器
+#### 聊天组件提供的接口
 
-控制器可以主动的让组件执行某些行为或者命令。例如：目前提供了发送图片消息、发送语音消息的方法。
-如果想要使用控制器，需要在聊天属性里面设置 `propsRef` 参数。
+聊天组件 `ChatFragment` 提供了除去命令消息之外的所有消息的发送方法，发送消息会默认加载到聊天气泡列表页面。也提供加载历史消息的方法。
+如果想要使用这些方法，需要在聊天属性里面设置 `propsRef` 参数。
 
 ```typescript
 export type ChatFragmentRef = {
-  sendImageMessage: (params: {
-    name: string;
-    localPath: string;
-    fileSize: string;
-    imageType: string;
-    width: number;
-    height: number;
-  }) => void;
+  sendImageMessage: (
+    params: {
+      name: string;
+      localPath: string;
+      fileSize: string;
+      imageType: string;
+      width: number;
+      height: number;
+    }[]
+  ) => void;
   sendVoiceMessage: (params: {
     localPath: string;
     fileSize?: number;
     duration?: number;
   }) => void;
+  sendTextMessage: (params: { content: string }) => void;
+  sendCustomMessage: (params: { data: CustomMessageItemType }) => void;
+  sendFileMessage: (params: {
+    localPath: string;
+    fileSize?: number;
+    displayName?: string;
+  }) => void;
+  sendVideoMessage: (params: {
+    localPath: string;
+    fileSize?: number;
+    displayName?: string;
+    duration: number;
+    thumbnailLocalPath?: string;
+    width?: number;
+    height?: number;
+  }) => void;
+  sendLocationMessage: (params: {
+    address: string;
+    latitude: string;
+    longitude: string;
+  }) => void;
+  loadHistoryMessage: (msgs: ChatMessage[]) => void;
 };
 ```
 
-#### 聊天组件属性
+#### 聊天组件提供的属性
 
-源码如下：
+聊天组件主要提供了常用的属性。例如：设置自定义聊天气泡列表组件，各种按钮或者状态的回调。
 
 ```typescript
 type ChatFragmentProps = {
@@ -250,6 +273,48 @@ type ChatFragmentProps = {
   onSendMessage?: (message: ChatMessage) => void;
   onSendMessageEnd?: (message: ChatMessage) => void;
   onVoiceRecordEnd?: (params: { localPath: string; duration: number }) => void;
+};
+```
+
+#### 聊天气泡列表组件提供的接口
+
+聊天气泡列表组件 `MessageBubbleList` 提供了滚动接口以及加载消息接口。可以直接调用 `addMessage` 方法加载消息。也可以通过操控 `ChatFragment` 组件间接添加消息。
+
+```typescript
+export type MessageBubbleListRef = {
+  scrollToEnd: () => void;
+  scrollToTop: () => void;
+  addMessage: (params: {
+    msgs: MessageItemType[];
+    direction: InsertDirectionType;
+  }) => void;
+  updateMessageState: (params: {
+    localMsgId: string;
+    result: boolean;
+    reason?: any;
+    item?: MessageItemType;
+  }) => void;
+};
+```
+
+#### 聊天气泡列表组件提供的属性
+
+聊天气泡列表组件主要进行消息展示，目前提供自定义消息气泡的样式，以及下拉刷新请求历史消息的回调。如果没有提供则使用默认样式。目前只有 文本、图片、语音提供了默认样式。
+
+```typescript
+export type MessageBubbleListProps = {
+  /**
+   * Click the message list, not the message item.
+   */
+  onPressed?: () => void;
+  onRequestHistoryMessage?: (params: { earliestId: string }) => void;
+  TextMessageItem?: ListRenderItem<TextMessageItemType>;
+  ImageMessageItem?: ListRenderItem<ImageMessageItemType>;
+  VoiceMessageItem?: ListRenderItem<VoiceMessageItemType>;
+  FileMessageItem?: ListRenderItem<FileMessageItemType>;
+  LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
+  VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
+  CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
 };
 ```
 
@@ -431,6 +496,8 @@ export default function ChatScreen(): JSX.Element {
 
 #### 聊天属性：点击聊天气泡通知
 
+典型应用：播放语音消息，显示图片预览。
+
 ```typescript
 export default function ChatScreen(): JSX.Element {
   const chatId = 'xxx';
@@ -449,6 +516,8 @@ export default function ChatScreen(): JSX.Element {
 ```
 
 #### 聊天属性：长按消息气泡通知
+
+典型应用：显示消息上下文菜单，进行消息转发、消息撤销等操作。
 
 ```typescript
 export default function ChatScreen(): JSX.Element {
@@ -574,6 +643,176 @@ export default function ChatScreen(): JSX.Element {
         screenParams={{ chatId, chatType }}
         onVoiceRecordEnd={(params: any) => {
           // TODO: Voice files are processed and voice messages are sent.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+---
+
+## 快速集成会话列表
+
+`ConversationListFragment` 最简单的集成方式:
+
+```typescript
+import * as React from 'react';
+import {
+  ConversationListFragment,
+  ScreenContainer,
+} from 'react-native-chat-uikit';
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment />
+    </ScreenContainer>
+  );
+}
+```
+
+### 会话列表提供的方法
+
+会话组件提供了创建、更新、已读、扩展属性的方法。
+
+```typescript
+export type ConversationListFragmentRef = {
+  update: (message: ChatMessage) => void;
+  create: (params: { convId: string; convType: ChatConversationType }) => void;
+  updateRead: (params: {
+    convId: string;
+    convType: ChatConversationType;
+  }) => void;
+  updateExtension: (params: {
+    convId: string;
+    convType: ChatConversationType;
+    ext?: any; // json object.
+  }) => void;
+};
+```
+
+### 会话列表提供的属性
+
+会话列表提供了点击、长按、未读数、排序策略、自定义样式的属性。
+
+```typescript
+export type ConversationListFragmentProps = {
+  propsRef?: React.RefObject<ConversationListFragmentRef>;
+  onLongPress?: (data?: ItemDataType) => void;
+  onPress?: (data?: ItemDataType) => void;
+  onData?: (data: ItemDataType[]) => void;
+  onUpdateReadCount?: (unreadCount: number) => void;
+  sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
+  RenderItem?: ItemComponent;
+  /**
+   * If `RenderItem` is a custom component and uses side-slip mode, you need to inform the width of the side-slide component.
+   */
+  RenderItemExtraWidth?: number;
+};
+```
+
+#### 设置个性化的会话列表
+
+#### 会话列表属性：点击回调
+
+点击会话列表项，典型应用：进入聊天页面。
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onPress={(data?: ItemDataType) => {
+          // todo: enter to chat detail screen.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 会话列表属性：长按回调
+
+长按聊天列表项，典型应用：显示上下文菜单。
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onLongPress={(data?: ItemDataType) => {
+          // todo: show context menu.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 会话列表属性：更新未读数回调
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onUpdateReadCount={(unreadCount: number) => {
+          // todo: show unread message count.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 会话列表属性：排序策略
+
+默认排序是对 `convId` 进行排序，如果需要可以自行设置。典型应用：会话置顶。
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        sortPolicy={(a: ItemDataType, b: ItemDataType) => {
+          if (a.key > b.key) {
+            return 1;
+          } else if (a.key < b.key) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 会话列表属性：自定义样式
+
+可以自定义会话列表项的显示样式。
+**注意** 如果激活侧滑功能，需要设置侧滑组件的宽度。
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        RenderItem={(props) => {
+          return <View />;
         }}
       />
     </ScreenContainer>
