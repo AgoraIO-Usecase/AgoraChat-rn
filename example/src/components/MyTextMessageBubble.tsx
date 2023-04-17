@@ -13,13 +13,10 @@ import {
   Loading,
   LocalIcon,
   LocalIconName,
-} from 'react-native-chat-uikit';
-
-import type {
   MessageItemStateType,
   MessageItemType,
   TextMessageItemType,
-} from '../fragments/MessageBubbleList';
+} from 'react-native-chat-uikit';
 
 const convertState = (state?: MessageItemStateType): LocalIconName => {
   let r = 'sent' as LocalIconName;
@@ -48,12 +45,29 @@ const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
   }
 });
 
+const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
+  const { state, ext, ...others } = props;
+  if (state === ('' as any)) console.log(others);
+  if (state === 'recalled') {
+    const tip = ext.recall.tip;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Text>{tip}</Text>
+      </View>
+    );
+  }
+  return <View />;
+};
+
 export const MyTextMessageBubble: ListRenderItem<MessageItemType> = React.memo(
   (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
     const sf = getScaleFactor();
     const { width: screenWidth } = useWindowDimensions();
     const { item } = info;
     const msg = item as TextMessageItemType;
+    if (item.state === 'recalled') {
+      return <RenderRecallMessage {...item} />;
+    }
     return (
       <View
         style={[

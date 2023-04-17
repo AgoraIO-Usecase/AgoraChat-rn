@@ -10,7 +10,11 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { ChatDownloadStatus, ChatMessageType } from 'react-native-chat-sdk';
+import {
+  ChatDownloadStatus,
+  ChatMessage,
+  ChatMessageType,
+} from 'react-native-chat-sdk';
 
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import DynamicHeightList, {
@@ -21,6 +25,7 @@ import Loading from '../components/Loading';
 import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import { wait } from '../utils/function';
+import type { MessageItemStateType } from './types';
 // import {
 //   type DynamicHeightListRef,
 //   type LocalIconName,
@@ -35,15 +40,6 @@ import { wait } from '../utils/function';
 //   wait,
 // } from 'react-native-chat-uikit';
 
-export type MessageItemStateType =
-  | 'unread'
-  | 'read'
-  | 'arrived'
-  | 'played'
-  | 'sending'
-  | 'failed'
-  | 'receiving';
-
 export interface MessageItemType {
   sender: string;
   timestamp: number;
@@ -54,6 +50,8 @@ export interface MessageItemType {
   state?: MessageItemStateType;
   onPress?: (data: MessageItemType) => void;
   onLongPress?: (data: MessageItemType) => void;
+  ext?: any;
+  isTip?: boolean;
 }
 
 export interface TextMessageItemType extends MessageItemType {
@@ -174,6 +172,20 @@ const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
   }
 });
 
+const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
+  const { state, ext, ...others } = props;
+  if (state === ('' as any)) console.log(others);
+  if (state === 'recalled') {
+    const tip = ext.recall.tip;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Text>{tip}</Text>
+      </View>
+    );
+  }
+  return <View />;
+};
+
 const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
   React.memo(
     (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
@@ -181,6 +193,9 @@ const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       const { width: screenWidth } = useWindowDimensions();
       const { item } = info;
       const msg = item as TextMessageItemType;
+      if (item.state === 'recalled') {
+        return <RenderRecallMessage {...item} />;
+      }
       return (
         <View
           style={[
@@ -261,6 +276,10 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       };
       const [_url] = React.useState(url(msg));
 
+      if (item.state === 'recalled') {
+        return <RenderRecallMessage {...item} />;
+      }
+
       return (
         <View
           style={[
@@ -329,6 +348,11 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
         r = r < 150 ? 150 : r;
         return r;
       };
+
+      if (item.state === 'recalled') {
+        return <RenderRecallMessage {...item} />;
+      }
+
       return (
         <View
           style={[
@@ -399,6 +423,11 @@ const CustomMessageRenderItemDefault: ListRenderItem<MessageItemType> =
     (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
       const { item } = info;
       const { SubComponent, SubComponentProps } = item as CustomMessageItemType;
+
+      if (item.state === 'recalled') {
+        return <RenderRecallMessage {...item} />;
+      }
+
       return <SubComponent {...SubComponentProps} />;
     }
   );
@@ -446,7 +475,7 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
       style={{
         width: '100%',
         alignItems:
-          item.isSender === undefined
+          item.isTip === true
             ? 'center'
             : item.isSender === true
             ? 'flex-end'
@@ -471,6 +500,9 @@ export type MessageBubbleListRef = {
     reason?: any;
     item?: MessageItemType;
   }) => void;
+  delMessage: (localMsgId: string) => void;
+  resendMessage: (localMsgId: string) => void;
+  recallMessage: (msg: ChatMessage) => void;
 };
 export type MessageBubbleListProps = {
   /**
@@ -572,7 +604,7 @@ const MessageBubbleList = (
       list,
       direction,
     }: {
-      type: 'add' | 'update-all' | 'update-part';
+      type: 'add' | 'update-all' | 'update-part' | 'del-one';
       list: MessageItemType[];
       direction: InsertDirectionType;
     }) => {
@@ -601,16 +633,31 @@ const MessageBubbleList = (
         case 'update-part':
           for (let index = 0; index < items.length; index++) {
             const item = items[index];
-            if (item) {
-              for (const i of list) {
-                if (item.key === i.key) {
-                  if (i.isSender) item.isSender = i.isSender;
-                  if (i.sender) item.sender = i.sender;
-                  if (i.state) item.state = i.state;
-                  if (i.timestamp) item.timestamp = i.timestamp;
-                  if (i.type) item.type = i.type;
-                  items[index] = { ...item }; // !!! only check array element, not element internal.
+            for (const i of list) {
+              if (item?.key === i.key) {
+                const old = item;
+                items[index] = (old ? { ...old, ...i } : i) as MessageItemType;
+                break;
+              }
+            }
+          }
+          break;
+        case 'del-one':
+          {
+            let hadDeleted = false;
+            for (let index = 0; index < items.length; index++) {
+              const item = items[index];
+              if (item) {
+                for (const i of list) {
+                  if (item.key === i.key) {
+                    items.splice(index, 1);
+                    hadDeleted = true;
+                    break;
+                  }
                 }
+              }
+              if (hadDeleted === true) {
+                break;
               }
             }
           }
@@ -676,6 +723,34 @@ const MessageBubbleList = (
         item?: MessageItemType;
       }) => {
         updateMessageState(params);
+      },
+      delMessage: (localMsgId: string) => {
+        updateData({
+          type: 'del-one',
+          list: [{ key: localMsgId } as MessageItemType],
+          direction: 'after',
+        });
+      },
+      resendMessage: (localMsgId: string) => {
+        updateData({
+          type: 'update-part',
+          list: [{ key: localMsgId, state: 'sending' } as MessageItemType],
+          direction: 'after',
+        });
+      },
+      recallMessage: (msg: ChatMessage) => {
+        updateData({
+          type: 'update-part',
+          list: [
+            {
+              isTip: true,
+              key: msg.localMsgId,
+              state: 'recalled',
+              ext: msg.attributes,
+            } as MessageItemType,
+          ],
+          direction: 'after',
+        });
       },
     }),
     [updateData, updateMessageState]

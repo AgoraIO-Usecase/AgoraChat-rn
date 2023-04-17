@@ -123,7 +123,10 @@ export type DataActionEventType =
   | 'chat_open_camera'
   | 'chat_open_media_library'
   | 'chat_open_document'
-  | 'update_conversation_mute';
+  | 'update_conversation_mute'
+  | 'delete_local_message'
+  | 'recall_message'
+  | 'resend_message';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////

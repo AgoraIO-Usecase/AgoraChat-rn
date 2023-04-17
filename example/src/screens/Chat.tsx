@@ -126,7 +126,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
     const sub = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
       (event) => {
-        const { action } = event as {
+        const { action, params } = event as {
           eventBizType: BizEventType;
           action: DataActionEventType;
           senderId: string;
@@ -160,6 +160,30 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
                 console.warn('error:', error);
               });
             break;
+          case 'delete_local_message':
+            chatRef.current?.deleteLocalMessage({
+              ...params,
+              onResult: (result) => {
+                console.log('delete_local_message:', result);
+              },
+            });
+            break;
+          case 'resend_message':
+            chatRef.current?.resendMessage({
+              ...params,
+              onResult: (result) => {
+                console.log('resend_message:', result);
+              },
+            });
+            break;
+          // case 'recall_message':
+          //   chatRef.current?.recallMessage({
+          //     ...params,
+          //     onResult: (result) => {
+          //       console.log('recall_message:', result);
+          //     },
+          //   });
+          //   break;
 
           default:
             break;
@@ -242,13 +266,16 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         console.warn('test:stopRecordAudio:error:', error);
       });
   }, [chatId, onVoiceRecordEnd]);
-  const onLongPressMessageBubble = React.useCallback((data) => {
-    sendEventFromChat({
-      eventType: 'ActionMenuEvent',
-      action: 'long_press_message_bubble',
-      params: data,
-    });
-  }, []);
+  const onLongPressMessageBubble = React.useCallback(
+    (data) => {
+      sendEventFromChat({
+        eventType: 'ActionMenuEvent',
+        action: 'long_press_message_bubble',
+        params: { ...data, convId: chatId, convType: chatType },
+      });
+    },
+    [chatId, chatType]
+  );
   const onSendMessage = React.useCallback((message: ChatMessage) => {
     sendEventFromChat({
       eventType: 'DataEvent',

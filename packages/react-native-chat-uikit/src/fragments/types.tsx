@@ -16,3 +16,13 @@ export type {
   VideoMessageItemType,
   VoiceMessageItemType,
 } from './MessageBubbleList';
+
+export type MessageItemStateType =
+  | 'unread'
+  | 'read'
+  | 'arrived'
+  | 'played'
+  | 'sending'
+  | 'failed'
+  | 'receiving'
+  | 'recalled';

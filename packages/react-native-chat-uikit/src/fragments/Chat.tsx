@@ -87,7 +87,6 @@ import MessageBubbleList, {
   type ImageMessageItemType,
   type MessageBubbleListProps,
   type MessageBubbleListRef,
-  type MessageItemStateType,
   type MessageItemType,
   type TextMessageItemType,
   type VoiceMessageItemType,
@@ -95,6 +94,7 @@ import MessageBubbleList, {
   LocationMessageItemType,
   VideoMessageItemType,
 } from './MessageBubbleList';
+import type { MessageItemStateType } from './types';
 
 type BaseProps = {
   chatId: string;
@@ -131,19 +131,28 @@ type ChatContentRef = {
       imageType: string;
       width: number;
       height: number;
+      onResult?: (params: any) => void;
     }[]
   ) => void;
   sendVoiceMessage: (params: {
     localPath: string;
     fileSize?: number;
     duration?: number;
+    onResult?: (params: any) => void;
   }) => void;
-  sendTextMessage: (params: { content: string }) => void;
-  sendCustomMessage: (params: { data: CustomMessageItemType }) => void;
+  sendTextMessage: (params: {
+    content: string;
+    onResult?: (params: any) => void;
+  }) => void;
+  sendCustomMessage: (params: {
+    data: CustomMessageItemType;
+    onResult?: (params: any) => void;
+  }) => void;
   sendFileMessage: (params: {
     localPath: string;
     fileSize?: number;
     displayName?: string;
+    onResult?: (params: any) => void;
   }) => void;
   sendVideoMessage: (params: {
     localPath: string;
@@ -153,13 +162,35 @@ type ChatContentRef = {
     thumbnailLocalPath?: string;
     width?: number;
     height?: number;
+    onResult?: (params: any) => void;
   }) => void;
   sendLocationMessage: (params: {
     address: string;
     latitude: string;
     longitude: string;
+    onResult?: (params: any) => void;
   }) => void;
-  loadHistoryMessage: (msgs: ChatMessage[]) => void;
+  loadHistoryMessage: (
+    msgs: ChatMessage[],
+    onResult?: (params: any) => void
+  ) => void;
+  deleteLocalMessage: (params: {
+    convId: string;
+    convType: ChatConversationType;
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
+  recallMessage: (params: {
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
+  resendMessage: (params: {
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
 };
 type ChatContentProps = BaseProps & {
   propsRef?: React.RefObject<ChatContentRef>;
@@ -233,7 +264,6 @@ const ChatInput = React.memo((props: ChatInputProps) => {
   };
 
   const calculateInputWidth = React.useCallback(() => {
-    console.log('test:123123123123:');
     return sf(width - 15 * 2 - 28 - 15 * 2 - (isInput === true ? 66 : 28));
   }, [isInput, sf, width]);
 
@@ -692,19 +722,26 @@ const ChatContent = React.memo(
     const convertFromMessage = React.useCallback(
       (msg: ChatMessage): MessageItemType => {
         const convertFromMessageState = (msg: ChatMessage) => {
+          let ret: MessageItemStateType;
           if (msg.status === ChatMessageStatus.SUCCESS) {
-            return 'arrived' as MessageItemStateType;
+            ret = 'arrived' as MessageItemStateType;
           } else if (msg.status === ChatMessageStatus.CREATE) {
-            return 'sending' as MessageItemStateType;
+            ret = 'sending' as MessageItemStateType;
           } else if (msg.status === ChatMessageStatus.FAIL) {
-            return 'failed' as MessageItemStateType;
+            ret = 'failed' as MessageItemStateType;
           } else if (msg.status === ChatMessageStatus.PROGRESS) {
             if (msg.direction === ChatMessageDirection.RECEIVE)
-              return 'receiving' as MessageItemStateType;
-            else return 'sending' as MessageItemStateType;
+              ret = 'receiving' as MessageItemStateType;
+            else ret = 'sending' as MessageItemStateType;
           } else {
-            return 'failed' as MessageItemStateType;
+            ret = 'failed' as MessageItemStateType;
           }
+          if (ret === 'sending' || ret === 'receiving') {
+            if (timestamp() > msg.localTime + 1000 * 60) {
+              ret = 'failed';
+            }
+          }
+          return ret;
         };
         const convertFromMessageBody = (
           msg: ChatMessage,
@@ -896,7 +933,7 @@ const ChatContent = React.memo(
     );
 
     const sendToServer = React.useCallback(
-      (msg: ChatMessage) => {
+      (msg: ChatMessage, onResult?: (params: any) => void) => {
         onSendMessage?.(msg);
         // onSendBefore(msg);
         client.chatManager
@@ -920,6 +957,10 @@ const ChatContent = React.memo(
               //   ...msg,
               //   status: ChatMessageStatus.FAIL,
               // } as ChatMessage);
+              onResult?.({
+                localMsgId,
+                error,
+              });
             },
             onSuccess: (message: ChatMessage): void => {
               console.log('test:sendToServer:onSuccess', message.localMsgId);
@@ -930,11 +971,13 @@ const ChatContent = React.memo(
               });
               onSendMessageEnd?.(message);
               // onSendResult(message);
+              onResult?.(undefined);
             },
           } as ChatMessageStatusCallback)
           .then(() => {})
           .catch((error) => {
             console.warn('test:sendToServer:error:', error);
+            onResult?.(error);
           });
       },
       [
@@ -947,7 +990,7 @@ const ChatContent = React.memo(
     );
 
     const sendTextMessage = React.useCallback(
-      (text: string) => {
+      (text: string, onResult?: (params: any) => void) => {
         if (text.length === 0) {
           return;
         }
@@ -975,7 +1018,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, onResult);
       },
       [
         chatId,
@@ -994,6 +1037,7 @@ const ChatContent = React.memo(
         fileSize,
         width,
         height,
+        onResult,
       }: {
         name: string;
         localPath: string;
@@ -1001,6 +1045,7 @@ const ChatContent = React.memo(
         imageType?: string;
         width?: number;
         height?: number;
+        onResult?: (params: any) => void;
       }) => {
         if (localPath.length === 0) {
           return;
@@ -1048,7 +1093,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, onResult);
       },
       [
         chatId,
@@ -1064,6 +1109,7 @@ const ChatContent = React.memo(
         localPath: string;
         fileSize?: number;
         displayName?: string;
+        onResult?: ((params: any) => void) | undefined;
       }) => {
         if (params.localPath.length === 0) {
           return;
@@ -1100,7 +1146,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, params.onResult);
       },
       [
         chatId,
@@ -1119,6 +1165,7 @@ const ChatContent = React.memo(
         thumbnailLocalPath?: string;
         width?: number;
         height?: number;
+        onResult?: ((params: any) => void) | undefined;
       }) => {
         if (params.localPath.length === 0) {
           return;
@@ -1159,7 +1206,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, params.onResult);
       },
       [
         chatId,
@@ -1170,7 +1217,12 @@ const ChatContent = React.memo(
       ]
     );
     const sendLocationMessage = React.useCallback(
-      (params: { address: string; latitude: string; longitude: string }) => {
+      (params: {
+        address: string;
+        latitude: string;
+        longitude: string;
+        onResult?: ((params: any) => void) | undefined;
+      }) => {
         const item = {
           sender: chatId,
           timestamp: timestamp(),
@@ -1195,7 +1247,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, params.onResult);
       },
       [
         chatId,
@@ -1207,7 +1259,13 @@ const ChatContent = React.memo(
     );
 
     const sendCustomMessage = React.useCallback(
-      ({ data }: { data: CustomMessageItemType }) => {
+      ({
+        data,
+        onResult,
+      }: {
+        data: CustomMessageItemType;
+        onResult?: (params: any) => void;
+      }) => {
         const msg = convertToMessage(data);
         if (msg === undefined) {
           throw new Error('This is impossible.');
@@ -1220,7 +1278,7 @@ const ChatContent = React.memo(
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
         });
-        sendToServer(msg);
+        sendToServer(msg, onResult);
       },
       [convertFromMessage, convertToMessage, getMsgListRef, sendToServer]
     );
@@ -1276,7 +1334,7 @@ const ChatContent = React.memo(
     );
 
     const loadHistoryMessage = React.useCallback(
-      (msgs: ChatMessage[]) => {
+      (msgs: ChatMessage[], onResult?: (params: any) => void) => {
         const items = [] as MessageItemType[];
         for (const msg of msgs) {
           const item = convertFromMessage(msg);
@@ -1287,6 +1345,7 @@ const ChatContent = React.memo(
           direction: 'before',
           msgs: items,
         });
+        onResult?.(undefined);
       },
       [checkAttachment, convertFromMessage, getMsgListRef]
     );
@@ -1311,6 +1370,113 @@ const ChatContent = React.memo(
           });
       },
       [chatId, chatType, client.chatManager, loadHistoryMessage]
+    );
+
+    const deleteLocalMessage = React.useCallback(
+      (params: {
+        convId: string;
+        convType: ChatConversationType;
+        msgId: string;
+        key: string;
+        onResult?: ((params: any) => void) | undefined;
+      }) => {
+        const { convId, convType, msgId, key } = params;
+        client.chatManager
+          .deleteMessage(convId, convType, msgId)
+          .then(() => {
+            getMsgListRef().current?.delMessage(key);
+            params.onResult?.(undefined);
+          })
+          .catch((error) => {
+            console.log('test:error:', error);
+            params.onResult?.(error);
+          });
+      },
+      [client.chatManager, getMsgListRef]
+    );
+
+    const recallMessage = React.useCallback(
+      (params: {
+        msgId: string;
+        key: string;
+        onResult?: ((params: any) => void) | undefined;
+      }): void => {
+        const { msgId } = params;
+        client.chatManager
+          .getMessage(msgId)
+          .then((msg) => {
+            if (msg) {
+              client.chatManager
+                .recallMessage(msgId)
+                .then(() => {
+                  getMsgListRef().current?.delMessage(msg.localMsgId);
+                  // const tip = 'You have recall a message.';
+                  // msg.attributes = {
+                  //   recall: {
+                  //     tip: tip,
+                  //   },
+                  // };
+                  // getMsgListRef().current?.recallMessage(msg);
+                  // todo: add local tip message.
+                })
+                .catch((error) => {
+                  console.log('test:error:', error);
+                  params.onResult?.(error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.log('test:error:', error);
+            params.onResult?.(error);
+          });
+      },
+      [client.chatManager, getMsgListRef]
+    );
+    const resendMessage = React.useCallback(
+      (params: {
+        msgId: string;
+        key: string;
+        onResult?: (params: any) => void;
+      }): void => {
+        const { msgId, key, onResult } = params;
+        client.chatManager
+          .getMessage(msgId)
+          .then((msg) => {
+            if (msg && msg?.status !== ChatMessageStatus.SUCCESS) {
+              getMsgListRef().current?.resendMessage(key);
+              client.chatManager
+                .resendMessage(msg, {
+                  onError(localMsgId: string, error: ChatError) {
+                    console.log('test:', localMsgId, error);
+                    onResult?.(error);
+                  },
+                  onSuccess(message: ChatMessage) {
+                    updateMessageState({
+                      localMsgId: message.localMsgId,
+                      result: true,
+                      item: convertFromMessage(message),
+                    });
+                    onResult?.(undefined);
+                  },
+                } as ChatMessageStatusCallback)
+                .then()
+                .catch((error) => {
+                  console.log('test:error:', error);
+                  onResult?.(error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.log('test:error:', error);
+            onResult?.(error);
+          });
+      },
+      [
+        client.chatManager,
+        convertFromMessage,
+        getMsgListRef,
+        updateMessageState,
+      ]
     );
 
     const loadMessage = React.useCallback(
@@ -1419,7 +1585,7 @@ const ChatContent = React.memo(
 
     if (propsRef?.current) {
       propsRef.current.sendImageMessage = (params: any) => {
-        const eventParams = params as any[];
+        const eventParams = params;
         for (const item of eventParams) {
           sendImageMessage({
             name: item.name,
@@ -1428,41 +1594,54 @@ const ChatContent = React.memo(
             imageType: item.type,
             width: item.width,
             height: item.height,
+            onResult: item.onResult,
           })
-            .then()
+            .then(() => {
+              item.onResult?.(undefined);
+            })
             .catch((error) => {
               console.warn('test:sendImageMessage:error', error);
+              item.onResult?.(error);
             });
         }
       };
-      propsRef.current.sendVoiceMessage = (params: any) => {
+      propsRef.current.sendVoiceMessage = (params) => {
         sendVoiceMessage({
           localPath: params.localPath,
           duration: params.duration,
         })
-          .then()
+          .then(() => {
+            params.onResult?.(undefined);
+          })
           .catch((error) => {
             console.warn('test:sendVoiceMessage:error', error);
+            params.onResult?.(error);
           });
       };
       propsRef.current.sendTextMessage = (params) => {
-        sendTextMessage(params.content);
+        sendTextMessage(params.content, params.onResult);
       };
       propsRef.current.sendCustomMessage = (params) => {
         sendCustomMessage(params);
       };
       propsRef.current.sendFileMessage = (params) => {
         sendFileMessage(params)
-          .then()
+          .then(() => {
+            params.onResult?.(undefined);
+          })
           .catch((error) => {
             console.warn('test:sendFileMessage:error', error);
+            params.onResult?.(error);
           });
       };
       propsRef.current.sendVideoMessage = (params) => {
         sendVideoMessage(params)
-          .then()
+          .then(() => {
+            params.onResult?.(undefined);
+          })
           .catch((error) => {
             console.warn('test:sendVideoMessage:error', error);
+            params.onResult?.(error);
           });
       };
       propsRef.current.sendLocationMessage = (params) => {
@@ -1470,6 +1649,15 @@ const ChatContent = React.memo(
       };
       propsRef.current.loadHistoryMessage = (params) => {
         loadHistoryMessage(params);
+      };
+      propsRef.current.deleteLocalMessage = (params) => {
+        deleteLocalMessage(params);
+      };
+      propsRef.current.recallMessage = (params) => {
+        recallMessage(params);
+      };
+      propsRef.current.resendMessage = (params) => {
+        resendMessage(params);
       };
     }
 
@@ -1493,6 +1681,16 @@ const ChatContent = React.memo(
                 if (r.length > 0) loadMessage(r);
               }
               break;
+            // case 'onMessagesRecalled': {
+            //   const messages = eventParams.messages;
+            //   for (const msg of messages) {
+            //     if (msg.conversationId === chatId) {
+            //       getMsgListRef().current?.recallMessage(msg);
+            //     }
+            //   }
+
+            //   break;
+            // }
             default:
               break;
           }
@@ -1703,6 +1901,7 @@ export type ChatFragmentRef = {
       imageType: string;
       width: number;
       height: number;
+      onResult?: (params: any) => void;
     }[]
   ) => void;
   /**
@@ -1712,17 +1911,24 @@ export type ChatFragmentRef = {
     localPath: string;
     fileSize?: number;
     duration?: number;
+    onResult?: (params: any) => void;
   }) => void;
 
   /**
    * send a text message.
    */
-  sendTextMessage: (params: { content: string }) => void;
+  sendTextMessage: (params: {
+    content: string;
+    onResult?: (params: any) => void;
+  }) => void;
 
   /**
    * send a custom message.
    */
-  sendCustomMessage: (params: { data: CustomMessageItemType }) => void;
+  sendCustomMessage: (params: {
+    data: CustomMessageItemType;
+    onResult?: (params: any) => void;
+  }) => void;
 
   /**
    * send a file message.
@@ -1731,6 +1937,7 @@ export type ChatFragmentRef = {
     localPath: string;
     fileSize?: number;
     displayName?: string;
+    onResult?: (params: any) => void;
   }) => void;
 
   /**
@@ -1744,6 +1951,7 @@ export type ChatFragmentRef = {
     thumbnailLocalPath?: string;
     width?: number;
     height?: number;
+    onResult?: (params: any) => void;
   }) => void;
 
   /**
@@ -1753,12 +1961,45 @@ export type ChatFragmentRef = {
     address: string;
     latitude: string;
     longitude: string;
+    onResult?: (params: any) => void;
   }) => void;
 
   /**
    * load history messages.
    */
-  loadHistoryMessage: (msgs: ChatMessage[]) => void;
+  loadHistoryMessage: (
+    msgs: ChatMessage[],
+    onResult?: (params: any) => void
+  ) => void;
+
+  /**
+   * delete local message.
+   */
+  deleteLocalMessage: (params: {
+    convId: string;
+    convType: ChatConversationType;
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
+
+  /**
+   * Undo a message that has been successfully sent.
+   */
+  // recallMessage: (params: {
+  //   msgId: string;
+  //   key: string;
+  //   onResult?: (params: any) => void;
+  // }) => void;
+
+  /**
+   * Resend the message that failed to be sent.
+   */
+  resendMessage: (params: {
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
 };
 
 /**
@@ -1883,6 +2124,15 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     };
     propsRef.current.loadHistoryMessage = (params) => {
       chatContentRef?.current.loadHistoryMessage(params);
+    };
+    propsRef.current.deleteLocalMessage = (params) => {
+      chatContentRef?.current.deleteLocalMessage(params);
+    };
+    // propsRef.current.recallMessage = (params) => {
+    //   chatContentRef?.current.recallMessage(params);
+    // };
+    propsRef.current.resendMessage = (params) => {
+      chatContentRef?.current.resendMessage(params);
     };
   }
   return (
