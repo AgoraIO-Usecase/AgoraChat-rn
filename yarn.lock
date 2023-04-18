@@ -11766,10 +11766,10 @@ react-native-file-access@^2.5.2:
   resolved "https://registry.npmmirror.com/react-native-file-access/-/react-native-file-access-2.5.2.tgz#b73b84a9a2166eeb48a879da33982d43249d5773"
   integrity sha512-YkbD06qEf+SxOz0hdQk0iStMYrQeunnAHIMybDLD0K+HLTQ6PTkvtdi0Wlzdz1g5tSx0bVzhhsbDrEvqf5JLaA==
 
-react-native-flipper@^0.174.0:
-  version "0.174.0"
-  resolved "https://registry.npmmirror.com/react-native-flipper/-/react-native-flipper-0.174.0.tgz#acb57d4cea68551edff73c0f17999e519b39614c"
-  integrity sha512-9WAUxqHLU57dYxD/Z5EkcU/MdP1KFWCxdZfeHJ6Ogq/GbJVawzibjVfGPVwc2GoLIMvE6rZ0Fvvw4AUIdykc/g==
+react-native-flipper@^0.189.0:
+  version "0.189.0"
+  resolved "https://registry.npmjs.org/react-native-flipper/-/react-native-flipper-0.189.0.tgz#b052832cc89694e828d43b3a09d6f59a57544eac"
+  integrity sha512-hV3Omq0wPCwGp6A61PHzh9QLw18pgfgxo74cYxTfOCfEQd0UbvMvEmfpWxiMCFLQ/3UWBylcRC2eu0bKQcKFdQ==
 
 react-native-gesture-handler@^2.8.0:
   version "2.8.0"

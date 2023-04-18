@@ -59,7 +59,7 @@
     "@react-navigation/devtools": "^6.0.13",
     "@types/react-native": "~0.70.0",
     "babel-plugin-module-resolver": "^4.1.0",
-    "react-native-flipper": "^0.174.0"
+    "react-native-flipper": "^0.189.0"
   },
   "private": true
 }
