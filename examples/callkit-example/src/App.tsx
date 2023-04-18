@@ -25,7 +25,7 @@ import {
   createStringSetEn2,
   DarkTheme,
   getScaleFactor,
-  GlobalContainer,
+  GlobalContainer as UikitContainer,
   LightTheme,
   Loading,
   Services,
@@ -214,7 +214,7 @@ export default function App() {
 
   return (
     <React.StrictMode>
-      <GlobalContainer
+      <UikitContainer
         option={{
           appKey: appKey,
           autoLogin: autoLogin.current,
@@ -394,7 +394,7 @@ export default function App() {
             </NavigationContainer>
           )}
         </CallkitContainer>
-      </GlobalContainer>
+      </UikitContainer>
     </React.StrictMode>
   );
 }

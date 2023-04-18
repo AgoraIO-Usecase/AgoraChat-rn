@@ -46,18 +46,6 @@ export type BasicCallProps = {
   callState?: CallState;
   isMinimize?: boolean;
   isTest?: boolean;
-  requestRTCToken?: (params: {
-    appKey: string;
-    channelId: string;
-    userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
-  }) => void;
-  requestUserMap?: (params: {
-    appKey: string;
-    channelId: string;
-    userId: string;
-    onResult: (params: { data: any; error?: any }) => void;
-  }) => void;
   onHangUp?: () => void;
   onCancel?: () => void;
   onRefuse?: () => void;

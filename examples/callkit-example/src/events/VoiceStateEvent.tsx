@@ -149,22 +149,6 @@ export function handleVoiceStateEvent(params: {
                   Alert.alert(`error: ${JSON.stringify(error)}`);
                 }
               }}
-              requestRTCToken={function (params: {
-                appKey: string;
-                channelId: string;
-                userId: string;
-                onResult: (params: { data: any; error?: any }) => void;
-              }): void {
-                console.log('test:requestRTCToken:', params);
-              }}
-              requestUserMap={function (params: {
-                appKey: string;
-                channelId: string;
-                userId: string;
-                onResult: (params: { data: any; error?: any }) => void;
-              }): void {
-                console.log('test:requestUserMap:', params);
-              }}
             />
           ),
           pointerEvents: 'box-none',

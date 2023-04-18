@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 import {
-  CallEndReason,
   CallError,
   CallListener,
   CallType,
@@ -288,14 +287,6 @@ export default function HomeScreen({
 
   const addListener = React.useCallback(() => {
     const listener = {
-      onCallEnded: (params: {
-        channelId: string;
-        callType: CallType;
-        endReason: CallEndReason;
-        elapsed: number;
-      }) => {
-        console.log('onCallEnded:', params);
-      },
       onCallReceived: (params: {
         channelId: string;
         inviterId: string;

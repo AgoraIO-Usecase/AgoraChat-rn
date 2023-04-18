@@ -50,10 +50,11 @@ git clone git@github.com:easemob/react-native-chat-library.git
 
 1. 使用 `vscode` 打开项目 `react-native-chat-library`
 2. 使用 `terminal` 初始化项目 `yarn`
-3. 如果是第一次项目初始化，还需要执行命令 `yarn run generate-source-env`
+3. 如果是第一次项目初始化，还需要执行命令 `yarn run generate-source-env`，生成相应的文件。例如：`env.ts`。
 
 **注意** `yarn` 会执行额外的命令，对于不了解命令的开发者，如果需要使用 `npm` 命令替换，需要了解更加相信的内容。
 **注意** 在创建该项目的时候，脚手架已经预置了部分 `yarn` 相关的命令，所以，推荐使用 `yarn` 完成绝大部分工作。
+**注意** 由于 `example` 使用了 `firebase cloud message (fcm)` 相关内容，如果用户需要使用相关内容，需要设置对应的文件（ios 平台需要 GoogleService-Info.plist， android 平台需要 google-services.json），如果不需要则删除相关内容即可。
 
 #### 通用编译
 
