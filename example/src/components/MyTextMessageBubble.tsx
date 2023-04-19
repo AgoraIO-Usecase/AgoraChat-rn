@@ -86,7 +86,7 @@ export const MyTextMessageBubble: ListRenderItem<MessageItemType> = React.memo(
             },
           ]}
         >
-          <DefaultAvatar size={sf(24)} radius={sf(12)} />
+          <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
         </View>
         <View
           style={[

@@ -18,6 +18,7 @@
         "podspec",
         "Pressable",
         "rneui",
+        "RNFS",
         "tabbar",
         "uikit"
     ]

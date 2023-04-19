@@ -2,9 +2,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
 import {
-  Avatar,
   createStyleSheet,
   DataEventType,
+  DefaultAvatar,
   getScaleFactor,
   LocalIcon,
   ScreenContainer,
@@ -166,7 +166,7 @@ export function ContactInfoScreenInternal({
   return (
     <View style={[styles.container, { alignItems: 'center' }]}>
       <View style={styles.top}>
-        <Avatar uri="" size={sf(100)} radius={sf(50)} />
+        <DefaultAvatar id={userId} size={sf(100)} radius={sf(50)} />
       </View>
       <View style={styles.top}>
         <Text numberOfLines={1} style={[styles.name, { maxWidth: '80%' }]}>

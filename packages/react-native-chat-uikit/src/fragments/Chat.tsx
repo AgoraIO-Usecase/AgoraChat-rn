@@ -41,6 +41,7 @@ import {
   ChatVideoMessageBody,
   ChatVoiceMessageBody,
 } from 'react-native-chat-sdk';
+// import RNFS from 'react-native-fs';
 // import {
 //   type LocalIconName,
 //   type MessageChatSdkEventType,
@@ -127,7 +128,7 @@ type ChatContentRef = {
     params: {
       name: string;
       localPath: string;
-      fileSize: string;
+      fileSize: number;
       imageType: string;
       width: number;
       height: number;
@@ -645,6 +646,51 @@ const ChatContent = React.memo(
               );
             }
             break;
+          case ChatMessageType.FILE:
+            {
+              const file = item as FileMessageItemType;
+              r = ChatMessage.createFileMessage(
+                chatId,
+                file.localPath,
+                chatType,
+                {
+                  displayName: file.displayName ?? 'file',
+                  fileSize: file.fileSize ?? 0,
+                } as any
+              );
+            }
+            break;
+          case ChatMessageType.LOCATION:
+            {
+              const location = item as LocationMessageItemType;
+              r = ChatMessage.createLocationMessage(
+                chatId,
+                location.latitude,
+                location.longitude,
+                chatType,
+                {
+                  address: location.address,
+                }
+              );
+            }
+            break;
+          case ChatMessageType.VIDEO:
+            {
+              const video = item as VideoMessageItemType;
+              r = ChatMessage.createVideoMessage(
+                chatId,
+                video.localPath,
+                chatType,
+                {
+                  displayName: video.displayName ?? 'video',
+                  thumbnailLocalPath: video.thumbnailLocalPath ?? '',
+                  duration: video.duration,
+                  width: video.width ?? 0,
+                  height: video.height ?? 0,
+                }
+              );
+            }
+            break;
           default:
             break;
         }
@@ -758,6 +804,7 @@ const ChatContent = React.memo(
                 r.fileSize = body.fileSize;
                 r.fileStatus = body.fileStatus;
                 r.duration = body.duration;
+                r.displayName = body.displayName;
                 r.type = ChatMessageType.VOICE;
               }
               break;
@@ -769,6 +816,7 @@ const ChatContent = React.memo(
                 r.remoteUrl = body.remotePath;
                 r.fileSize = body.fileSize;
                 r.fileStatus = body.fileStatus;
+                r.displayName = body.displayName;
                 r.localThumbPath = body.thumbnailLocalPath;
                 r.type = ChatMessageType.IMAGE;
               }
@@ -812,6 +860,7 @@ const ChatContent = React.memo(
                 r.remoteUrl = body.remotePath;
                 r.fileSize = body.fileSize;
                 r.fileStatus = body.fileStatus;
+                r.displayName = body.displayName;
                 r.type = ChatMessageType.FILE;
               }
               break;
@@ -1000,7 +1049,7 @@ const ChatContent = React.memo(
           sender: chatId,
           timestamp: timestamp(),
           isSender: true,
-          key: seqId('ml').toString(),
+          // key: seqId('ml').toString(),
           text: text,
           type: ChatMessageType.TXT,
           state: 'sending',
@@ -1013,7 +1062,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1069,7 +1118,7 @@ const ChatContent = React.memo(
 
         const modifiedTargetPath = removeFileHeader(targetPath);
         const item = {
-          key: seqId('ml').toString(),
+          // key: seqId('ml').toString(),
           displayName: name,
           sender: chatId,
           isSender: true,
@@ -1088,7 +1137,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1114,6 +1163,22 @@ const ChatContent = React.memo(
         if (params.localPath.length === 0) {
           return;
         }
+        // const localPathD = decodeURIComponent(params.localPath);
+        // if (Platform.OS === 'android') {
+        //   // const r = await Services.ps.hasMediaLibraryPermission();
+        //   // if (r === false) {
+        //   // await Services.ps.requestMediaLibraryPermission();
+        //   // }
+
+        //   try {
+        //     const result = await RNFS.stat(localPathD);
+        //     console.log('test:123:', result);
+        //   } catch (error) {
+        //     console.warn('test:234:', error);
+        //   }
+
+        //   return;
+        // }
         if (__DEV__) {
           const test_existed = await Services.dcs.isExistedFile(
             params.localPath
@@ -1123,7 +1188,7 @@ const ChatContent = React.memo(
 
         const modifiedTargetPath = removeFileHeader(params.localPath);
         const item = {
-          key: seqId('ml').toString(),
+          // key: seqId('ml').toString(),
           sender: chatId,
           isSender: true,
           type: ChatMessageType.FILE,
@@ -1141,7 +1206,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1179,7 +1244,7 @@ const ChatContent = React.memo(
 
         const modifiedTargetPath = removeFileHeader(params.localPath);
         const item = {
-          key: seqId('ml').toString(),
+          // key: seqId('ml').toString(),
           sender: chatId,
           isSender: true,
           type: ChatMessageType.VIDEO,
@@ -1201,7 +1266,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1227,7 +1292,7 @@ const ChatContent = React.memo(
           sender: chatId,
           timestamp: timestamp(),
           isSender: true,
-          key: seqId('ml').toString(),
+          // key: seqId('ml').toString(),
           type: ChatMessageType.LOCATION,
           state: 'sending',
           address: params.address,
@@ -1242,7 +1307,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1317,7 +1382,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), ...item }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1587,15 +1652,7 @@ const ChatContent = React.memo(
       propsRef.current.sendImageMessage = (params: any) => {
         const eventParams = params;
         for (const item of eventParams) {
-          sendImageMessage({
-            name: item.name,
-            localPath: item.uri,
-            fileSize: item.size,
-            imageType: item.type,
-            width: item.width,
-            height: item.height,
-            onResult: item.onResult,
-          })
+          sendImageMessage(item)
             .then(() => {
               item.onResult?.(undefined);
             })
@@ -1898,7 +1955,7 @@ export type ChatFragmentRef = {
     params: {
       name: string;
       localPath: string;
-      fileSize: string;
+      fileSize: number;
       imageType: string;
       width: number;
       height: number;

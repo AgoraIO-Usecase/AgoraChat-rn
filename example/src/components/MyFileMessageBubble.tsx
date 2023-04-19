@@ -9,13 +9,15 @@ import {
 import {
   createStyleSheet,
   DefaultAvatar,
+  FileMessageItemType,
   getScaleFactor,
+  Image,
   Loading,
   LocalIcon,
   LocalIconName,
+  localLocalIcon,
   MessageItemStateType,
   MessageItemType,
-  VideoMessageItemType,
 } from 'react-native-chat-uikit';
 
 const convertState = (state?: MessageItemStateType): LocalIconName => {
@@ -45,13 +47,30 @@ const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
   }
 });
 
-export const MyVideoMessageBubble: ListRenderItem<MessageItemType> = React.memo(
+const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
+  const { state, ext, ...others } = props;
+  if (state === ('' as any)) console.log(others);
+  if (state === 'recalled') {
+    const tip = ext.recall.tip;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <Text>{tip}</Text>
+      </View>
+    );
+  }
+  return <View />;
+};
+
+export const MyFileMessageBubble: ListRenderItem<MessageItemType> = React.memo(
   (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
     const sf = getScaleFactor();
     const { width: screenWidth } = useWindowDimensions();
     const { item } = info;
-    const msg = item as VideoMessageItemType;
-    console.log('test:video:', msg);
+    const msg = item as FileMessageItemType;
+    if (item.state === 'recalled') {
+      return <RenderRecallMessage {...item} />;
+    }
+
     return (
       <View
         style={[
@@ -82,17 +101,55 @@ export const MyVideoMessageBubble: ListRenderItem<MessageItemType> = React.memo(
             },
           ]}
         >
-          <Text
-            style={[
-              styles.text,
-              {
-                backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
-                color: msg.isSender ? 'white' : '#333333',
-              },
-            ]}
-          >
-            {msg.displayName}
-          </Text>
+          <View style={styles.file}>
+            {msg.isSender ? (
+              <View>
+                <Image
+                  source={localLocalIcon('file_doc')}
+                  style={{ height: 36, width: 36 }}
+                />
+              </View>
+            ) : null}
+            <View>
+              <Text
+                numberOfLines={1}
+                style={[
+                  {
+                    fontSize: sf(15),
+                    fontWeight: '600',
+                    lineHeight: sf(22),
+                    color: '#333333',
+                    maxWidth: screenWidth * 0.6,
+                  },
+                ]}
+              >
+                {msg.displayName}
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={[
+                  {
+                    fontSize: sf(12),
+                    fontWeight: '400',
+                    lineHeight: sf(20),
+                    color: '#666666',
+                    maxWidth: screenWidth * 0.6,
+                  },
+                ]}
+              >
+                {msg.fileSize}
+              </Text>
+            </View>
+
+            {msg.isSender ? null : (
+              <View>
+                <Image
+                  source={localLocalIcon('file_doc')}
+                  style={{ height: 36, width: 36 }}
+                />
+              </View>
+            )}
+          </View>
         </View>
         <View
           style={[
@@ -125,9 +182,9 @@ const styles = createStyleSheet({
     // backgroundColor: 'red',
     overflow: 'hidden',
   },
-  text: {
+  file: {
+    flexDirection: 'row',
     backgroundColor: 'rgba(242, 242, 242, 1)',
     padding: 10,
-    flexWrap: 'wrap',
   },
 });

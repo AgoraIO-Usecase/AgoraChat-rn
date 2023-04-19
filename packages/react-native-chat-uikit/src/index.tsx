@@ -64,7 +64,7 @@ export {
   ListHeaderProps,
 } from './components/EqualHeightList';
 export { FaceList } from './components/FaceList';
-export { LocalIcon, LocalIconName, VectorIcon } from './components/Icon';
+export * from './components/Icon';
 export { default as Image } from './components/Image';
 export { ListItemSeparator as DefaultListItemSeparator } from './components/ListItemSeparator';
 export { ListSearchHeader as DefaultListSearchHeader } from './components/ListSearchHeader';

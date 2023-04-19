@@ -23,7 +23,7 @@ export enum IconSize {
 export type IconName = keyof typeof ICON_ASSETS;
 type SizeList = keyof typeof sizeStyles;
 
-const localLocalIcon = <T extends IconName>(
+export const localLocalIcon = <T extends IconName>(
   name: T,
   size: IconSize = IconSize.ICON_NORMAL
 ) => {

@@ -214,7 +214,7 @@ const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
               },
             ]}
           >
-            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+            <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
           </View>
           <View
             style={[
@@ -298,7 +298,7 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
               },
             ]}
           >
-            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+            <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
           </View>
           <View
             style={{
@@ -371,7 +371,7 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
               },
             ]}
           >
-            <DefaultAvatar size={sf(24)} radius={sf(12)} />
+            <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
           </View>
           <View
             style={[
@@ -508,6 +508,7 @@ export type MessageBubbleListProps = {
   /**
    * Click the message list, not the message item.
    */
+  // eslint-disable-next-line react/no-unused-prop-types
   onPressed?: () => void;
   onRequestHistoryMessage?: (params: { earliestId: string }) => void;
   TextMessageItem?: ListRenderItem<TextMessageItemType>;
@@ -523,7 +524,6 @@ const MessageBubbleList = (
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
   // const { onPressed } = props;
-  console.log('test:onPressed:', props.onPressed);
 
   GTextMessageItem = props.TextMessageItem;
   GImageMessageItem = props.ImageMessageItem;

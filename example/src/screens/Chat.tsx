@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 import {
   type AudioSet,
   AudioEncoderAndroidType,
@@ -32,6 +32,7 @@ import {
 } from 'react-native-chat-uikit';
 
 import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
+import { MyFileMessageBubble } from '../components/MyFileMessageBubble';
 import { MyTextMessageBubble } from '../components/MyTextMessageBubble';
 import { MyVideoMessageBubble } from '../components/MyVideoMessageBubble';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
@@ -125,7 +126,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const addListeners = React.useCallback(() => {
     const sub = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
-      (event) => {
+      async (event) => {
         const { action, params } = event as {
           eventBizType: BizEventType;
           action: DataActionEventType;
@@ -137,24 +138,59 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
           case 'chat_open_camera':
             Services.ms
               .openCamera({})
-              .then(() => {})
+              .then((result) => {
+                console.log('openCamera:', Platform.OS, result);
+                // chatRef.current?.sendImageMessage([result as any]);
+              })
               .catch((error) => {
                 console.warn('error:', error);
               });
             break;
           case 'chat_open_document':
-            Services.ms
-              .openDocument({})
-              .then(() => {})
-              .catch((error) => {
-                console.warn('error:', error);
-              });
+            {
+              const ret = await Services.ps.hasMediaLibraryPermission();
+              if (ret === false) {
+                await Services.ps.requestMediaLibraryPermission();
+              }
+              Services.ms
+                .openDocument({})
+                .then((result) => {
+                  console.log('openDocument:', Platform.OS, result);
+                  chatRef.current?.sendFileMessage({
+                    localPath: result?.uri ?? '',
+                    fileSize: result?.size ?? 0,
+                    displayName: result?.name,
+                    onResult: (result) => {
+                      console.log('openDocument:result', result);
+                    },
+                  });
+                })
+                .catch((error) => {
+                  console.warn('error:', error);
+                });
+            }
+
             break;
           case 'chat_open_media_library':
             Services.ms
               .openMediaLibrary({ selectionLimit: 1 })
               .then((result) => {
-                chatRef.current?.sendImageMessage(result as any);
+                console.log('openMediaLibrary:', Platform.OS, result);
+                chatRef.current?.sendImageMessage(
+                  result.map((value) => {
+                    return {
+                      name: value?.name ?? '',
+                      localPath: value?.uri ?? '',
+                      fileSize: value?.size ?? 0,
+                      imageType: value?.type ?? '',
+                      width: value?.width ?? 0,
+                      height: value?.height ?? 0,
+                      onResult: (result) => {
+                        console.log('openMediaLibrary:result:', result);
+                      },
+                    };
+                  })
+                );
               })
               .catch((error) => {
                 console.warn('error:', error);
@@ -381,6 +417,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             },
             TextMessageItem: MyTextMessageBubble,
             VideoMessageItem: MyVideoMessageBubble,
+            FileMessageItem: MyFileMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}
