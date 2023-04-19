@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { createStyleSheet, ICON_ASSETS, Image } from 'react-native-chat-uikit';
 
 type HeaderTitleProps = {
@@ -7,7 +7,7 @@ type HeaderTitleProps = {
 };
 
 export default function HomeHeaderTitle(props: HeaderTitleProps): JSX.Element {
-  // console.log('test:HomeHeaderTitle:', props);
+  console.log('test:HomeHeaderTitle:', props);
   const { name } = props;
   const _styles = (name: string) => {
     if (name === 'Chats') {
@@ -17,12 +17,17 @@ export default function HomeHeaderTitle(props: HeaderTitleProps): JSX.Element {
     }
     return null;
   };
+  const resizeMode = Platform.select({
+    ios: 'cover',
+    android: 'center',
+    default: 'cover',
+  });
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image
         source={ICON_ASSETS[name]('2x')}
-        resizeMode="cover"
+        resizeMode={resizeMode as any}
         style={_styles(name)}
         onLoad={(_) => {
           // console.log('test:getDefaultAvatar:', e);
