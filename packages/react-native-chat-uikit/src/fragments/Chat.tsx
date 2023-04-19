@@ -1819,66 +1819,67 @@ const ChatContent = React.memo(
 
     return (
       <View style={{ flex: 1 }}>
-        <View
-          style={{
-            flexGrow: 1,
-            // backgroundColor: '#fff8dc',
+        <TouchableWithoutFeedback
+          onPress={() => {
+            // keyboardVerticalOffset = sf(0);
+            Keyboard.dismiss();
+            _onFace('face');
           }}
         >
-          <ChatMessageBubbleList />
-        </View>
+          <View
+            style={{
+              flexGrow: 1,
+              // backgroundColor: '#fff8dc',
+            }}
+          >
+            <ChatMessageBubbleList />
+          </View>
+        </TouchableWithoutFeedback>
         <KeyboardAvoidingView
           pointerEvents="box-none"
           // style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={keyboardVerticalOffset}
         >
-          <TouchableWithoutFeedback
-            onPress={() => {
-              // keyboardVerticalOffset = sf(0);
-              Keyboard.dismiss();
-              _onFace('face');
+          <ChatInput
+            inputRef={inputRef ? inputRef : TextInputRef}
+            chatId={chatId}
+            chatType={chatType}
+            onFace={_onFace}
+            onSendTextMessage={({ content }) => {
+              const test = true;
+              if (test) sendTextMessage(content);
+              else
+                sendCustomMessage({
+                  data: {
+                    sender: chatId,
+                    timestamp: timestamp(),
+                    isSender: true,
+                    key: seqId('ml').toString(),
+                    type: ChatMessageType.CUSTOM,
+                    state: 'sending',
+                    SubComponentProps: {
+                      data: content,
+                      eventType: 'test',
+                    },
+                  } as CustomMessageItemType,
+                });
+              setTestRef.current();
             }}
-          >
-            <ChatInput
-              inputRef={inputRef ? inputRef : TextInputRef}
-              chatId={chatId}
-              chatType={chatType}
-              onFace={_onFace}
-              onSendTextMessage={({ content }) => {
-                const test = true;
-                if (test) sendTextMessage(content);
-                else
-                  sendCustomMessage({
-                    data: {
-                      sender: chatId,
-                      timestamp: timestamp(),
-                      isSender: true,
-                      key: seqId('ml').toString(),
-                      type: ChatMessageType.CUSTOM,
-                      state: 'sending',
-                      SubComponentProps: {
-                        data: content,
-                        eventType: 'test',
-                      },
-                    } as CustomMessageItemType,
-                  });
-                setTestRef.current();
-              }}
-              onInit={({ setIsInput, exeTest, getContent, setContent }) => {
-                setIsInputRef.current = setIsInput;
-                setTestRef.current = exeTest;
-                setContentRef.current = setContent;
-                getContentRef.current = getContent;
-              }}
-              onVoiceRecordEnd={
-                onVoiceRecordEnd ? onVoiceRecordEnd : onVoiceRecordEndInternal
-              }
-              onClickInputMoreButton={onClickInputMoreButton}
-              onPressInInputVoiceButton={onPressInInputVoiceButton}
-              onPressOutInputVoiceButton={onPressOutInputVoiceButton}
-            />
-          </TouchableWithoutFeedback>
+            onInit={({ setIsInput, exeTest, getContent, setContent }) => {
+              setIsInputRef.current = setIsInput;
+              setTestRef.current = exeTest;
+              setContentRef.current = setContent;
+              getContentRef.current = getContent;
+            }}
+            onVoiceRecordEnd={
+              onVoiceRecordEnd ? onVoiceRecordEnd : onVoiceRecordEndInternal
+            }
+            onClickInputMoreButton={onClickInputMoreButton}
+            onPressInInputVoiceButton={onPressInInputVoiceButton}
+            onPressOutInputVoiceButton={onPressOutInputVoiceButton}
+          />
+
           <FaceList height={faceHeightRef} onFace={onFaceInternal} />
         </KeyboardAvoidingView>
       </View>

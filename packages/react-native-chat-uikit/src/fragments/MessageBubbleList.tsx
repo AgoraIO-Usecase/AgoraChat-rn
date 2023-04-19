@@ -522,7 +522,8 @@ const MessageBubbleList = (
   props: MessageBubbleListProps,
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
-  const { onPressed } = props;
+  // const { onPressed } = props;
+  console.log('test:onPressed:', props.onPressed);
 
   GTextMessageItem = props.TextMessageItem;
   GImageMessageItem = props.ImageMessageItem;
@@ -804,7 +805,7 @@ const MessageBubbleList = (
       keyExtractor={(_: any, index: number) => {
         return index.toString();
       }}
-      onTouchEnd={onPressed}
+      // onTouchEnd={onPressed}
     />
   );
 };

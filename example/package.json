@@ -7,6 +7,8 @@
     "cg": "del src/env.ts",
     "start": "expo start --dev-client",
     "startr": "expo start --dev-client --clear",
+    "rn_start": "yarn run react-native start",
+    "rn_startr": "yarn run react-native start --reset-cache",
     "android": "expo run:android",
     "androidi": "expo run:android --device \"MX6\"",
     "androids": "expo run:android --device \"generic_arm64\"",

@@ -231,7 +231,6 @@ function LogList(props: LogListProps): JSX.Element {
               str += a.toString();
             }
           }
-          console.log('demo:123:', str);
           _data.push({ index: index.current, content: str });
           index.current += 1;
           // queueMicrotask(() => {
