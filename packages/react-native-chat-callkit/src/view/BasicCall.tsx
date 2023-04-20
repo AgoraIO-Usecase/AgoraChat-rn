@@ -30,10 +30,8 @@ export type BottomButtonType =
   | 'invitee-audio-calling';
 
 export type BasicCallProps = {
-  appKey: string;
-  agoraAppId: string;
   inviterId: string;
-  inviterName: string;
+  inviterName?: string;
   inviterUrl?: string;
   currentId: string;
   currentName: string;
