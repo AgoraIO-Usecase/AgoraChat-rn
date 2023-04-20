@@ -22,6 +22,8 @@ import DynamicHeightList, {
 } from '../components/DynamicHeightList';
 import { type LocalIconName, LocalIcon } from '../components/Icon';
 import Loading from '../components/Loading';
+import { useChatSdkContext } from '../contexts';
+import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import { wait } from '../utils/function';
@@ -145,7 +147,7 @@ export interface FileMessageItemType extends MessageItemType {
 //   type: ChatMessageType.VOICE,
 // };
 
-const convertState = (state?: MessageItemStateType): LocalIconName => {
+export const convertState = (state?: MessageItemStateType): LocalIconName => {
   let r = 'sent' as LocalIconName;
   switch (state) {
     case 'arrived':
@@ -163,14 +165,74 @@ const convertState = (state?: MessageItemStateType): LocalIconName => {
   return r;
 };
 
-const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
-  const sf = getScaleFactor();
-  if (state === 'sending') {
-    return <Loading name={convertState(state)} size={sf(12)} />;
-  } else {
-    return <LocalIcon name={convertState(state)} size={sf(12)} />;
+export const StateLabel = React.memo(
+  ({ state }: { state?: MessageItemStateType }) => {
+    const sf = getScaleFactor();
+    if (state === 'sending') {
+      return <Loading name={convertState(state)} size={sf(12)} />;
+    } else {
+      return <LocalIcon name={convertState(state)} size={sf(12)} />;
+    }
   }
-});
+);
+
+export async function getImageExistedPath(
+  msg: ImageMessageItemType
+): Promise<string | undefined> {
+  if (msg.localThumbPath) {
+    let ret = await Services.ms.isExistedFile(msg.localThumbPath);
+    if (ret === true) {
+      return msg.localThumbPath;
+    } else {
+      ret = await Services.ms.isExistedFile(msg.localPath);
+      if (ret === true) {
+        return msg.localPath;
+      }
+    }
+  } else {
+    let ret = await Services.ms.isExistedFile(msg.localPath);
+    if (ret === true) {
+      return msg.localPath;
+    }
+  }
+  // let ret = await Services.ms.isExistedFile(msg.localPath);
+  // if (ret === false) {
+  //   if (msg.localThumbPath) {
+  //     ret = await Services.ms.isExistedFile(msg.localThumbPath);
+  //     if (ret === true) {
+  //       return msg.localThumbPath;
+  //     }
+  //   }
+  // } else {
+  //   return msg.localPath;
+  // }
+  return undefined;
+}
+
+export function getImageInfo(
+  msg: ImageMessageItemType,
+  onResult: (params: { width?: number; height?: number; error?: any }) => void
+): void {
+  getImageExistedPath(msg)
+    .then((ret) => {
+      if (ret) {
+        Image.getSize(
+          ret,
+          (width: number, height: number) => {
+            onResult({ width, height });
+          },
+          (error: any) => {
+            onResult({ error });
+          }
+        );
+      } else {
+        onResult({ error: 'local file is not existed.' });
+      }
+    })
+    .catch((error) => {
+      onResult({ error });
+    });
+}
 
 const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
   const { state, ext, ...others } = props;
@@ -257,6 +319,7 @@ const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
 const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
   React.memo(
     (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const { client } = useChatSdkContext();
       const sf = getScaleFactor();
       const { item } = info;
       const msg = item as ImageMessageItemType;
@@ -269,8 +332,18 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
         } else {
           r = msg.remoteUrl ?? '';
         }
+
+        // r = encodeURIComponent(r);
         r = encodeURI(r);
-        r = r.replace('#', '%23');
+        if (r.includes('#')) {
+          const appKey = client.options?.appKey;
+          if (appKey && r.includes(appKey)) {
+            const newAppKey = appKey.replace('#', '%23');
+            console.log('test:234234:', appKey, newAppKey);
+            r = r.replace(appKey, newAppKey);
+          }
+        }
+        console.log('test:123:', r);
         // return '/var/mobile/Containers/Data/Application/10335732-F30F-46F6-93C1-2C89FC7C3B4E/Library/Application%20Support/HyphenateSDK/appdata/asterisk001/asterisk003/thumb_128dc850-b4b7-11ed-9711-5313982e6d8a';
         return r;
       };

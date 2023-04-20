@@ -38,10 +38,10 @@ export function localUrl(localPath: string): string {
  */
 export function removeFileHeader(localPath: string): string {
   return Platform.select({
-    ios: localPath,
-    android: localPath.includes('file://')
+    ios: localPath.includes('file://')
       ? localPath.replace('file://', '')
       : localPath,
+    android: localPath,
     default: localPath,
   });
 }

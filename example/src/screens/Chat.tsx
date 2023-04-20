@@ -140,7 +140,19 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
               .openCamera({})
               .then((result) => {
                 console.log('openCamera:', Platform.OS, result);
-                // chatRef.current?.sendImageMessage([result as any]);
+                chatRef.current?.sendImageMessage([
+                  {
+                    name: result?.name ?? '',
+                    localPath: result?.uri ?? '',
+                    fileSize: result?.size ?? 0,
+                    imageType: result?.type ?? '',
+                    width: result?.width ?? 0,
+                    height: result?.height ?? 0,
+                    onResult: (r) => {
+                      console.log('openCamera:result:', r);
+                    },
+                  },
+                ]);
               })
               .catch((error) => {
                 console.warn('error:', error);
@@ -320,6 +332,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
     });
   }, []);
   const onSendMessageEnd = React.useCallback((message: ChatMessage) => {
+    console.log('test:onSendMessageEnd:', message);
     sendEventFromChat({
       eventType: 'DataEvent',
       action: 'on_send_result',
@@ -412,9 +425,6 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         messageBubbleList={{
           MessageBubbleListP: MessageBubbleListFragment,
           MessageBubbleListPropsP: {
-            onPressed: () => {
-              console.log('test:onPressed:', 'click message bubble list');
-            },
             TextMessageItem: MyTextMessageBubble,
             VideoMessageItem: MyVideoMessageBubble,
             FileMessageItem: MyFileMessageBubble,

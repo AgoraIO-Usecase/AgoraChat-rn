@@ -1186,7 +1186,10 @@ const ChatContent = React.memo(
           console.log('test:test_existed:', test_existed);
         }
 
-        const modifiedTargetPath = removeFileHeader(params.localPath);
+        let modifiedTargetPath = removeFileHeader(params.localPath);
+        if (Platform.OS === 'ios') {
+          modifiedTargetPath = decodeURIComponent(modifiedTargetPath);
+        }
         const item = {
           // key: seqId('ml').toString(),
           sender: chatId,

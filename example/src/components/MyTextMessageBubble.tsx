@@ -10,40 +10,10 @@ import {
   createStyleSheet,
   DefaultAvatar,
   getScaleFactor,
-  Loading,
-  LocalIcon,
-  LocalIconName,
-  MessageItemStateType,
   MessageItemType,
+  StateLabel,
   TextMessageItemType,
 } from 'react-native-chat-uikit';
-
-const convertState = (state?: MessageItemStateType): LocalIconName => {
-  let r = 'sent' as LocalIconName;
-  switch (state) {
-    case 'arrived':
-      r = 'read';
-      break;
-    case 'failed':
-      r = 'ex_mark';
-      break;
-    case 'sending':
-      r = 'loading2';
-      break;
-    default:
-      break;
-  }
-  return r;
-};
-
-const StateLabel = React.memo(({ state }: { state?: MessageItemStateType }) => {
-  const sf = getScaleFactor();
-  if (state === 'sending') {
-    return <Loading name={convertState(state)} size={sf(12)} />;
-  } else {
-    return <LocalIcon name={convertState(state)} size={sf(12)} />;
-  }
-});
 
 const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
   const { state, ext, ...others } = props;
