@@ -159,6 +159,7 @@ export default function ImagePreviewScreen({
           // backgroundColor: 'green',
           position: 'absolute',
           left: 10,
+          top: 44,
         }}
       >
         <LocalIcon

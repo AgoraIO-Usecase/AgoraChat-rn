@@ -1,8 +1,7 @@
 import * as React from 'react';
 import {
-  Image,
   // DeviceEventEmitter,
-  // Image as RNImage,
+  Image as RNImage,
   ListRenderItem,
   ListRenderItemInfo,
   Pressable,
@@ -62,6 +61,7 @@ export interface TextMessageItemType extends MessageItemType {
 
 export interface ImageMessageItemType extends FileMessageItemType {
   localThumbPath?: string;
+  remoteThumbPath?: string;
   width?: number;
   height?: number;
 }
@@ -183,29 +183,8 @@ export async function getImageExistedPath(
     let ret = await Services.ms.isExistedFile(msg.localThumbPath);
     if (ret === true) {
       return msg.localThumbPath;
-    } else {
-      ret = await Services.ms.isExistedFile(msg.localPath);
-      if (ret === true) {
-        return msg.localPath;
-      }
-    }
-  } else {
-    let ret = await Services.ms.isExistedFile(msg.localPath);
-    if (ret === true) {
-      return msg.localPath;
     }
   }
-  // let ret = await Services.ms.isExistedFile(msg.localPath);
-  // if (ret === false) {
-  //   if (msg.localThumbPath) {
-  //     ret = await Services.ms.isExistedFile(msg.localThumbPath);
-  //     if (ret === true) {
-  //       return msg.localThumbPath;
-  //     }
-  //   }
-  // } else {
-  //   return msg.localPath;
-  // }
   return undefined;
 }
 
@@ -216,7 +195,7 @@ export function getImageInfo(
   getImageExistedPath(msg)
     .then((ret) => {
       if (ret) {
-        Image.getSize(
+        RNImage.getSize(
           ret,
           (width: number, height: number) => {
             onResult({ width, height });
@@ -323,31 +302,42 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       const sf = getScaleFactor();
       const { item } = info;
       const msg = item as ImageMessageItemType;
-      const url = (msg: ImageMessageItemType): string => {
+      const url = async (msg: ImageMessageItemType) => {
         let r: string;
-        if (msg.localThumbPath && msg.localThumbPath.length > 0) {
-          r = msg.localThumbPath;
-        } else if (msg.localPath && msg.localPath.length > 0) {
-          r = msg.localPath;
+        const ret = await getImageExistedPath(msg);
+        if (ret === undefined) {
+          if (msg.remoteThumbPath && msg.remoteThumbPath.length > 0) {
+            r = msg.remoteThumbPath;
+          } else {
+            r = msg.remoteUrl ?? '';
+          }
         } else {
-          r = msg.remoteUrl ?? '';
+          r = msg.localThumbPath ?? '';
         }
 
-        // r = encodeURIComponent(r);
-        r = encodeURI(r);
-        if (r.includes('#')) {
-          const appKey = client.options?.appKey;
-          if (appKey && r.includes(appKey)) {
-            const newAppKey = appKey.replace('#', '%23');
-            console.log('test:234234:', appKey, newAppKey);
-            r = r.replace(appKey, newAppKey);
+        if (
+          r.startsWith('http://') === false &&
+          r.startsWith('https://') === false
+        ) {
+          if (r.includes('#')) {
+            const appKey = client.options?.appKey;
+            if (appKey && r.includes(appKey)) {
+              const newAppKey = appKey.replace('#', '%23');
+              r = r.replace(appKey, newAppKey);
+            }
           }
+          r = r.includes('file://') ? r : `file://${r}`;
         }
-        console.log('test:123:', r);
-        // return '/var/mobile/Containers/Data/Application/10335732-F30F-46F6-93C1-2C89FC7C3B4E/Library/Application%20Support/HyphenateSDK/appdata/asterisk001/asterisk003/thumb_128dc850-b4b7-11ed-9711-5313982e6d8a';
         return r;
       };
-      const [_url] = React.useState(url(msg));
+
+      const [_url, setUrl] = React.useState(msg.remoteThumbPath);
+
+      const checked = async (msg: ImageMessageItemType) => {
+        setUrl(await url(msg));
+      };
+
+      checked(msg);
 
       if (item.state === 'recalled') {
         return <RenderRecallMessage {...item} />;
@@ -380,14 +370,18 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
               flexGrow: 1,
             }}
           >
-            <Image
+            <RNImage
               source={{
-                uri: _url.includes('file://') ? _url : `file://${_url}`,
+                uri: _url,
               }}
               resizeMode="cover"
               style={{ height: sf(200), borderRadius: sf(10) }}
-              onLoad={(_) => {}}
-              onError={(_) => {}}
+              onLoad={() => {
+                console.log('test:onLoad:');
+              }}
+              onError={() => {
+                console.log('test:onError:');
+              }}
             />
           </View>
           <View
@@ -516,7 +510,6 @@ let GCustomMessageItem: ListRenderItem<CustomMessageItemType> | undefined;
 const MessageRenderItem: ListRenderItem<MessageItemType> = (
   info: ListRenderItemInfo<MessageItemType>
 ): React.ReactElement | null => {
-  // console.log('test:MessageRenderItem:', info);
   const { item } = info;
   let MessageItem: ListRenderItem<MessageItemType> | undefined;
   if (item.type === ChatMessageType.TXT) {
@@ -634,7 +627,6 @@ const MessageBubbleList = (
   }
 
   const getEarliestItem = React.useCallback(() => {
-    console.log('test:data1:', data1, data2);
     if (currentData.current === data1) {
       if (data1.length > 0) {
         return data1[0];

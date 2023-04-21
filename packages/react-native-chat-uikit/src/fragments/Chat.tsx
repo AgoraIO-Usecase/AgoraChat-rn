@@ -192,6 +192,10 @@ type ChatContentRef = {
     key: string;
     onResult?: (params: any) => void;
   }) => void;
+  downloadAttachment: (params: {
+    msg: ChatMessage;
+    onResult?: (params?: any) => void;
+  }) => void;
 };
 type ChatContentProps = BaseProps & {
   propsRef?: React.RefObject<ChatContentRef>;
@@ -554,7 +558,7 @@ const ChatContent = React.memo(
     const setTestRef = React.useRef(() => {});
     const faceHeight = sf(300);
     const faceHeightRef = React.useRef(new Animated.Value(0)).current;
-    const { client } = useChatSdkContext();
+    const { client, getCurrentId } = useChatSdkContext();
 
     const getMsgListRef = React.useCallback(() => {
       if (messageBubbleList) {
@@ -818,6 +822,7 @@ const ChatContent = React.memo(
                 r.fileStatus = body.fileStatus;
                 r.displayName = body.displayName;
                 r.localThumbPath = body.thumbnailLocalPath;
+                r.remoteThumbPath = body.thumbnailRemotePath;
                 r.type = ChatMessageType.IMAGE;
               }
               break;
@@ -912,26 +917,22 @@ const ChatContent = React.memo(
       [getMsgListRef]
     );
 
-    const downloadAttachment = React.useCallback(
+    const downloadThumbAttachment = React.useCallback(
       (msg: ChatMessage) => {
         if (
           msg.body.type === ChatMessageType.IMAGE ||
-          msg.body.type === ChatMessageType.VOICE
+          msg.body.type === ChatMessageType.VIDEO
         ) {
-          client.chatManager.downloadAttachment(msg, {
+          client.chatManager.downloadThumbnail(msg, {
             onProgress: (localMsgId: string, progress: number): void => {
               console.log(
-                'test:downloadAttachment:onProgress:',
+                'test:downloadThumbnail:onProgress:',
                 localMsgId,
                 progress
               );
             },
             onError: (localMsgId: string, error: ChatError): void => {
-              console.log(
-                'test:downloadAttachment:onError:',
-                localMsgId,
-                error
-              );
+              console.log('test:downloadThumbnail:onError:', localMsgId, error);
             },
             onSuccess: (message: ChatMessage): void => {
               updateMessageState({
@@ -946,36 +947,83 @@ const ChatContent = React.memo(
       [client.chatManager, convertFromMessage, updateMessageState]
     );
 
-    const checkAttachment = React.useCallback(
+    const checkThumbAttachment = React.useCallback(
       (msg: ChatMessage) => {
         const isExisted = async (msg: ChatMessage) => {
+          let ret = false;
           if (msg.body.type === ChatMessageType.IMAGE) {
             const body = msg.body as ChatImageMessageBody;
-            // const thumb = await Services.dcs.isExistedFile(
-            //   body.thumbnailLocalPath
-            // );
-            const org = await Services.dcs.isExistedFile(body.localPath);
-            if (org === false) {
-              return false;
-            } else {
-              return true;
-            }
-          } else if (msg.body.type === ChatMessageType.VOICE) {
-            const body = msg.body as ChatVoiceMessageBody;
-            const org = await Services.dcs.isExistedFile(body.localPath);
-            return org;
-          } else {
-            return true;
+            ret = await Services.dcs.isExistedFile(body.thumbnailLocalPath);
+          } else if (msg.body.type === ChatMessageType.VIDEO) {
+            const body = msg.body as ChatVideoMessageBody;
+            ret = await Services.dcs.isExistedFile(body.thumbnailLocalPath);
           }
+          return ret;
         };
         isExisted(msg)
           .then((result) => {
             if (result === false) {
-              downloadAttachment(msg);
+              downloadThumbAttachment(msg);
             }
           })
           .catch((error) => {
-            console.warn('test:checkAttachment:error:', error);
+            console.warn('test:checkThumbAttachment:error:', error);
+          });
+      },
+      [downloadThumbAttachment]
+    );
+
+    const downloadAttachment = React.useCallback(
+      (msg: ChatMessage, onResult?: (params?: { error?: any }) => void) => {
+        if (
+          msg.body.type === ChatMessageType.IMAGE ||
+          msg.body.type === ChatMessageType.VOICE ||
+          msg.body.type === ChatMessageType.VIDEO ||
+          msg.body.type === ChatMessageType.FILE
+        ) {
+          client.chatManager.downloadAttachment(msg, {
+            onProgress: (localMsgId: string, progress: number): void => {
+              console.log(
+                'test:downloadAttachment:onProgress:',
+                localMsgId,
+                progress
+              );
+            },
+            onError: (_: string, error: ChatError): void => {
+              onResult?.({ error });
+            },
+            onSuccess: (_: ChatMessage): void => {
+              onResult?.();
+            },
+          } as ChatMessageStatusCallback);
+        }
+      },
+      [client.chatManager]
+    );
+
+    const checkAttachment = React.useCallback(
+      (msg: ChatMessage, onResult?: (params?: { error?: any }) => void) => {
+        const isExisted = async (msg: ChatMessage) => {
+          let ret = false;
+          if (
+            msg.body.type === ChatMessageType.IMAGE ||
+            msg.body.type === ChatMessageType.VOICE ||
+            msg.body.type === ChatMessageType.FILE ||
+            msg.body.type === ChatMessageType.VIDEO
+          ) {
+            const body = msg.body as ChatFileMessageBody;
+            ret = await Services.dcs.isExistedFile(body.localPath);
+          }
+          return ret;
+        };
+        isExisted(msg)
+          .then((result) => {
+            if (result === false) {
+              downloadAttachment(msg, onResult);
+            }
+          })
+          .catch((error) => {
+            onResult?.({ error });
           });
       },
       [downloadAttachment]
@@ -1407,7 +1455,12 @@ const ChatContent = React.memo(
         for (const msg of msgs) {
           const item = convertFromMessage(msg);
           items.push(item);
-          checkAttachment(msg);
+          if (
+            client.options?.isAutoDownload === false ||
+            msg.from === getCurrentId()
+          ) {
+            checkThumbAttachment(msg);
+          }
         }
         getMsgListRef().current?.addMessage({
           direction: 'before',
@@ -1415,7 +1468,13 @@ const ChatContent = React.memo(
         });
         onResult?.(undefined);
       },
-      [checkAttachment, convertFromMessage, getMsgListRef]
+      [
+        checkThumbAttachment,
+        client.options?.isAutoDownload,
+        convertFromMessage,
+        getCurrentId,
+        getMsgListRef,
+      ]
     );
 
     const requestHistoryMessage = React.useCallback(
@@ -1553,7 +1612,12 @@ const ChatContent = React.memo(
         for (const msg of msgs) {
           const item = convertFromMessage(msg);
           items.push(item);
-          checkAttachment(msg);
+          if (
+            client.options?.isAutoDownload === false ||
+            msg.from === getCurrentId()
+          ) {
+            checkThumbAttachment(msg);
+          }
         }
         getMsgListRef().current?.addMessage({
           direction: 'after',
@@ -1563,7 +1627,13 @@ const ChatContent = React.memo(
           getMsgListRef().current?.scrollToEnd();
         });
       },
-      [checkAttachment, convertFromMessage, getMsgListRef]
+      [
+        checkThumbAttachment,
+        client.options?.isAutoDownload,
+        convertFromMessage,
+        getCurrentId,
+        getMsgListRef,
+      ]
     );
 
     const _onFace = (value?: 'face' | 'key') => {
@@ -1718,6 +1788,9 @@ const ChatContent = React.memo(
       };
       propsRef.current.resendMessage = (params) => {
         resendMessage(params);
+      };
+      propsRef.current.downloadAttachment = (params) => {
+        checkAttachment(params.msg, params.onResult);
       };
     }
 
@@ -2061,6 +2134,14 @@ export type ChatFragmentRef = {
     key: string;
     onResult?: (params: any) => void;
   }) => void;
+
+  /**
+   * download message attachment.
+   */
+  downloadAttachment: (params: {
+    msg: ChatMessage;
+    onResult?: (params?: any) => void;
+  }) => void;
 };
 
 /**
@@ -2194,6 +2275,9 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     // };
     propsRef.current.resendMessage = (params) => {
       chatContentRef?.current.resendMessage(params);
+    };
+    propsRef.current.downloadAttachment = (params) => {
+      chatContentRef?.current.downloadAttachment(params);
     };
   }
   return (
