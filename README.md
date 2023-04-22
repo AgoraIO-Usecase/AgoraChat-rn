@@ -50,10 +50,11 @@ This is a multi-package management project managed by `lerna` and `yarn workspac
 
 1. Use `vscode` to open the project `react-native-chat-library`
 2. Use `terminal` to initialize the project `yarn`
-3. If this is the first project initialization, run the 'yarn run generate-source-env' command.
+3. If it is the first project initialization, you also need to execute the command `yarn run generate-source-env` to generate the corresponding files. For example: `env.ts`.
 
-**Note** `yarn` will execute additional commands. For developers who do not understand commands, if they need to use `npm` command replacement, they need to understand more reliable content.
-**Note** When creating this project, the scaffolding has preset some commands related to `yarn`, so it is recommended to use `yarn` to complete most of the work.
+**Note** `yarn` will execute additional commands. For developers who don’t understand commands, if they need to use `npm` command instead, they need to understand more trustworthy content.
+**Note** When creating this project, the scaffolding has preset some `yarn` related commands, so it is recommended to use `yarn` to complete most of the work.
+**Note** Because `example` uses `firebase cloud message (fcm)` related content, if users need to use related content, they need to set the corresponding file (GoogleService-Info.plist is required for ios platform, google-services is required for android platform .json), if you don’t need it, just delete the relevant content.
 
 #### Universal Compilation
 
@@ -109,14 +110,14 @@ During the compilation phase, the `Android` platform needs to execute the `sync`
 5. When `sync` is successful, click the `run app` button to compile and run the project.
 
 **Note** If you use `as` for the first time, it may take a lot of downloading and the waiting time will be longer.
-**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example` uses the `expo` tool, it does it for you, so no manual work is required.
+**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example`uses the`expo` tool, it does it for you, so no manual work is required.
 
 **<span style="color:orange">run the project</span>**
 
 Use the command provided by the `expo` tool to start the local service, refer to the `General Operation` chapter.
 
 **Note** If the running application is not loaded correctly, you need to refresh the page, or close the application and restart it. For error reporting problems, you can generally solve them through corresponding prompts.
-**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. But, thanks to the `expo` tool, it does it for you, no manual work required.
+**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example`uses the`expo` tool, it does it for you, so no manual work is required.
 
 ## Parameter Settings
 
@@ -144,7 +145,7 @@ There are several ways to use `uikit`:
 
 1. Create a new project and integrate `uikit`. In this case, you need to pay attention to the development environment. Errors may be reported when compiling and running due to cross-version.
 1. In the existing project, integrate `uikit`. In this case, you need to pay attention to the compatibility between the existing project version and the `uikit` project version, as well as the dependent version.
-2. Modify the `example` project to complete product development. In this case, there are almost no development environment problems, but it is necessary to learn and understand the architectural thinking of `example` in order to better complete application development.
+1. Modify the `example` project to complete product development. In this case, there are almost no development environment problems, but it is necessary to learn and understand the architectural thinking of `example` in order to better complete application development.
 
 The following is the most common way, the introduction of integrating `uikit` in existing projects.
 
@@ -156,6 +157,32 @@ yarn add react-native-chat-uikit
 ```
 
 For development, compilation, and operation, please refer to relevant chapters. The following uses the integrated chat page as an example to illustrate.
+
+## Initialize settings
+
+Before you are ready to use uikit, you need to initialize it. The modal component is used to receive events and display the modal window. Use default if default.
+
+```typescript
+import { GlobalContainer as UikitContainer } from 'react-native-chat-uikit';
+import { ModalPlaceholder } from './events';
+export default function App() {
+  return (
+    <React.StrictMode>
+      <UikitContainer
+        option={{
+          appKey: appKey,
+          autoLogin: autoLogin.current,
+          debugModel: true,
+        }}
+        ModalComponent={() => <ModalPlaceholder />}
+      />
+    </React.StrictMode>
+  );
+}
+```
+
+**Description** The modal window management component needs to be set up during initialization. If this parameter is defaulted, the corresponding event notification may not be received.
+**Description** Please refer to [Reference](./example/src/App.tsx) for actual use
 
 ## Quick Integration Chat Page
 
@@ -176,8 +203,7 @@ Sample code:
 
 ```typescript
 import * as React from 'react';
-import ChatFragment from '../fragments/Chat';
-import { ScreenContainer } from 'react-native-chat-uikit';
+import { ChatFragment, ScreenContainer } from 'react-native-chat-uikit';
 export default function ChatScreen(): JSX.Element {
   const chatId = 'xxx';
   const chatType = 0;
@@ -193,32 +219,56 @@ export default function ChatScreen(): JSX.Element {
 
 The chat component has many parameters and configurations, which can be set according to the needs to achieve the desired effect. For more advanced customization, please refer to the source code implementation.
 
-#### Chat Component Controller
+#### The interface provided by the chat component
 
-Controllers can actively make components perform certain actions or commands. For example: Currently, methods for sending picture messages and voice messages are provided.
-If you want to use a controller, you need to set the `propsRef` parameter in the chat properties.
+The chat component `ChatFragment` provides methods for sending all messages except command messages, and sending messages will be loaded to the chat bubble list page by default. Also provides a method to load historical messages.
+If you want to use these methods, you need to set the `propsRef` parameter in the chat properties.
 
 ```typescript
 export type ChatFragmentRef = {
-  sendImageMessage: (params: {
-    name: string;
-    localPath: string;
-    fileSize: string;
-    imageType: string;
-    width: number;
-    height: number;
-  }) => void;
+  sendImageMessage: (
+    params: {
+      name: string;
+      localPath: string;
+      fileSize: string;
+      imageType: string;
+      width: number;
+      height: number;
+    }[]
+  ) => void;
   sendVoiceMessage: (params: {
     localPath: string;
     fileSize?: number;
     duration?: number;
   }) => void;
+  sendTextMessage: (params: { content: string }) => void;
+  sendCustomMessage: (params: { data: CustomMessageItemType }) => void;
+  sendFileMessage: (params: {
+    localPath: string;
+    fileSize?: number;
+    displayName?: string;
+  }) => void;
+  sendVideoMessage: (params: {
+    localPath: string;
+    fileSize?: number;
+    displayName?: string;
+    duration: number;
+    thumbnailLocalPath?: string;
+    width?: number;
+    height?: number;
+  }) => void;
+  sendLocationMessage: (params: {
+    address: string;
+    latitude: string;
+    longitude: string;
+  }) => void;
+  loadHistoryMessage: (msgs: ChatMessage[]) => void;
 };
 ```
 
-#### Chat Component Properties
+#### The properties provided by the chat component
 
-The source code is as follows:
+The chat component mainly provides common attributes. For example: set custom chat bubble list components, callbacks for various buttons or states.
 
 ```typescript
 type ChatFragmentProps = {
@@ -253,6 +303,48 @@ type ChatFragmentProps = {
 };
 ```
 
+#### The interface provided by the chat bubble list component
+
+The chat bubble list component `MessageBubbleList` provides scrolling interface and loading message interface. Messages can be loaded directly by calling the `addMessage` method. Messages can also be added indirectly by manipulating the `ChatFragment` component.
+
+```typescript
+export type MessageBubbleListRef = {
+  scrollToEnd: () => void;
+  scrollToTop: () => void;
+  addMessage: (params: {
+    msgs: MessageItemType[];
+    direction: InsertDirectionType;
+  }) => void;
+  updateMessageState: (params: {
+    localMsgId: string;
+    result: boolean;
+    reason?: any;
+    item?: MessageItemType;
+  }) => void;
+};
+```
+
+#### The properties provided by the chat bubble list component
+
+The chat bubble list component mainly displays messages. Currently, it provides a custom message bubble style, and a pull-down refresh request history message callback. Default style is used if not provided. Currently only text, image, and voice provide default styles.
+
+```typescript
+export type MessageBubbleListProps = {
+  /**
+   * Click the message list, not the message item.
+   */
+  onPressed?: () => void;
+  onRequestHistoryMessage?: (params: { earliestId: string }) => void;
+  TextMessageItem?: ListRenderItem<TextMessageItemType>;
+  ImageMessageItem?: ListRenderItem<ImageMessageItemType>;
+  VoiceMessageItem?: ListRenderItem<VoiceMessageItemType>;
+  FileMessageItem?: ListRenderItem<FileMessageItemType>;
+  LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
+  VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
+  CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
+};
+```
+
 #### Chat Properties: Controller
 
 `propsRef` This property is mainly used to actively call related methods of `ChatFragment`.
@@ -263,7 +355,7 @@ type ChatFragmentProps = {
 2. Use attribute callbacks to notify upper-level users of status changes
 3. Use controllers (ref) to control the active behavior of subcomponents
 
-Example: After recording a voice file, send the voice message
+Example: After recording a voice, send a voice message
 
 ```typescript
 export default function ChatScreen(): JSX.Element {
@@ -324,30 +416,8 @@ export default function ChatScreen(): JSX.Element {
   }, [addListeners]);
   return (
     <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
-      <ChatFragment
-        screenParams={{ chatId, chatType }}
-      />
+      <ChatFragment screenParams={{ chatId, chatType }} />
     </ScreenContainer>
-  );
-}
-```
-
-**Description** The modal window management component needs to be set up during initialization. If this parameter is defaulted, the corresponding event notification may not be received.
-
-```typescript
-import { ModalPlaceholder } from './events';
-export default function App() {
-  return (
-    <React.StrictMode>
-      <GlobalContainer
-        option={{
-          appKey: appKey,
-          autoLogin: autoLogin.current,
-          debugModel: true,
-        }}
-        ModalComponent={() => <ModalPlaceholder />}
-      />
-    </React.StrictMode>
   );
 }
 ```
@@ -356,7 +426,7 @@ export default function App() {
 
 When the default chat bubble cannot meet the custom requirements, you can design the style of the chat bubble yourself.
 
-Suppose `MessageBubbleList` is your custom chat bubble list component.
+Suppose `MessageBubbleList` is a custom chat bubble list component.
 
 ```typescript
 import type { MessageBubbleListProps } from '../fragments/MessageBubbleList';
@@ -433,6 +503,8 @@ export default function ChatScreen(): JSX.Element {
 
 #### Chat properties: click on the chat bubble notification
 
+Typical applications: playing voice messages, displaying picture previews.
+
 ```typescript
 export default function ChatScreen(): JSX.Element {
   const chatId = 'xxx';
@@ -470,6 +542,8 @@ export default function ChatScreen(): JSX.Element {
 ```
 
 #### Chat Properties: Notify on click of extension button
+
+Typical application: display message context menu, and perform operations such as message forwarding and message cancellation.
 
 ```typescript
 export default function ChatScreen(): JSX.Element {
@@ -583,498 +657,173 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
----
+## Quick integration session list
 
-# system introduction
-
-This multi-package project mainly includes `uikit` and `example`. Among them, `uikit` mainly provides the basic tools for instant messaging, and `example` mainly realizes the demonstration of the corresponding functions.
-
-**Description** `react-native-chat-uikit` is the name of the `npm` package, formerly named `Agora Uikit SDK`, referred to as `uikit` here. `Agora Uikit SDK` depends on `Agora Chat SDK` (package named `react-native-agora-chat`).
-
-## example project
-
-The `example` project mainly includes `routing and navigation (page switching related)`, `initialization settings`, `login and logout`, `contact management`, `group management`, `session management`, `my setting module ` demo.
-
-## uikit project
-
-The `uikit` project mainly includes `UI basic components`, `internationalization tool`, `theme tool`, `data sharing tool`, `media service`, `storage service`, etc.
-
-## Project initialization
-
-Initialization is a prerequisite for using `uikit` and must be done.
-
-The initialization part includes many important parameters, which determine the behavior of subsequent application operations.
-
-The initialization component is `GlobalContainer`, which provides a parameter list `GlobalContainerProps`.
+The easiest way to integrate `ConversationListFragment`:
 
 ```typescript
-export type GlobalContainerProps = React.PropsWithChildren<{
-  option: {
-    appKey: string;
-    autoLogin: boolean;
-  };
-  localization?: StringSetContextType | undefined;
-  theme?: ThemeContextType | undefined;
-  sdk?: ChatSdkContextType | undefined;
-  header?: HeaderContextType | undefined;
-  services?: {
-    clipboard?: ClipboardService | undefined;
-    media?: MediaService | undefined;
-    notification?: NotificationService | undefined;
-    permission?: PermissionService | undefined;
-    storage?: LocalStorageService | undefined;
-    dir?: DirCacheService | undefined;
-  };
-  onInitialized?: () => void;
-  ModalComponent?: React.FunctionComponent;
-}>;
-```
-
-Parameter Description:
-
-- option:
-  - appKey: The application id from the console.
-  - autoLogin: Whether to use automatic login.
-- localization: Application language internationalization. English is supported by default.
-- theme: Apply the theme. The system provides the 'light' version by default.
-- sdk: Chat SDK.
-- header: Status bar Settings for mobile devices.
-- services:
-  - clipboard: Paste board service. 'uikit' provides the default version.
-  - media: Media services. 'uikit' provides the default version.
-  - notification: Notification service. 'uikit' provides the default version.
-  - permission: Apply permission service. 'uikit' provides the default version.
-  - storage: Storage service. Currently support 'key-value' persistent storage. 'uikit' provides the default version.
-  - dir: Directory service. 'uikit' provides the default version.
-- onInitialized: Called after uikit is initialized.
-- ModalComponent: A custom modal system component that manages all modal Windows.
-
-Many parameters provide default options, if not set, the system default parameters will be used.
-
-Example of default parameter initialization:
-
-```typescript
-export default function App() {
-  return <GlobalContainer option={{ appKey: 'test#demo', autoLogin: false }} />;
+import * as React from 'react';
+import {
+  ConversationListFragment,
+  ScreenContainer,
+} from 'react-native-chat-uikit';
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment />
+    </ScreenContainer>
+  );
 }
 ```
 
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/App.tsx)
+### The methods provided by the session list
 
-## Routing and Navigator
-
-The switching of pages is inseparable from the use of navigator or routing.
-
-It is not part of `uikit`. Part of `example`. There are also many options for the navigator, and the common `react-navigation` component library is used here.
-
-For its usage, please refer to the `example` project. You can also refer to the official documentation [skip to official website](https://reactnavigation.org/)
-
-## Modal window management
-
-A modal window is a special type of window. Subsequent operations can only be performed after the transaction of the window is completed and closed. It puts forward higher requirements for the design and maintenance of the code, which is handled in the way of `event` + `unified management` here. Reduce maintenance costs and improve platoon development efficiency.
-
-#### Modal window management system
-
-The modal system provides a unified event number, a unified sending interface, and a unified receiving process. It also provides extensions for custom events, and supports event bubbling sequence processing (subcomponents can intercept time processing, and can decide whether to let the parent component also process).
-
-Send event method:
-
-- `function sendEvent(params: sendEventProps): void`
-
-Send event properties:
+The session component provides methods for creating, updating, reading, and extending attributes.
 
 ```typescript
-export type sendEventProps = {
-  eventType: EventType;
-  eventBizType: BizEventType;
-  action: ActionEventType;
-  senderId: string;
-  params: any;
-  timestamp?: number;
+export type ConversationListFragmentRef = {
+  update: (message: ChatMessage) => void;
+  create: (params: { convId: string; convType: ChatConversationType }) => void;
+  updateRead: (params: {
+    convId: string;
+    convType: ChatConversationType;
+  }) => void;
+  updateExtension: (params: {
+    convId: string;
+    convType: ChatConversationType;
+    ext?: any; // json object.
+  }) => void;
 };
 ```
 
-Receive event processing:
+### Attributes provided by the session list
 
-- `DeviceEventEmitter. addListener('DataEvent' as DataEventType, (event) => {})`
-
-#### Event Classification
-
-- `AlertActionEventType`: alert window event
-- `ToastActionEventType`: `toast` window event
-- `SheetActionEventType`: `bottom sheet` window event
-- `PromptActionEventType`: `prompt` window event
-- `MenuActionEventType`: `context menu` window event
-- `StateActionEventType`: `custom state` window event
-- `DataActionEventType`: data event (non-modal window event)
-
-#### Example of event usage process: Delete contact operation process.
-
-1. Send the page to display the confirmation dialog command
+The session list provides attributes of click, long press, unread count, sorting strategy, and custom style.
 
 ```typescript
-sendContactInfoEvent({
-  eventType: 'AlertEvent',
-  action: 'manual_remove_contact',
-  params: { userId },
-});
-```
-
-2. The system receives the command and displays a dialog box. After the user clicks OK, the command to execute the delete operation is sent.
-
-```typescript
-// The modal system receives the event processing and displays a confirmation dialog.
-alert.openAlert({
-  title: `Block ${s.userId}`,
-  message: contactInfo.deleteAlert.message,
-  buttons: [
-    {
-      text: contactInfo.deleteAlert.cancelButton,
-    },
-    {
-      text: contactInfo.deleteAlert.confirmButton,
-      onPress: () => {
-        // If the user confirms that the contact is to be deleted, an event is sent
-        sendEventFromAlert({
-          eventType: 'DataEvent',
-          action: 'exec_remove_contact',
-          params: alertEvent.params,
-          eventBizType: 'contact',
-        });
-      },
-    },
-  ],
-});
-```
-
-3. The page receives the command and starts to delete contacts. After the operation is completed, it sends a prompt indicating that the deletion operation has been completed.
-
-```typescript
-// The contact page receives the command to delete contacts.
-removeContact(userId, (result) => {
-  if (result === true) {
-    // After deleting the contact, the toast prompt box is displayed.
-    sendContactInfoEvent({
-      eventType: 'ToastEvent',
-      action: 'toast_',
-      params: contactInfo.toast[1]!,
-    });
-    navigation.goBack();
-  }
-});
-```
-
-4. The system receives the display prompt command and starts to display the prompt content window.
-
-```typescript
-// The modal system receives the command to display the toast prompt box.
-toast.showToast(content);
-```
-
-5. After the processing is completed, close and continue the follow-up operation.
-
-#### Example source code
-
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/screens/ContactInfo.tsx)
-
-## Typical scenario: login
-
-Currently, two methods, active login and automatic login, are supported.
-
-#### Normal login process
-
-1. Initialization: Initialization needs to be processed at the very beginning of the application. See `App.tsx` page for implementation.
-2. Notification of initialization completion: initialization is complete, and it will be notified through `GlobalContainer.onInitialized` callback.
-3. Login: If automatic login is used, it can be started after the initialization is completed.
-4. Notification of login completion: the login notifies the user through `ChatSdkContextType.login.onResult`, and the automatic login notifies the user through `ChatSdkContextType.autologin.onResult`.
-
-#### Active login
-
-Use the login interface `ChatSdkContextType.login` provided by `uikit sdk` instead of `ChatClient.login` provided by `chat sdk`.
-
-Login requires the user to provide the necessary parameters: user id and user password or token.
-
-Examples are as follows:
-
-```typescript
-login({
-  id: 'userId',
-  pass: 'userPassword',
-  onResult: (result) => {
-    if (result.result === true) {
-      // TODO: Operations performed after successful login.
-    } else {
-      // TOTO: Operations after a login failure.
-    }
-  },
-});
-```
-
-#### auto login
-
-If automatic login is set, subsequent logins will be performed automatically after successful login.
-
-The `splash` page is loaded before automatic login, and the `login` or `home` page is loaded after successful login.
-
-```typescript
-autoLogin({
-  onResult: ({ result, error }) => {
-    if (error === undefined) {
-      if (result === true) {
-        // TODO: The application home page is displayed.
-      } else {
-        // TODO: The login page is displayed.
-      }
-    } else {
-      // TODO: Error handling.
-    }
-  },
-});
-```
-
-#### page
-
-The login page does not have complex interaction logic, and only includes id or password input components, login button components, etc.
-The component style and writing method are common `react-native`, please refer to it for developers who are just getting started, and ignore it for experienced developers.
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/screens/SignIn.tsx)
-
-## Typical scenario: Logout
-
-Logout is mainly divided into two situations:
-
-1. The user voluntarily logs out
-2. There may be many reasons for the user to disconnect the server passively. For details, refer to the relevant documents on the official website.
-
-#### Actively logout
-
-```typescript
-logoutAction({
-  onResult: ({ result, error }) => {
-    if (result === true) {
-      // TODO: Operations performed after a successful logout.
-    } else {
-      // TODO: Logout operation after failure.
-    }
-  },
-});
-```
-
-#### Passive logout
-
-There are many reasons for passive logout: for example, being kicked off by other devices of the user, being prohibited from logging in by the server, the user has changed the password, token expired, etc.
-
-Passive logout is mainly realized by listening to events.
-
-```typescript
-DeviceEventEmitter.addListener(ConnectStateChatSdkEvent, (event) => {
-  console.log('test:SplashScreen:addListener:', event);
-  const eventType = event.type as ConnectStateChatSdkEventType;
-  switch (eventType) {
-    case 'onConnected':
-      break;
-    case 'onDisconnected':
-      break;
-    case 'onTokenDidExpire':
-      break;
-    case 'onTokenWillExpire':
-      break;
-
-    default:
-      break;
-  }
-});
-```
-
-The logout button is currently on my settings page.
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/screens/MySetting.tsx)
-
-## Typical application: session list
-
-This page displays recent chat records, through which chats can be established quickly.
-
-The conversation page `ConversationListScreen` consists of a navigator `NavigationHeaderRight` and a conversation list component `ConversationListFragment`.
-
-The component `ConversationListFragment` provides the property `ConversationListFragmentProps`.
-
-The component `ConversationListFragment` is mainly composed of the search component `DefaultListSearchHeader` and the list component `ConversationList`.
-
-The search component supports local list searches.
-
-List component displays recent chat sessions.
-
-#### Session Attributes
-
-Session attributes currently include basic event notifications.
-
-```typescript
-type ConversationListFragmentProps = {
+export type ConversationListFragmentProps = {
+  propsRef?: React.RefObject<ConversationListFragmentRef>;
   onLongPress?: (data?: ItemDataType) => void;
   onPress?: (data?: ItemDataType) => void;
   onData?: (data: ItemDataType[]) => void;
   onUpdateReadCount?: (unreadCount: number) => void;
+  sortPolicy?: (a: ItemDataType, b: ItemDataType) => number;
+  RenderItem?: ItemComponent;
+  /**
+   * If `RenderItem` is a custom component and uses side-slip mode, you need to inform the width of the side-slide component.
+   */
+  RenderItemExtraWidth?: number;
 };
 ```
 
-#### Session Interface
+#### Set up a personalized session list
 
-Page initialization and deinitialization. The lifecycle of a page is a very important concept. In the life cycle to ensure the correct use of the page.
+#### Session list attribute: click callback
 
-- load: This method will be called when the page loads.
-- unload: This method will be called when the page is unloaded.
-
-**<span style="color:orange">The above method is general and is used on almost every page. Since it is not a `class` component, some interfaces cannot be written in the base class and will be optimized later.</span>**
-
-In the initialization phase, `ConversationListFragment` mainly does several things.
-
-- `initList` loads the session list
-- `initDirs` creates a session directory to hold message resources
-- `addListeners` initializes event listeners to receive required events. For example: message event, page event, etc.
-
-During the unloading phase, `ConversationListFragment` mainly releases resources.
-
-- release event listener resources
-
-The basic functional interface provided by the session:
-
-- `createConversation` creates a conversation
-- `removeConversation` removes a conversation
-- `updateConversationFromMessage` updates the conversation
-- `conversationRead` conversation read
-
-#### Session List Items
-
-Main object: data source `ItemDataType`
+Click on the conversation list item, typical application: enter the chat page.
 
 ```typescript
-export type ItemDataType = EqualHeightListItemData & {
-  convId: string;
-  convType: ChatConversationType;
-  lastMsg?: ChatMessage;
-  convContent: string;
-  timestamp: number;
-  timestampS: string;
-  count: number;
-  actions?: {
-    onDelete?: (data: ItemDataType) => void;
-  };
-};
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onPress={(data?: ItemDataType) => {
+          // todo: enter to chat detail screen.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
 ```
 
-Main object: render component `Item`.
+#### Session list attribute: long press callback
 
-If you want to modify the session list items, please refer to `ItemDataType` and `Item` related component source code.
-
-#### create session
-
-There are several ways to create a session:
-
-1. Receive a message
-2. Enter the chat page, if you do not chat, you will create a temporary session, and if you chat, you will create a persistent session
-
-#### Delete session
-
-Delete session: Currently, the delete menu is displayed by sliding the list item, click delete.
-**NOTE** Cleans up other traces of the session. Example: Not read.
-
-#### Enter the chat page
-
-Click on the conversation list item to enter the chat page.
-
-#### Session Menu
-
-There is an important entry in the upper right corner of the session, which includes:
-
-1. Create a group
-2. Add contacts
-3. Search groups
-
-#### Extensions
-
-Users can modify and use `corresponding components` as needed.
-
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/screens/ConversationList.tsx)
-
-## Typical scenario: Chat
-
-Currently, the chat page supports personal chat, group chat, and chat content type supports text (moji expression), picture and voice. See `ChatFragment` and `ChatFragmentProps` for details
-
-#### composition
-
-The chat page consists of chat bubble components and input components. See `ChatMessageBubbleList` and `ChatInput` for details
-
-Important components include:
-
-- `ChatMessageBubbleList` chat bubble component
-- `ChatInput` input component
-- `ChatFaceList` emoticon component
-
-#### interface
-
-- load loads the component
-- unload Unload the component
-
-**<span style="color:orange">The above methods are common and are used in almost every page. Because they do not use `class` style components, some interfaces cannot be written in the base class and will be optimized later. </span>**
-
-- initList initializes historical message records
-- initDirs initialize resource directory
-- clearRead marks the session as read
-- sendTextMessage send text message
-- sendImageMessage send image message
-- sendVoiceMessage send voice message
-- sendCustomMessage send custom message
-- loadHistoryMessage load history message
-- showFace show face
-- hideFace to hide facial expressions
-- downloadAttachment download attachment
-
-#### Attributes
-
-`ChatFragmentProps` properties mainly include session ID session type and others.
+Long press the chat list item, typical application: display the context menu.
 
 ```typescript
-type ChatFragmentProps = {
-  screenParams: {
-    params: {
-      chatId: string;
-      chatType: number;
-    };
-  };
-  onUpdateReadCount?: (unreadCount: number) => void;
-  onItemPress?: (data: MessageItemType) => void;
-  onItemLongPress?: (data: MessageItemType) => void;
-};
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onLongPress={(data?: ItemDataType) => {
+          // todo: show context menu.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
 ```
 
-#### Chat Bubble Items
+#### session list attribute: update unread count callback
 
-Currently includes: text, voice, picture message bubbles. Currently the source code is encapsulated in the `MessageBubbleList` component.
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        onUpdateReadCount={(unreadCount: number) => {
+          // todo: show unread message count.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
 
-##### text
+#### Session list attribute: sorting strategy
 
-- `TextMessageItemType`: data source
-- `TextMessageRenderItem`: Rendering component
+The default sorting is to sort `convId`, you can set it yourself if you want. Typical application: session sticking to the top.
 
-##### picture
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        sortPolicy={(a: ItemDataType, b: ItemDataType) => {
+          if (a.key > b.key) {
+            return 1;
+          } else if (a.key < b.key) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
 
-- `ImageMessageItemType`: data source
-- `ImageMessageRenderItem`: Rendering component
+#### Session List Properties: Custom Styles
 
-##### Voice
+The display style of the session list items can be customized.
+**Note** If you activate the side sliding function, you need to set the width of the side sliding component.
 
-- `VoiceMessageItemType`: data source
-- `VoiceMessageRenderItem`: render component
-
-#### Extensions
-
-For users who need more changes, you can refer to `ChatFragment` design and implementation.
-For users who need to change custom messages, please refer to `ChatMessageBubbleList` for design and implementation.
-For users who need to change input components, please refer to `ChatInput` for design and implementation.
-
-#### Special Note
-
-In order to solve code reuse and reduce data loading, more sub-components are added. For example: `ChatContent` `ChatInput`.
-
-[sample code](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/fragments/Chat.tsx)
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment
+        RenderItem={(props) => {
+          return <View />;
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
 
 ---
 
