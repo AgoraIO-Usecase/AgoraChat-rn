@@ -31,7 +31,6 @@ import {
   VoiceMessageItemType,
 } from 'react-native-chat-uikit';
 
-import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
 import { MyFileMessageBubble } from '../components/MyFileMessageBubble';
 import { MyTextMessageBubble } from '../components/MyTextMessageBubble';
 import { MyVideoMessageBubble } from '../components/MyVideoMessageBubble';
@@ -430,9 +429,6 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             FileMessageItem: MyFileMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
-        }}
-        customMessageBubble={{
-          CustomMessageRenderItemP: CustomMessageRenderItem,
         }}
         onUpdateReadCount={onUpdateReadCount}
         onClickMessageBubble={onClickMessageBubble}

@@ -330,10 +330,6 @@ The chat bubble list component mainly displays messages. Currently, it provides 
 
 ```typescript
 export type MessageBubbleListProps = {
-  /**
-   * Click the message list, not the message item.
-   */
-  onPressed?: () => void;
   onRequestHistoryMessage?: (params: { earliestId: string }) => void;
   TextMessageItem?: ListRenderItem<TextMessageItemType>;
   ImageMessageItem?: ListRenderItem<ImageMessageItemType>;
@@ -439,9 +435,11 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleList,
+          MessageBubbleListP: MessageBubbleListFragment,
           MessageBubbleListPropsP: {
-            onPressed: () => {},
+            TextMessageItem: MyTextMessageBubble,
+            VideoMessageItem: MyVideoMessageBubble,
+            FileMessageItem: MyFileMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}
@@ -452,35 +450,6 @@ export default function ChatScreen(): JSX.Element {
 ```
 
 **Description** Since `MessageBubbleList` implements too many source codes, please refer to it if necessary [here](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/components/CustomMessageBubble.tsx)
-
-#### Chat Properties: Custom Message Components
-
-If you want to customize an order message, you can use the `custom type` component to display, send and receive custom messages (order messages).
-
-The data source of a custom message component needs to be extended with `MessageItemType` as the base type.
-The rendering part of the custom message component needs to obey the `FunctionComponent` component rules.
-
-```typescript
-import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
-import type { MessageBubbleListProps } from '../fragments/MessageBubbleList';
-import MessageBubbleList from '../fragments/MessageBubbleList';
-export default function ChatScreen(): JSX.Element {
-  const chatId = 'xxx';
-  const chatType = 0;
-  return (
-    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
-      <ChatFragment
-        screenParams={{ chatId, chatType }}
-        customMessageBubble={{
-          CustomMessageRenderItemP: CustomMessageRenderItem,
-        }}
-      />
-    </ScreenContainer>
-  );
-}
-```
-
-**Description** Since `CustomMessageRenderItem` implements too much source code, please refer to it if necessary [here](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/components/CustomMessageBubble.tsx)
 
 #### Chat Properties: Unread Count Notifications
 

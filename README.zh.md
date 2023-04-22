@@ -330,10 +330,6 @@ export type MessageBubbleListRef = {
 
 ```typescript
 export type MessageBubbleListProps = {
-  /**
-   * Click the message list, not the message item.
-   */
-  onPressed?: () => void;
   onRequestHistoryMessage?: (params: { earliestId: string }) => void;
   TextMessageItem?: ListRenderItem<TextMessageItemType>;
   ImageMessageItem?: ListRenderItem<ImageMessageItemType>;
@@ -439,9 +435,11 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleList,
+          MessageBubbleListP: MessageBubbleListFragment,
           MessageBubbleListPropsP: {
-            onPressed: () => {},
+            TextMessageItem: MyTextMessageBubble,
+            VideoMessageItem: MyVideoMessageBubble,
+            FileMessageItem: MyFileMessageBubble,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}
@@ -452,35 +450,6 @@ export default function ChatScreen(): JSX.Element {
 ```
 
 **说明** 由于 `MessageBubbleList` 实现源码太多，如有需要请参考 [here](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/components/CustomMessageBubble.tsx)
-
-#### 聊天属性：自定义消息组件
-
-假如，你想要自定义一个订单消息，可以使用 `自定义类型` 组件 实现 自定义消息（订单消息） 的显示、发送和接收。
-
-自定义消息组件的数据源需要以 `MessageItemType` 为基础类型进行扩展。
-自定义消息组件的渲染部分需要遵守 `FunctionComponent` 组件规则。
-
-```typescript
-import { CustomMessageRenderItem } from '../components/CustomMessageBubble';
-import type { MessageBubbleListProps } from '../fragments/MessageBubbleList';
-import MessageBubbleList from '../fragments/MessageBubbleList';
-export default function ChatScreen(): JSX.Element {
-  const chatId = 'xxx';
-  const chatType = 0;
-  return (
-    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
-      <ChatFragment
-        screenParams={{ chatId, chatType }}
-        customMessageBubble={{
-          CustomMessageRenderItemP: CustomMessageRenderItem,
-        }}
-      />
-    </ScreenContainer>
-  );
-}
-```
-
-**说明** 由于 `CustomMessageRenderItem` 实现源码太多，如有需要请参考 [here](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/components/CustomMessageBubble.tsx)
 
 #### 聊天属性：未读数通知
 
