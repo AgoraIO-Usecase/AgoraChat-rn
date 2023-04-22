@@ -18,15 +18,41 @@ import type {
   PermissionServiceOption,
 } from './types';
 
+/**
+ * List of basic services provided.
+ */
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Services {
+  /**
+   * Pasteboard service.
+   */
   static cbs: ClipboardService;
+  /**
+   * Media service.
+   */
   static ms: MediaService;
+  /**
+   * Notification service.
+   */
   static ns: NotificationService;
+  /**
+   * Permission service.
+   */
   static ps: PermissionService;
+  /**
+   * Local storage service.
+   */
   static ls: LocalStorageService;
+  /**
+   * Directory cache service.
+   */
   static dcs: DirCacheService;
 
+  /**
+   * Create permission service single object.
+   * @param option - The option. see {@link PermissionServiceOption}
+   * @returns The Permission service object.
+   */
   public static createPermissionService(
     option: PermissionServiceOption
   ): PermissionService {
@@ -36,6 +62,11 @@ export class Services {
     return Services.ps;
   }
 
+  /**
+   * Create clipboard service single object.
+   * @param option - The option. see {@link ClipboardServiceOption}
+   * @returns The clipboard service object.
+   */
   public static createClipboardService(
     option: ClipboardServiceOption
   ): ClipboardService {
@@ -45,6 +76,11 @@ export class Services {
     return Services.cbs;
   }
 
+  /**
+   * Create media service single object.
+   * @param option - The option. see {@link MediaServiceOptions}
+   * @returns The media service object.
+   */
   public static createMediaService(option: MediaServiceOptions): MediaService {
     if (Services.ms === undefined) {
       Services.ms = new MediaServiceImplement(option);
@@ -52,6 +88,11 @@ export class Services {
     return Services.ms;
   }
 
+  /**
+   * Create notification service single object.
+   * @param option - The option. see {@link NotificationServiceOption}
+   * @returns The notification service object.
+   */
   public static createNotificationService(
     option: NotificationServiceOption
   ): NotificationService {
@@ -61,6 +102,11 @@ export class Services {
     return Services.ns;
   }
 
+  /**
+   * Create local storage service single object.
+   * @param option - The option. see {@link LocalStorageService}
+   * @returns The local storage service object.
+   */
   public static createLocalStorageService(
     service?: LocalStorageService
   ): LocalStorageService {
@@ -73,6 +119,11 @@ export class Services {
     return Services.ls;
   }
 
+  /**
+   * Create directory cache service single object.
+   * @param option - The option. see {@link DirCacheServiceOption}
+   * @returns The directory cache service object.
+   */
   public static createDirCacheService(
     option: DirCacheServiceOption
   ): DirCacheService {

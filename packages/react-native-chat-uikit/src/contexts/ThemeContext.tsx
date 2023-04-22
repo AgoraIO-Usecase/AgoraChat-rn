@@ -18,6 +18,9 @@ export function ThemeContextProvider({ value, children }: ThemeContextProps) {
   );
 }
 
+/**
+ * Use theme components.
+ */
 export function useThemeContext(): ThemeContextType {
   const theme = React.useContext(ThemeContext);
   if (!theme) throw Error(`${ThemeContext.displayName} is not provided`);

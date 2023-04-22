@@ -1,3 +1,6 @@
+/**
+ * Data sharing through context technology.
+ */
 export {
   ContentStateContextProvider,
   useContentStateContext,

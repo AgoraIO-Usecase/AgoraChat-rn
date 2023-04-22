@@ -96,6 +96,13 @@ export function messageTimestamp(date: Date | number, locale?: Locale): string {
   }
 }
 
+/**
+ * Format the message timestamp.
+ *
+ * @param date The message timestamp.
+ * @param locale The locale format
+ * @returns Formatted time.
+ */
 export function messageTime(date: Date | number, locale?: Locale): string {
   let _date: Date;
   if (typeof date === 'number') {

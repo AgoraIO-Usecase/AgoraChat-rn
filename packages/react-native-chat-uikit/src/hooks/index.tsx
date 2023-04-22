@@ -32,6 +32,10 @@ type TimeoutType = {
  * ref: https://juejin.cn/post/7083466010505773093#3
  * !!! This function does not exist before react 18.
  *
+ * Typical application scenarios: Delayed display of search results to improve performance.
+ *
+ * This method can only be used inside the rendering component, if you need to use it elsewhere, please use `throttle`.
+ *
  * @param value any type value
  * @param defer timeout (ms)
  * @returns deferred timeout value

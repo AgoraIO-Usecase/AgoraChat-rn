@@ -39,6 +39,9 @@ export const HeaderStyleProvider = ({
   );
 };
 
+/**
+ * header style data.
+ */
 export function useHeaderContext(): HeaderContextType {
   const header = React.useContext(HeaderContext);
   if (!header) throw Error(`${HeaderContext.displayName} is not provided`);

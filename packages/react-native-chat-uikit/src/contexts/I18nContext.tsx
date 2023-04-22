@@ -17,6 +17,9 @@ export function I18nContextProvider({ i18n, children }: I18nContextProps) {
   );
 }
 
+/**
+ * Internationalized data.
+ */
 export function useI18nContext(): StringSetContextType {
   const i18n = React.useContext(StringSetContext);
   if (!i18n) throw Error(`${StringSetContext.displayName} is not provided`);

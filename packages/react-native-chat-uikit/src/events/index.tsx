@@ -1,3 +1,6 @@
+/**
+ * A set of suites designed and implemented around events. Mainly, event definition, distribution, reception, and display of modal components can be performed. Users can customize events.
+ */
 export * from './types';
 export * from './UikitEvents';
 export * from './UikitModals';

@@ -1,4 +1,8 @@
-export const getUIKitVersion = () => {
+/**
+ * Get the current uikit version number.
+ * @returns The version.
+ */
+export function getUikitVersion(): string | undefined {
   try {
     const v = require('../version').VERSION;
     return v;
@@ -6,4 +10,4 @@ export const getUIKitVersion = () => {
     console.warn('test:version:', error);
     return undefined;
   }
-};
+}

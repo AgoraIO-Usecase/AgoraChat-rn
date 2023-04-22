@@ -32,6 +32,12 @@ export function uuid(): string {
   return v4();
 }
 
+/**
+ * Get the current timestamp. Returns a timestamp in milliseconds by default.
+ *
+ * @param type second or millisecond.
+ * @returns The current timestamp.
+ */
 export function timestamp(
   type: 'second' | 'millisecond' = 'millisecond'
 ): number {

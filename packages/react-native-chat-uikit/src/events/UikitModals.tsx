@@ -122,6 +122,14 @@ const UikitModalPlaceholderInternalForward = React.forwardRef<
 type UikitModalPlaceholderProps = React.PropsWithChildren<
   ExtraDataType & HandleDataType
 >;
+
+/**
+ * A manager for modal components and event dispatch and reception.
+ *
+ * Users can implement their own version.
+ *
+ * Reference usage example: {@url https://github.com/easemob/react-native-chat-library/blob/b5ce51840190a8b36bf109c3f49510cf99a8737b/example/src/events/Modals.tsx}
+ */
 export function UikitModalPlaceholder(
   props: UikitModalPlaceholderProps
 ): JSX.Element {

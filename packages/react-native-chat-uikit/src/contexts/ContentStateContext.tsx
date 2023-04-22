@@ -61,6 +61,9 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
   );
 }
 
+/**
+ * Show and hide custom components. Showing and hiding of this component is not affected by page responsiveness. Typical application scenarios: recording voice messages and displaying voice components.
+ */
 export function useContentStateContext(): VoiceStateContextType {
   const context = React.useContext(ContentStateContext);
   if (!context)

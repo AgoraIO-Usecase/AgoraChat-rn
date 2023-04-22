@@ -45,6 +45,9 @@ export function ToastContextProvider({
   );
 }
 
+/**
+ * Display the toast component.
+ */
 export function useToastContext(): ToastContextType {
   const context = React.useContext(ToastContext);
   if (!context) throw new Error(`${ToastContext.displayName} is not provided`);

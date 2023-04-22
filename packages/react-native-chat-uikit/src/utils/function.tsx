@@ -148,6 +148,12 @@ export function onceEx(fn: Function) {
   return f;
 }
 
+/**
+ * Returns the hash value of a string.
+ *
+ * @param str The string content.
+ * @returns The hash value.
+ */
 export function hashCode(str?: string): number {
   let hash = 0,
     i,

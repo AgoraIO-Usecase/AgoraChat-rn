@@ -205,22 +205,34 @@ export const DialogContextProvider = ({
   );
 };
 
+/**
+ * Displays the context menu modal component.
+ */
 export const useActionMenu = () => {
   const context = React.useContext(ActionMenuContext);
   if (!context)
     throw new Error(`${ActionMenuContext.displayName} is not provided`);
   return context;
 };
+/**
+ * Displays the alert modal component.
+ */
 export const useAlert = () => {
   const context = React.useContext(AlertContext);
   if (!context) throw new Error(`${AlertContext.displayName} is not provided`);
   return context;
 };
+/**
+ * Displays the prompt modal component.
+ */
 export const usePrompt = () => {
   const context = React.useContext(PromptContext);
   if (!context) throw new Error(`${PromptContext.displayName} is not provided`);
   return context;
 };
+/**
+ * Displays the bottom sheet modal component.
+ */
 export const useBottomSheet = () => {
   const context = React.useContext(BottomSheetContext);
   if (!context)

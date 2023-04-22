@@ -99,3 +99,13 @@ export function formatElapsed(elapsed: number): string {
     return placeholder({ m, s });
   }
 }
+
+export function getCallKitVersion(): string | undefined {
+  try {
+    const v = require('../version').VERSION;
+    return v;
+  } catch (error) {
+    console.warn('test:version:', error);
+    return undefined;
+  }
+}

@@ -81,6 +81,9 @@ export function ChatSdkContextProvider({ sdk, children }: ImSdkContextProps) {
   );
 }
 
+/**
+ * Components packaged by chat sdk. Typical application scenarios: Encapsulate methods such as login and logout to facilitate the use of UI components.
+ */
 export function useChatSdkContext(): ChatSdkContextType {
   const sdk = React.useContext(ChatSdkContext);
   if (!sdk) throw Error(`${ChatSdkContext.displayName} is not provided`);

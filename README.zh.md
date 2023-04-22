@@ -156,6 +156,32 @@ cd your_project_root
 yarn add react-native-chat-uikit
 ```
 
+## 初始化设置
+
+在准备使用 uikit 之前，需要进行初始化操作。其中模态组件是用来接收事件并显示模态窗口的。如果缺省则使用默认的。
+
+```typescript
+import { GlobalContainer as UikitContainer } from 'react-native-chat-uikit';
+import { ModalPlaceholder } from './events';
+export default function App() {
+  return (
+    <React.StrictMode>
+      <UikitContainer
+        option={{
+          appKey: appKey,
+          autoLogin: autoLogin.current,
+          debugModel: true,
+        }}
+        ModalComponent={() => <ModalPlaceholder />}
+      />
+    </React.StrictMode>
+  );
+}
+```
+
+**说明** 需要在初始化的时候设置好模态窗口管理组件。如果缺省该参数，可能无法收到相应的事件通知。
+**说明** 实际使用请[参考](./example/src/App.tsx)
+
 开发、编译和运行等请参考相关章节，下面以集成聊天页面为例进行说明。
 
 ## 快速集成聊天页面
@@ -392,26 +418,6 @@ export default function ChatScreen(): JSX.Element {
     <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
       <ChatFragment screenParams={{ chatId, chatType }} />
     </ScreenContainer>
-  );
-}
-```
-
-**说明** 需要在初始化的时候设置好模态窗口管理组件。如果缺省该参数，可能无法收到相应的事件通知。
-
-```typescript
-import { ModalPlaceholder } from './events';
-export default function App() {
-  return (
-    <React.StrictMode>
-      <GlobalContainer
-        option={{
-          appKey: appKey,
-          autoLogin: autoLogin.current,
-          debugModel: true,
-        }}
-        ModalComponent={() => <ModalPlaceholder />}
-      />
-    </React.StrictMode>
   );
 }
 ```

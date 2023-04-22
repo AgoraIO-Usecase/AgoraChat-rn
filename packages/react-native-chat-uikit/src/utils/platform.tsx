@@ -30,15 +30,9 @@ export function localUrl(localPath: string): string {
   });
 }
 
-/**
- * android normally supports the 'file://' protocol, but the 'android sdk' does not, requiring special handling.
- *
- * @param localPath Possible path with 'file / ://'.
- * @returns Returns a path without file://.
- */
 export function removeFileHeader(localPath: string): string {
   return Platform.select({
-    ios: localPath.includes('file://')
+    ios: localPath.startsWith('file://')
       ? localPath.replace('file://', '')
       : localPath,
     android: localPath,
@@ -48,7 +42,7 @@ export function removeFileHeader(localPath: string): string {
 
 export function playUrl(localPath: string): string {
   return Platform.select({
-    ios: localPath.includes('file://') ? localPath : `file://${localPath}`,
+    ios: localPath.startsWith('file://') ? localPath : `file://${localPath}`,
     android: localPath,
     default: localPath,
   });
