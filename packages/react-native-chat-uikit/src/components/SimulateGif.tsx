@@ -1,9 +1,8 @@
 import * as React from 'react';
-import {
+import type {
   ColorValue,
   ImageStyle,
   StyleProp,
-  View,
   ViewStyle,
 } from 'react-native';
 
@@ -38,9 +37,5 @@ export default function SimulateGif(props: SimulateGifProps): JSX.Element {
       clearInterval(ret);
     };
   }, [count, interval, names]);
-  return (
-    <View>
-      <LocalIcon {...props} name={name} />
-    </View>
-  );
+  return <LocalIcon {...props} name={name} />;
 }

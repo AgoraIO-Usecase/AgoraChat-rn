@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  DeviceEventEmitter,
   // DeviceEventEmitter,
   Image as RNImage,
   ListRenderItem,
@@ -21,6 +22,7 @@ import DynamicHeightList, {
 } from '../components/DynamicHeightList';
 import { type LocalIconName, LocalIcon } from '../components/Icon';
 import Loading from '../components/Loading';
+import SimulateGif from '../components/SimulateGif';
 import { useChatSdkContext } from '../contexts';
 import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';
@@ -407,14 +409,47 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       const { item } = info;
       const { width } = useWindowDimensions();
       const msg = item as VoiceMessageItemType;
+      const isPlayingRef = React.useRef(false);
+      const [isPlaying, setIsPlaying] = React.useState(isPlayingRef.current);
+      const timeout = React.useRef<NodeJS.Timeout | null>(
+        null
+      ) as React.MutableRefObject<NodeJS.Timeout | null>;
       const _width = (duration: number) => {
         if (duration < 0) {
           throw new Error('The voice length cannot be less than 0.');
         }
         let r = width * 0.7 * (1 / 60) * (duration > 60 ? 60 : duration);
-        r = r < 150 ? 150 : r;
+        r += 150;
         return r;
       };
+
+      const stopPlayTimeout = React.useCallback(() => {
+        if (timeout.current !== null) {
+          clearTimeout(timeout.current);
+        }
+        timeout.current = setTimeout(() => {
+          setIsPlaying(false);
+        }, msg.duration * 1000);
+      }, [msg.duration]);
+
+      React.useEffect(() => {
+        const sub = DeviceEventEmitter.addListener(
+          'uikit_click_voice_button',
+          (data) => {
+            if (data.key !== msg.key) {
+              return;
+            }
+            if (isPlayingRef.current === false) {
+              stopPlayTimeout();
+            }
+            isPlayingRef.current = !isPlayingRef.current;
+            setIsPlaying(!isPlaying);
+          }
+        );
+        return () => {
+          sub.remove();
+        };
+      }, [isPlaying, msg.key, stopPlayTimeout]);
 
       if (item.state === 'recalled') {
         return <RenderRecallMessage {...item} />;
@@ -452,12 +487,27 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
               },
             ]}
           >
-            <LocalIcon
-              name={msg.isSender ? 'wave3_left' : 'wave3_right'}
-              size={sf(22)}
-              color={msg.isSender ? 'white' : '#A9A9A9'}
-              style={{ marginHorizontal: sf(8) }}
-            />
+            {isPlaying === true ? (
+              <SimulateGif
+                names={
+                  msg.isSender
+                    ? ['wave1_left', 'wave2_left', 'wave3_left']
+                    : ['wave1_right', 'wave2_right', 'wave3_right']
+                }
+                size={sf(22)}
+                color={msg.isSender ? 'white' : '#A9A9A9'}
+                style={{ marginHorizontal: sf(8) }}
+                interval={300}
+              />
+            ) : (
+              <LocalIcon
+                name={msg.isSender ? 'wave3_left' : 'wave3_right'}
+                size={sf(22)}
+                color={msg.isSender ? 'white' : '#A9A9A9'}
+                style={{ marginHorizontal: sf(8) }}
+              />
+            )}
+
             <Text
               style={[
                 styles.text,
@@ -533,6 +583,13 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
   return (
     <Pressable
       onPress={() => {
+        if (item.type === ChatMessageType.VOICE) {
+          if (MessageItem === VoiceMessageRenderItemDefault) {
+            DeviceEventEmitter.emit('uikit_click_voice_button', {
+              key: item.key,
+            });
+          }
+        }
         item.onPress?.(item);
       }}
       onLongPress={() => {
@@ -884,7 +941,7 @@ const styles = createStyleSheet({
     padding: 10,
   },
   innerContainer: {
-    // flex: 1,
+    flex: 1,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     // backgroundColor: 'red',

@@ -80,7 +80,12 @@ import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import { timeoutTask } from '../utils/function';
 import { seqId, timestamp, uuid } from '../utils/generator';
-import { localUrl, playUrl, removeFileHeader } from '../utils/platform';
+import {
+  localUrl,
+  localUrlEscape,
+  playUrl,
+  removeFileHeader,
+} from '../utils/platform';
 // import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 // import { sendEvent, sendEventProps } from '../events/sendEvent';
 import MessageBubbleList, {
@@ -711,7 +716,7 @@ const ChatContent = React.memo(
           if (voice.localPath) {
             Services.ms
               .playAudio({
-                url: playUrl(voice.localPath),
+                url: localUrlEscape(playUrl(voice.localPath)),
                 onPlay({ isMuted, currentPosition, duration }) {
                   console.log(
                     'test:onPlay',

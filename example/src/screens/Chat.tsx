@@ -21,6 +21,7 @@ import {
   getFileExtension,
   ImageMessageItemType,
   localUrl,
+  localUrlEscape,
   MessageBubbleListFragment,
   MessageBubbleListProps,
   MessageItemType,
@@ -84,13 +85,13 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         if (voice.localPath) {
           Services.ms
             .playAudio({
-              url: playUrl(voice.localPath),
+              url: localUrlEscape(playUrl(voice.localPath)),
               onPlay({ isMuted, currentPosition, duration }) {
                 console.log('test:onPlay', isMuted, currentPosition, duration);
               },
             })
             .then(() => {
-              console.log('test:playAudio:finish:');
+              console.log('test:playAudio:finish:2:');
             })
             .catch((error) => {
               console.warn('test:error:', error);

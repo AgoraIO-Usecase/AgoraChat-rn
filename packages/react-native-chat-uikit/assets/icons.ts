@@ -1135,6 +1135,42 @@ export const ICON_ASSETS = {
       return require('./icons/Global/volume8.png');
     }
   },
+  'wave1_left': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave1_left_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave1_left_2x.png');
+    } else {
+      return require('./icons/Global/wave1_left.png');
+    }
+  },
+  'wave1_right': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave1_right_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave1_right_2x.png');
+    } else {
+      return require('./icons/Global/wave1_right.png');
+    }
+  },
+  'wave2_left': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave2_left_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave2_left_2x.png');
+    } else {
+      return require('./icons/Global/wave2_left.png');
+    }
+  },
+  'wave2_right': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/wave2_right_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/wave2_right_2x.png');
+    } else {
+      return require('./icons/Global/wave2_right.png');
+    }
+  },
   'wave3_left': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/wave3_left_3x.png');

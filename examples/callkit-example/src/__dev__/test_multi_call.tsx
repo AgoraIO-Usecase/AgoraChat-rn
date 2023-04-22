@@ -63,11 +63,9 @@ export function test_all() {
   const callType = 'audio'; // !!! must
   const bottomButtonType = 'invitee-video-init'; // for test
   const muteVideo = false; // for test
-  const appKey = 'sdf';
   const inviterId = 'inviterId';
   const currentId = 'wo';
   const isTest = true;
-  const agoraAppId = 'xxx';
   const inviteeIds = ['1', '2', '3', '4', '5', '6'];
   // const inviteeIds = ['1'];
   return (
@@ -78,29 +76,11 @@ export function test_all() {
       callType={callType}
       bottomButtonType={bottomButtonType}
       muteVideo={muteVideo}
-      appKey={appKey}
       inviterId={inviterId}
       inviterName={inviterId}
       currentId={currentId}
       currentName={currentId}
-      requestRTCToken={function (params: {
-        appKey: string; // for test
-        channelId: string;
-        userId: string;
-        onResult: (params: { data: any; error?: any }) => void;
-      }): void {
-        console.log(params);
-      }}
-      requestUserMap={function (params: {
-        appKey: string;
-        channelId: string;
-        userId: string;
-        onResult: (params: { data: any; error?: any }) => void;
-      }): void {
-        console.log(params);
-      }}
       isTest={isTest}
-      agoraAppId={agoraAppId}
       inviteeIds={inviteeIds}
       inviteeList={{
         InviteeList: ContactList,

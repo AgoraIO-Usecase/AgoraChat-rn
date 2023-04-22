@@ -47,3 +47,10 @@ export function playUrl(localPath: string): string {
     default: localPath,
   });
 }
+export function localUrlEscape(localPath: string): string {
+  if (localPath.startsWith('file://')) {
+    return localPath.replace(/#/g, '%23').replace(/ /g, '%20');
+  } else {
+    return localPath;
+  }
+}

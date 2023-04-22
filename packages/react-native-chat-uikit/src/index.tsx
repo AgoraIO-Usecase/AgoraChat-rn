@@ -141,6 +141,7 @@ export { seqId, timestamp, uuid } from './utils/generator';
 export {
   autoFocus,
   localUrl,
+  localUrlEscape,
   playUrl,
   removeFileHeader,
 } from './utils/platform';
