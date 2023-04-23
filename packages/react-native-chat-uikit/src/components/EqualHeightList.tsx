@@ -760,7 +760,7 @@ const styles = createStyleSheet({
   alphabetContainer: {
     position: 'absolute',
     right: 0,
-    top: 70,
+    top: -0,
     // bottom: 100,
     width: 40,
     // height: '80%',
@@ -788,7 +788,7 @@ const styles = createStyleSheet({
     display: 'flex',
     borderRadius: 9,
     overflow: 'hidden',
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
   },
   alphabetPressable: {
     flex: 1,

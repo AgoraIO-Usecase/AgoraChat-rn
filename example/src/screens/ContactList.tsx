@@ -21,7 +21,7 @@ import {
   Pressable,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
+  // useWindowDimensions,
   View,
 } from 'react-native';
 import { ChatGroupOptions, ChatGroupStyle } from 'react-native-chat-sdk';
@@ -256,7 +256,7 @@ export function ContactListScreenInternal({
   const params = rp?.params as any;
   const type = params?.type as Undefinable<ContactActionType>;
   const { header, groupInfo } = useAppI18nContext();
-  const { height: screenHeight } = useWindowDimensions();
+  // const { height: screenHeight } = useWindowDimensions();
 
   const [selectedCount] = React.useState(10);
 
@@ -476,10 +476,10 @@ export function ContactListScreenInternal({
     [manualRefresh, standardizedData]
   );
 
-  const _calculateAlphabetHeight = () => {
-    const r = sf(screenHeight - 450 - 340);
-    return r;
-  };
+  // const _calculateAlphabetHeight = () => {
+  //   const r = sf(screenHeight - 450 - 340);
+  //   return r;
+  // };
 
   const NavigationHeaderRight = React.useCallback(
     (_: HeaderButtonProps) => {
@@ -907,15 +907,15 @@ export function ContactListScreenInternal({
         enableHeader={enableHeader}
         alphabet={{
           alphabetCurrent: {
-            backgroundColor: 'orange',
+            backgroundColor: 'rgba(0, 95, 255, 1)',
             color: 'white',
           },
           alphabetItemContainer: {
-            width: 15,
-            borderRadius: 8,
+            width: sf(15),
+            borderRadius: sf(8),
           },
           alphabetContainer: {
-            top: _calculateAlphabetHeight(),
+            // top: _calculateAlphabetHeight(),
           },
         }}
         ItemSeparatorComponent={DefaultListItemSeparator}
