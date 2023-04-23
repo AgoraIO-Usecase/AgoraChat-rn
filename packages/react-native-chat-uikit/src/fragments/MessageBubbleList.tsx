@@ -428,6 +428,7 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
           clearTimeout(timeout.current);
         }
         timeout.current = setTimeout(() => {
+          isPlayingRef.current = false;
           setIsPlaying(false);
         }, msg.duration * 1000);
       }, [msg.duration]);
