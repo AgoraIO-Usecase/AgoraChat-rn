@@ -58,6 +58,13 @@ target 'example' do
   pod 'Permission-SpeechRecognition', :path => "#{permissions_path}/SpeechRecognition"
   pod 'Permission-StoreKit', :path => "#{permissions_path}/StoreKit"
 
+  # Uncomment to opt-in to using Flipper
+  # Note that if you have use_frameworks! enabled, Flipper will not work
+  #
+  # if !ENV['CI']
+  #   use_flipper!({ 'Flipper' => '0.189.0' })
+  # end
+
   post_install do |installer|
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
