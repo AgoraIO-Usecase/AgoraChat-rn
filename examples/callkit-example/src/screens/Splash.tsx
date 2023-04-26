@@ -12,7 +12,6 @@ import {
   DataEventType,
   getScaleFactor,
   Loading,
-  Services,
 } from 'react-native-chat-uikit';
 
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
@@ -37,20 +36,7 @@ export function SplashScreen({
 }: NativeStackScreenProps<RootParamsList, 'Splash'>): JSX.Element {
   console.log('test:SplashScreen:');
   const sf = getScaleFactor();
-  const {
-    autoLogin: autoLoginAction,
-    getCurrentId,
-    client,
-  } = useAppChatSdkContext();
-
-  const createUserDir = React.useCallback(() => {
-    const currentId = getCurrentId();
-    if (currentId.length > 0) {
-      Services.dcs.init(
-        `${client.options!.appKey.replace('#', '-')}/${currentId}`
-      );
-    }
-  }, [client.options, getCurrentId]);
+  const { autoLogin: autoLoginAction } = useAppChatSdkContext();
 
   const onDisconnected = React.useCallback(
     (errorCode?: number) => {
@@ -133,7 +119,6 @@ export function SplashScreen({
                   onResult: ({ result, error }) => {
                     if (error === undefined) {
                       if (result === true) {
-                        createUserDir();
                         eventParams.navigation.dispatch(
                           StackActions.push('Home', {
                             params: { id: 'sdf', pass: 'xxx' },
@@ -165,7 +150,6 @@ export function SplashScreen({
             }
             break;
           case 'on_logined':
-            createUserDir();
             break;
 
           default:
@@ -177,13 +161,7 @@ export function SplashScreen({
       sub2.remove();
       sub3.remove();
     };
-  }, [
-    autoLoginAction,
-    createUserDir,
-    onDisconnected,
-    onTokenDidExpire,
-    onTokenWillExpire,
-  ]);
+  }, [autoLoginAction, onDisconnected, onTokenDidExpire, onTokenWillExpire]);
 
   React.useEffect(() => {
     const load = () => {

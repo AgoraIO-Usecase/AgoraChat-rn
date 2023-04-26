@@ -1,3 +1,5 @@
+import 'react-native-get-random-values';
+
 import { v4 } from 'uuid';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class

@@ -20,10 +20,14 @@ import { DefaultAvatar } from '../components/DefaultAvatars';
 import DynamicHeightList, {
   type DynamicHeightListRef,
 } from '../components/DynamicHeightList';
-import { type LocalIconName, LocalIcon } from '../components/Icon';
+import {
+  type LocalIconName,
+  LocalIcon,
+  localLocalIcon,
+} from '../components/Icon';
+import Image from '../components/Image';
 import Loading from '../components/Loading';
 import SimulateGif from '../components/SimulateGif';
-import { useChatSdkContext } from '../contexts';
 import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
@@ -181,13 +185,24 @@ export const StateLabel = React.memo(
 export async function getImageExistedPath(
   msg: ImageMessageItemType
 ): Promise<string | undefined> {
-  if (msg.localThumbPath) {
-    let ret = await Services.ms.isExistedFile(msg.localThumbPath);
-    if (ret === true) {
-      return msg.localThumbPath;
+  let isExisted = false;
+  let ret: string | undefined;
+
+  if (msg.localThumbPath && msg.localThumbPath.length > 0) {
+    isExisted = await Services.ms.isExistedFile(msg.localThumbPath);
+    if (isExisted === true) {
+      ret = msg.localThumbPath;
     }
   }
-  return undefined;
+  if (isExisted === false) {
+    if (msg.localPath && msg.localPath.length > 0) {
+      isExisted = await Services.ms.isExistedFile(msg.localPath);
+      if (isExisted === true) {
+        ret = msg.localPath;
+      }
+    }
+  }
+  return ret;
 }
 
 export function getImageInfo(
@@ -245,7 +260,7 @@ const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
             styles.container,
             {
               flexDirection: msg.isSender ? 'row-reverse' : 'row',
-              width: screenWidth * 0.9,
+              maxWidth: screenWidth * 0.9,
             },
           ]}
         >
@@ -296,51 +311,14 @@ const TextMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       );
     }
   );
-// height < 50%, width < 200px,
-const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+
+export const FileMessageRenderItemDefault: ListRenderItem<MessageItemType> =
   React.memo(
     (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
-      const { client } = useChatSdkContext();
       const sf = getScaleFactor();
+      const { width: screenWidth } = useWindowDimensions();
       const { item } = info;
-      const msg = item as ImageMessageItemType;
-      const url = async (msg: ImageMessageItemType) => {
-        let r: string;
-        const ret = await getImageExistedPath(msg);
-        if (ret === undefined) {
-          if (msg.remoteThumbPath && msg.remoteThumbPath.length > 0) {
-            r = msg.remoteThumbPath;
-          } else {
-            r = msg.remoteUrl ?? '';
-          }
-        } else {
-          r = msg.localThumbPath ?? '';
-        }
-
-        if (
-          r.startsWith('http://') === false &&
-          r.startsWith('https://') === false
-        ) {
-          if (r.includes('#')) {
-            const appKey = client.options?.appKey;
-            if (appKey && r.includes(appKey)) {
-              const newAppKey = appKey.replace('#', '%23');
-              r = r.replace(appKey, newAppKey);
-            }
-          }
-          r = r.includes('file://') ? r : `file://${r}`;
-        }
-        return r;
-      };
-
-      const [_url, setUrl] = React.useState(msg.remoteThumbPath);
-
-      const checked = async (msg: ImageMessageItemType) => {
-        setUrl(await url(msg));
-      };
-
-      checked(msg);
-
+      const msg = item as FileMessageItemType;
       if (item.state === 'recalled') {
         return <RenderRecallMessage {...item} />;
       }
@@ -351,7 +329,7 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
             styles.container,
             {
               flexDirection: msg.isSender ? 'row-reverse' : 'row',
-              width: '80%',
+              maxWidth: screenWidth * 0.9,
             },
           ]}
         >
@@ -366,23 +344,216 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
             <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
           </View>
           <View
-            style={{
-              height: sf(200),
-              // flex: 1,
-              flexGrow: 1,
-            }}
+            style={[
+              styles.innerContainer,
+              {
+                borderBottomRightRadius: msg.isSender ? undefined : sf(12),
+                borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
+                maxWidth: screenWidth * 0.7,
+              },
+            ]}
           >
+            <View style={styles.file}>
+              {msg.isSender ? (
+                <View>
+                  <Image
+                    source={localLocalIcon('file_doc')}
+                    style={{ height: 36, width: 36 }}
+                  />
+                </View>
+              ) : null}
+              <View>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    {
+                      fontSize: sf(15),
+                      fontWeight: '600',
+                      lineHeight: sf(22),
+                      color: '#333333',
+                      maxWidth: screenWidth * 0.6,
+                    },
+                  ]}
+                >
+                  {msg.displayName}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    {
+                      fontSize: sf(12),
+                      fontWeight: '400',
+                      lineHeight: sf(20),
+                      color: '#666666',
+                      maxWidth: screenWidth * 0.6,
+                    },
+                  ]}
+                >
+                  {msg.fileSize}
+                </Text>
+              </View>
+
+              {msg.isSender ? null : (
+                <View>
+                  <Image
+                    source={localLocalIcon('file_doc')}
+                    style={{ height: 36, width: 36 }}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? sf(10) : undefined,
+                marginLeft: msg.isSender ? undefined : sf(10),
+                opacity: 1,
+              },
+            ]}
+          >
+            <StateLabel state={msg.state} />
+          </View>
+        </View>
+      );
+    }
+  );
+
+const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
+  React.memo(
+    (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
+      const sf = getScaleFactor();
+      const { item } = info;
+      const msg = item as ImageMessageItemType;
+      const { width: wWidth } = useWindowDimensions();
+      const [width, setWidth] = React.useState(wWidth * 0.6);
+      const [height, setHeight] = React.useState((wWidth * 0.6 * 4) / 3);
+
+      const updateUrl = (url: string) => {
+        let r = url;
+        if (
+          r.startsWith('http://') === false &&
+          r.startsWith('https://') === false
+        ) {
+          // if (r.includes('#')) {
+          //   const appKey = client.options?.appKey;
+          //   if (appKey && r.includes(appKey)) {
+          //     r = localUrlEscape(r);
+          //   }
+          // }
+          if (r.length > 0) {
+            r = r.includes('file://') ? r : `file://${r}`;
+            // r = localUrlEscape(r);
+          }
+        }
+        return r;
+      };
+      const url = (msg: ImageMessageItemType) => {
+        let r: string;
+        if (msg.localThumbPath && msg.localThumbPath.length > 0) {
+          r = msg.localThumbPath;
+        } else if (msg.remoteThumbPath && msg.remoteThumbPath.length > 0) {
+          r = msg.remoteThumbPath;
+        } else if (msg.localPath && msg.localPath.length > 0) {
+          r = msg.localPath;
+        } else {
+          r = msg.remoteUrl ?? '';
+        }
+        return updateUrl(r);
+      };
+      const urlAsync = async (msg: ImageMessageItemType) => {
+        return getImageExistedPath(msg);
+      };
+
+      const [_url, setUrl] = React.useState(url(msg));
+
+      const checked = async (msg: ImageMessageItemType) => {
+        const ret = await urlAsync(msg);
+        if (ret) {
+          setUrl(updateUrl(ret));
+        } else {
+          setTimeout(() => checked(msg), 1000);
+        }
+      };
+
+      const hw = (params: {
+        height: number;
+        width: number;
+      }): { width: number; height: number } => {
+        const { height, width } = params;
+        let ret = params;
+        if (width / height >= 10) {
+          const w = wWidth * 0.6;
+          ret = {
+            width: w,
+            height: w * 0.1,
+          };
+        } else if (width * 4 >= 3 * height) {
+          const w = wWidth * 0.6;
+          ret = {
+            width: w,
+            height: w * (height / width),
+          };
+        } else if (width * 10 >= 1 * height) {
+          const h = (wWidth * 0.6 * 4) / 3;
+          ret = {
+            width: (width / height) * h,
+            height: h,
+          };
+        } else {
+          // width / height < 1 / 10
+          console.log('test:10:', width, height);
+          const h = (wWidth * 0.6 * 4) / 3;
+          ret = {
+            width: 0.1 * h,
+            height: h,
+          };
+        }
+        return ret;
+      };
+
+      if (item.state === 'recalled') {
+        return <RenderRecallMessage {...item} />;
+      }
+
+      return (
+        <View
+          style={[
+            styles.container,
+            {
+              flexDirection: msg.isSender ? 'row-reverse' : 'row',
+              // maxWidth: '80%',
+            },
+          ]}
+        >
+          <View
+            style={[
+              {
+                marginRight: msg.isSender ? undefined : sf(10),
+                marginLeft: msg.isSender ? sf(10) : undefined,
+              },
+            ]}
+          >
+            <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
+          </View>
+          <View>
             <RNImage
               source={{
                 uri: _url,
               }}
-              resizeMode="cover"
-              style={{ height: sf(200), borderRadius: sf(10) }}
-              onLoad={() => {
-                console.log('test:onLoad:');
+              resizeMode="contain"
+              resizeMethod="scale"
+              style={{ height: height, width: width, borderRadius: sf(10) }}
+              onLoad={(e) => {
+                console.log('test:onLoad:', e.nativeEvent);
+                const ret = hw(e.nativeEvent.source);
+                setHeight(ret.height);
+                setWidth(ret.width);
               }}
               onError={() => {
                 console.log('test:onError:');
+                setUrl('');
+                checked(msg);
               }}
             />
           </View>
@@ -485,6 +656,7 @@ const VoiceMessageRenderItemDefault: ListRenderItem<MessageItemType> =
                 borderBottomRightRadius: msg.isSender ? undefined : sf(12),
                 borderBottomLeftRadius: msg.isSender ? sf(12) : undefined,
                 backgroundColor: msg.isSender ? '#0041FF' : '#F2F2F2',
+                flexGrow: 1,
               },
             ]}
           >
@@ -576,7 +748,7 @@ const MessageRenderItem: ListRenderItem<MessageItemType> = (
   } else if (item.type === ChatMessageType.LOCATION) {
     MessageItem = GLocationMessageItem as any;
   } else if (item.type === ChatMessageType.FILE) {
-    MessageItem = GFileMessageItem as any;
+    MessageItem = GFileMessageItem ?? (FileMessageRenderItemDefault as any);
   }
   if (MessageItem === null || MessageItem === undefined) {
     return null;
@@ -942,7 +1114,7 @@ const styles = createStyleSheet({
     padding: 10,
   },
   innerContainer: {
-    flex: 1,
+    // flex: 1,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     // backgroundColor: 'red',
@@ -952,6 +1124,11 @@ const styles = createStyleSheet({
     backgroundColor: 'rgba(242, 242, 242, 1)',
     padding: 10,
     flexWrap: 'wrap',
+  },
+  file: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(242, 242, 242, 1)',
+    padding: 10,
   },
 });
 

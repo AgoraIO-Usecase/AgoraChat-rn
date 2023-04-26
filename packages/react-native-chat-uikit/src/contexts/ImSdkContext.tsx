@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ChatClient } from 'react-native-chat-sdk';
 
+import { Services } from '../services';
 import type { ChatSdkContextType } from './types';
 
 export class UIKitChatSdkContext implements ChatSdkContextType {
@@ -35,6 +36,9 @@ export class UIKitChatSdkContext implements ChatSdkContextType {
           await this.client.loginWithAgoraToken(params.id, params.pass);
         }
         this.currentId = await this.client.getCurrentUsername();
+        Services.dcs.init(
+          `${client.options!.appKey.replace('#', '-')}/${this.currentId}`
+        );
         params.onResult?.({ result: true });
       } catch (error) {
         params.onResult?.({ result: false, error: error });
@@ -58,6 +62,9 @@ export class UIKitChatSdkContext implements ChatSdkContextType {
         const autoLoginFlag = this.client.options?.autoLogin;
         if (autoLoginFlag === true) {
           this.currentId = await this.client.getCurrentUsername();
+          Services.dcs.init(
+            `${client.options!.appKey.replace('#', '-')}/${this.currentId}`
+          );
         }
         params.onResult?.({ result: result });
       } catch (error) {

@@ -33,6 +33,14 @@ import { ThemeContextProvider } from '../contexts/ThemeContext';
 import { UikitModalPlaceholder } from '../events';
 import { createStringSetEn, UIKitStringSet } from '../I18n2/CStringSet.en';
 import {
+  ConnectStateEventDispatch,
+  ContactEventDispatch,
+  ConversationEventDispatch,
+  GroupEventDispatch,
+  MessageEventDispatch,
+  MultiDevicesEventDispatch,
+} from '../nativeEvents';
+import {
   ClipboardService,
   DirCacheService,
   LocalStorageService,
@@ -216,7 +224,8 @@ export function GlobalContainer({
     return <UikitModalPlaceholder />;
   };
 
-  const init = once(() => {
+  const initChatSDK = once(() => {
+    console.log('test:initChatSDK:');
     sdk?.client
       .init(
         new ChatOptions({
@@ -235,7 +244,57 @@ export function GlobalContainer({
       });
   });
 
-  init();
+  const contactEventListener = React.useRef<ContactEventDispatch>(
+    new ContactEventDispatch()
+  );
+  const messageEventListener = React.useRef<MessageEventDispatch>(
+    new MessageEventDispatch()
+  );
+  const connectEventListener = React.useRef<ConnectStateEventDispatch>(
+    new ConnectStateEventDispatch()
+  );
+  const convEventListener = React.useRef<ConversationEventDispatch>(
+    new ConversationEventDispatch()
+  );
+  const multiEventListener = React.useRef<MultiDevicesEventDispatch>(
+    new MultiDevicesEventDispatch()
+  );
+  const groupEventListener = React.useRef<GroupEventDispatch>(
+    new GroupEventDispatch()
+  );
+
+  const init = React.useCallback(() => {
+    contactEventListener.current.init();
+    messageEventListener.current.init();
+    convEventListener.current.init();
+    connectEventListener.current.init();
+    multiEventListener.current.init();
+    groupEventListener.current.init();
+  }, []);
+
+  const unInit = React.useCallback(() => {
+    contactEventListener.current.unInit();
+    messageEventListener.current.unInit();
+    convEventListener.current.unInit();
+    connectEventListener.current.unInit();
+    multiEventListener.current.unInit();
+    groupEventListener.current.unInit();
+  }, []);
+
+  React.useEffect(() => {
+    const load = () => {
+      console.log('test:load:', GlobalContainer.name);
+      init();
+      initChatSDK();
+    };
+    const unload = () => {
+      console.log('test:unload:', GlobalContainer.name);
+      unInit();
+    };
+
+    load();
+    return () => unload();
+  }, [init, initChatSDK, unInit]);
 
   return (
     <SafeAreaProvider>

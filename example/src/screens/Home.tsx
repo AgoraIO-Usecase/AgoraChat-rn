@@ -4,15 +4,9 @@ import * as React from 'react';
 import { DeviceEventEmitter } from 'react-native';
 import { ChatMessage, ChatMessageChatType } from 'react-native-chat-sdk';
 import {
-  ConnectStateEventDispatch,
   ContactChatSdkEvent,
   ContactChatSdkEventType,
-  ContactEventDispatch,
-  ConversationEventDispatch,
   DataEventType,
-  GroupEventDispatch,
-  MessageEventDispatch,
-  MultiDevicesEventDispatch,
 } from 'react-native-chat-uikit';
 
 import TabBarIcon from '../components/TabBarIcon';
@@ -182,25 +176,6 @@ export default function HomeScreen(
   const { client, getCurrentId, getAllUnreadCount } = useAppChatSdkContext();
   const contactFlag = React.useRef(false);
 
-  const contactEventListener = React.useRef<ContactEventDispatch>(
-    new ContactEventDispatch()
-  );
-  const messageEventListener = React.useRef<MessageEventDispatch>(
-    new MessageEventDispatch()
-  );
-  const connectEventListener = React.useRef<ConnectStateEventDispatch>(
-    new ConnectStateEventDispatch()
-  );
-  const convEventListener = React.useRef<ConversationEventDispatch>(
-    new ConversationEventDispatch()
-  );
-  const multiEventListener = React.useRef<MultiDevicesEventDispatch>(
-    new MultiDevicesEventDispatch()
-  );
-  const groupEventListener = React.useRef<GroupEventDispatch>(
-    new GroupEventDispatch()
-  );
-
   const saveRequest = React.useCallback(
     (params: { from: string; convId: string }) => {
       const msg = ChatMessage.createCustomMessage(
@@ -259,22 +234,10 @@ export default function HomeScreen(
 
   const init = React.useCallback(() => {
     console.log('test:HomeScreen:init:');
-    contactEventListener.current.init();
-    messageEventListener.current.init();
-    convEventListener.current.init();
-    connectEventListener.current.init();
-    multiEventListener.current.init();
-    groupEventListener.current.init();
   }, []);
 
   const unInit = React.useCallback(() => {
     console.log('test:HomeScreen:unInit:');
-    contactEventListener.current.unInit();
-    messageEventListener.current.unInit();
-    convEventListener.current.unInit();
-    connectEventListener.current.unInit();
-    multiEventListener.current.unInit();
-    groupEventListener.current.unInit();
   }, []);
 
   const initContactFlag = React.useCallback(async () => {

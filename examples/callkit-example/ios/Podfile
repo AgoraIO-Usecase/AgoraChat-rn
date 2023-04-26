@@ -61,9 +61,9 @@ target 'example' do
   # Uncomment to opt-in to using Flipper
   # Note that if you have use_frameworks! enabled, Flipper will not work
   #
-  if !ENV['CI']
-    use_flipper!({ 'Flipper' => '0.189.0' })
-  end
+  # if !ENV['CI']
+  #   use_flipper!({ 'Flipper' => '0.189.0' })
+  # end
 
   post_install do |installer|
     react_native_post_install(installer)

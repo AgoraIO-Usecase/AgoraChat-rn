@@ -281,7 +281,9 @@ export class CallManagerImpl
   ): void {
     calllog.log('CallManagerImpl:setLogHandler:', handler);
     calllog.tag = '[call]';
-    calllog.handler = handler;
+    if (handler) {
+      calllog.handler = handler;
+    }
   }
 
   public addViewListener(listener: CallViewListener): void {
