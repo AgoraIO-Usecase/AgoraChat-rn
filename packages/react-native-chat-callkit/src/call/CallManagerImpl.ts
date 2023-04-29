@@ -26,7 +26,7 @@ import {
   CallErrorType,
   CallType,
 } from '../enums';
-import { timestamp, uuid } from '../utils/utils';
+import { hashCode, timestamp, uuid } from '../utils/utils';
 import { calllog } from './CallConst';
 import * as K from './CallConst';
 import { CallDevice } from './CallDevice';
@@ -58,6 +58,7 @@ export class CallManagerImpl
   private _isInit: boolean;
   private _client?: ChatClient;
   private _option: CallOption;
+  private _type?: 'easemob' | 'agora' | undefined;
   private _listener?: CallViewListener;
   private _engine?: IRtcEngine;
   private _ship: CallRelationship;
@@ -74,6 +75,8 @@ export class CallManagerImpl
     appKey: string;
     channelId: string;
     userId: string;
+    userChannelId?: number;
+    type?: 'easemob' | 'agora' | undefined;
     onResult: (params: { data?: any; error?: any }) => void;
   }) => void;
   private _requestUserMap?: (params: {
@@ -111,10 +114,13 @@ export class CallManagerImpl
     option: CallOption;
     listener?: CallViewListener;
     enableLog?: boolean;
+    type?: 'easemob' | 'agora' | undefined;
     requestRTCToken: (params: {
       appKey: string;
       channelId: string;
       userId: string;
+      userChannelId?: number;
+      type?: 'easemob' | 'agora' | undefined;
       onResult: (params: { data?: any; error?: any }) => void;
     }) => void;
     requestUserMap: (params: {
@@ -154,6 +160,7 @@ export class CallManagerImpl
       callTimeout: params.option.callTimeout ?? K.KeyTimeout,
       ringFilePath: params.option.ringFilePath ?? '', // TODO:
     };
+    this._type = params.type;
     this._listener = params.listener;
     this._requestRTCToken = params.requestRTCToken;
     this._requestUserMap = params.requestUserMap;
@@ -1217,10 +1224,16 @@ export class CallManagerImpl
         callId: call.callId,
         new: CallSignalingState.InviterJoining,
       });
+      let userChannelId: number | undefined;
+      if (this._type !== 'easemob') {
+        userChannelId = Math.abs(hashCode(this.userId));
+      }
       this.requestRTCToken?.({
         appKey: this.option.appKey,
         channelId: call.channelId,
         userId: this.userId,
+        userChannelId: userChannelId,
+        type: this._type,
         onResult: (p: { data?: any; error?: any }) => {
           calllog.log('CallManagerImpl:onRequestJoin:requestRTCToken:', p);
           if (p.error === undefined) {

@@ -51,28 +51,19 @@ export function handleVoiceStateEvent(params: {
     case 'show_single_call':
       {
         console.log('test:stateEvent.params', stateEvent.params);
-        const {
-          inviterId,
-          isInviter,
-          callType,
-          currentId,
-          inviteeIds,
-          appKey,
-          agoraAppId,
-        } = stateEvent.params as {
-          appKey: string;
-          agoraAppId: string;
-          isInviter: boolean;
-          inviterId: string;
-          currentId: string;
-          inviteeIds: string[];
-          callType: CallType;
-        };
+        const { inviterId, isInviter, callType, currentId, inviteeIds } =
+          stateEvent.params as {
+            appKey: string;
+            agoraAppId: string;
+            isInviter: boolean;
+            inviterId: string;
+            currentId: string;
+            inviteeIds: string[];
+            callType: CallType;
+          };
         params.voiceState.showState({
           children: (
             <SingleCall
-              appKey={appKey}
-              agoraAppId={agoraAppId}
               inviterId={inviterId}
               inviterName={inviterId}
               currentId={currentId}
@@ -158,28 +149,19 @@ export function handleVoiceStateEvent(params: {
     case 'show_multi_call':
       {
         console.log('test:stateEvent.params:multi:', stateEvent.params);
-        const {
-          inviterId,
-          isInviter,
-          callType,
-          currentId,
-          inviteeIds,
-          appKey,
-          agoraAppId,
-        } = stateEvent.params as {
-          appKey: string;
-          agoraAppId: string;
-          isInviter: boolean;
-          inviterId: string;
-          currentId: string;
-          inviteeIds: string[];
-          callType: CallType;
-        };
+        const { inviterId, isInviter, callType, currentId, inviteeIds } =
+          stateEvent.params as {
+            appKey: string;
+            agoraAppId: string;
+            isInviter: boolean;
+            inviterId: string;
+            currentId: string;
+            inviteeIds: string[];
+            callType: CallType;
+          };
         params.voiceState.showState({
           children: (
             <MultiCall
-              appKey={appKey}
-              agoraAppId={agoraAppId}
               inviterId={inviterId}
               inviterName={inviterId}
               currentId={currentId}

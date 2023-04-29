@@ -69,6 +69,7 @@ let __TEST__ = true;
 let appKey = '';
 let agoraAppId = '';
 let fcmSenderId: string | undefined;
+let accountType: 'easemob' | 'agora' | undefined;
 
 try {
   const env = require('./env');
@@ -76,6 +77,7 @@ try {
   appKey = env.appKey;
   agoraAppId = env.agoraAppId;
   fcmSenderId = env.fcmSenderId;
+  accountType = env.accountType;
 } catch (e) {
   console.warn('test:', e);
 }
@@ -153,6 +155,12 @@ export default function App() {
     if (isOnInitialized.current === false || isOnReady.current === false) {
       return;
     }
+
+    if (accountType !== 'easemob') {
+      AppServerClient.rtcTokenUrl = 'http://a41.easemob.com/token/rtc/channel';
+      AppServerClient.mapUrl = 'http://a41.easemob.com/agora/channel/mapper';
+    }
+
     if ((await checkFCMPermission()) === false) {
       const ret = await requestFCMPermission();
       if (ret === false) {
@@ -271,6 +279,8 @@ export default function App() {
             appKey: string;
             channelId: string;
             userId: string;
+            userChannelId?: number | undefined;
+            type?: 'easemob' | 'agora' | undefined;
             onResult: (params: { data?: any; error?: any }) => void;
           }) => {
             console.log('requestRTCToken:', params);
@@ -278,6 +288,8 @@ export default function App() {
               userAccount: params.userId,
               channelId: params.channelId,
               appKey,
+              userChannelId: params.userChannelId,
+              type: params.type,
               onResult: (pp: { data?: any; error?: any }) => {
                 console.log('test:', pp);
                 params.onResult(pp);
