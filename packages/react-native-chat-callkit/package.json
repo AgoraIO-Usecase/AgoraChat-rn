@@ -1,6 +1,6 @@
 {
   "name": "react-native-chat-callkit",
-  "version": "0.1.1-beta.0",
+  "version": "0.1.1-beta.1",
   "description": "test",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
