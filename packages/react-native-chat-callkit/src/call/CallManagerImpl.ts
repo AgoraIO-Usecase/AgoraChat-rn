@@ -690,10 +690,6 @@ export class CallManagerImpl
       if (this.ship.currentCall.state !== CallSignalingState.Idle) {
         return true;
       }
-    } else if (this.ship.receiveCallList) {
-      if (this.ship.receiveCallList.size > 0) {
-        return true;
-      }
     }
     return false;
   }
@@ -867,6 +863,10 @@ export class CallManagerImpl
     } else {
       this.ship.receiveCallList.delete(callId);
     }
+  }
+  private _clearCall(): void {
+    this.ship.currentCall = undefined;
+    this.ship.receiveCallList.clear();
   }
 
   private _getCallByChannelId(channelId: string): CallObject | undefined {
@@ -1507,7 +1507,7 @@ export class CallManagerImpl
         if (params.isValid === true) {
           const call = this.ship.receiveCallList.get(params.callId);
           if (call) {
-            this._removeCall(params.callId);
+            this._clearCall();
             this.ship.currentCall = call;
             this.userListener?.onCallReceived?.({
               channelId: call.channelId,
