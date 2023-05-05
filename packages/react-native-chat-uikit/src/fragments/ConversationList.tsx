@@ -188,6 +188,7 @@ const Item: ItemComponent = (props) => {
 export type ConversationListFragmentRef = {
   update: (message: ChatMessage) => void;
   create: (params: { convId: string; convType: ChatConversationType }) => void;
+  remove: (params: { convId: string; convType: ChatConversationType }) => void;
   updateRead: (params: {
     convId: string;
     convType: ChatConversationType;
@@ -597,6 +598,31 @@ export default function ConversationListFragment(
     [duplicateCheck, manualRefresh, standardizedData]
   );
 
+  const removeConversation2 = React.useCallback(
+    (params: { convId: string; convType: ChatConversationType }) => {
+      manualRefresh({
+        type: 'del-one',
+        items: [
+          standardizedData({
+            key: params.convId,
+            convId: params.convId,
+            convType: params.convType,
+            lastMsg: undefined,
+            count: 0,
+          } as ItemDataType),
+        ],
+      });
+
+      client.chatManager
+        .deleteConversation(params.convId, true)
+        .then()
+        .catch((error) => {
+          console.warn('test:deleteConversation:error:', error);
+        });
+    },
+    [client.chatManager, manualRefresh, standardizedData]
+  );
+
   const updateConversationFromMessage = React.useCallback(
     async (msg: ChatMessage) => {
       const convId = getConvId(msg);
@@ -703,6 +729,12 @@ export default function ConversationListFragment(
           } as ItemDataType),
         ],
       });
+    };
+    propsRef.current.remove = (params: {
+      convId: string;
+      convType: ChatConversationType;
+    }) => {
+      removeConversation2(params);
     };
     propsRef.current.updateRead = (params: {
       convId: string;
