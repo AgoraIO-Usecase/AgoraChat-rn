@@ -200,6 +200,27 @@ export class CallSignallingHandler implements ChatMessageEventListener {
     }
     return ret;
   }
+
+  protected convertToInt(callType: CallType): number {
+    let ret = 0;
+    switch (callType) {
+      case CallType.Audio1v1:
+        ret = 0;
+        break;
+      case CallType.Video1v1:
+        ret = 1;
+        break;
+      case CallType.AudioMulti:
+        ret = 3;
+        break;
+      case CallType.VideoMulti:
+        ret = 2;
+        break;
+      default:
+        break;
+    }
+    return ret;
+  }
   /**
    * The inviter sends an invitation message. The invitee receives the notification through {@link CallSignallingListener.onInvite}.
    */
@@ -222,7 +243,7 @@ export class CallSignallingHandler implements ChatMessageEventListener {
       [K.KeyMsgType]: K.KeyMsgTypeValue,
       [K.KeyAction]: K.KeyInviteAction,
       [K.KeyCallId]: params.callId,
-      [K.KeyCallType]: params.callType as number,
+      [K.KeyCallType]: this.convertToInt(params.callType),
       [K.KeyCallerDevId]: params.inviterDeviceToken,
       [K.KeyChannelName]: params.channelId,
       [K.KeyTs]: timestamp(),
