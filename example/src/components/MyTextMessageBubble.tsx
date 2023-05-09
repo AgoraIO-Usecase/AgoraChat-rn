@@ -18,15 +18,39 @@ import {
 const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
   const { state, ext, ...others } = props;
   if (state === ('' as any)) console.log(others);
-  if (state === 'recalled') {
-    const tip = ext.recall.tip;
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Text>{tip}</Text>
-      </View>
-    );
-  }
-  return <View />;
+  const tip = ext.recall_content;
+  return (
+    <View
+      style={{
+        // flex: 1,
+        height: 30,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ color: '#A6A6A6' }}>{tip}</Text>
+    </View>
+  );
+};
+
+const RenderTipMessage = (props: MessageItemType): JSX.Element => {
+  const { state, ext, ...others } = props;
+  if (state === ('' as any)) console.log(others);
+  const tip = ext.tip_content;
+  return (
+    <View
+      style={{
+        flex: 1,
+        height: 30,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ flex: 1, color: '#A6A6A6' }}>{tip}</Text>
+    </View>
+  );
 };
 
 export const MyTextMessageBubble: ListRenderItem<MessageItemType> = React.memo(
@@ -35,8 +59,10 @@ export const MyTextMessageBubble: ListRenderItem<MessageItemType> = React.memo(
     const { width: screenWidth } = useWindowDimensions();
     const { item } = info;
     const msg = item as TextMessageItemType;
-    if (item.state === 'recalled') {
+    if (msg.ext && msg.ext.type === 'recall') {
       return <RenderRecallMessage {...item} />;
+    } else if (msg.ext && msg.ext.type === 'time') {
+      return <RenderTipMessage {...item} />;
     }
     return (
       <View

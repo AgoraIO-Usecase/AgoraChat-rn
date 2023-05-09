@@ -2,11 +2,17 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { DeviceEventEmitter } from 'react-native';
-import { ChatMessage, ChatMessageChatType } from 'react-native-chat-sdk';
+import {
+  ChatMessage,
+  ChatMessageChatType,
+  ChatMessageStatus,
+} from 'react-native-chat-sdk';
 import {
   ContactChatSdkEvent,
   ContactChatSdkEventType,
   DataEventType,
+  MessageChatSdkEvent,
+  MessageChatSdkEventType,
 } from 'react-native-chat-uikit';
 
 import TabBarIcon from '../components/TabBarIcon';
@@ -37,6 +43,7 @@ type HomeScreenInternalProps = {
 const HomeScreenInternal = React.memo((props: HomeScreenInternalProps) => {
   console.log('test:HomeScreenInternal:', props);
   const { contactFlag } = props;
+  const { client, currentId } = useAppChatSdkContext();
 
   const [convBarState, setConvBarState] = React.useState<
     number | boolean | undefined
@@ -49,6 +56,44 @@ const HomeScreenInternal = React.memo((props: HomeScreenInternalProps) => {
   );
 
   const addListeners = React.useCallback(() => {
+    const sub = DeviceEventEmitter.addListener(MessageChatSdkEvent, (event) => {
+      const eventType = event.type as MessageChatSdkEventType;
+      const eventParams = event.params as { messages: ChatMessage[] };
+      switch (eventType) {
+        case 'onMessagesRecalled': {
+          const messages = eventParams.messages;
+          for (const msg of messages) {
+            const content =
+              msg.from === currentId
+                ? `You have recall a message`
+                : `${msg.from} has recall a message`;
+            const tip = { ...msg } as ChatMessage;
+            tip.attributes = {
+              type: 'recall',
+              recall_from: msg.from,
+              recall_content: content,
+            };
+            tip.status = ChatMessageStatus.SUCCESS;
+            client.chatManager
+              .insertMessage(tip)
+              .then(() => {
+                sendEventFromHome({
+                  eventType: 'DataEvent',
+                  action: 'on_recall_message',
+                  params: { tip },
+                });
+              })
+              .catch((e) => {
+                console.log('test:insertMessage:', e);
+              });
+          }
+
+          break;
+        }
+        default:
+          break;
+      }
+    });
     const sub2 = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
       (event) => {
@@ -83,9 +128,10 @@ const HomeScreenInternal = React.memo((props: HomeScreenInternalProps) => {
       }
     );
     return () => {
+      sub.remove();
       sub2.remove();
     };
-  }, []);
+  }, [client.chatManager, currentId]);
 
   React.useEffect(() => {
     console.log('test:useEffect:', addListeners);

@@ -12,6 +12,7 @@ import {
 import {
   ChatConversationType,
   ChatMessage,
+  ChatMessageStatus,
   ChatMessageType,
 } from 'react-native-chat-sdk';
 import {
@@ -24,6 +25,7 @@ import {
   localUrlEscape,
   MessageBubbleListFragment,
   MessageBubbleListProps,
+  MessageBubbleListRef,
   MessageItemType,
   playUrl,
   ScreenContainer,
@@ -72,10 +74,9 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const params = rp?.params as { chatId: string; chatType: number };
   const chatId = params.chatId;
   const chatType = params.chatType as ChatConversationType;
-  const messageBubbleListRefP =
-    React.useRef<typeof MessageBubbleListFragment>(null);
+  const messageBubbleListRefP = React.useRef<MessageBubbleListRef>({} as any);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
-  const { client } = useAppChatSdkContext();
+  const { client, currentId } = useAppChatSdkContext();
 
   const onClickMessageBubble = React.useCallback(
     (data: MessageItemType) => {
@@ -122,126 +123,6 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
       headerTitle: chatId,
     });
   }, [chatId, navigation]);
-
-  const addListeners = React.useCallback(() => {
-    const sub = DeviceEventEmitter.addListener(
-      'DataEvent' as DataEventType,
-      async (event) => {
-        const { action, params } = event as {
-          eventBizType: BizEventType;
-          action: DataActionEventType;
-          senderId: string;
-          params: any;
-          timestamp?: number;
-        };
-        switch (action) {
-          case 'chat_open_camera':
-            Services.ms
-              .openCamera({})
-              .then((result) => {
-                console.log('openCamera:', Platform.OS, result);
-                chatRef.current?.sendImageMessage([
-                  {
-                    name: result?.name ?? '',
-                    localPath: result?.uri ?? '',
-                    fileSize: result?.size ?? 0,
-                    imageType: result?.type ?? '',
-                    width: result?.width ?? 0,
-                    height: result?.height ?? 0,
-                    onResult: (r) => {
-                      console.log('openCamera:result:', r);
-                    },
-                  },
-                ]);
-              })
-              .catch((error) => {
-                console.warn('error:', error);
-              });
-            break;
-          case 'chat_open_document':
-            {
-              const ret = await Services.ps.hasMediaLibraryPermission();
-              if (ret === false) {
-                await Services.ps.requestMediaLibraryPermission();
-              }
-              Services.ms
-                .openDocument({})
-                .then((result) => {
-                  console.log('openDocument:', Platform.OS, result);
-                  chatRef.current?.sendFileMessage({
-                    localPath: result?.uri ?? '',
-                    fileSize: result?.size ?? 0,
-                    displayName: result?.name,
-                    onResult: (result) => {
-                      console.log('openDocument:result', result);
-                    },
-                  });
-                })
-                .catch((error) => {
-                  console.warn('error:', error);
-                });
-            }
-
-            break;
-          case 'chat_open_media_library':
-            Services.ms
-              .openMediaLibrary({ selectionLimit: 1 })
-              .then((result) => {
-                console.log('openMediaLibrary:', Platform.OS, result);
-                chatRef.current?.sendImageMessage(
-                  result.map((value) => {
-                    return {
-                      name: value?.name ?? '',
-                      localPath: value?.uri ?? '',
-                      fileSize: value?.size ?? 0,
-                      imageType: value?.type ?? '',
-                      width: value?.width ?? 0,
-                      height: value?.height ?? 0,
-                      onResult: (result) => {
-                        console.log('openMediaLibrary:result:', result);
-                      },
-                    };
-                  })
-                );
-              })
-              .catch((error) => {
-                console.warn('error:', error);
-              });
-            break;
-          case 'delete_local_message':
-            chatRef.current?.deleteLocalMessage({
-              ...params,
-              onResult: (result) => {
-                console.log('delete_local_message:', result);
-              },
-            });
-            break;
-          case 'resend_message':
-            chatRef.current?.resendMessage({
-              ...params,
-              onResult: (result) => {
-                console.log('resend_message:', result);
-              },
-            });
-            break;
-          // case 'recall_message':
-          //   chatRef.current?.recallMessage({
-          //     ...params,
-          //     onResult: (result) => {
-          //       console.log('recall_message:', result);
-          //     },
-          //   });
-          //   break;
-
-          default:
-            break;
-        }
-      }
-    );
-    return () => {
-      sub.remove();
-    };
-  }, []);
 
   const onPressInInputVoiceButton = React.useCallback(() => {
     sendEventFromChat({
@@ -398,6 +279,150 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
     createConversationIfNotExisted();
     clearRead();
   }, [clearRead, createConversationIfNotExisted]);
+
+  const addListeners = React.useCallback(() => {
+    const sub = DeviceEventEmitter.addListener(
+      'DataEvent' as DataEventType,
+      async (event) => {
+        const { action, params } = event as {
+          eventBizType: BizEventType;
+          action: DataActionEventType;
+          senderId: string;
+          params: any;
+          timestamp?: number;
+        };
+        switch (action) {
+          case 'chat_open_camera':
+            Services.ms
+              .openCamera({})
+              .then((result) => {
+                console.log('openCamera:', Platform.OS, result);
+                chatRef.current?.sendImageMessage([
+                  {
+                    name: result?.name ?? '',
+                    localPath: result?.uri ?? '',
+                    fileSize: result?.size ?? 0,
+                    imageType: result?.type ?? '',
+                    width: result?.width ?? 0,
+                    height: result?.height ?? 0,
+                    onResult: (r) => {
+                      console.log('openCamera:result:', r);
+                    },
+                  },
+                ]);
+              })
+              .catch((error) => {
+                console.warn('error:', error);
+              });
+            break;
+          case 'chat_open_document':
+            {
+              const ret = await Services.ps.hasMediaLibraryPermission();
+              if (ret === false) {
+                await Services.ps.requestMediaLibraryPermission();
+              }
+              Services.ms
+                .openDocument({})
+                .then((result) => {
+                  console.log('openDocument:', Platform.OS, result);
+                  chatRef.current?.sendFileMessage({
+                    localPath: result?.uri ?? '',
+                    fileSize: result?.size ?? 0,
+                    displayName: result?.name,
+                    onResult: (result) => {
+                      console.log('openDocument:result', result);
+                    },
+                  });
+                })
+                .catch((error) => {
+                  console.warn('error:', error);
+                });
+            }
+
+            break;
+          case 'chat_open_media_library':
+            Services.ms
+              .openMediaLibrary({ selectionLimit: 1 })
+              .then((result) => {
+                console.log('openMediaLibrary:', Platform.OS, result);
+                chatRef.current?.sendImageMessage(
+                  result.map((value) => {
+                    return {
+                      name: value?.name ?? '',
+                      localPath: value?.uri ?? '',
+                      fileSize: value?.size ?? 0,
+                      imageType: value?.type ?? '',
+                      width: value?.width ?? 0,
+                      height: value?.height ?? 0,
+                      onResult: (result) => {
+                        console.log('openMediaLibrary:result:', result);
+                      },
+                    };
+                  })
+                );
+              })
+              .catch((error) => {
+                console.warn('error:', error);
+              });
+            break;
+          case 'delete_local_message':
+            chatRef.current?.deleteLocalMessage({
+              ...params,
+              onResult: (result) => {
+                console.log('delete_local_message:', result);
+              },
+            });
+            break;
+          case 'resend_message':
+            chatRef.current?.resendMessage({
+              ...params,
+              onResult: (result) => {
+                console.log('resend_message:', result);
+              },
+            });
+            break;
+          case 'recall_message':
+            chatRef.current?.recallMessage({
+              ...params,
+              onResult: (result) => {
+                if (result.message) {
+                  const msg = result.message as ChatMessage;
+                  const content =
+                    msg.from === currentId
+                      ? `You have recall a message`
+                      : `${msg.from} has recall a message`;
+                  const tip = { ...msg } as ChatMessage;
+                  tip.attributes = {
+                    type: 'recall',
+                    recall_from: msg.from,
+                    recall_content: content,
+                  };
+                  tip.status = ChatMessageStatus.SUCCESS;
+                  chatRef.current?.insertMessage({ msg: tip });
+                  onSendMessageEnd(tip);
+                }
+              },
+            });
+            break;
+          case 'on_recall_message':
+            {
+              const { tip } = params;
+              messageBubbleListRefP.current?.delMessage({
+                localMsgId: tip.localMsgId,
+              });
+              chatRef.current?.insertMessage({ msg: tip });
+              onSendMessageEnd(tip);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    );
+    return () => {
+      sub.remove();
+    };
+  }, [currentId, onSendMessageEnd]);
 
   React.useEffect(() => {
     const load = () => {

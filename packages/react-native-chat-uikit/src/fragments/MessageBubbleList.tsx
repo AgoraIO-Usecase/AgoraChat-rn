@@ -796,7 +796,7 @@ export type MessageBubbleListRef = {
     reason?: any;
     item?: MessageItemType;
   }) => void;
-  delMessage: (localMsgId: string) => void;
+  delMessage: (params: { localMsgId?: string; msgId?: string }) => void;
   resendMessage: (localMsgId: string) => void;
   recallMessage: (msg: ChatMessage) => void;
 };
@@ -945,10 +945,18 @@ const MessageBubbleList = (
               const item = items[index];
               if (item) {
                 for (const i of list) {
-                  if (item.key === i.key) {
-                    items.splice(index, 1);
-                    hadDeleted = true;
-                    break;
+                  if (i.key === undefined) {
+                    if (item.msgId === i.msgId) {
+                      items.splice(index, 1);
+                      hadDeleted = true;
+                      break;
+                    }
+                  } else {
+                    if (item.key === i.key) {
+                      items.splice(index, 1);
+                      hadDeleted = true;
+                      break;
+                    }
                   }
                 }
               }
@@ -1020,10 +1028,15 @@ const MessageBubbleList = (
       }) => {
         updateMessageState(params);
       },
-      delMessage: (localMsgId: string) => {
+      delMessage: (params: { localMsgId?: string; msgId?: string }) => {
         updateData({
           type: 'del-one',
-          list: [{ key: localMsgId } as MessageItemType],
+          list: [
+            {
+              key: params.localMsgId,
+              msgId: params.msgId,
+            } as MessageItemType,
+          ],
           direction: 'after',
         });
       },

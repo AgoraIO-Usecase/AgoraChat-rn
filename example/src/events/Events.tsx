@@ -126,7 +126,8 @@ export type DataActionEventType =
   | 'update_conversation_mute'
   | 'delete_local_message'
   | 'recall_message'
-  | 'resend_message';
+  | 'resend_message'
+  | 'on_recall_message';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////

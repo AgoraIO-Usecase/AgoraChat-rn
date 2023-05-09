@@ -129,6 +129,7 @@ type ChatInputProps = BaseProps & {
 };
 
 type ChatContentRef = {
+  insertMessage: (params: { msg: ChatMessage }) => void;
   sendImageMessage: (
     params: {
       name: string;
@@ -703,6 +704,7 @@ const ChatContent = React.memo(
           default:
             break;
         }
+        if (r) r.attributes = item.ext;
         return r;
       },
       [chatId, chatType]
@@ -903,6 +905,7 @@ const ChatContent = React.memo(
           key: msg.localMsgId,
           msgId: msg.msgId,
           state: convertFromMessageState(msg),
+          ext: msg.attributes,
         } as MessageItemType;
         convertFromMessageBody(msg, r);
         return standardizedData(r);
@@ -1130,6 +1133,26 @@ const ChatContent = React.memo(
         getMsgListRef,
         sendToServer,
       ]
+    );
+
+    const insertMessage = React.useCallback(
+      (params: { msg: ChatMessage }) => {
+        const { msg } = params;
+        if (msg === undefined) {
+          throw new Error('This is impossible.');
+        }
+
+        getMsgListRef().current?.addMessage({
+          direction: 'after',
+          msgs: [{ ...convertFromMessage(msg) }],
+        });
+        timeoutTask(() => {
+          getMsgListRef().current?.scrollToEnd();
+        });
+
+        client.chatManager.insertMessage(msg).then().catch();
+      },
+      [client.chatManager, convertFromMessage, getMsgListRef]
     );
 
     const sendImageMessage = React.useCallback(
@@ -1516,12 +1539,11 @@ const ChatContent = React.memo(
         client.chatManager
           .deleteMessage(convId, convType, msgId)
           .then(() => {
-            getMsgListRef().current?.delMessage(key);
+            getMsgListRef().current?.delMessage({ localMsgId: key, msgId });
             params.onResult?.(undefined);
           })
           .catch((error) => {
-            console.log('test:error:', error);
-            params.onResult?.(error);
+            params.onResult?.({ error });
           });
       },
       [client.chatManager, getMsgListRef]
@@ -1541,25 +1563,19 @@ const ChatContent = React.memo(
               client.chatManager
                 .recallMessage(msgId)
                 .then(() => {
-                  getMsgListRef().current?.delMessage(msg.localMsgId);
-                  // const tip = 'You have recall a message.';
-                  // msg.attributes = {
-                  //   recall: {
-                  //     tip: tip,
-                  //   },
-                  // };
-                  // getMsgListRef().current?.recallMessage(msg);
-                  // todo: add local tip message.
+                  getMsgListRef().current?.delMessage({
+                    localMsgId: params.key,
+                    msgId,
+                  });
+                  params.onResult?.({ message: msg });
                 })
                 .catch((error) => {
-                  console.log('test:error:', error);
-                  params.onResult?.(error);
+                  params.onResult?.({ error });
                 });
             }
           })
           .catch((error) => {
-            console.log('test:error:', error);
-            params.onResult?.(error);
+            params.onResult?.({ error });
           });
       },
       [client.chatManager, getMsgListRef]
@@ -1579,8 +1595,7 @@ const ChatContent = React.memo(
               client.chatManager
                 .resendMessage(msg, {
                   onError(localMsgId: string, error: ChatError) {
-                    console.log('test:', localMsgId, error);
-                    onResult?.(error);
+                    onResult?.({ error });
                   },
                   onSuccess(message: ChatMessage) {
                     updateMessageState({
@@ -1588,19 +1603,17 @@ const ChatContent = React.memo(
                       result: true,
                       item: convertFromMessage(message),
                     });
-                    onResult?.(undefined);
+                    onResult?.({ message });
                   },
                 } as ChatMessageStatusCallback)
                 .then()
                 .catch((error) => {
-                  console.log('test:error:', error);
-                  onResult?.(error);
+                  onResult?.({ error });
                 });
             }
           })
           .catch((error) => {
-            console.log('test:error:', error);
-            onResult?.(error);
+            onResult?.({ error });
           });
       },
       [
@@ -1727,6 +1740,9 @@ const ChatContent = React.memo(
     }, []);
 
     if (propsRef?.current) {
+      propsRef.current.insertMessage = (params: any) => {
+        insertMessage(params);
+      };
       propsRef.current.sendImageMessage = (params: any) => {
         const eventParams = params;
         for (const item of eventParams) {
@@ -1823,7 +1839,14 @@ const ChatContent = React.memo(
             //   const messages = eventParams.messages;
             //   for (const msg of messages) {
             //     if (msg.conversationId === chatId) {
-            //       getMsgListRef().current?.recallMessage(msg);
+            //       console.log('test:onMessagesRecalled:', msg.msgId);
+            //       client.chatManager
+            //         .getMessage(msg.msgId)
+            //         .then((value) => {
+            //           console.log('test:onMessagesRecalled:getMessage:', value);
+            //         })
+            //         .catch();
+            //       // getMsgListRef().current?.recallMessage(msg);
             //     }
             //   }
 
@@ -2030,6 +2053,12 @@ const ChatContent = React.memo(
  */
 export type ChatFragmentRef = {
   /**
+   * Insert a local message.
+   *
+   * Typical application: Add prompt messages.
+   */
+  insertMessage: (params: { msg: ChatMessage }) => void;
+  /**
    * send image message
    */
   sendImageMessage: (
@@ -2125,11 +2154,11 @@ export type ChatFragmentRef = {
   /**
    * Undo a message that has been successfully sent.
    */
-  // recallMessage: (params: {
-  //   msgId: string;
-  //   key: string;
-  //   onResult?: (params: any) => void;
-  // }) => void;
+  recallMessage: (params: {
+    msgId: string;
+    key: string;
+    onResult?: (params: any) => void;
+  }) => void;
 
   /**
    * Resend the message that failed to be sent.
@@ -2248,6 +2277,9 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
   const chatContentRef = React.useRef<ChatContentRef>({} as any);
 
   if (propsRef?.current) {
+    propsRef.current.insertMessage = (params) => {
+      chatContentRef?.current.insertMessage(params);
+    };
     propsRef.current.sendImageMessage = (params) => {
       chatContentRef?.current.sendImageMessage(params);
     };
@@ -2275,9 +2307,9 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     propsRef.current.deleteLocalMessage = (params) => {
       chatContentRef?.current.deleteLocalMessage(params);
     };
-    // propsRef.current.recallMessage = (params) => {
-    //   chatContentRef?.current.recallMessage(params);
-    // };
+    propsRef.current.recallMessage = (params) => {
+      chatContentRef?.current.recallMessage(params);
+    };
     propsRef.current.resendMessage = (params) => {
       chatContentRef?.current.resendMessage(params);
     };
