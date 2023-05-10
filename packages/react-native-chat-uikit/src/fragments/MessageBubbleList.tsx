@@ -956,7 +956,7 @@ const MessageBubbleList = (
               let ret = false;
               for (const i of items) {
                 if (
-                  i.ext?.time_content !== undefined &&
+                  i?.ext?.time_content !== undefined &&
                   i.ext.time_content === target?.ext.time_content
                 ) {
                   ret = true;
@@ -972,7 +972,8 @@ const MessageBubbleList = (
                   const elementI = items[i];
                   const elementJ = items[j];
                   if (
-                    elementI?.ext.time_content &&
+                    elementI?.ext?.time_content &&
+                    elementJ?.ext?.time_content &&
                     elementI?.ext.time_content === elementJ?.ext.time_content &&
                     i !== j
                   ) {
