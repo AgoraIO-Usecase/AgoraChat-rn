@@ -1594,7 +1594,7 @@ const ChatContent = React.memo(
               getMsgListRef().current?.resendMessage(key);
               client.chatManager
                 .resendMessage(msg, {
-                  onError(localMsgId: string, error: ChatError) {
+                  onError(_: string, error: ChatError) {
                     onResult?.({ error });
                   },
                   onSuccess(message: ChatMessage) {

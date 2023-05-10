@@ -31,7 +31,9 @@ import SimulateGif from '../components/SimulateGif';
 import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
+import { messageTimeForChat } from '../utils/format';
 import { wait } from '../utils/function';
+import { seqId } from '../utils/generator';
 import type { MessageItemStateType } from './types';
 // import {
 //   type DynamicHeightListRef,
@@ -814,12 +816,13 @@ export type MessageBubbleListProps = {
   LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
   VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
   CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
+  showTimeLabel?: boolean;
 };
 const MessageBubbleList = (
   props: MessageBubbleListProps,
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
-  // const { onPressed } = props;
+  const { showTimeLabel } = props;
 
   GTextMessageItem = props.TextMessageItem;
   GImageMessageItem = props.ImageMessageItem;
@@ -894,7 +897,7 @@ const MessageBubbleList = (
     [data1, data2]
   );
 
-  const updateData = React.useCallback(
+  const insertTimeLabel = React.useCallback(
     ({
       type,
       list,
@@ -906,12 +909,143 @@ const MessageBubbleList = (
     }) => {
       switch (type) {
         case 'add':
+          {
+            const createTip = (
+              items: MessageItemType[],
+              data: MessageItemType
+            ) => {
+              let ret: MessageItemType | undefined;
+              let isCreated = false;
+              if (data !== undefined) {
+                if (items.length === 0) {
+                  // TODO: add tip
+                  isCreated = true;
+                } else if (items.length > 0) {
+                  const tip = items[items.length - 1] as MessageItemType;
+                  const first = data as MessageItemType;
+                  if (
+                    tip.ext.type !== 'tip' &&
+                    tip.timestamp + 60 * 1000 < first.timestamp
+                  ) {
+                    // TODO: add tip
+                    isCreated = true;
+                  }
+                }
+                if (isCreated === true) {
+                  ret = {
+                    sender: data.sender,
+                    timestamp: data.timestamp,
+                    key: seqId('__msg_').toString(),
+                    msgId: data.msgId,
+                    type: ChatMessageType.TXT,
+                    ext: {
+                      type: 'time',
+                      time_content: messageTimeForChat(data.timestamp),
+                    },
+                    isTip: true,
+                  } as MessageItemType;
+                }
+              }
+
+              return ret;
+            };
+            const isExistedTip = (
+              items: MessageItemType[],
+              target?: MessageItemType
+            ) => {
+              let ret = false;
+              for (const i of items) {
+                if (
+                  i.ext?.time_content !== undefined &&
+                  i.ext.time_content === target?.ext.time_content
+                ) {
+                  ret = true;
+                  break;
+                }
+              }
+              return ret;
+            };
+            const removeDuplicateTip = (items: MessageItemType[]) => {
+              let length = items.length;
+              for (let i = 0; i < length; i++) {
+                for (let j = 0; j < length; j++) {
+                  const elementI = items[i];
+                  const elementJ = items[j];
+                  if (
+                    elementI?.ext.time_content &&
+                    elementI?.ext.time_content === elementJ?.ext.time_content &&
+                    i !== j
+                  ) {
+                    items.splice(j, 1);
+                    --length;
+                    --j;
+                  }
+                }
+              }
+              return items;
+            };
+            if (direction === 'after') {
+              for (const i of list) {
+                const ret = createTip(items, i);
+                if (ret && isExistedTip(items, ret) === false) {
+                  items.push(ret);
+                }
+                items.push(i);
+              }
+              const tmp = [...items];
+              items.length = 0;
+              items.push(...removeDuplicateTip(tmp));
+            } else {
+              let arr = [] as MessageItemType[];
+              for (const i of list) {
+                const ret = createTip(arr, i);
+                if (ret && isExistedTip(arr, ret) === false) {
+                  arr.push(ret);
+                }
+                arr.push(i);
+              }
+              const tmp = arr.concat(items);
+              items.length = 0;
+              items.push(...removeDuplicateTip(tmp));
+            }
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    [items]
+  );
+
+  const updateData = React.useCallback(
+    ({
+      type,
+      list,
+      direction,
+      isAddTimeLabel,
+    }: {
+      type: 'add' | 'update-all' | 'update-part' | 'del-one';
+      list: MessageItemType[];
+      direction: InsertDirectionType;
+      isAddTimeLabel?: boolean;
+    }) => {
+      switch (type) {
+        case 'add':
           if (direction === 'after') {
-            items.push(...list);
+            if (isAddTimeLabel === true) {
+              insertTimeLabel({ type, list, direction });
+            } else {
+              items.push(...list);
+            }
           } else {
-            const tmp = list.concat(items);
-            items.length = 0;
-            items.push(...tmp);
+            if (isAddTimeLabel === true) {
+              insertTimeLabel({ type, list, direction });
+            } else {
+              const tmp = list.concat(items);
+              items.length = 0;
+              items.push(...tmp);
+            }
           }
           break;
         case 'update-all':
@@ -971,7 +1105,7 @@ const MessageBubbleList = (
       }
       updateDataInternal(items);
     },
-    [items, updateDataInternal]
+    [insertTimeLabel, items, updateDataInternal]
   );
 
   const updateMessageState = React.useCallback(
@@ -1018,6 +1152,7 @@ const MessageBubbleList = (
           type: 'add',
           list: params.msgs,
           direction: params.direction,
+          isAddTimeLabel: showTimeLabel,
         });
       },
       updateMessageState: (params: {
@@ -1062,7 +1197,7 @@ const MessageBubbleList = (
         });
       },
     }),
-    [updateData, updateMessageState]
+    [showTimeLabel, updateData, updateMessageState]
   );
 
   const initList = React.useCallback(() => {}, []);
@@ -1110,8 +1245,9 @@ const MessageBubbleList = (
           })
           .catch();
       }}
-      keyExtractor={(_: any, index: number) => {
-        return index.toString();
+      keyExtractor={(item: MessageItemType, _: number) => {
+        return item.key;
+        // return index.toString();
       }}
       // onTouchEnd={onPressed}
     />

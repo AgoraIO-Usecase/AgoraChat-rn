@@ -77,6 +77,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const messageBubbleListRefP = React.useRef<MessageBubbleListRef>({} as any);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
   const { client, currentId } = useAppChatSdkContext();
+  const showTimeLabel = true;
 
   const onClickMessageBubble = React.useCallback(
     (data: MessageItemType) => {
@@ -453,6 +454,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             TextMessageItem: MyTextMessageBubble,
             VideoMessageItem: MyVideoMessageBubble,
             FileMessageItem: MyFileMessageBubble,
+            showTimeLabel: showTimeLabel,
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}

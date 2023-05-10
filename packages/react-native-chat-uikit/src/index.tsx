@@ -121,6 +121,7 @@ export { generateFileName, getFileExtension } from './utils/file';
 export {
   getDateTimePoint,
   messageTime,
+  messageTimeForChat,
   messageTimestamp,
   truncateContent,
   truncatedBadgeCount,

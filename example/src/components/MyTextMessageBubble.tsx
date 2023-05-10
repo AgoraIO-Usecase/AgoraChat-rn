@@ -37,7 +37,7 @@ const RenderRecallMessage = (props: MessageItemType): JSX.Element => {
 const RenderTipMessage = (props: MessageItemType): JSX.Element => {
   const { state, ext, ...others } = props;
   if (state === ('' as any)) console.log(others);
-  const tip = ext.tip_content;
+  const tip = ext.time_content;
   return (
     <View
       style={{
