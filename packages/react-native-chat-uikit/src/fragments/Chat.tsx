@@ -227,6 +227,7 @@ type ChatContentProps = BaseProps & {
   onSendMessage?: (message: ChatMessage) => void;
   onSendMessageEnd?: (message: ChatMessage) => void;
   onVoiceRecordEnd?: (params: { localPath: string; duration: number }) => void;
+  keyboardVerticalOffset?: number;
 };
 
 // const sendEventFromChat = (
@@ -552,6 +553,7 @@ const ChatContent = React.memo(
     onSendMessage,
     onSendMessageEnd,
     onVoiceRecordEnd,
+    keyboardVerticalOffset,
   }: ChatContentProps) => {
     const sf = getScaleFactor();
     const TextInputRef = React.useRef<RNTextInput>(null);
@@ -1723,7 +1725,13 @@ const ChatContent = React.memo(
       const subscription1 = Keyboard.addListener('keyboardWillHide', (_) => {
         setIsInputRef.current(false);
       });
+      const subscription5 = Keyboard.addListener('keyboardDidHide', (_) => {
+        setIsInputRef.current(false);
+      });
       const subscription2 = Keyboard.addListener('keyboardWillShow', (_) => {
+        setIsInputRef.current(true);
+      });
+      const subscription4 = Keyboard.addListener('keyboardDidShow', (_) => {
         setIsInputRef.current(true);
       });
       const subscription3 = DeviceEventEmitter.addListener('onFace', (face) => {
@@ -1736,6 +1744,8 @@ const ChatContent = React.memo(
         subscription1.remove();
         subscription2.remove();
         subscription3.remove();
+        subscription4.remove();
+        subscription5.remove();
       };
     }, []);
 
@@ -1974,15 +1984,15 @@ const ChatContent = React.memo(
       [sendVoiceMessage]
     );
 
-    const keyboardVerticalOffset = sf(
-      Platform.select({ ios: 100, android: 0 })!
+    // There are problems with react-navigation native stack and keyboard being used together.
+    const keyboardVerticalOffsetInternal = sf(
+      Platform.select({ ios: 64, android: 0 })!
     );
 
     return (
       <View style={{ flex: 1 }}>
         <TouchableWithoutFeedback
           onPress={() => {
-            // keyboardVerticalOffset = sf(0);
             Keyboard.dismiss();
             _onFace('face');
           }}
@@ -2000,7 +2010,9 @@ const ChatContent = React.memo(
           pointerEvents="box-none"
           // style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={keyboardVerticalOffset}
+          keyboardVerticalOffset={
+            keyboardVerticalOffset ?? keyboardVerticalOffsetInternal
+          }
         >
           <ChatInput
             inputRef={inputRef ? inputRef : TextInputRef}
@@ -2249,6 +2261,10 @@ export type ChatFragmentProps = {
    * A callback notification after a voice file is recorded.
    */
   onVoiceRecordEnd?: (params: { localPath: string; duration: number }) => void;
+  /**
+   * Try to solve the keyboard height problem.
+   */
+  keyboardVerticalOffset?: number;
 };
 
 export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
@@ -2266,6 +2282,7 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
     onSendMessage,
     onSendMessageEnd,
     onVoiceRecordEnd,
+    keyboardVerticalOffset,
   } = props;
   const params = screenParams.params as {
     chatId: string;
@@ -2349,6 +2366,7 @@ export default function ChatFragment(props: ChatFragmentProps): JSX.Element {
         onSendMessage={onSendMessage}
         onSendMessageEnd={onSendMessageEnd}
         onVoiceRecordEnd={onVoiceRecordEnd}
+        keyboardVerticalOffset={keyboardVerticalOffset}
       />
       {/* </TouchableWithoutFeedback> */}
       {/* </KeyboardAvoidingView> */}
