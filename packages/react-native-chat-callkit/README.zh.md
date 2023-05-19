@@ -32,6 +32,33 @@ yarn && yarn run generate-source-env
 
 该 sdk 主要提供 manager，listener，view 共同完成通话。
 
+<table>
+  <tr>
+    <td>function</td>
+    <td>description</td>
+  </tr>
+  <tr>
+    <td>CallManager</td>
+    <td style="font-size: 10px">提供添加和删除监听器等功能的管理器。</td>
+  </tr>
+  <tr>
+    <td>CallListener</td>
+    <td style="font-size: 10px">接收邀请、发送错误等通知的监听器</td>
+  </tr>
+  <tr>
+    <td>SingleCall</td>
+    <td style="font-size: 10px">
+      提供单人聊天页面，提供邀请、接听、挂断等操作，支持音视频通话的页面。
+    </td>
+  </tr>
+  <tr>
+    <td>MultiCall</td>
+    <td style="font-size: 10px">
+      提供多人聊天页面，提供邀请、接听、挂断等操作的页面。
+    </td>
+  </tr>
+</table>
+
 ### 管理器
 
 `CallManager` 管理器主要进行通话管理。

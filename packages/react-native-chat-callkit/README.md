@@ -32,6 +32,40 @@ agora callkit sdk is designed on the basis of agora chat sdk. Through the chat s
 
 The sdk mainly provides manager, listener, and view to complete the call together.
 
+<table>
+  <tr>
+    <td>function</td>
+    <td>description</td>
+  </tr>
+  <tr>
+    <td>CallManager</td>
+    <td style="font-size: 10px">
+      A manager that provides functions such as adding and removing listeners.
+    </td>
+  </tr>
+  <tr>
+    <td>CallListener</td>
+    <td style="font-size: 10px">
+      Listener for receiving notifications such as invitations and sending
+      errors
+    </td>
+  </tr>
+  <tr>
+    <td>SingleCall</td>
+    <td style="font-size: 10px">
+      Provide a single-person chat page, provide operations such as invitation,
+      answering, and hanging up, and a page that supports audio and video calls.
+    </td>
+  </tr>
+  <tr>
+    <td>MultiCall</td>
+    <td style="font-size: 10px">
+      Provide a multi-person chat page, and provide pages for operations such as
+      invitation, answering, and hanging up.
+    </td>
+  </tr>
+</table>
+
 ### Manager
 
 The `CallManager` manager is mainly for call management.

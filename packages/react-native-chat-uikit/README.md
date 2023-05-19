@@ -30,6 +30,69 @@ yarn && yarn run generate-source-env
 
 The agora uikit sdk is designed on the basis of agora chat sdk. Application development can be realized more efficiently through these UI components. In addition to the UI components, it also provides the necessary packaging of agora chat sdk and some basic tools to provide the greatest possible convenience for developing applications.
 
+<table>
+  <tr>
+    <td>module</td>
+    <td>function</td>
+    <td>description</td>
+  </tr>
+  <tr>
+    <td rowspan="5" style="font-weight: bold">Conversation List</td>
+  </tr>
+  <tr>
+    <td>Conversation list</td>
+    <td style="font-size: 10px">
+      The session list displays the profile avatar, nickname, latest message
+      content, unread message count, time and slide menu.
+    </td>
+  </tr>
+  <tr>
+    <td>Add conversation</td>
+    <td style="font-size: 10px">
+      Add the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation</td>
+    <td style="font-size: 10px">
+      Update the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td>Delete conversation</td>
+    <td style="font-size: 10px">
+      Deletes the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="5" style="font-weight: bold">Chat</td>
+  </tr>
+  <tr>
+    <td>Message Bubble</td>
+    <td style="font-size: 10px">
+      Built-in message bubble styles for some basic types, and support custom
+      message bubble styles.
+    </td>
+  </tr>
+  <tr>
+    <td>Send Message</td>
+    <td style="font-size: 10px">Support message sending</td>
+  </tr>
+  <tr>
+    <td>Message Bubble Event</td>
+    <td style="font-size: 10px">
+      Support message bubble click and long press events.
+    </td>
+  </tr>
+  <tr>
+    <td>emoji</td>
+    <td style="font-size: 10px">Support ink emoticons with unicode codes.</td>
+  </tr>
+  <tr>
+    <td colspan="3">More features in development...</td>
+  </tr>
+</table>
+
 ## function list
 
 ### Session list component

@@ -30,6 +30,66 @@ yarn && yarn run generate-source-env
 
 在 agora chat sdk 基础上设计了 agora uikit sdk。通过这些 UI 组件可以更加高效的实现应用开发。除了 UI 组件还提供了必要的 agora chat sdk 的封装以及一些基础工具，尽最大可能提供开发应用的便利性。
 
+<table>
+  <tr>
+    <td>module</td>
+    <td>function</td>
+    <td>description</td>
+  </tr>
+  <tr>
+    <td rowspan="5" style="font-weight: bold">Conversation List</td>
+  </tr>
+  <tr>
+    <td>Conversation list</td>
+    <td style="font-size: 10px">
+      The session list displays the profile avatar, nickname, latest message
+      content, unread message count, time and slide menu.
+    </td>
+  </tr>
+  <tr>
+    <td>Add conversation</td>
+    <td style="font-size: 10px">
+      Add the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation</td>
+    <td style="font-size: 10px">
+      Update the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td>Delete conversation</td>
+    <td style="font-size: 10px">
+      Deletes the conversation from the conversation list
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="5" style="font-weight: bold">Chat</td>
+  </tr>
+  <tr>
+    <td>Message Bubble</td>
+    <td style="font-size: 10px">
+      内置部分基础类型消息气泡样式，支持自定义消息气泡样式。
+    </td>
+  </tr>
+  <tr>
+    <td>Send Message</td>
+    <td style="font-size: 10px">支持消息发送</td>
+  </tr>
+  <tr>
+    <td>Message Bubble Event</td>
+    <td style="font-size: 10px">支持消息气泡的点击、长按事件。</td>
+  </tr>
+  <tr>
+    <td>emoji</td>
+    <td style="font-size: 10px">支持unicode码的墨迹表情。</td>
+  </tr>
+  <tr>
+    <td colspan="3">More features in development...</td>
+  </tr>
+</table>
+
 ## 功能列表
 
 ### 会话列表组件
