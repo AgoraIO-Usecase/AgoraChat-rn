@@ -26,7 +26,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "esnext"
+    "target": "esnext",
+    "ignoreDeprecations": "5.0"
   },
   "exclude": ["packages/*/lib"]
 }
