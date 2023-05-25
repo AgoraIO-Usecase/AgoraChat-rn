@@ -274,6 +274,7 @@ export default function App() {
             appKey: appKey,
             agoraAppId: agoraAppId,
           }}
+          type={accountType}
           enableLog={enableLog}
           requestRTCToken={(params: {
             appKey: string;
