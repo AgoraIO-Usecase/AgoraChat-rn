@@ -46,7 +46,7 @@
     "react-native-safe-area-context": "^4.4.1",
     "react-native-screens": "^3.18.2",
     "react-native-video": "^5.2.1",
-    "uuid": "^9.0.0"
+    "pure-uuid": "~1.6.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

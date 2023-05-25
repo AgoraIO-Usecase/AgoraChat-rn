@@ -15,6 +15,7 @@ import {
   ChatMessage,
   ChatMessageType,
 } from 'react-native-chat-sdk';
+import FastImage from 'react-native-fast-image';
 
 import { DefaultAvatar } from '../components/DefaultAvatars';
 import DynamicHeightList, {
@@ -25,6 +26,7 @@ import {
   LocalIcon,
   localLocalIcon,
 } from '../components/Icon';
+// import { IconSize } from '../components/Icon/LocalIcon';
 import Image from '../components/Image';
 import Loading from '../components/Loading';
 import SimulateGif from '../components/SimulateGif';
@@ -102,58 +104,6 @@ export interface FileMessageItemType extends MessageItemType {
   displayName?: string;
   fileStatus: ChatDownloadStatus;
 }
-// const text1: TextMessageItemType = {
-//   sender: 'zs',
-//   timestamp: timestamp(),
-//   isSender: false,
-//   key: seqId('ml').toString(),
-//   text: 'Uffa, ho tanto da raccontare alla mia famiglia, ma quando chiamano loro dagli Stati Uniti io ho lezione e quando posso telefonare io loro dormono!',
-//   type: ChatMessageType.TXT,
-//   state: 'sending',
-// };
-// const text2: TextMessageItemType = {
-//   sender: 'zs',
-//   timestamp: timestamp(),
-//   isSender: true,
-//   key: seqId('ml').toString(),
-//   text: 'Uffa, ho tanto da raccontare alla mia famiglia, ma quando chiamano loro dagli Stati Uniti io ho lezione e quando posso telefonare io loro dormono!',
-//   type: ChatMessageType.TXT,
-//   state: 'arrived',
-// };
-// const image1: ImageMessageItemType = {
-//   sender: 'self',
-//   timestamp: timestamp(),
-//   isSender: false,
-//   key: seqId('ml').toString(),
-//   remoteUrl:
-//     'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
-//   type: ChatMessageType.IMAGE,
-// };
-// const image2: ImageMessageItemType = {
-//   sender: 'self',
-//   timestamp: timestamp(),
-//   isSender: true,
-//   key: seqId('ml').toString(),
-//   remoteUrl:
-//     'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
-//   type: ChatMessageType.IMAGE,
-// };
-// const voice1: VoiceMessageItemType = {
-//   sender: 'zs',
-//   timestamp: timestamp(),
-//   isSender: false,
-//   key: seqId('ml').toString(),
-//   duration: 60,
-//   type: ChatMessageType.VOICE,
-// };
-// const voice2: VoiceMessageItemType = {
-//   sender: 'zs',
-//   timestamp: timestamp(),
-//   isSender: true,
-//   key: seqId('ml').toString(),
-//   duration: 3,
-//   type: ChatMessageType.VOICE,
-// };
 
 export const convertState = (state?: MessageItemStateType): LocalIconName => {
   let r = 'sent' as LocalIconName;
@@ -421,6 +371,9 @@ export const FileMessageRenderItemDefault: ListRenderItem<MessageItemType> =
     }
   );
 
+// const gph: number = localLocalIcon('img_ph', IconSize.ICON_MAX);
+// const gphb: number = localLocalIcon('img_xmark', IconSize.ICON_MAX);
+
 const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
   React.memo(
     (info: ListRenderItemInfo<MessageItemType>): React.ReactElement | null => {
@@ -430,6 +383,9 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
       const { width: wWidth } = useWindowDimensions();
       const [width, setWidth] = React.useState(wWidth * 0.6);
       const [height, setHeight] = React.useState((wWidth * 0.6 * 4) / 3);
+      // const [ph, setPh] = React.useState(gph);
+      // const count = React.useRef(0);
+      const isFastImage = true;
 
       const updateUrl = (url: string) => {
         let r = url;
@@ -437,21 +393,21 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
           r.startsWith('http://') === false &&
           r.startsWith('https://') === false
         ) {
-          // if (r.includes('#')) {
-          //   const appKey = client.options?.appKey;
-          //   if (appKey && r.includes(appKey)) {
-          //     r = localUrlEscape(r);
-          //   }
-          // }
           if (r.length > 0) {
             r = r.includes('file://') ? r : `file://${r}`;
-            // r = localUrlEscape(r);
           }
         }
         return r;
       };
       const url = (msg: ImageMessageItemType) => {
         let r: string;
+        if (
+          msg.isSender === false &&
+          msg.remoteThumbPath &&
+          msg.remoteThumbPath.length > 0
+        ) {
+          return msg.remoteThumbPath;
+        }
         if (msg.localThumbPath && msg.localThumbPath.length > 0) {
           r = msg.localThumbPath;
         } else if (msg.remoteThumbPath && msg.remoteThumbPath.length > 0) {
@@ -469,14 +425,14 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
 
       const [_url, setUrl] = React.useState(url(msg));
 
-      const checked = async (msg: ImageMessageItemType) => {
-        const ret = await urlAsync(msg);
-        if (ret) {
-          setUrl(updateUrl(ret));
-        } else {
-          setTimeout(() => checked(msg), 1000);
-        }
-      };
+      const checked = React.useCallback((msg: ImageMessageItemType) => {
+        setTimeout(async () => {
+          const ret = await urlAsync(msg);
+          if (ret) {
+            setUrl(updateUrl(ret));
+          }
+        }, 3000);
+      }, []);
 
       const hw = (params: {
         height: number;
@@ -539,25 +495,54 @@ const ImageMessageRenderItemDefault: ListRenderItem<MessageItemType> =
             <DefaultAvatar id={msg.sender} size={sf(24)} radius={sf(12)} />
           </View>
           <View>
-            <RNImage
-              source={{
-                uri: _url,
-              }}
-              resizeMode="contain"
-              resizeMethod="scale"
-              style={{ height: height, width: width, borderRadius: sf(10) }}
-              onLoad={(e) => {
-                console.log('test:onLoad:', e.nativeEvent);
-                const ret = hw(e.nativeEvent.source);
-                setHeight(ret.height);
-                setWidth(ret.width);
-              }}
-              onError={() => {
-                console.log('test:onError:');
-                setUrl('');
-                checked(msg);
-              }}
-            />
+            {isFastImage ? (
+              <FastImage
+                style={{ height: height, width: width, borderRadius: 10 }}
+                source={
+                  _url.length === 0
+                    ? 0
+                    : {
+                        uri: _url,
+                      }
+                }
+                resizeMode={FastImage.resizeMode.cover}
+                onLoad={(e) => {
+                  console.log('test:onLoad:', e.nativeEvent);
+                  const ret = hw(e.nativeEvent);
+                  setHeight(ret.height);
+                  setWidth(ret.width);
+                }}
+                onError={() => {
+                  console.log('test:onError:');
+                  setUrl('');
+                  checked(msg);
+                }}
+              />
+            ) : (
+              <RNImage
+                source={
+                  _url.length === 0
+                    ? 0
+                    : {
+                        uri: _url,
+                      }
+                }
+                resizeMode="contain"
+                resizeMethod="scale"
+                style={{ height: height, width: width, borderRadius: 10 }}
+                onLoad={(e) => {
+                  console.log('test:onLoad:', e.nativeEvent);
+                  const ret = hw(e.nativeEvent.source);
+                  setHeight(ret.height);
+                  setWidth(ret.width);
+                }}
+                onError={() => {
+                  console.log('test:onError:');
+                  setUrl('');
+                  checked(msg);
+                }}
+              />
+            )}
           </View>
           <View
             style={[
@@ -839,23 +824,8 @@ const MessageBubbleList = (
   const data2 = React.useMemo(() => [] as MessageItemType[], []);
   const currentData = React.useRef(data1);
   const [items, setItems] = React.useState<MessageItemType[]>(data1);
-  // const items = React.useMemo(() => [] as MessageItemType[], []);
   const listRef = React.useRef<DynamicHeightListRef>(null);
-  // const items = React.useMemo(() => {
-  //   return _items;
-  // }, [_items]);
-  // for (let index = 0; index < 100; index++) {
-  //   const element: MessageItemType = { key: index.toString() };
-  //   items.push(element);
-  // }
   if (loading) {
-    // items.length = 0;
-    // items.push(text1);
-    // items.push(text2);
-    // items.push(image1);
-    // items.push(image2);
-    // items.push(voice1);
-    // items.push(voice2);
     setLoading(false);
   }
 

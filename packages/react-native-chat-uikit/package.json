@@ -63,7 +63,7 @@
     "@types/react-native": "~0.70.0",
     "@types/react-native-vector-icons": "^6.4.12",
     "@types/react-native-video": "^5.0.14",
-    "@types/uuid": "^9.0.0",
+    "@types/uuid": "^8.0.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-satya164": "^3.1.11",
@@ -106,7 +106,7 @@
     "react-native-vector-icons": "^9.2.0",
     "react-native-video": "^5.2.1",
     "twemoji": "^14.0.2",
-    "uuid": "^9.0.0"
+    "pure-uuid": "~1.6.3"
   },
   "peerDependencies": {
     "@react-native-async-storage/async-storage": ">=1.17.11",

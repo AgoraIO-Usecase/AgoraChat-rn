@@ -982,6 +982,24 @@ export const ICON_ASSETS = {
       return require('./icons/Global/group_invite.png');
     }
   },
+  'img_ph': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/img_ph_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/img_ph_2x.png');
+    } else {
+      return require('./icons/Global/img_ph.png');
+    }
+  },
+  'img_xmark': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/img_xmark_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/img_xmark_2x.png');
+    } else {
+      return require('./icons/Global/img_xmark.png');
+    }
+  },
   'input_delete': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/input_delete_3x.png');

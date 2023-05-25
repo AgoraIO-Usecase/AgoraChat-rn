@@ -1,9 +1,9 @@
 import 'react-native-get-random-values';
 
-import { v4 } from 'uuid';
+import UUID from 'pure-uuid';
 
 export function uuid(): string {
-  return v4();
+  return new UUID(4).format();
 }
 
 export function timestamp(

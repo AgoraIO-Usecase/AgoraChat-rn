@@ -1,6 +1,6 @@
 import 'react-native-get-random-values';
 
-import { v4 } from 'uuid';
+import UUID from 'pure-uuid';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class Sequence {
@@ -31,7 +31,7 @@ export function seqId(key = '_global'): number {
 }
 
 export function uuid(): string {
-  return v4();
+  return new UUID(4).format();
 }
 
 /**
