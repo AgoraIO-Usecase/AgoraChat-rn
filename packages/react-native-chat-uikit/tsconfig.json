@@ -2,7 +2,6 @@
   "extends": "../../tsconfig",
   "references": [],
   "compilerOptions": {
-    "outDir": "./lib/typescript",
-    "ignoreDeprecations": "5.0"
+    "outDir": "./lib/typescript"
   }
 }
