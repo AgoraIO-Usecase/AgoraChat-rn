@@ -212,8 +212,6 @@ Basic general properties. The important required attributes mainly include:
 
 ```typescript
 export type BasicCallProps = {
-  appKey: string;
-  agoraAppId: string;
   inviterId: string;
   inviterName: string;
   inviterUrl?: string;

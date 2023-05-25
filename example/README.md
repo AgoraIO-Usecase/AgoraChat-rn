@@ -262,6 +262,9 @@ export type MessageBubbleListRef = {
     reason?: any;
     item?: MessageItemType;
   }) => void;
+  delMessage: (params: { localMsgId?: string; msgId?: string }) => void;
+  resendMessage: (localMsgId: string) => void;
+  recallMessage: (msg: ChatMessage) => void;
 };
 ```
 
@@ -596,6 +599,7 @@ The session component provides methods for creating, updating, reading, and exte
 export type ConversationListFragmentRef = {
   update: (message: ChatMessage) => void;
   create: (params: { convId: string; convType: ChatConversationType }) => void;
+  remove: (params: { convId: string; convType: ChatConversationType }) => void;
   updateRead: (params: {
     convId: string;
     convType: ChatConversationType;

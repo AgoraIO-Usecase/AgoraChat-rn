@@ -212,8 +212,6 @@ export default function HomeScreen(): JSX.Element {
 
 ```typescript
 export type BasicCallProps = {
-  appKey: string;
-  agoraAppId: string;
   inviterId: string;
   inviterName: string;
   inviterUrl?: string;
