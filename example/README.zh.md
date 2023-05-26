@@ -282,6 +282,8 @@ export type MessageBubbleListProps = {
   LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
   VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
   CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
+  showTimeLabel?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 ```
 
@@ -563,6 +565,79 @@ export default function ChatScreen(): JSX.Element {
         screenParams={{ chatId, chatType }}
         onVoiceRecordEnd={(params: any) => {
           // TODO: Voice files are processed and voice messages are sent.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 气泡属性：自定义背景色
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            style: { backgroundColor: 'yellow' },
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 气泡属性：隐藏时间标签
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            showTimeLabel: false,
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### 气泡属性：自定义文本消息样式
+
+例如：修改文本消息背景色、头像、文本气泡，消息状态等。
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            TextMessageItem: (info: ListRenderItemInfo<MessageItemType>) => {
+              return <Text>{info.item.sender}</Text>;
+            },
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>

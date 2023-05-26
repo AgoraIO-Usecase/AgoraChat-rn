@@ -455,6 +455,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             VideoMessageItem: MyVideoMessageBubble,
             FileMessageItem: MyFileMessageBubble,
             showTimeLabel: showTimeLabel,
+            // style: { backgroundColor: 'yellow' },
           } as MessageBubbleListProps,
           MessageBubbleListRefP: messageBubbleListRefP as any,
         }}

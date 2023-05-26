@@ -282,6 +282,8 @@ export type MessageBubbleListProps = {
   LocationMessageItem?: ListRenderItem<LocationMessageItemType>;
   VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
   CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
+  showTimeLabel?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 ```
 
@@ -563,6 +565,79 @@ export default function ChatScreen(): JSX.Element {
         screenParams={{ chatId, chatType }}
         onVoiceRecordEnd={(params: any) => {
           // TODO: Voice files are processed and voice messages are sent.
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### Bubble property: custom background color
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            style: { backgroundColor: 'yellow' },
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### Bubble property: hide time label
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            showTimeLabel: false,
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
+        }}
+      />
+    </ScreenContainer>
+  );
+}
+```
+
+#### Bubble property: custom text message style
+
+For example: Modify text message background color, avatar, text bubble, message status, etc.
+
+```typescript
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment
+        screenParams={{ chatId, chatType }}
+        messageBubbleList={{
+          MessageBubbleListP: MessageBubbleListFragment,
+          MessageBubbleListPropsP: {
+            TextMessageItem: (info: ListRenderItemInfo<MessageItemType>) => {
+              return <Text>{info.item.sender}</Text>;
+            },
+          } as MessageBubbleListProps,
+          MessageBubbleListRefP: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>

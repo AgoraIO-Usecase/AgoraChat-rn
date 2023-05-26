@@ -6,9 +6,11 @@ import {
   ListRenderItem,
   ListRenderItemInfo,
   Pressable,
+  StyleProp,
   Text,
   useWindowDimensions,
   View,
+  ViewStyle,
 } from 'react-native';
 import {
   ChatDownloadStatus,
@@ -802,12 +804,13 @@ export type MessageBubbleListProps = {
   VideoMessageItem?: ListRenderItem<VideoMessageItemType>;
   CustomMessageItem?: ListRenderItem<CustomMessageItemType>;
   showTimeLabel?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 const MessageBubbleList = (
   props: MessageBubbleListProps,
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
-  const { showTimeLabel } = props;
+  const { showTimeLabel, style } = props;
 
   GTextMessageItem = props.TextMessageItem;
   GImageMessageItem = props.ImageMessageItem;
@@ -1196,32 +1199,34 @@ const MessageBubbleList = (
   }, [addListeners, initList]);
 
   return (
-    <DynamicHeightList
-      ref={listRef}
-      items={items}
-      extraData={items}
-      RenderItemFC={MessageRenderItem}
-      enableRefresh={enableRefresh}
-      refreshing={refreshing}
-      onRefresh={() => {
-        setRefreshing(true);
-        if (props.onRequestHistoryMessage) {
-          const item = getEarliestItem();
-          props.onRequestHistoryMessage({ earliestId: item?.msgId ?? '' });
-        }
-        // requestHistory();
-        wait(1500)
-          .then(() => {
-            setRefreshing(false);
-          })
-          .catch();
-      }}
-      keyExtractor={(item: MessageItemType, _: number) => {
-        return item.key;
-        // return index.toString();
-      }}
-      // onTouchEnd={onPressed}
-    />
+    <View style={[{ flex: 1 }, style]}>
+      <DynamicHeightList
+        ref={listRef}
+        items={items}
+        extraData={items}
+        RenderItemFC={MessageRenderItem}
+        enableRefresh={enableRefresh}
+        refreshing={refreshing}
+        onRefresh={() => {
+          setRefreshing(true);
+          if (props.onRequestHistoryMessage) {
+            const item = getEarliestItem();
+            props.onRequestHistoryMessage({ earliestId: item?.msgId ?? '' });
+          }
+          // requestHistory();
+          wait(1500)
+            .then(() => {
+              setRefreshing(false);
+            })
+            .catch();
+        }}
+        keyExtractor={(item: MessageItemType, _: number) => {
+          return item.key;
+          // return index.toString();
+        }}
+        // onTouchEnd={onPressed}
+      />
+    </View>
   );
 };
 
