@@ -822,6 +822,8 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
+https://github.com/easemob/react-native-chat-library/assets/11733363/0a3ac24c-9fae-4961-8395-89a3c2e6ef5e
+
 ---
 
 # Q & A
