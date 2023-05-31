@@ -37,7 +37,7 @@ git clone git@github.com:easemob/react-native-chat-library.git
 This is a multi-package management project managed by `lerna` and `yarn workspace`.
 
 - `example`: A relatively complete example project, used for demonstration and test development.
-- `examples/uikit-example`: uikit example project (to be developed)
+- ~~`examples/uikit-example`: uikit example project (to be developed)~~
 - `examples/callkit-example`: callkit example project, mainly for demonstration of `callkit sdk`.
 - `packages/react-native-chat-uikit`: uikit project
 - `packages/react-native-chat-callkit`: callkit project
