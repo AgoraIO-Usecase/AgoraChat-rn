@@ -343,24 +343,43 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             break;
           case 'chat_open_media_library':
             Services.ms
-              .openMediaLibrary({ selectionLimit: 1 })
+              .openMediaLibrary({ selectionLimit: 1, mediaType: 'all' })
               .then((result) => {
                 console.log('openMediaLibrary:', Platform.OS, result);
-                chatRef.current?.sendImageMessage(
-                  result.map((value) => {
-                    return {
-                      name: value?.name ?? '',
-                      localPath: value?.uri ?? '',
-                      fileSize: value?.size ?? 0,
-                      imageType: value?.type ?? '',
-                      width: value?.width ?? 0,
-                      height: value?.height ?? 0,
-                      onResult: (result) => {
-                        console.log('openMediaLibrary:result:', result);
-                      },
-                    };
-                  })
-                );
+                if (result === undefined || result.length === 0) {
+                  return;
+                }
+                console.log('openMediaLibrary:', Platform.OS, result[0]?.type);
+                const type = result[0]?.type;
+                if (type?.includes('video')) {
+                  chatRef.current?.sendVideoMessage({
+                    localPath: result[0]?.uri ?? '',
+                    fileSize: result[0]?.size ?? 0,
+                    displayName: result[0]?.name ?? '',
+                    duration: 0,
+                    width: result[0]?.width ?? 0,
+                    height: result[0]?.height ?? 0,
+                    onResult: (result) => {
+                      console.log('openMediaLibrary:result:', result);
+                    },
+                  });
+                } else {
+                  chatRef.current?.sendImageMessage(
+                    result.map((value) => {
+                      return {
+                        name: value?.name ?? '',
+                        localPath: value?.uri ?? '',
+                        fileSize: value?.size ?? 0,
+                        imageType: value?.type ?? '',
+                        width: value?.width ?? 0,
+                        height: value?.height ?? 0,
+                        onResult: (result) => {
+                          console.log('openMediaLibrary:result:', result);
+                        },
+                      };
+                    })
+                  );
+                }
               })
               .catch((error) => {
                 console.warn('error:', error);

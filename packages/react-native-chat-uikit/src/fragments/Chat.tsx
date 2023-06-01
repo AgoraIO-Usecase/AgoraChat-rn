@@ -1323,7 +1323,8 @@ const ChatContent = React.memo(
           console.log('test:test_existed:', test_existed);
         }
 
-        const modifiedTargetPath = removeFileHeader(params.localPath);
+        // const modifiedTargetPath = removeFileHeader(params.localPath);
+        const modifiedTargetPath = params.localPath;
         const item = {
           // key: seqId('ml').toString(),
           sender: chatId,
