@@ -1,141 +1,108 @@
-_English | [中文](./README.zh.md)_
-
----
-
 # react-native-chat-callkit
 
-This is the documentation for agora callkit sdk.
+AgoraChatCallKit is an open-source audio and video UI library developed based on Agora's real-time communications and signaling services. With this library, you can implement audio and video calling functionalities with enhanced synchronization between multiple devices. In scenarios where a user ID is logged in to multiple devices, once the user deals with an incoming call that is ringing on one device, all the other devices stop ringing simultaneously.
 
 ## Environment Requirements
 
-- react-native: 0.63.5 or above
+- react-native: 0.66.0 or later
 - nodejs: 16.18.0 or later
 
 ## download link
 
-```sh
+```
 git clone git@github.com:easemob/react-native-chat-library.git
 ```
 
 ## Initialization
 
-In the terminal command tool, change to the project root directory.
+In the terminal, change to the project root directory.
 
-```sh
+```
 cd react-native-chat-library
 yarn && yarn run generate-source-env
 ```
 
-## basic introduction
+## Introduction
 
-agora callkit sdk is designed on the basis of agora chat sdk. Through the chat sdk and callkit sdk, real-time audio and video calls of one or more people can be realized.
+The Agora Chat CallKit SDK is designed on the basis of the Agora Chat SDK. The two SDKS work together to implement one-to-one audio and video calls and group calls.
 
-The sdk mainly provides manager, listener, and view to complete the call together.
+The Agora Chat CallKit SDK mainly provides a call manager, a call listener, and call views to implement calls.
 
-<table>
-  <tr>
-    <td>function</td>
-    <td>description</td>
-  </tr>
-  <tr>
-    <td>CallManager</td>
-    <td style="font-size: 10px">
-      A manager that provides functions such as adding and removing listeners.
-    </td>
-  </tr>
-  <tr>
-    <td>CallListener</td>
-    <td style="font-size: 10px">
-      Listener for receiving notifications such as invitations and sending
-      errors
-    </td>
-  </tr>
-  <tr>
-    <td>SingleCall</td>
-    <td style="font-size: 10px">
-      Provide a single-person chat page, provide operations such as invitation,
-      answering, and hanging up, and a page that supports audio and video calls.
-    </td>
-  </tr>
-  <tr>
-    <td>MultiCall</td>
-    <td style="font-size: 10px">
-      Provide a multi-person chat page, and provide pages for operations such as
-      invitation, answering, and hanging up.
-    </td>
-  </tr>
-</table>
+| function     | description                                                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| CallManager  | A manager that provides functions such as adding and removing listeners.                                                               |
+| CallListener | Listener for receiving notifications such as invitations.                                                                              |
+| SingleCall   | A one-to-one call page for audio and video call operations such as inviting a user, answering the call, and hanging up the call.       |
+| MultiCall    | A group call page for audio and video call operations operations such as inviting a user, answering the call, and hanging up the call. |
 
 ### Manager
 
-The `CallManager` manager is mainly for call management.
+The `CallManager` manager is mainly for call management by providing the following APIs:
 
-The provided interfaces include:
-
-- addListener: add listener
-- removeListener: remove the listener
+- addListener: adds a listener.
+- removeListener: removes a listener.
 
 ### Listener
 
-The `CallListener` listener can receive call invitations.
+The `CallListener` listener receives call invitations by providing the following callbacks:
 
-The provided interfaces include:
+- onCallReceived: Occurs when a call invitation is received.
+- onCallOccurError: Occurs when an error is reported.
 
-- onCallReceived: Received call invitation notification.
-- onCallOccurError: An error notification was received.
+### Call pages
 
-### pages
+`SingleCall` provides one-to-one audio and video page components. `MultiCall` provides group audio and video page components. These two components have common functions, so there is also the basic audio and video component `BasicCall`.
 
-`SingleCall` provides single-person audio and video page components, and `MultiCall` provides multi-person audio and video page components. These two components have common functions, so there is also the basic audio and video component `BasicCall`.
+Common properties provided by the two components are as follows:
 
-Properties or methods provided by common components:
+| Property            | Type    | Description                                                                       |
+| :------------------ | :------ | :-------------------------------------------------------------------------------- |
+| `inviterId`         | String  | The user ID of the inviter.                                                       |
+| `inviterName `      | String  | The nickname of the inviter.                                                      |
+| `inviterUrl `       | String  | The avatar URL of the inviter.                                                    |
+| `currentId `        | String  | The current user ID.                                                              |
+| `currentName `      | String  | The nickname of the current user.                                                 |
+| `currentUrl `       | String  | The avatar URL of the current user.                                               |
+| `timeout `          | Number  | The timeout time. If the timeout period expires, the call hangs up automatically. |
+| `bottomButtonType ` | String  | Initial Button group style.                                                       |
+| `muteVideo `        | Boolean | Whether to disable video.                                                         |
+| `callType `         | String  | The call type, i.e., audio call or video call.                                    |
+| `callState `        | String  | The call state.                                                                   |
+| `isMinimize `       | Boolean | Whether the call page is the minimized state.                                     |
+| `isTest `           | Boolean | Whether to enable the test mode. It is disabled by default.                       |
 
-- inviterId: inviter ID.
-- inviterName: Inviter nickname.
-- inviterUrl: inviter's avatar url.
-- currentId: current user ID.
-- currentName: current user nickname.
-- currentUrl: current user avatar url.
-- timeout: Timeout time. Automatically hang up after timeout.
-- bottomButtonType: Button group style. It can be used for those who need to set the initial style.
-- muteVideo: Whether to disable video.
-- callType: audio type or video type.
-- isInviter: Whether the current user is an inviter.
-- callState: call state.
-- isMinimize: Whether it is the minimized state.
-- isTest: test default. It is not enabled by default.
-- onHangUp: hang up call notification.
-- onCancel: cancel call notification. Only the inviter receives it.
-- onRefuse: reject call notification. Only invitees receive.
-- onClose: Close call notification. Requires the user to close the component.
-- onError: call error notification. The user chooses the method by himself.
-- onInitialized: notification of completion of initialization. Users can handle accordingly at this stage.
-- onSelfJoined: Self-joined call notification.
+Common events provided by the two components are as follows:
 
-Attributes or callback methods provided by individual components:
+| Event           | Description                                                                                                                                                                                                                                                                        |
+| :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onHangUp`      | Occurs when a user hangs up a call. When a user hangs up a call, the local user receives the `onHangUp` event and the `onClose` event.                                                                                                                                             |
+| `onCancel`      | Occurs when the call is cancelled. Only the caller receives the event.                                                                                                                                                                                                             |
+| `onRefuse`      | Occurs when the call is rejected by the callee when a call invitation is received. The callee(s) receive this event.                                                                                                                                                               |
+| `onClose`       | Occurs when a user hangs up a call. In one-to-one call, both users in the call receive this event. In a group call, the user that hangs up the call receives the event. This events also shows the call duration. In this event, you can close the call page to release resources. |
+| `onError`       | Occurs when a call error is reported.                                                                                                                                                                                                                                              |
+| `onInitialized` | Occurs when the page initialization is complete.                                                                                                                                                                                                                                   |
+| `onSelfJoined`  | Occurs when a user joins a call. The user that successfully joins the call receives the event.                                                                                                                                                                                     |
 
-- inviteeId: invitee ID.
-- onPeerJoined: The peer joins the call notification.
+Besides the common properties and events, `SingleCall` provides the following property and event:
 
-Properties or callback methods provided by multiplayer components:
+- `inviteeId`: The user ID of the invitee. The property value is of the string type.
+- `onPeerJoined`: Occurs when the invitee joins the call. The caller receives this event.
 
-- inviteeIds: invitee list IDs.
-- inviteeList: Custom invitee list component.
+Besides the common properties and events, `MultiCall` provides the following properties:
 
-**Description** Multiplayer audio and video currently supports up to 18 channels of video and 128 channels of audio.
+- `inviteeIds`: The list of user IDs of the invitees when a group call is started. The property value is of the array type.
+- `inviteeList`: The list of user IDs of the invitees during an ongoing group call. The property value is of the array type.
+
+For group audio and video calls, the Agora Chat CallKit SDK supports up to 18 video channels and 128 audio channels.
 
 ## Example Demo
 
-[Reference](../../examples/callkit-example/README.md)
+[Reference](https://github.com/AgoraIO-Usecase/AgoraChat-rn/blob/dev/examples/callkit-example/README.md)
 
 ## Contributing
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+See the [contributing guide](https://github.com/AgoraIO-Usecase/AgoraChat-rn/blob/dev/packages/react-native-chat-callkit/CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
 ## License
 
 MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
