@@ -31,9 +31,7 @@ export default function TestSheet() {
               console.log(icon);
               setIcon(!icon);
             }}
-          >
-            change icon
-          </RNButton>
+          />
         </View>
         <BottomSheet
           visible={icon}

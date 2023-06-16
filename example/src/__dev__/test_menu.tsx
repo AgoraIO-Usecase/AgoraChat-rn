@@ -29,9 +29,7 @@ export default function TestMenu() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <ActionMenu
         menuItems={[{ title: 'name1' }, { title: 'name2' }]}

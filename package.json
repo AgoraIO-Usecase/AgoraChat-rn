@@ -1,11 +1,10 @@
 {
   "name": "react-native-chat-library",
+  "version": "0.1.0",
+  "description": "react native multi package workspaces.",
+  "repository": "https://github.com/easemob/react-native-chat-library",
+  "author": "asteriskzuo@hotmail.com",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/easemob/react-native-chat-library.git"
-  },
-  "author": "Asterisk Zuo <zuoyuhsywn@hotmail.com>",
   "private": true,
   "workspaces": [
     "packages/react-native-chat-uikit",
@@ -14,34 +13,33 @@
     "example"
   ],
   "devDependencies": {
-    "@arkweid/lefthook": "^0.7.7",
     "@commitlint/config-conventional": "^17.0.2",
-    "@types/jest": "^28.1.2",
+    "@evilmartians/lefthook": "^1.2.2",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-config-satya164": "^3.1.11",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
     "jest": "^28.1.1",
-    "lerna": "^6.0.3",
-    "metro-react-native-babel-preset": "^0.67.0",
+    "lerna": "^7.0.1",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
-    "release-it": "^15.0.0",
-    "typescript": "~5.0.4"
+    "typescript": "^4.5.2"
   },
   "scripts": {
-    "generate-source-version": "node scripts/generate-version.js",
-    "generate-source-env": "yarn workspace example run gse && yarn workspace callkit-example run gse",
-    "generate-source": "yarn run generate-source-version && yarn run generate-source-env",
-    "generate-lib": "lerna run gl",
-    "generate": "yarn run generate-source && yarn run generate-lib",
-    "clean-generate": "lerna run cg",
-    "lint": "lerna run lint",
-    "start": "yarn workspace example run start",
-    "prepare": "yarn run generate-source-version && lerna run prepare"
+    "yarn-lint": "yarn workspace react-native-chat-uikit lint && yarn workspace react-native-chat-callkit lint",
+    "lerna-lint": "lerna run lint",
+    "lint": "yarn run lerna-lint",
+    "yarn-prepack": "yarn workspace react-native-chat-uikit prepack && yarn workspace react-native-chat-callkit prepack",
+    "lerna-prepack": "lerna run prepack --verbose",
+    "prepack": "yarn run lerna-prepack",
+    "clean": "lerna run clean  --verbose",
+    "clean-module": "lerna run clean-module  --verbose",
+    "bootstrap": "lerna run bootstrap --verbose",
+    "sdk-version": "node scripts/generate-version.js",
+    "example-env": "lerna run gen-env --verbose",
+    "doctor": "lerna run doctor --verbose"
   },
   "prettier": {
     "quoteProps": "consistent",
@@ -53,7 +51,7 @@
   "jest": {
     "testEnvironment": "node",
     "preset": "react-native",
-    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|tsx?)$",
+    "testRegex": "/__tests__/.*\\.(test|spec)\\.(js|jsx|ts|tsx?)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -69,6 +67,15 @@
       "<rootDir>/packages/react-native-chat-uikit/node_modules/",
       "<rootDir>/packages/react-native-chat-callkit/lib/",
       "<rootDir>/packages/react-native-chat-callkit/node_modules/"
+    ]
+  },
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "packageManager": "^yarn@1.22.15",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   }
 }

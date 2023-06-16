@@ -2,8 +2,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { DeviceEventEmitter, Platform } from 'react-native';
 import {
-  type AudioSet,
   AudioEncoderAndroidType,
+  type AudioSet,
   AudioSourceAndroidType,
   AVEncoderAudioQualityIOSType,
   AVEncodingOption,
@@ -197,7 +197,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
       });
   }, [chatId, onVoiceRecordEnd]);
   const onLongPressMessageBubble = React.useCallback(
-    (data) => {
+    (data: any) => {
       sendEventFromChat({
         eventType: 'ActionMenuEvent',
         action: 'long_press_message_bubble',

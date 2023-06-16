@@ -47,7 +47,7 @@ try {
 
     return (
       <Text
-        {...rest}
+        {...(rest as any)}
         style={[
           styles.icon,
           {

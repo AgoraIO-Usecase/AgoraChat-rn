@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
       "react-native-chat-uikit": ["packages/react-native-chat-uikit/src"],
       "react-native-chat-callkit": ["packages/react-native-chat-callkit/src"],
-      "@asteriskzuo/*": ["packages/*/src"]
     },
-    "composite": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -27,7 +25,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "ignoreDeprecations": "5.0"
+    "composite": true
   },
   "exclude": ["packages/*/lib"]
 }

@@ -113,7 +113,7 @@ export default function Draggable(props: IProps) {
   }, [x, y]);
 
   const shouldStartDrag = React.useCallback(
-    (gs) => {
+    (gs: any) => {
       return !disabled && (Math.abs(gs.dx) > 2 || Math.abs(gs.dy) > 2);
     },
     [disabled]
@@ -262,7 +262,7 @@ export default function Draggable(props: IProps) {
     }
   }, [children, imageSource, renderSize, renderText]);
 
-  const handleOnLayout = React.useCallback((event) => {
+  const handleOnLayout = React.useCallback((event: any) => {
     const { height, width } = event.nativeEvent.layout;
     childSize.current = { x: width, y: height };
   }, []);

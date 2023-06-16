@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const path = require('path');
 const escape = require('escape-string-regexp');
 const { getDefaultConfig } = require('@expo/metro-config');
@@ -36,22 +35,6 @@ module.exports = {
       acc[name] = path.join(root, 'node_modules', name);
       return acc;
     }, {}),
-  },
-
-  server: {
-    ...defaultConfig.server,
-
-    enhanceMiddleware: (middleware) => {
-      return (req, res, next) => {
-        // When an asset is imported outside the project root, it has wrong path on Android
-        // So we fix the path to correct one
-        if (/\/packages\/.+\.png\?.+$/.test(req.url)) {
-          req.url = `/assets/../${req.url}`;
-        }
-
-        return middleware(req, res, next);
-      };
-    },
   },
 
   transformer: {

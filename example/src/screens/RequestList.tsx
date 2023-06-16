@@ -205,6 +205,9 @@ export default function RequestListScreen(_props: Props): JSX.Element {
           console.log('test:result:', result);
           if (result) {
             const body = result.body as ChatCustomMessageBody;
+            if (body?.params === undefined || body?.params === null) {
+              return;
+            }
             if (
               body.params.type === 'ContactInvitationAccepted' ||
               body.params.type === 'ContactInvitationDeclined' ||
@@ -238,14 +241,21 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               .then(() => {
                 console.log('test:result:success');
                 onResult?.(true, body);
+                if (body?.params === undefined || body?.params === null) {
+                  return;
+                }
                 if (
                   body.params.type === 'ContactInvitationAccepted' ||
                   body.params.type === 'ContactInvitationDeclined'
                 ) {
                   if (body.params.type === 'ContactInvitationAccepted') {
-                    client.contactManager.acceptInvitation(body.params.from);
+                    client.contactManager.acceptInvitation(
+                      body.params.from ?? ''
+                    );
                   } else {
-                    client.contactManager.declineInvitation(body.params.from);
+                    client.contactManager.declineInvitation(
+                      body.params.from ?? ''
+                    );
                   }
                 } else if (
                   body.params.type === 'GroupRequestJoinAccepted' ||
@@ -253,13 +263,13 @@ export default function RequestListScreen(_props: Props): JSX.Element {
                 ) {
                   if (body.params.type === 'GroupRequestJoinAccepted') {
                     client.groupManager.acceptJoinApplication(
-                      body.params.groupId,
-                      body.params.from
+                      body.params.groupId ?? '',
+                      body.params.from ?? ''
                     );
                   } else {
                     client.groupManager.declineJoinApplication(
-                      body.params.groupId,
-                      body.params.from
+                      body.params.groupId ?? '',
+                      body.params.from ?? ''
                     );
                   }
                 } else if (
@@ -268,13 +278,13 @@ export default function RequestListScreen(_props: Props): JSX.Element {
                 ) {
                   if (body.params.type === 'GroupInvitationAccepted') {
                     client.groupManager.acceptInvitation(
-                      body.params.groupId,
-                      body.params.from
+                      body.params.groupId ?? '',
+                      body.params.from ?? ''
                     );
                   } else {
                     client.groupManager.declineInvitation(
-                      body.params.groupId,
-                      body.params.from
+                      body.params.groupId ?? '',
+                      body.params.from ?? ''
                     );
                   }
                 }
@@ -301,6 +311,9 @@ export default function RequestListScreen(_props: Props): JSX.Element {
         const result = await client.chatManager.getMessage(item.msgId);
         if (result) {
           let body = result.body as ChatCustomMessageBody;
+          if (body?.params === undefined || body?.params === null) {
+            return;
+          }
 
           if (
             body.params.type === 'ContactInvitationAccepted' ||
@@ -338,9 +351,13 @@ export default function RequestListScreen(_props: Props): JSX.Element {
             body.params.type === 'ContactInvitationDeclined'
           ) {
             if (body.params.type === 'ContactInvitationAccepted') {
-              await client.contactManager.acceptInvitation(body.params.from);
+              await client.contactManager.acceptInvitation(
+                body.params.from ?? ''
+              );
             } else {
-              await client.contactManager.declineInvitation(body.params.from);
+              await client.contactManager.declineInvitation(
+                body.params.from ?? ''
+              );
             }
           } else if (
             body.params.type === 'GroupRequestJoinAccepted' ||
@@ -348,13 +365,13 @@ export default function RequestListScreen(_props: Props): JSX.Element {
           ) {
             if (body.params.type === 'GroupRequestJoinAccepted') {
               client.groupManager.acceptJoinApplication(
-                body.params.groupId,
-                body.params.from
+                body.params.groupId ?? '',
+                body.params.from ?? ''
               );
             } else {
               client.groupManager.declineJoinApplication(
-                body.params.groupId,
-                body.params.from
+                body.params.groupId ?? '',
+                body.params.from ?? ''
               );
             }
           } else if (
@@ -363,13 +380,13 @@ export default function RequestListScreen(_props: Props): JSX.Element {
           ) {
             if (body.params.type === 'GroupInvitationAccepted') {
               client.groupManager.acceptInvitation(
-                body.params.groupId,
-                body.params.from
+                body.params.groupId ?? '',
+                body.params.from ?? ''
               );
             } else {
               client.groupManager.declineInvitation(
-                body.params.groupId,
-                body.params.from
+                body.params.groupId ?? '',
+                body.params.from ?? ''
               );
             }
           }
@@ -523,7 +540,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
                 items: [
                   {
                     ...item,
-                    notificationType: body!.params.type,
+                    notificationType: body!.params!.type,
                   } as ItemDataType,
                 ],
               });
@@ -542,7 +559,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
               items: [
                 {
                   ...item,
-                  notificationType: body.params.type,
+                  notificationType: body.params!.type,
                 } as ItemDataType,
               ],
             });
@@ -600,7 +617,7 @@ export default function RequestListScreen(_props: Props): JSX.Element {
         console.log('test:RequestListScreen:success:', result.length);
         initData(
           result.map((item) => {
-            const content = (item.body as ChatCustomMessageBody).params;
+            const content = (item.body as ChatCustomMessageBody).params as any;
             return {
               msgId: item.msgId,
               timestamp: item.serverTime,

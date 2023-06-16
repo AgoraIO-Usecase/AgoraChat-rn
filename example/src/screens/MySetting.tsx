@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
 import { CommonActions, CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack/lib/typescript/src/types';
@@ -25,7 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type {
   BottomTabScreenParamsList,
@@ -132,7 +133,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
       navigation.getParent()?.setOptions({
         headerBackVisible: false,
         headerRight: undefined,
-        headerTitle: () => <Text />,
+        headerTitle: () => <Text children={undefined} />,
         headerShadowVisible: false,
         headerBackTitleVisible: false,
       });

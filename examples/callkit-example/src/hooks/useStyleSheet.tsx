@@ -1,6 +1,6 @@
 import {
-  type ThemeContextType,
   createStyleSheetP,
+  type ThemeContextType,
   useThemeContext,
 } from 'react-native-chat-uikit';
 

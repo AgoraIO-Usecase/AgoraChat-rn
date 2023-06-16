@@ -9,7 +9,7 @@ import type {
 } from 'react-native-chat-uikit';
 
 import type { MenuActionEventType } from './Events';
-import { type sendEventProps, sendEvent } from './sendEvent';
+import { sendEvent, type sendEventProps } from './sendEvent';
 import type { BizEventType } from './types';
 
 const sendEventFromMenu = (

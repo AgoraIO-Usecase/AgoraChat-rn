@@ -27,8 +27,8 @@ import { ListItemSeparator } from '../components/ListItemSeparator';
 import { ListSearchHeader } from '../components/ListSearchHeader';
 import { useChatSdkContext } from '../contexts';
 import {
-  type MessageChatSdkEventType,
   MessageChatSdkEvent,
+  type MessageChatSdkEventType,
 } from '../nativeEvents';
 import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';

@@ -65,7 +65,11 @@ export default function TestRadioButton() {
           </View>
         </Pressable>
       </View>
-      <MyRadioButton size={40} checked={checked} onChecked={setChecked} />
+      <MyRadioButton
+        size={40}
+        checked={checked}
+        onChecked={setChecked as any}
+      />
     </View>
   );
 }

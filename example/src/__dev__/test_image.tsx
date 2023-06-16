@@ -33,9 +33,7 @@ export default function TestImage() {
                 : 'https://reactnative.dev/img/tiny_logo.png'
             );
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <Image
         source={{

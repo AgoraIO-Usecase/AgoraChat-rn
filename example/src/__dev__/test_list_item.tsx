@@ -54,7 +54,7 @@ const Item = (item: ItemDataType) => {
 
   const _autoAlign = (moveX: number, width: number) => {
     const w = width / 2;
-    if (0 <= moveX && moveX < w) {
+    if (moveX >= 0 && moveX < w) {
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
     } else {
       scrollViewRef.current?.scrollTo({ x: width, animated: true });

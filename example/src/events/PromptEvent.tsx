@@ -6,7 +6,7 @@ import type {
 
 import type { AppStringSet } from '../I18n/AppCStringSet.en';
 import type { PromptActionEventType } from './Events';
-import { type sendEventProps, sendEvent } from './sendEvent';
+import { sendEvent, type sendEventProps } from './sendEvent';
 import type { BizEventType } from './types';
 
 const sendEventFromPrompt = (

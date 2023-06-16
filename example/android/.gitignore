@@ -11,12 +11,6 @@ local.properties
 *.iml
 *.hprof
 
-# BUCK
-buck-out/
-\.buckd/
-*.keystore
-!debug.keystore
-
 # Bundle artifacts
 *.jsbundle
 google-services.json

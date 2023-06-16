@@ -169,9 +169,7 @@ export default function TestUtil() {
             console.log('test:messageTimestamp:', messageTimestamp(new Date()));
             test5();
           }}
-        >
-          messageTimestamp
-        </RNButton>
+        />
       </View>
       <View>
         <Button
@@ -196,9 +194,7 @@ export default function TestUtil() {
               })
             );
           }}
-        >
-          truncateContent
-        </RNButton>
+        />
       </View>
       <View>
         <Button
@@ -217,9 +213,7 @@ export default function TestUtil() {
           onPress={() => {
             console.log('test:seqId:', seqId());
           }}
-        >
-          seqId
-        </RNButton>
+        />
       </View>
       <View>
         <RNButton
@@ -227,9 +221,7 @@ export default function TestUtil() {
           onPress={() => {
             console.log('test:seqId:my:', seqId('my'));
           }}
-        >
-          seqId
-        </RNButton>
+        />
       </View>
       <View>
         <Button

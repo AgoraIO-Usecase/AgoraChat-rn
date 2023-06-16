@@ -1,8 +1,7 @@
 {
   "expo": {
-    "name": "example",
-    "displayName": "ChatCallkitExample",
-    "slug": "example",
+    "name": "ChatCallkitExample",
+    "slug": "ChatCallkitExample",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,24 +11,19 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyphenate.callkit.demo",
-      "googleServicesFile": "./ios/example/GoogleService-Info.plist"
+      "bundleIdentifier": "com.hyphenate.rn.ChatCallkitExample"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#ffffff"
       },
-      "package": "com.example.rnchatcallkit",
-      "googleServicesFile": "./android/app/google-services.json"
+      "package": "com.hyphenate.rn.ChatCallkitExample"
     },
     "web": {
       "favicon": "./assets/favicon.png"

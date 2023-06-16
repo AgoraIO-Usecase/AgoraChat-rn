@@ -35,9 +35,7 @@ export default function TestButton() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <View>
         <UIButton

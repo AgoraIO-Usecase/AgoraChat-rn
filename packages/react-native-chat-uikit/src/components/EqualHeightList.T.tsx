@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-prop-types */
 import * as React from 'react';
 import {
   Animated,
@@ -17,6 +16,15 @@ import {
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
 import LoadingRN from './LoadingRN';
+
+const RefreshComponentMemo = React.memo(
+  (props: { RefreshComponent?: RefreshComponentType }) => {
+    const { RefreshComponent } = props;
+    if (RefreshComponent)
+      return <RefreshComponent.Component {...RefreshComponent.props} />;
+    return <LoadingRN size="large" />;
+  }
+);
 
 export interface ItemData {
   key: string;
@@ -48,7 +56,6 @@ type RenderItemProps<ItemT extends ItemData = ItemData> = {
   ItemContainer: ItemContainerComponent;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RefreshProps {}
 export type RefreshComponent = (props: RefreshProps) => JSX.Element;
 
@@ -286,12 +293,7 @@ export const EqualHeightList: <ItemT extends ItemData = ItemData>(
       setRefreshing(false);
       onRefresh?.('ended');
     });
-    const r = React.memo(() => {
-      if (RefreshComponent)
-        return <RefreshComponent.Component {...RefreshComponent.props} />;
-      return <LoadingRN size="large" />;
-    });
-    return r;
+    return <RefreshComponentMemo RefreshComponent={RefreshComponent} />;
   }, [RefreshComponent, enableRefresh, onRefresh]);
 
   const _asyncSetAlphabetListPageY = () => {

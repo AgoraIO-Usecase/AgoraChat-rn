@@ -1,7 +1,7 @@
 import type { DialogContextType, ExtraDataType } from 'react-native-chat-uikit';
 
 import type { PromptActionEventType } from './Events';
-import { type sendEventProps, sendEvent } from './sendEvent';
+import { sendEvent, type sendEventProps } from './sendEvent';
 import type { BizEventType } from './types';
 
 export const sendEventFromPrompt = (

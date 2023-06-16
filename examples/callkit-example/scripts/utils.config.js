@@ -28,7 +28,7 @@ const kvs2 = workspaces.map((it) => {
 });
 
 // Get the list of dependencies for all packages in the monorepo
-const modules = ['@expo/vector-icons']
+const modules = []
   .concat(
     ...workspaces.map((it) => {
       const pak = JSON.parse(

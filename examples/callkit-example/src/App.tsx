@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import './utils/globals';
 
 import { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
@@ -12,7 +13,7 @@ import {
   useNavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { registerRootComponent } from 'expo';
+// import { registerRootComponent } from 'expo';
 import * as React from 'react';
 import { Linking, Platform, View } from 'react-native';
 import * as Audio from 'react-native-audio-recorder-player';
@@ -168,7 +169,7 @@ export default function App() {
         return;
       }
     }
-    if (false === (await requestAndroidVideo())) {
+    if ((await requestAndroidVideo()) === false) {
       console.warn('Video and Audio Permission request failed.');
       return;
     }
@@ -415,4 +416,4 @@ export default function App() {
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,
 // the environment is set up appropriately
-registerRootComponent(App);
+// registerRootComponent(App);

@@ -16,7 +16,7 @@ import {
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import type { BizEventType, DataActionEventType } from '../events';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 
 const sendGroupSettingEvent = (
   params: Omit<sendEventProps, 'senderId' | 'timestamp' | 'eventBizType'>

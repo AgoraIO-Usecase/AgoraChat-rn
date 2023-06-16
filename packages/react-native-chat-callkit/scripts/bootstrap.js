@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-
-/* eslint-disable import/no-commonjs */
 const os = require('os');
 const path = require('path');
 const child_process = require('child_process');

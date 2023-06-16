@@ -51,6 +51,12 @@
   ];
 ```
 
+### 添加tag
+
+```sh
+git commit -am"ci: v0.1.1-beta.3" && git tag -a v0.1.1-beta.3 -m"v0.1.1-beta.3"
+```
+
 ---
 
 [返回父文档](./index.md)

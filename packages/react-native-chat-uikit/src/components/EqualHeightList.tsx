@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unused-prop-types */
-
 import * as React from 'react';
 import {
   Animated,
@@ -22,6 +20,17 @@ import {
 import createStyleSheet from '../styles/createStyleSheet';
 import { arraySort, wait } from '../utils/function';
 import { timestamp } from '../utils/generator';
+
+const HeaderComponentMemo = React.memo(
+  (props: { HeaderComponent?: ListHeaderComponentType }) => {
+    const { HeaderComponent } = props;
+    if (HeaderComponent) {
+      return <HeaderComponent.Component {...HeaderComponent.props} />;
+    } else {
+      return null;
+    }
+  }
+);
 
 const CustomEvents = {
   closeEditable: {
@@ -138,7 +147,7 @@ const DefaultItemSideslipContainer: ItemContainerComponent = (
 
   const _autoAlign = (moveX: number, width: number) => {
     const w = width / 2;
-    if (0 <= moveX && moveX < w) {
+    if (moveX >= 0 && moveX < w) {
       setIsEditable(false);
       scrollViewRef.current?.scrollTo({ x: 0, animated: true });
     } else {
@@ -655,9 +664,7 @@ export const EqualHeightList: (
         ListHeaderComponent={
           enableHeader === true
             ? HeaderComponent
-              ? React.memo(() => (
-                  <HeaderComponent.Component {...HeaderComponent.props} />
-                ))
+              ? HeaderComponentMemo
               : Header
               ? Header
               : undefined

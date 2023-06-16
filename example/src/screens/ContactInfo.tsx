@@ -13,7 +13,7 @@ import {
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 import type { RootScreenParamsList } from '../routes';
 
 type Props = NativeStackScreenProps<RootScreenParamsList>;

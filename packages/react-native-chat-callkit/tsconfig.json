@@ -1,7 +1,10 @@
 {
-  "extends": "../../tsconfig",
-  "references": [],
+  "extends":"../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "react-native-chat-callkit": ["./src/index"]
+    },
     "outDir": "./lib/typescript"
   }
 }

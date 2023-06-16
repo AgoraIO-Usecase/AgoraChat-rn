@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
@@ -18,7 +19,7 @@ import {
 import TabBarIcon from '../components/TabBarIcon';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
 import type { BizEventType, DataActionEventType } from '../events';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 import type { RootParamsList } from '../routes';
 import ContactScreen from './Contact';
 import ConversationList from './ConversationList';

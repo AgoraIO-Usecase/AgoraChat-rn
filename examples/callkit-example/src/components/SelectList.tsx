@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
-  type ListRenderItemInfo,
   FlatList,
+  type ListRenderItemInfo,
   Text,
   TextInput as RNTextInput,
   View,
@@ -254,7 +254,7 @@ export const ContactList = (props: InviteeListProps): JSX.Element => {
       <SelectListMemo
         selectedIds={selectedIds}
         maxCount={maxCount}
-        onChangeCount={React.useCallback((c) => {
+        onChangeCount={React.useCallback((c: any) => {
           setCount(c);
         }, [])}
         onAddedIds={React.useCallback((ids: string[]) => {

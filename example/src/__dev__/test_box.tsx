@@ -29,9 +29,7 @@ export default function TestBox() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <DialogBox
         style={{

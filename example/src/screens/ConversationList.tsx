@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import type {
   MaterialBottomTabNavigationProp,
   MaterialBottomTabScreenProps,
@@ -37,7 +38,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import HomeHeaderTitle from '../components/HomeHeaderTitle';
 import type { BizEventType, DataActionEventType } from '../events';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 // import ConversationListFragment, {
 //   ConversationListFragmentRef,
 //   ItemDataType as ItemDataType,

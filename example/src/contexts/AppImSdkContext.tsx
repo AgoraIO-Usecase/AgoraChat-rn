@@ -33,7 +33,7 @@ export class AppChatSdkContext extends UIKitChatSdkContext {
           for (const item of result) {
             if (item.body.type === ChatMessageType.CUSTOM) {
               const content = (item.body as ChatCustomMessageBody).params;
-              const notificationType = content.type;
+              const notificationType = content?.type;
               if (
                 notificationType !== 'ContactInvitationAccepted' &&
                 notificationType !== 'GroupRequestJoinAccepted' &&

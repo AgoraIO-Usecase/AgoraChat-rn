@@ -29,9 +29,7 @@ export default function TestIcon() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <LocalIcon name={icon ? 'alert_info' : 'alert_success'} size={48} />
       <VectorIcon name={icon ? 'ab-testing' : 'abacus'} size={48} />

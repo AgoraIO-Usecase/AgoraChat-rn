@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import {
@@ -30,7 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
-import { type sendEventProps, sendEvent } from '../events/sendEvent';
+import { sendEvent, type sendEventProps } from '../events/sendEvent';
 import { useStyleSheet } from '../hooks/useStyleSheet';
 import type { RootScreenParamsList } from '../routes';
 import type { SearchActionType, Undefinable } from '../types';

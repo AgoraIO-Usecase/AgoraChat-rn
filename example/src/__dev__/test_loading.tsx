@@ -34,9 +34,7 @@ export default function TestLoading() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       {icon ? <Loading /> : undefined}
     </View>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react';
 import { View } from 'react-native';
 import { Button, Text } from 'react-native-paper';

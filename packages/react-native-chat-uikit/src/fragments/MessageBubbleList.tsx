@@ -24,8 +24,8 @@ import DynamicHeightList, {
   type DynamicHeightListRef,
 } from '../components/DynamicHeightList';
 import {
-  type LocalIconName,
   LocalIcon,
+  type LocalIconName,
   localLocalIcon,
 } from '../components/Icon';
 // import { IconSize } from '../components/Icon/LocalIcon';
@@ -793,7 +793,6 @@ export type MessageBubbleListProps = {
   /**
    * Click the message list, not the message item.
    */
-  // eslint-disable-next-line react/no-unused-prop-types
   onPressed?: () => void;
   onRequestHistoryMessage?: (params: { earliestId: string }) => void;
   TextMessageItem?: ListRenderItem<TextMessageItemType>;

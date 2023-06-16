@@ -28,9 +28,7 @@ export default function TestUtilDefer() {
           onPress={() => {
             setValue(++count);
           }}
-        >
-          defer value
-        </RNButton>
+        />
         <Text>{value}</Text>
         <Text>{useDeferredValue(value)}</Text>
       </View>
@@ -40,9 +38,7 @@ export default function TestUtilDefer() {
           onPress={() => {
             setValue2(++count);
           }}
-        >
-          defer value2
-        </RNButton>
+        />
         <Text>{value2}</Text>
         <Text>{useDeferredValueM(value2)}</Text>
       </View>
@@ -52,9 +48,7 @@ export default function TestUtilDefer() {
           onPress={() => {
             setObj({ name: obj.name, age: obj.age + 1 });
           }}
-        >
-          defer object value
-        </RNButton>
+        />
         <Text>{obj.age}</Text>
         <Text>{useDeferredValueM(obj).age}</Text>
       </View>
@@ -64,9 +58,7 @@ export default function TestUtilDefer() {
           onPress={() => {
             setObjs([{ name: objs[0]!.name, age: objs[0]!.age + 1 }]);
           }}
-        >
-          defer object value
-        </RNButton>
+        />
         <Text>{objs[0]!.age}</Text>
         <Text>{useDeferredValueM(objs)[0]!.age}</Text>
       </View>

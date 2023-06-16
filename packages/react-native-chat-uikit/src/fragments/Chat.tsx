@@ -68,12 +68,12 @@ import moji from 'twemoji';
 
 import Button from '../components/Button';
 import { FaceList } from '../components/FaceList';
-import { type LocalIconName, LocalIcon } from '../components/Icon';
+import { LocalIcon, type LocalIconName } from '../components/Icon';
 import TextInput from '../components/TextInput';
 import { useChatSdkContext, useI18nContext } from '../contexts';
 import {
-  type MessageChatSdkEventType,
   MessageChatSdkEvent,
+  type MessageChatSdkEventType,
 } from '../nativeEvents';
 import { Services } from '../services';
 import { getScaleFactor } from '../styles/createScaleFactor';
@@ -90,17 +90,56 @@ import {
 // import { sendEvent, sendEventProps } from '../events/sendEvent';
 import MessageBubbleList, {
   type CustomMessageItemType,
+  FileMessageItemType,
   type ImageMessageItemType,
+  LocationMessageItemType,
   type MessageBubbleListProps,
   type MessageBubbleListRef,
   type MessageItemType,
   type TextMessageItemType,
-  type VoiceMessageItemType,
-  FileMessageItemType,
-  LocationMessageItemType,
   VideoMessageItemType,
+  type VoiceMessageItemType,
 } from './MessageBubbleList';
 import type { MessageItemStateType } from './types';
+
+const ChatMessageBubbleList = React.memo(
+  (props: {
+    messageBubbleList?: {
+      MessageBubbleListP: React.ForwardRefExoticComponent<
+        MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
+      >;
+      MessageBubbleListPropsP: MessageBubbleListProps;
+      MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+    };
+    _onFace: (value?: 'face' | 'key') => void;
+    onRequestHistoryMessage: (params: { earliestId: string }) => void;
+    msgListRef: React.RefObject<MessageBubbleListRef>;
+  }) => {
+    const { messageBubbleList, _onFace, onRequestHistoryMessage, msgListRef } =
+      props;
+    return messageBubbleList ? (
+      <messageBubbleList.MessageBubbleListP
+        ref={messageBubbleList.MessageBubbleListRefP}
+        {...messageBubbleList.MessageBubbleListPropsP}
+        onPressed={() => {
+          Keyboard.dismiss();
+          _onFace('face');
+          messageBubbleList.MessageBubbleListPropsP?.onPressed?.();
+        }}
+        onRequestHistoryMessage={onRequestHistoryMessage}
+      />
+    ) : (
+      <MessageBubbleList
+        ref={msgListRef}
+        onPressed={() => {
+          Keyboard.dismiss();
+          _onFace('face');
+        }}
+        onRequestHistoryMessage={onRequestHistoryMessage}
+      />
+    );
+  }
+);
 
 type BaseProps = {
   chatId: string;
@@ -217,7 +256,7 @@ type ChatContentProps = BaseProps & {
       MessageItemType & { eventType: string; data: any }
     >;
   };
-  // eslint-disable-next-line react/no-unused-prop-types
+
   onUpdateReadCount?: (unreadCount: number) => void;
   onClickMessageBubble?: (data: MessageItemType) => void;
   onLongPressMessageBubble?: (data: MessageItemType) => void;
@@ -1947,29 +1986,28 @@ const ChatContent = React.memo(
       [messageBubbleList?.MessageBubbleListPropsP, requestHistoryMessage]
     );
 
-    const ChatMessageBubbleList = React.memo(() =>
-      messageBubbleList ? (
-        <messageBubbleList.MessageBubbleListP
-          ref={messageBubbleList.MessageBubbleListRefP}
-          {...messageBubbleList.MessageBubbleListPropsP}
-          onPressed={() => {
-            Keyboard.dismiss();
-            _onFace('face');
-            messageBubbleList.MessageBubbleListPropsP?.onPressed?.();
-          }}
-          onRequestHistoryMessage={onRequestHistoryMessage}
-        />
-      ) : (
-        <MessageBubbleList
-          ref={msgListRef}
-          onPressed={() => {
-            Keyboard.dismiss();
-            _onFace('face');
-          }}
-          onRequestHistoryMessage={onRequestHistoryMessage}
-        />
-      )
-    );
+    // const ChatMessageBubbleList = () =>
+    //   messageBubbleList ? (
+    //     <messageBubbleList.MessageBubbleListP
+    //       ref={messageBubbleList.MessageBubbleListRefP}
+    //       {...messageBubbleList.MessageBubbleListPropsP}
+    //       onPressed={() => {
+    //         Keyboard.dismiss();
+    //         _onFace('face');
+    //         messageBubbleList.MessageBubbleListPropsP?.onPressed?.();
+    //       }}
+    //       onRequestHistoryMessage={onRequestHistoryMessage}
+    //     />
+    //   ) : (
+    //     <MessageBubbleList
+    //       ref={msgListRef}
+    //       onPressed={() => {
+    //         Keyboard.dismiss();
+    //         _onFace('face');
+    //       }}
+    //       onRequestHistoryMessage={onRequestHistoryMessage}
+    //     />
+    //   );
 
     const onVoiceRecordEndInternal = React.useCallback(
       (params: { localPath: string; duration: number }) => {
@@ -2004,7 +2042,12 @@ const ChatContent = React.memo(
               // backgroundColor: '#fff8dc',
             }}
           >
-            <ChatMessageBubbleList />
+            <ChatMessageBubbleList
+              messageBubbleList={messageBubbleList}
+              _onFace={_onFace}
+              onRequestHistoryMessage={onRequestHistoryMessage}
+              msgListRef={msgListRef}
+            />
           </View>
         </TouchableWithoutFeedback>
         <KeyboardAvoidingView

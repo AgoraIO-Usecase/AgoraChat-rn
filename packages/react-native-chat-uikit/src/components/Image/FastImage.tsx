@@ -31,7 +31,7 @@ const convertSource = (
   source: ImageProps['source']
 ): Source | ImageRequireSource => {
   if (Array.isArray(source)) {
-    return convertSource(source[0]);
+    return convertSource(source[0]!);
   }
 
   if (typeof source === 'number') {
@@ -58,7 +58,7 @@ const convertDefaultSource = (
     return source;
   }
   if (Array.isArray(source)) {
-    return convertDefaultSource(source[0]);
+    return convertDefaultSource(source[0]!);
   }
 
   if (typeof source === 'number') {
@@ -112,7 +112,7 @@ const FastImageWrapper: ImageComponent = ({
       }
       style={style as FastImageProps['style']}
       source={convertSource(source)}
-      defaultSource={convertDefaultSource(defaultSource)}
+      defaultSource={convertDefaultSource(defaultSource!)}
       resizeMode={convertResizeMode(resizeMode)}
     />
   );

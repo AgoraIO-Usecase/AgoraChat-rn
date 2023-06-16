@@ -4,10 +4,10 @@ pre-commit:
     lint:
       files: git diff --name-only @{push}
       glob: "*.{js,ts,jsx,tsx}"
-      run: yarn eslint {staged_files}
+      run: yarn eslint {files}
     types:
       files: git diff --name-only @{push}
-      glob: "*.{js,ts,jsx,tsx}"
+      glob: "*.{js,ts, jsx, tsx}"
       run: yarn tsc --noEmit
 commit-msg:
   parallel: true

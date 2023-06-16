@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import type { MaterialBottomTabScreenProps } from '@react-navigation/material-bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import type { ParamListBase } from '@react-navigation/native';
