@@ -47,14 +47,31 @@
     'refactor',
     'revert',
     'style',
-    'test'
+    'test',
+    'tag
   ];
+```
+
+```
+feat: 一项新功能
+fix: 一个错误修复
+docs: 仅文档更改
+style: 不影响代码含义的更改（空白，格式，缺少分号等）
+refactor: 既不修正错误也不增加功能的代码更改（重构）
+perf: 改进性能的代码更改
+test: 添加缺失或更正现有测试
+build: 影响构建系统或外部依赖项的更改（gulp，npm等）
+ci: 对CI配置文件和脚本的更改
+chore: 更改构建过程或辅助工具和库，例如文档生成
+tag: 多包版本管理
+
+ref: https://juejin.cn/post/6934292467160514567
 ```
 
 ### 添加tag
 
 ```sh
-git commit -am"ci: v0.1.1-beta.3" && git tag -a v0.1.1-beta.3 -m"v0.1.1-beta.3"
+git commit -am"tag: v0.1.1 uikit-v0.1.1-beta.3 callkit-v0.1.2-beta.3" && git tag -a v0.1.1 -m"v0.1.1"
 ```
 
 ---
