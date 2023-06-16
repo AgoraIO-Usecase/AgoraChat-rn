@@ -20,6 +20,7 @@
         "rneui",
         "RNFS",
         "tabbar",
-        "uikit"
+        "uikit",
+        "Usecase"
     ]
 }

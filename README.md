@@ -26,10 +26,10 @@ This is a multi-package managed repository. Includes uikit sdk and callkit sdk.
 
 ## Source Code Download
 
-[download link](https://github.com/easemob/react-native-chat-library/)
+[download link](https://github.com/AgoraIO-Usecase/AgoraChat-rn)
 
 ```sh
-git clone git@github.com:easemob/react-native-chat-library.git
+git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 ```
 
 ## Project Structure
