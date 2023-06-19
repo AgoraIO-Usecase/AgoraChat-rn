@@ -10,7 +10,7 @@ Instant messaging connects people wherever they are and allows them to communica
 ## Download link
 
 ```sh
-git clone git@github.com:easemob/react-native-chat-library.git
+git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 ```
 
 ## Initialization
