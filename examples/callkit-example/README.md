@@ -26,10 +26,10 @@ Take you to quickly complete the compilation and operation of the project.
 
 ## Source code download
 
-[Download URL](https://github.com/easemob/react-native-chat-library/)
+[Download URL](https://github.com/AgoraIO-Usecase/AgoraChat-rn)
 
 ```sh
-git clone git@github.com:easemob/react-native-chat-library.git
+git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 ```
 
 ## Project initialization

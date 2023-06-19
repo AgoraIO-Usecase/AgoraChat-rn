@@ -26,10 +26,10 @@ Take you to quickly complete the compilation and operation of the project.
 
 ## Source Code Download
 
-[download link](https://github.com/easemob/react-native-chat-library/)
+[download link](https://github.com/AgoraIO-Usecase/AgoraChat-rn)
 
 ```sh
-git clone git@github.com:easemob/react-native-chat-library.git
+git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 ```
 
 ## Compile and run
@@ -129,7 +129,7 @@ export default function App() {
 
 The chat page consists of several components. It mainly includes: message bubble list component and input component. The input component is composed of emoji component, voice component and extension component.
 
-<img src=https://github.com/easemob/react-native-chat-library/tree/dev/docs/typical/ui_chat_struct_1.jpg width="50%">
+<img src=https://github.com/AgoraIO-Usecase/AgoraChat-rntree/dev/docs/typical/ui_chat_struct_1.jpg width="50%">
 
 <!-- <img src=https://img-blog.csdnimg.cn/20200822014538211.png width=60% /> -->
 
@@ -395,7 +395,7 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
-**Description** Since `MessageBubbleList` implements too many source codes, please refer to it if necessary [here](https://github.com/easemob/react-native-chat-library/tree/dev/example/src/components/CustomMessageBubble.tsx)
+**Description** Since `MessageBubbleList` implements too many source codes, please refer to it if necessary [here](https://github.com/AgoraIO-Usecase/AgoraChat-rntree/dev/example/src/components/CustomMessageBubble.tsx)
 
 #### Chat Properties: Unread Count Notifications
 
@@ -644,7 +644,7 @@ export default function ChatScreen(): JSX.Element {
   );
 }
 ```
-https://github.com/easemob/react-native-chat-library/assets/11733363/e5fed2c3-ede4-47f4-86c3-c185800158f0
+https://github.com/AgoraIO-Usecase/AgoraChat-rnassets/11733363/e5fed2c3-ede4-47f4-86c3-c185800158f0
 
 ## Quick integration session list
 
@@ -817,7 +817,7 @@ export default function ChatScreen(): JSX.Element {
 
 
 
-https://github.com/easemob/react-native-chat-library/assets/11733363/0a3ac24c-9fae-4961-8395-89a3c2e6ef5e
+https://github.com/AgoraIO-Usecase/AgoraChat-rnassets/11733363/0a3ac24c-9fae-4961-8395-89a3c2e6ef5e
 
 
 

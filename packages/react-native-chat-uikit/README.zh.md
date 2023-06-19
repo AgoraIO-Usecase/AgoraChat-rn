@@ -14,7 +14,7 @@ _中文 | [English](./README.md)_
 ## 下载地址
 
 ```sh
-git clone git@github.com:easemob/react-native-chat-library.git
+git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 ```
 
 ## 初始化

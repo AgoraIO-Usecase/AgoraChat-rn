@@ -219,7 +219,7 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
-**说明** 由于 `MessageBubbleList` 实现源码太多，如有需要请参考 [here](https://github.com/easemob/react-native-chat-library/blob/ac7d4cdda36afae34a314e3e5d636be7bcf4b06e/example/src/components/CustomMessageBubble.tsx)
+**说明** 由于 `MessageBubbleList` 实现源码太多，如有需要请参考 [here](https://github.com/AgoraIO-Usecase/AgoraChat-rnblob/ac7d4cdda36afae34a314e3e5d636be7bcf4b06e/example/src/components/CustomMessageBubble.tsx)
 
 #### 聊天属性：自定义消息组件
 
@@ -248,7 +248,7 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
-**说明** 由于 `CustomMessageRenderItem` 实现源码太多，如有需要请参考 [here](https://github.com/easemob/react-native-chat-library/blob/ac7d4cdda36afae34a314e3e5d636be7bcf4b06e/example/src/components/CustomMessageBubble.tsx)
+**说明** 由于 `CustomMessageRenderItem` 实现源码太多，如有需要请参考 [here](https://github.com/AgoraIO-Usecase/AgoraChat-rnblob/ac7d4cdda36afae34a314e3e5d636be7bcf4b06e/example/src/components/CustomMessageBubble.tsx)
 
 #### 聊天属性：未读数通知
 
