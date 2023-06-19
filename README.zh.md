@@ -37,7 +37,6 @@ git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
 这是一个多包管理项目，通过 `lerna` 和 `yarn workspace` 实现管理。
 
 - `example`: 较为完整的示例项目，用于演示和测试开发的包。
-- `examples/uikit-example`: uikit 示例项目（待开发）
 - `examples/callkit-example`: callkit 示例项目，主要针对 `callkit sdk` 进行演示。
 - `packages/react-native-chat-uikit`: uikit 项目
 - `packages/react-native-chat-callkit`: callkit 项目
