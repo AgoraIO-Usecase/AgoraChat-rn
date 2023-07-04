@@ -125,7 +125,7 @@ export class CallSignallingHandler implements ChatMessageEventListener {
           c = callType;
         }
       } else {
-        c = parseInt(callType);
+        c = parseInt(callType, 10);
       }
 
       switch (c) {
@@ -151,7 +151,7 @@ export class CallSignallingHandler implements ChatMessageEventListener {
   }
 
   protected parseTs(ts: string | number): number | undefined {
-    let ret = undefined;
+    let ret;
     if (Number.isNaN(ts) === false) {
       if (typeof ts === 'number') {
         ret = parseFloat(ts.toString());

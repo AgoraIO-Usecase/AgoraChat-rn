@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import 'react-native-get-random-values';
 
 import UUID from 'pure-uuid';

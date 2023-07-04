@@ -16,7 +16,7 @@ export default function Blank(props: Props): JSX.Element {
         // source={{
         //   uri: 'https://t4.focus-img.cn/sh740wsh/zx/duplication/9aec104f-1380-4425-a5c6-bc03000c4332.JPEG',
         // }}
-        source={ICON_ASSETS['empty']('2x') as number}
+        source={ICON_ASSETS.empty('2x') as number}
         onLoad={() => {
           console.log('test:Image:onLoad:');
         }}

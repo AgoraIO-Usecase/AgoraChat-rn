@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { CameraRoll as MediaLibrary } from '@react-native-camera-roll/camera-roll';
 import Clipboard from '@react-native-clipboard/clipboard';
 import FirebaseMessage from '@react-native-firebase/messaging';

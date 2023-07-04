@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 export const wait = (timeout: number) => {
   return new Promise((resolve) => setTimeout(resolve, timeout));
 };
@@ -98,7 +99,7 @@ export const callbackToAsync = (f: Function, cb: Callback, ...args: any[]) => {
 };
 
 export const versionToArray = (version: string): number[] => {
-  return version.split('.').map((v) => parseInt(v));
+  return version.split('.').map((v) => parseInt(v, 10));
 };
 
 /**

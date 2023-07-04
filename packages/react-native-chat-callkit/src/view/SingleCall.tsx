@@ -786,7 +786,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     const { callType } = this.props;
     const { isMinimize } = this.state;
     if (isMinimize) {
-      let ret = undefined;
+      let ret;
       if (callType === 'audio') {
         ret = this.renderFloatAudio();
       } else {

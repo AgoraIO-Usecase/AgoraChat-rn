@@ -9,8 +9,8 @@ import type { CallManagerImpl } from '../call/CallManagerImpl';
 import type { CallViewListener } from '../call/CallViewListener';
 import { CallEndReason, CallState, CallType } from '../enums';
 import {
-  type BottomMenuButtonType,
   BottomMenuButton,
+  type BottomMenuButtonType,
 } from './components/BottomMenuButton';
 import Image from './components/Image';
 import { IconSize, localLocalIcon } from './components/LocalIcon';
@@ -73,7 +73,6 @@ export abstract class BasicCall<
   extends React.Component<Props, State>
   implements CallViewListener
 {
-  // eslint-disable-next-line react/sort-comp
   protected _inviteeTimer?: NodeJS.Timeout;
   protected _startPreview: boolean;
   protected channelId: string;
@@ -436,6 +435,7 @@ function RenderBottomMenu(props: RenderBottomMenuProps): JSX.Element {
   const video = (): BottomMenuButtonType => {
     return muteVideo ? 'mute-video' : 'video';
   };
+  // eslint-disable-next-line react/no-unstable-nested-components
   const Container = (props: React.PropsWithChildren<{}>) => {
     const { children } = props;
     return (

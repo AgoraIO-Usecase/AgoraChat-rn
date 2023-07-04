@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable import/no-commonjs */
 const fs = require('node:fs');
 const path = require('node:path');
 const prettier = require('prettier');
@@ -13,13 +12,13 @@ const pattern3 = /\.png/g;
 const faceDir = path.join(root, 'assets', 'icons', 'moji');
 const indexDir = path.join(root, 'assets');
 
-const generateFaces = (faceDir) => {
+const generateFaces = (_faceDir) => {
   const result = [];
 
-  fs.readdirSync(faceDir).forEach((filename) => {
-    const s = fs.statSync(path.join(faceDir, filename));
+  fs.readdirSync(_faceDir).forEach((filename) => {
+    const s = fs.statSync(path.join(_faceDir, filename));
     if (s.isDirectory()) {
-      generateFaces(path.join(faceDir, filename));
+      generateFaces(path.join(_faceDir, filename));
     } else {
       if (filename.match(pattern1)) {
         const r = filename.replace(pattern1, () => {

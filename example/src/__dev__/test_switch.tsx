@@ -29,9 +29,7 @@ export default function TestSwitch() {
             console.log(icon);
             setIcon(!icon);
           }}
-        >
-          change icon
-        </RNButton>
+        />
       </View>
       <Switch
         value={icon}

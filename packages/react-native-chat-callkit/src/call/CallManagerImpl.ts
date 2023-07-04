@@ -1914,19 +1914,19 @@ export class CallManagerImpl
               let remoteUserId;
               Object.entries(p.data.result).forEach((value: [string, any]) => {
                 if (call.inviter.userId === value[1]) {
-                  if (remoteUid === parseInt(value[0])) {
+                  if (remoteUid === parseInt(value[0], 10)) {
                     call.inviter.userChannelId = remoteUid;
                     call.inviter.userHadJoined = true;
                   }
                 } else {
                   const invitee = call.invitees.get(value[1]);
                   if (invitee) {
-                    if (remoteUid === parseInt(value[0])) {
+                    if (remoteUid === parseInt(value[0], 10)) {
                       invitee.userChannelId = remoteUid;
                       invitee.userHadJoined = true;
                     }
                   } else {
-                    if (remoteUid === parseInt(value[0])) {
+                    if (remoteUid === parseInt(value[0], 10)) {
                       this._addInvitee(call.callId, [
                         {
                           userId: value[1],

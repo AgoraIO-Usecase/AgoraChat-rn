@@ -21,7 +21,6 @@ import type {
 /**
  * List of basic services provided.
  */
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Services {
   /**
    * Pasteboard service.

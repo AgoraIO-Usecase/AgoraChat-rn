@@ -394,6 +394,7 @@ export class MediaServiceImplement implements MediaService {
   private static _hash(str: string) {
     return String(
       Math.abs(
+        // eslint-disable-next-line no-bitwise
         str.split('').reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0)
       )
     );

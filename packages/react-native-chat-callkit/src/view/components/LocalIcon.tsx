@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-unused-styles */
 import * as React from 'react';
 import {
   ColorValue,

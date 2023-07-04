@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable import/no-commonjs */
 const fs = require('node:fs');
 const path = require('node:path');
 const prettier = require('prettier');
@@ -18,14 +17,14 @@ const icons = {};
 // const arr = [{xx:['', '.png' '', '2x', '3x']}, ...];
 const arr = [];
 
-const parseIcons = (iconDir, relativeDir) => {
+const parseIcons = (_iconDir, relativeDir) => {
   // console.log('iconDir:', iconDir, 'relativeDir:', relativeDir);
-  fs.readdirSync(iconDir).forEach((filename) => {
-    const s = fs.statSync(path.join(iconDir, filename));
+  fs.readdirSync(_iconDir).forEach((filename) => {
+    const s = fs.statSync(path.join(_iconDir, filename));
     // console.log('isDirectory:', s.isDirectory(), 'filename:', filename);
     if (s.isDirectory()) {
       parseIcons(
-        path.join(iconDir, filename),
+        path.join(_iconDir, filename),
         path.join(relativeDir, filename)
       );
     } else {

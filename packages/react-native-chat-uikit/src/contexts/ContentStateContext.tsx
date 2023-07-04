@@ -13,6 +13,22 @@ type ContentStateContextProps = React.PropsWithChildren<{
   content?: ContentStateProps;
 }>;
 
+const ContentStateMemo = React.memo(
+  ({
+    display,
+    container,
+    pointerEvents,
+    children,
+  }: ContentStateProps & { display: 'none' | 'flex' | undefined }) => (
+    <ContentState
+      container={[container, { display }]}
+      pointerEvents={pointerEvents}
+    >
+      {children}
+    </ContentState>
+  )
+);
+
 export function ContentStateContextProvider(props: ContentStateContextProps) {
   const { children } = props;
   // const [opacity, setOpacity] = React.useState(0);
@@ -23,14 +39,7 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
   //   'visible' | 'hidden' | undefined
   // >('hidden');
   const [content, setContent] = React.useState(props.content);
-  const ContentStateMemo = React.memo((content?: ContentStateProps) => (
-    <ContentState
-      container={[content?.container, { display }]}
-      pointerEvents={content?.pointerEvents}
-    >
-      {content?.children}
-    </ContentState>
-  ));
+
   return (
     <ContentStateContext.Provider
       value={{
@@ -54,6 +63,7 @@ export function ContentStateContextProvider(props: ContentStateContextProps) {
       <ContentStateMemo
         container={content?.container}
         pointerEvents={content?.pointerEvents}
+        display={display}
       >
         {content?.children}
       </ContentStateMemo>

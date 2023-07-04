@@ -2,7 +2,6 @@ import 'react-native-get-random-values';
 
 import UUID from 'pure-uuid';
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class Sequence {
   static aa = new Map<string, number>();
   static sequenceId(key: string): number {
