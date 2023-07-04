@@ -74,6 +74,13 @@ ref: https://juejin.cn/post/6934292467160514567
 git commit -am"tag: v0.1.1 uikit-v0.1.1-beta.3 callkit-v0.1.2-beta.3" && git tag -a v0.1.1 -m"v0.1.1"
 ```
 
+```sh
+git commit -m"tag: uikit@1.0.0 && callkit@1.0.0"
+git tag -a uikit@1.0.0 -m"uikit@1.0.0"
+git tag -a callkit@1.0.0 -m"callkit@1.0.0"
+git push --tags
+```
+
 ---
 
 [返回父文档](./index.md)
