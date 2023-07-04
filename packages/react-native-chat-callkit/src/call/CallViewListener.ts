@@ -10,7 +10,7 @@ export interface CallViewListener {
    *
    * It may be necessary to stop the ringer and close the call page.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - callType: call type. {@link CallType}
    * - endReason: The reason for the end of the call. {@link CallEndReason}
@@ -25,7 +25,7 @@ export interface CallViewListener {
   /**
    * Notification that an error occurred.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - error: An error occurred during a call or signaling process. {@link CallError}
    */
@@ -35,7 +35,7 @@ export interface CallViewListener {
    *
    * **Note** Users need to obtain the mapping relationship between user id and channel user id through app server. And notify the Callkit SDK.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
    * - userId: the user ID.
@@ -48,7 +48,7 @@ export interface CallViewListener {
   /**
    * Notifications when other remote user leave.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
    * - userId: the user ID.
@@ -61,7 +61,7 @@ export interface CallViewListener {
   /**
    * Notifications when remove remote user for error.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
    * - userId: the user ID.
@@ -78,7 +78,7 @@ export interface CallViewListener {
    *
    * **Note** Users need to obtain the mapping relationship between user id and channel user id through app server. And notify the Callkit SDK.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
    * - userId: the user ID.
@@ -93,7 +93,7 @@ export interface CallViewListener {
   /**
    * Notifications when you leave a channel.
    *
-   * @param -
+   * @params params
    * - channelId: Call channel ID.
    * - userChannelId: The ID of the user who joined the channel.
    * - userId: the user ID.
@@ -107,7 +107,7 @@ export interface CallViewListener {
   /**
    * Callback notification for request to join a channel.
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - userId: the user ID.
    * - userChannelId: the user channel ID.
@@ -123,7 +123,7 @@ export interface CallViewListener {
   /**
    * Notification for remote user disable/enable video.
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - userId: the user ID.
    * - userChannelId: the user channel ID.
@@ -139,7 +139,7 @@ export interface CallViewListener {
   /**
    * Notification for remote user disable/enable audio.
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - userId: the user ID.
    * - userChannelId: the user channel ID.
@@ -155,7 +155,7 @@ export interface CallViewListener {
   /**
    * Notification for local user disable/enable video.
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - userId: the user ID.
    * - userChannelId: the user channel ID.
@@ -171,7 +171,7 @@ export interface CallViewListener {
   /**
    * Notification for local user disable/enable audio.
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - userId: the user ID.
    * - userChannelId: the user channel ID.
@@ -187,7 +187,7 @@ export interface CallViewListener {
   /**
    * Reports the volume information of users. By default, this callback is disabled. You can enable it by calling enableAudioVolumeIndication .
    *
-   * @param params -
+   * @params params
    * - channelId: Call channel ID.
    * - speakerNumber: The total number of users.
    * - speakers:

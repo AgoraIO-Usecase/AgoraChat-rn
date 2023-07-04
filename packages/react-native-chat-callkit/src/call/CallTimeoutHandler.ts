@@ -51,7 +51,7 @@ export class CallTimeoutHandler {
   /**
    * After the inviter message is sent, the timer starts.
    *
-   * @param params -
+   * @params params
    * - callId: call id.
    * - userId: Could be an inviter or an invitee.
    * - callTimeoutState: call state.
@@ -80,7 +80,7 @@ export class CallTimeoutHandler {
   /**
    * Manually stop the timeout without triggering the callback notification.
    *
-   * @param params -
+   * @params params
    * - callId: call id.
    * - userId: Could be an inviter or an invitee.
    */
@@ -107,7 +107,7 @@ export class CallTimeoutHandler {
   /**
    * After the xxx message is sent, the timer starts.
    *
-   * @param params -
+   * @params params
    * - callId: call id.
    * - userId: Could be an inviter or an invitee.
    * - callTimeoutState: call timeout state.

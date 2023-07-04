@@ -337,9 +337,9 @@ export class CallManagerImpl
   /**
    * An invitation to start a 1v1 audio call. The result of this operation is returned by `onResult`, if it is successful, it returns `callId`, otherwise it returns `error`.
    *
-   * @param params -
+   * @params params
    * - inviteeId: Invitee ID.
-   * - channelId: The unique identifier of the call channel. It is recommended to create via {@link createChannelId}. This property is highly recommended for preservation.
+   * - channelId: The unique identifier of the call channel. It is recommended to create via {@link CallManagerImpl.createChannelId}. This property is highly recommended for preservation.
    * - rtcToken: The token obtained through the `appserver` request using `channelId`.
    * - extension: any.
    * - onResult: Returns `callId` on success, `error` on failure. The `callId` property is highly recommended for preservation.
@@ -363,7 +363,7 @@ export class CallManagerImpl
    *
    * If the network is not good, you can try to switch to audio mode. {@link videoToAudio}
    *
-   * @param params -
+   * @params params
    * - inviteeId: Invitee ID.
    * - channelId: The unique identifier of the call channel. It is recommended to create via {@link createChannelId}. This property is highly recommended for preservation.
    * - rtcToken: The token obtained through the `appserver` request using `channelId`.
@@ -391,7 +391,7 @@ export class CallManagerImpl
    *
    * During the call, you can invite the dropped person or others again.
    *
-   * @param params -
+   * @params params
    * - inviteeIds: Invitee ID list.
    * - channelId: The unique identifier of the call channel. It is recommended to create via {@link createChannelId}. This property is highly recommended for preservation.
    * - rtcToken: The token obtained through the `appserver` request using `channelId`.
@@ -428,7 +428,7 @@ export class CallManagerImpl
    *
    * You can hang up the call during the call, or the inviter initiates the invitation and has not been answered.
    *
-   * @param params -
+   * @params params
    * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
@@ -467,7 +467,7 @@ export class CallManagerImpl
    *
    * Only used if the invitee does not answer or declines.
    *
-   * @param params -
+   * @params params
    * - callId: The ID obtained by {@link startSingleAudioCall} {@link startSingleVideoCall} {@link startMultiCall}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
@@ -482,7 +482,7 @@ export class CallManagerImpl
   /**
    * decline the current call. Can only be used by the invitee.
    *
-   * @param params -
+   * @params params
    * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
@@ -531,7 +531,7 @@ export class CallManagerImpl
   /**
    * Accept the current call. Can only be used by the invitee.
    *
-   * @param params -
+   * @params params
    * - callId: The ID obtained by {@link CallViewListener.onCallReceived}.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
@@ -617,7 +617,7 @@ export class CallManagerImpl
   /**
    * Video calls are converted to voice calls.
    *
-   * @param params -
+   * @params params
    * - callId: The call ID.
    * - onResult: Returns `callId` on success, `error` on failure.
    */
@@ -641,7 +641,7 @@ export class CallManagerImpl
   /**
    * Set agora information for the current user.
    *
-   * @param params -
+   * @params params
    * - channelId: The unique identifier of the call channel. It is recommended to create via {@link createChannelId}. This property is highly recommended for preservation.
    * - userId: The current user ID.
    * - userChannelId: The channel ID of user.
