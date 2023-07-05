@@ -4,7 +4,7 @@ AgoraChatCallKit is an open-source audio and video UI library developed based on
 
 ## Environment Requirements
 
-- react-native: 0.66.0 or later
+- react-native: 0.63.0 or later
 - nodejs: 16.18.0 or later
 
 ## download link
@@ -59,10 +59,10 @@ Common properties provided by the two components are as follows:
 | :------------------ | :------ | :-------------------------------------------------------------------------------- |
 | `inviterId`         | String  | The user ID of the inviter.                                                       |
 | `inviterName `      | String  | The nickname of the inviter.                                                      |
-| `inviterUrl `       | String  | The avatar URL of the inviter.                                                    |
+| `inviterAvatar `       | String  | The avatar URL of the inviter.                                                    |
 | `currentId `        | String  | The current user ID.                                                              |
 | `currentName `      | String  | The nickname of the current user.                                                 |
-| `currentUrl `       | String  | The avatar URL of the current user.                                               |
+| `currentAvatar `       | String  | The avatar URL of the current user.                                               |
 | `timeout `          | Number  | The timeout time. If the timeout period expires, the call hangs up automatically. |
 | `bottomButtonType ` | String  | Initial Button group style.                                                       |
 | `muteVideo `        | Boolean | Whether to disable video.                                                         |

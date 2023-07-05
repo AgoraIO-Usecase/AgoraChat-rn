@@ -214,10 +214,10 @@ Basic general properties. The important required attributes mainly include:
 export type BasicCallProps = {
   inviterId: string;
   inviterName: string;
-  inviterUrl?: string;
+  inviterAvatar?: string;
   currentId: string;
   currentName: string;
-  currentUrl?: string;
+  currentAvatar?: string;
   timeout?: number;
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;

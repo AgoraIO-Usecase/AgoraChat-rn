@@ -81,14 +81,17 @@ const avatarNames = [
 const avatarNamesCount = avatarNames.length;
 
 export function DefaultAvatar(
-  props: Omit<AvatarProps, 'uri' | 'uriOnError'> & { userId: string }
+  props: Omit<AvatarProps, 'uri' | 'uriOnError'> & {
+    userId: string;
+    userAvatar?: string;
+  }
 ): JSX.Element {
-  const { userId, ...others } = props;
+  const { userId, userAvatar, ...others } = props;
   const i = hashCode(userId);
   const index = Math.abs(i) % avatarNamesCount;
   const name = avatarNames[index] as IconName;
   const source = localLocalIcon(name) as number;
-  return <Avatar uri={source} {...others} />;
+  return <Avatar uri={userAvatar ?? source} {...others} />;
 }
 
 export const DefaultAvatarMemo = React.memo(DefaultAvatar);

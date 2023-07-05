@@ -6,7 +6,7 @@ export interface CallUser {
   /**
    * Call user nick name.
    */
-  userNickName: string;
+  userName?: string;
   /**
    * Call user avatar url
    */

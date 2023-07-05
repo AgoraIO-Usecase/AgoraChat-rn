@@ -6,7 +6,7 @@ import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
 import { calllog } from '../../call/CallConst';
 import type { User } from '../../types';
-import { Avatar, DefaultAvatar, DefaultAvatarMemo } from './Avatar';
+import { DefaultAvatar, DefaultAvatarMemo } from './Avatar';
 import { LocalIcon } from './LocalIcon';
 
 const PageCount = 4;
@@ -82,6 +82,7 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
         >
           <DefaultAvatarMemo
             userId={user.userId}
+            userAvatar={user.userAvatar}
             size={height > width ? height : width}
           />
           <BlurView
@@ -167,15 +168,12 @@ export class VideoTab extends React.Component<VideoTabProps, VideoTabState> {
                         borderRadius: 105,
                       }}
                     >
-                      {user.userAvatar ? (
-                        <Avatar uri={user.userAvatar} size={100} radius={100} />
-                      ) : (
-                        <DefaultAvatar
-                          userId={user.userId}
-                          size={100}
-                          radius={100}
-                        />
-                      )}
+                      <DefaultAvatar
+                        userId={user.userId}
+                        userAvatar={user.userAvatar}
+                        size={100}
+                        radius={100}
+                      />
                     </View>
                     <View style={{ flex: 2 }} />
                   </View>

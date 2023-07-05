@@ -88,6 +88,10 @@ export class CallManagerImpl
   private _requestCurrentUser?: (params: {
     onResult: (params: { user: CallUser; error?: any }) => void;
   }) => void;
+  private _requestUserInfo?: (params: {
+    userId: string;
+    onResult: (params: { user: CallUser; error?: any }) => void;
+  }) => void;
 
   constructor() {
     calllog.log('CallManagerImpl:constructor:');
@@ -110,6 +114,20 @@ export class CallManagerImpl
     // Note: reserve.
   }
 
+  /**
+   * Initialize the `CallManager` object.
+   *
+   * @param params
+   * - option: Important parameters. See {@link CallOption}
+   * - listener: Receive notification events. See {@link CallViewListener}
+   * - enableLog: Whether to enable logging.
+   * - type: The main user gets `rtc token`. See {@link requestRTCToken}
+   * - requestRTCToken: Get the rtc token. It needs to be set by the user during initialization and is called when joining the channel. If you don't set it, you can't make a call normally.
+   * - requestUserMap: Get the mapping relationship between user chat id and user rtc id. It needs to be set during initialization. If you don't set it, you can't make a call normally.
+   * - requestCurrentUser: Get current user information. It needs to be set during initialization.
+   * - requestUserInfo: Get user information. If this parameter is not defined, the properties of `SingleCall` or `MultiCall`, or the default value, will be used. If the result is normal, it will be cached. The cache is destroyed after the UI component is unmounted.
+   * - onResult: The result of initialization is returned through this parameter. If the argument is `undefined` then initialization is complete, otherwise an error message is given.
+   */
   public init(params: {
     option: CallOption;
     listener?: CallViewListener;
@@ -130,6 +148,10 @@ export class CallManagerImpl
       onResult: (params: { data?: any; error?: any }) => void;
     }) => void;
     requestCurrentUser: (params: {
+      onResult: (params: { user: CallUser; error?: any }) => void;
+    }) => void;
+    requestUserInfo?: (params: {
+      userId: string;
       onResult: (params: { user: CallUser; error?: any }) => void;
     }) => void;
     onResult?: (params?: { error?: CallError }) => void;
@@ -165,6 +187,7 @@ export class CallManagerImpl
     this._requestRTCToken = params.requestRTCToken;
     this._requestUserMap = params.requestUserMap;
     this._requestCurrentUser = params.requestCurrentUser;
+    this._requestUserInfo = params.requestUserInfo;
     this._device.init((dt) => {
       this._deviceToken = dt;
       i2 = true;
@@ -178,6 +201,11 @@ export class CallManagerImpl
       params.onResult?.();
     }
   }
+
+  /**
+   * Deinitialize the `CallManager` object.
+   * Mainly release resources, stop event notification, stop timer object, etc.
+   */
   public unInit(): void {
     calllog.log('CallManagerImpl:unInit:');
     if (this._isInit === false) {
@@ -254,6 +282,10 @@ export class CallManagerImpl
     return this._requestCurrentUser;
   }
 
+  public get requestUserInfo() {
+    return this._requestUserInfo;
+  }
+
   public get elapsed() {
     return this._elapsed;
   }
@@ -300,6 +332,9 @@ export class CallManagerImpl
     this._listener = undefined;
   }
 
+  /**
+   * Initializes the RTC object.
+   */
   public initRTC(): void {
     calllog.log('CallManagerImpl:initRTC:', this.option.agoraAppId);
     this._engine = createAgoraRtcEngine();
@@ -310,6 +345,10 @@ export class CallManagerImpl
     const ret2 = this._engine.registerEventHandler(this);
     calllog.log('CallManagerImpl:initRTC:', ret1, ret2);
   }
+
+  /**
+   * Deinitialize the RTC object.
+   */
   public unInitRTC(): void {
     calllog.log('CallManagerImpl:unInitRTC:');
     this._engine?.unregisterEventHandler(this);
@@ -319,7 +358,9 @@ export class CallManagerImpl
   public setCurrentUser(currentUser: CallUser): void {
     calllog.log('CallManagerImpl:setCurrentUser:', currentUser);
     this._userId = currentUser.userId;
-    this._setUser(currentUser);
+    if (currentUser.userAvatarUrl || currentUser.userName) {
+      this._setUser(currentUser);
+    }
   }
 
   public clear(): void {

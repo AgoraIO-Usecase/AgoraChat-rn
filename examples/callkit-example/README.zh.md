@@ -214,10 +214,10 @@ export default function HomeScreen(): JSX.Element {
 export type BasicCallProps = {
   inviterId: string;
   inviterName: string;
-  inviterUrl?: string;
+  inviterAvatar?: string;
   currentId: string;
   currentName: string;
-  currentUrl?: string;
+  currentAvatar?: string;
   timeout?: number;
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;

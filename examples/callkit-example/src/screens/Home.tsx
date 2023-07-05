@@ -12,6 +12,7 @@ import {
   CallError,
   CallListener,
   CallType,
+  CallUser,
   useCallkitSdkContext,
 } from 'react-native-chat-callkit';
 import { Button, RadioButton } from 'react-native-chat-uikit';
@@ -105,13 +106,20 @@ const ContactList = React.memo((props: ContactListProps) => {
       inviterId?: string;
     }) => {
       console.log('test:showCall:', params);
-      const l = [] as string[];
+      const inviteeIds = [] as string[];
+      const invitees = [] as CallUser[];
       for (const i of _data) {
         if (i.isSelected === true) {
-          l.push(i.userId);
+          inviteeIds.push(i.userId);
+          invitees.push({
+            userId: i.userId,
+            userName: `${i.userId}_name`,
+            userAvatarUrl:
+              'https://cdn0.iconfinder.com/data/icons/creatype-pet-shop-glyph/64/1_paw_dog_cat_paws_pets_animal-14-128.png',
+          } as CallUser);
         }
       }
-      if (params.isInviter === true && l.length === 0) {
+      if (params.isInviter === true && inviteeIds.length === 0) {
         Alert.alert(`error: please add invitee.`);
         return;
       }
@@ -127,8 +135,27 @@ const ContactList = React.memo((props: ContactListProps) => {
           agoraAppId: agoraAppId,
           isInviter: params.isInviter,
           inviterId: params.isInviter === true ? currentId : params.inviterId!,
+          // inviterName:
+          //   params.isInviter === true
+          //     ? `${currentId}_name`
+          //     : `${params.inviterId!}_name`,
+          // inviterAvatar:
+          //   params.isInviter === true
+          //     ? 'https://cdn0.iconfinder.com/data/icons/creatype-pet-shop-glyph/64/1_paw_dog_cat_paws_pets_animal-14-128.png'
+          //     : 'https://cdn3.iconfinder.com/data/icons/food-3-11/128/food_Bone-Dog-Doggy-128.png',
+          // invitees:
+          //   params.isInviter === true
+          //     ? invitees
+          //     : [
+          //         {
+          //           userId: currentId,
+          //           userName: `${currentId}_name`,
+          //           userAvatarUrl:
+          //             'https://cdn0.iconfinder.com/data/icons/creatype-pet-shop-glyph/64/1_paw_dog_cat_paws_pets_animal-14-128.png',
+          //         } as CallUser,
+          //       ],
           currentId: currentId,
-          inviteeIds: params.isInviter === true ? l : [currentId],
+          inviteeIds: params.isInviter === true ? inviteeIds : [currentId],
           callType: params.callType,
         },
       });

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Alert, Platform, ToastAndroid } from 'react-native';
 import {
   CallType,
+  CallUser,
   formatElapsed,
   MultiCall,
   SingleCall,
@@ -51,24 +52,37 @@ export function handleVoiceStateEvent(params: {
     case 'show_single_call':
       {
         console.log('test:stateEvent.params', stateEvent.params);
-        const { inviterId, isInviter, callType, currentId, inviteeIds } =
-          stateEvent.params as {
-            appKey: string;
-            agoraAppId: string;
-            isInviter: boolean;
-            inviterId: string;
-            currentId: string;
-            inviteeIds: string[];
-            callType: CallType;
-          };
+        const {
+          inviterId,
+          isInviter,
+          callType,
+          currentId,
+          inviteeIds,
+          inviterName,
+          inviterAvatar,
+          invitees,
+        } = stateEvent.params as {
+          appKey: string;
+          agoraAppId: string;
+          isInviter: boolean;
+          inviterId: string;
+          currentId: string;
+          inviteeIds: string[];
+          callType: CallType;
+          inviterName?: string;
+          inviterAvatar?: string;
+          invitees?: CallUser[];
+        };
         params.voiceState.showState({
           children: (
             <SingleCall
               inviterId={inviterId}
-              inviterName={inviterId}
+              inviterName={inviterName}
+              inviterAvatar={inviterAvatar}
               currentId={currentId}
-              currentName={currentId}
               inviteeId={inviteeIds[0] ?? ''}
+              inviteeName={invitees?.[0]?.userName}
+              inviteeAvatar={invitees?.[0]?.userAvatarUrl}
               isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
               onClose={(elapsed, reason) => {
@@ -149,27 +163,39 @@ export function handleVoiceStateEvent(params: {
     case 'show_multi_call':
       {
         console.log('test:stateEvent.params:multi:', stateEvent.params);
-        const { inviterId, isInviter, callType, currentId, inviteeIds } =
-          stateEvent.params as {
-            appKey: string;
-            agoraAppId: string;
-            isInviter: boolean;
-            inviterId: string;
-            currentId: string;
-            inviteeIds: string[];
-            callType: CallType;
-          };
+        const {
+          inviterId,
+          isInviter,
+          callType,
+          currentId,
+          inviteeIds,
+          inviterName,
+          inviterAvatar,
+          invitees,
+        } = stateEvent.params as {
+          appKey: string;
+          agoraAppId: string;
+          isInviter: boolean;
+          inviterId: string;
+          currentId: string;
+          inviteeIds: string[];
+          callType: CallType;
+          inviterName?: string;
+          inviterAvatar?: string;
+          invitees?: CallUser[];
+        };
         params.voiceState.showState({
           children: (
             <MultiCall
               inviterId={inviterId}
-              inviterName={inviterId}
+              inviterName={inviterName}
+              inviterAvatar={inviterAvatar}
               currentId={currentId}
-              currentName={currentId}
               callType={callType === CallType.AudioMulti ? 'audio' : 'video'}
               isInviter={isInviter}
               inviteeIds={inviteeIds}
               inviteeList={{ InviteeList: ContactList }}
+              invitees={invitees}
               onClose={(elapsed, reason) => {
                 console.log('test:stateEvent.onClose', elapsed, reason);
                 sendEventFromState({

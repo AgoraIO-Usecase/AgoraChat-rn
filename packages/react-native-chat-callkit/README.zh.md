@@ -85,10 +85,10 @@ yarn && yarn run generate-source-env
 
 - inviterId: 邀请者 ID。
 - inviterName: 邀请者昵称。
-- inviterUrl: 邀请者头像 url。
+- inviterAvatar: 邀请者头像 url。
 - currentId: 当前用户 ID。
 - currentName: 当前用户昵称。
-- currentUrl: 当前用户头像 url。
+- currentAvatar: 当前用户头像 url。
 - timeout: 超时时间。超时后自动挂断处理。
 - bottomButtonType: 按钮组样式。对于需要设置初始样式的可以使用。
 - muteVideo:是否禁用视频。

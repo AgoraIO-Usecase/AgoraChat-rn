@@ -6,6 +6,7 @@ import type { VideoViewSetupMode } from 'react-native-agora';
 import { calllog } from '../call/CallConst';
 import type { CallError } from '../call/CallError';
 import type { CallManagerImpl } from '../call/CallManagerImpl';
+import type { CallUser } from '../call/CallUser';
 import type { CallViewListener } from '../call/CallViewListener';
 import { CallEndReason, CallState, CallType } from '../enums';
 import {
@@ -32,10 +33,10 @@ export type BottomButtonType =
 export type BasicCallProps = {
   inviterId: string;
   inviterName?: string;
-  inviterUrl?: string;
+  inviterAvatar?: string;
   currentId: string;
-  currentName: string;
-  currentUrl?: string;
+  currentName?: string;
+  currentAvatar?: string;
   timeout?: number;
   bottomButtonType?: BottomButtonType;
   muteVideo?: boolean;
@@ -65,6 +66,7 @@ export type BasicCallState = {
   elapsed: number; // ms unit
   reason?: CallEndReason;
   error?: CallError;
+  selfInfo?: CallUser;
 };
 export abstract class BasicCall<
     Props extends BasicCallProps,
@@ -98,6 +100,32 @@ export abstract class BasicCall<
 
   protected abstract init(): void;
   protected abstract unInit(): void;
+
+  protected async getUserInfoAsync(
+    userId: string
+  ): Promise<CallUser | undefined> {
+    return new Promise(
+      (
+        resolve: (value: CallUser | undefined) => void,
+        reject: (reason?: any) => void
+      ) => {
+        if (this.manager?.requestUserInfo) {
+          this.manager?.requestUserInfo?.({
+            userId: userId,
+            onResult: ({ user, error }) => {
+              if (error === undefined) {
+                resolve(user);
+              } else {
+                reject(error);
+              }
+            },
+          });
+        } else {
+          resolve(undefined);
+        }
+      }
+    );
+  }
 
   onClickHangUp = () => {
     const { isInviter, onHangUp, onCancel, onRefuse } = this.props;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { RtcSurfaceView, VideoViewSetupMode } from 'react-native-agora';
 
-import { CallError } from '../call';
+import { CallError, CallUser } from '../call';
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
 import { CallEndReason, CallErrorCode, CallState } from '../enums';
@@ -30,7 +30,7 @@ const ContentBottom = 148;
 export type InviteeListProps = {
   selectedIds: string[];
   maxCount: number;
-  onClose: (addedIds: string[]) => void;
+  onClose: (addedIds: string[], addeds?: CallUser[]) => void;
   onCancel: () => void;
 };
 
@@ -40,6 +40,10 @@ export type MultiCallProps = BasicCallProps & {
     InviteeList: (props: InviteeListProps) => JSX.Element;
     props?: InviteeListProps;
   };
+  invitees?: CallUser[];
+  groupId?: string;
+  groupName?: string;
+  groupAvatar?: string;
 };
 export type MultiCallState = BasicCallState & {
   remoteUsersJoinChannelSuccess: Map<string, boolean>;
@@ -59,13 +63,13 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   constructor(props: MultiCallProps) {
     super(props);
     this._videoTabRef = React.createRef<VideoTabs>();
-    const l = [] as User[];
-    l.push({
+    const users = [] as User[];
+    users.push({
       userId: props.inviterId,
       userHadJoined: false,
       isSelf: props.isInviter ? true : false,
     } as User);
-    l.push(
+    users.push(
       ...props.inviteeIds.map((userId) => {
         return {
           userId: userId,
@@ -74,6 +78,32 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         } as User;
       })
     );
+    if (props.invitees) {
+      for (const user of users) {
+        for (const invitee of props.invitees) {
+          if (user.userId === invitee.userId) {
+            user.userName = invitee.userName;
+            user.userAvatar = invitee.userAvatarUrl;
+          }
+        }
+      }
+    }
+    if (props.inviterName) {
+      for (const user of users) {
+        if (user.userId === props.inviterId) {
+          user.userName = props.inviterName;
+        }
+      }
+    }
+    if (props.inviterAvatar) {
+      for (const user of users) {
+        if (user.userId === props.inviterId) {
+          user.userAvatar = props.inviterAvatar;
+        }
+      }
+    }
+    calllog.log('test:MultiCall:constructor:users:', users);
+
     this.state = {
       isMinimize: props.isMinimize ?? false,
       callState: props.callState ?? CallState.Connecting,
@@ -96,9 +126,9 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       remoteUsersJoinChannelSuccess: new Map(),
       remoteUsersUid: new Map(),
       inviteeIds: props.inviteeIds,
-      users: l,
+      users: users,
       isFullVideo: false,
-      usersCount: l.length,
+      usersCount: users.length,
       showInvite: false,
       cache: new Map(),
     };
@@ -120,8 +150,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.manager = createManagerImpl();
     this.manager?.setCurrentUser({
       userId: this.props.currentId,
-      userNickName: this.props.currentName,
-      userAvatarUrl: this.props.currentUrl,
+      userName: this.props.currentName,
+      userAvatarUrl: this.props.currentAvatar,
     });
 
     this.manager?.initRTC();
@@ -148,6 +178,25 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         this.onClickClose();
       }, this.props.timeout ?? KeyTimeout);
     }
+
+    if (
+      this.props.invitees ||
+      this.props.inviterName ||
+      this.props.inviterAvatar
+    ) {
+      const { users } = this.state;
+      for (const user of users) {
+        if (user.userAvatar || user.userName) {
+          this.manager?.setUsers({
+            userId: user.userId,
+            userName: user.userName,
+            userAvatarUrl: user.userAvatar,
+          } as CallUser);
+        }
+      }
+    }
+
+    this.updateUserInfoList();
   }
   protected unInit(): void {
     if (this.props.isTest === true) {
@@ -174,7 +223,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.manager?.clear();
   }
 
-  private onInviteCall(addedIds: string[]) {
+  private onInviteCall(addedIds: string[], addeds?: CallUser[]) {
     calllog.log('MultiCall:onInviteCall:', addedIds);
     if (addedIds.length === 0) {
       return;
@@ -182,6 +231,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     const list = [] as {
       userChannelId?: number;
       userId: string;
+      userName?: string;
+      userAvatar?: string;
       isSelf: boolean;
       userHadJoined?: boolean;
     }[];
@@ -191,6 +242,16 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         isSelf: false,
         userHadJoined: false,
       });
+    }
+    if (addeds) {
+      for (const i of list) {
+        for (const j of addeds) {
+          if (i.userId === j.userId) {
+            i.userName = j.userName;
+            i.userAvatar = j.userAvatarUrl;
+          }
+        }
+      }
     }
     let channelId = this.channelId;
     if (this.channelId === '') {
@@ -330,6 +391,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userList: {
       userChannelId?: number;
       userId: string;
+      userName?: string;
+      userAvatar?: string;
       isSelf: boolean;
       userHadJoined?: boolean;
     }[]
@@ -356,6 +419,12 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
               cache.delete(userP.userChannelId);
             }
           }
+          if (userP.userName) {
+            user.userName = userP.userName;
+          }
+          if (userP.userAvatar) {
+            user.userAvatar = userP.userAvatar;
+          }
           break;
         }
       }
@@ -378,6 +447,8 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           userId: userP.userId,
           userChannelId: userP.userChannelId,
           userHadJoined: userP.userHadJoined ?? true,
+          userName: userP.userName,
+          userAvatar: userP.userAvatar,
           isSelf: userP.isSelf,
           muteAudio,
           muteVideo,
@@ -421,6 +492,47 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     if (params.userChannelId) {
       cache.delete(params.userChannelId);
     }
+  }
+
+  private async getUserInfoList(
+    userIds: string[]
+  ): Promise<CallUser[] | undefined> {
+    const ret: CallUser[] = [];
+    for (const userId of userIds) {
+      const user = this.manager?.getUserInfo(userId);
+      if (user === undefined) {
+        const _user = await this.getUserInfoAsync(userId);
+        if (_user) {
+          this.manager?.setUsers(_user);
+          ret.push(_user);
+        }
+      } else {
+        ret.push(user);
+      }
+    }
+    return ret;
+  }
+
+  private updateUserInfoList(): void {
+    this.getUserInfoList([this.props.inviterId, ...this.props.inviteeIds])
+      .then((result) => {
+        if (result) {
+          calllog.log('test:updateUserInfoList:result:', result);
+          const { users } = this.state;
+          for (const i of result) {
+            for (const user of users) {
+              if (user.userId === i.userId) {
+                user.userName = i.userName;
+                user.userAvatar = i.userAvatarUrl;
+              }
+            }
+          }
+          this.setState({ users: [...users] });
+        }
+      })
+      .catch((e) => {
+        calllog.warn(e);
+      });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -660,6 +772,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   protected renderAudio(): React.ReactNode {
     calllog.log('MultiCall:renderAudio:');
     const { users } = this.state;
+    calllog.log('test:renderAudio:users:', users);
     return (
       <View
         style={{
@@ -834,6 +947,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   }
 
   protected renderFloat(): React.ReactNode {
+    const { groupId, groupAvatar } = this.props;
     const { callState } = this.state;
     const content = 'Calling...';
     return (
@@ -862,7 +976,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
               alignItems: 'center',
             }}
           >
-            <DefaultAvatar userId="" size={36} />
+            <DefaultAvatar
+              userId={groupId ?? ''}
+              userAvatar={groupAvatar}
+              size={36}
+            />
             {callState === CallState.Calling ? (
               <Elapsed timer={this.manager?.elapsed ?? 0} />
             ) : (
@@ -949,10 +1067,10 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           {...inviteeListProps}
           selectedIds={getSelectedIds()}
           maxCount={callType === 'audio' ? AudioMaxCount : VideoMaxCount}
-          onClose={(addedIds) => {
+          onClose={(addedIds, addeds) => {
             calllog.log('added:', addedIds);
             this.setState({ showInvite: false });
-            this.onInviteCall(addedIds);
+            this.onInviteCall(addedIds, addeds);
           }}
           onCancel={() => {
             calllog.log('onCancel:');

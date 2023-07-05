@@ -9,6 +9,7 @@ import {
 
 import { calllog, KeyTimeout } from '../call/CallConst';
 import { createManagerImpl } from '../call/CallManagerImpl';
+import type { CallUser } from '../call/CallUser';
 import { CallEndReason, CallState } from '../enums';
 import {
   BasicCall,
@@ -23,18 +24,61 @@ import { Elapsed } from './components/Elapsed';
 import { IconButton } from './components/IconButton';
 import { MiniButton } from './components/MiniButton';
 
+/**
+ * Single call attribute object.
+ */
 export type SingleCallProps = BasicCallProps & {
+  /**
+   * The invitee ID.
+   */
   inviteeId: string;
+  /**
+   * The invitee Name.
+   */
+  inviteeName?: string;
+  /**
+   * The invitee Avatar url.
+   */
+  inviteeAvatar?: string;
+  /**
+   * Notification that the other party has joined.
+   */
   onPeerJoined?: () => void;
 };
+
+/**
+ * Single call status object.
+ */
 export type SingleCallState = BasicCallState & {
+  /**
+   * Whether the peer has joined.
+   */
   peerJoinChannelSuccess: boolean;
+  /**
+   * Whether the peer has disables the camera.
+   */
   peerMuteVideo: boolean;
+  /**
+   * Whether the peer has disabled the microphone.
+   */
   peerMuteAudio: boolean;
+  /**
+   * The peer RTC channel ID.
+   */
   peerUid: number;
+  /**
+   * Whether to switch the local camera.
+   */
   isSwitchVideo: boolean;
+  /**
+   * The peer information. Include name and avatar.
+   */
+  peerInfo?: CallUser;
 };
 
+/**
+ * Single call UI component. The common part is detailed here. {@link BasicCall}
+ */
 export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   constructor(props: SingleCallProps) {
     super(props);
@@ -72,8 +116,8 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     this.manager = createManagerImpl();
     this.manager?.setCurrentUser({
       userId: this.props.currentId,
-      userNickName: this.props.currentName,
-      userAvatarUrl: this.props.currentUrl,
+      userName: this.props.currentName,
+      userAvatarUrl: this.props.currentAvatar,
     });
 
     this.manager?.initRTC();
@@ -97,6 +141,22 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         this.onClickClose();
       }, this.props.timeout ?? KeyTimeout);
     }
+
+    if (this.props.inviteeName || this.props.inviteeAvatar) {
+      this.manager?.setUsers({
+        userId: this.props.inviteeId,
+        userName: this.props.inviteeName,
+        userAvatarUrl: this.props.inviteeAvatar,
+      } as CallUser);
+    }
+    if (this.props.inviterName || this.props.inviterAvatar) {
+      this.manager?.setUsers({
+        userId: this.props.inviterId,
+        userName: this.props.inviterName,
+        userAvatarUrl: this.props.inviterAvatar,
+      } as CallUser);
+    }
+    this.getPeerInfo();
   }
   protected unInit(): void {
     if (this.props.isTest === true) {
@@ -205,6 +265,52 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       }
     }
     return ret;
+  }
+
+  private async getUserInfo(userId: string): Promise<CallUser | undefined> {
+    const ret = this.manager?.getUserInfo(userId);
+    if (ret === undefined) {
+      const _ret = await this.getUserInfoAsync(userId);
+      if (_ret) {
+        this.manager?.setUsers(_ret);
+      }
+      return _ret;
+    }
+    return ret;
+  }
+
+  private getName(userId: string): string {
+    const { peerInfo } = this.state;
+    if (userId === this.props.currentId) {
+      return this.props.currentName ?? this.props.currentId;
+    } else {
+      return peerInfo?.userName ?? userId;
+    }
+  }
+
+  private getPeerInfo(): void {
+    const userId =
+      this.props.currentId === this.props.inviteeId
+        ? this.props.inviterId
+        : this.props.inviteeId;
+    this.getUserInfo(userId)
+      .then((user) => {
+        if (user) {
+          const { peerInfo } = this.state;
+          if (peerInfo === undefined) {
+            this.setState({
+              peerInfo: {
+                userId: user?.userId,
+                userName: user?.userName,
+                userAvatarUrl: user?.userAvatarUrl,
+              },
+            });
+          }
+        }
+      })
+      .catch((e) => {
+        calllog.warn(e);
+      });
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -497,7 +603,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
   protected renderAvatar(): React.ReactNode {
     const { callType, isInviter, inviteeId, inviterId, currentId } = this.props;
-    const { callState } = this.state;
+    const { callState, peerInfo } = this.state;
     return (
       <View
         style={{
@@ -508,6 +614,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         <View style={{ height: 60 }} />
         <DefaultAvatar
           userId={currentId === inviterId ? inviteeId : inviterId}
+          userAvatar={peerInfo?.userAvatarUrl}
           size={100}
           radius={100}
         />
@@ -521,7 +628,9 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               color: 'white',
             }}
           >
-            {currentId === inviterId ? inviteeId : inviterId}
+            {currentId === inviterId
+              ? this.getName(inviteeId)
+              : this.getName(inviterId)}
           </Text>
         </View>
         {callState === CallState.Calling ? (
@@ -549,7 +658,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
   protected renderFloatAudio(): React.ReactNode {
     const { inviterId, inviteeId, currentId } = this.props;
-    const { callState } = this.state;
+    const { callState, peerInfo } = this.state;
     const content = 'Calling...';
     return (
       <View
@@ -572,6 +681,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         >
           <DefaultAvatar
             userId={currentId === inviterId ? inviteeId : inviterId}
+            userAvatar={peerInfo?.userAvatarUrl}
             size={36}
             radius={36}
           />
@@ -750,7 +860,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
   protected renderBlur(): React.ReactNode {
     const { callType, currentId, inviteeId, inviterId } = this.props;
-    const { isMinimize } = this.state;
+    const { isMinimize, peerInfo } = this.state;
     const { height, width } = Dimensions.get('window');
     if (isMinimize === false && callType === 'audio') {
       return (
@@ -767,6 +877,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
         >
           <DefaultAvatarMemo
             userId={currentId === inviterId ? inviteeId : inviterId}
+            userAvatar={peerInfo?.userAvatarUrl}
             size={height > width ? height : width}
           />
           <BlurView

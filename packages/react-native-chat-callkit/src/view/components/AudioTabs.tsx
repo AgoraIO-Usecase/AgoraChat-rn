@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 
 import type { User } from '../../types';
-import { Avatar, DefaultAvatar } from './Avatar';
+import { DefaultAvatar } from './Avatar';
 import { LocalIcon } from './LocalIcon';
 
 const PageCount = 9;
@@ -60,11 +60,12 @@ export function AudioTab(props: AudioTabProps): JSX.Element {
                       user.talking === true ? '#14FF72' : undefined,
                   }}
                 >
-                  {user.userAvatar ? (
-                    <Avatar uri={user.userAvatar} size={80} radius={80} />
-                  ) : (
-                    <DefaultAvatar userId={user.userId} size={80} radius={80} />
-                  )}
+                  <DefaultAvatar
+                    userId={user.userId}
+                    userAvatar={user.userAvatar}
+                    size={80}
+                    radius={80}
+                  />
                 </View>
               </View>
               <View style={{ height: 5 }} />

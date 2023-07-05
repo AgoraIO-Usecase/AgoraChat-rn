@@ -37,6 +37,7 @@
     "pure-uuid": "^1.6.3",
     "react": "18.2.0",
     "react-native": "0.71.11",
+    "react-native-agora": "^4.2.0",
     "react-native-audio-recorder-player": "^3.5.3",
     "react-native-chat-sdk": "^1.1.2",
     "react-native-create-thumbnail": "^1.6.4",

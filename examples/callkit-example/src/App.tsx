@@ -325,13 +325,30 @@ export default function App() {
                 params.onResult({
                   user: {
                     userId: result,
-                    userNickName: result,
+                    userName: `${result}_self_name`,
+                    userAvatarUrl:
+                      'https://cdn3.iconfinder.com/data/icons/vol-2/128/dog-128.png',
                   },
                 });
               })
               .catch((error) => {
                 console.warn('test:getCurrentUsername:error:', error);
               });
+          }}
+          requestUserInfo={(params: {
+            userId: string;
+            onResult: (params: { user: CallUser; error?: any }) => void;
+          }) => {
+            console.log('requestCurrentUser:', params);
+            // pseudo
+            params.onResult({
+              user: {
+                userId: params.userId,
+                userName: `${params.userId}_name2`,
+                userAvatarUrl:
+                  'https://cdn2.iconfinder.com/data/icons/pet-and-veterinary-1/85/dog_charity_love_adopt_adoption-128.png',
+              },
+            });
           }}
         >
           {__TEST__ === true ? (
