@@ -2051,7 +2051,10 @@ export class CallManagerImpl
           this._onCallEnded({
             channelId: call.channelId,
             callType: call.callType,
-            endReason: CallEndReason.RemoteNoResponse,
+            endReason:
+              reason === UserOfflineReasonType.UserOfflineDropped
+                ? CallEndReason.RemoteNoResponse
+                : CallEndReason.HungUp,
           });
         } else {
           this.listener?.onRemoteUserOffline?.({
@@ -2255,15 +2258,8 @@ export class CallManagerImpl
     connection: RtcConnection,
     speakers: AudioVolumeInfo[],
     speakerNumber: number,
-    totalVolume: number
+    _totalVolume: number
   ): void {
-    calllog.log(
-      'CallManagerImpl:onAudioVolumeIndication:',
-      connection,
-      speakers,
-      speakerNumber,
-      totalVolume
-    );
     if (speakers === null || speakers === undefined) {
       return;
     }

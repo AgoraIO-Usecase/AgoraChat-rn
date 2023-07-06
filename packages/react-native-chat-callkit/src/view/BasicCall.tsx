@@ -395,7 +395,7 @@ export abstract class BasicCall<
     throw new Error('Requires subclass implementation.');
   }
 
-  onAudioVolumeIndication(params: {
+  onAudioVolumeIndication(_params: {
     channelId: string;
     speakerNumber: number;
     speakers: {
@@ -404,7 +404,7 @@ export abstract class BasicCall<
       totalVolume: number;
     }[];
   }): void {
-    calllog.log('BasicCall:onAudioVolumeIndication:', params);
+    // calllog.log('BasicCall:onAudioVolumeIndication:', params);
   }
 
   onLocalVideoStateChanged(params: {
