@@ -87,7 +87,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
       callState: props.callState ?? CallState.Connecting,
       bottomButtonType:
         props.bottomButtonType ??
-        (props.isInviter
+        (this.isInviter
           ? props.callType === 'audio'
             ? 'inviter-audio'
             : 'inviter-video'
@@ -132,7 +132,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
 
     this.manager?.addViewListener(this);
     this.props.onInitialized?.();
-    if (this.props.isInviter === true) {
+    if (this.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         this.startCall();
       }
@@ -224,7 +224,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   private updateBottomButtons(): void {
     const { peerJoinChannelSuccess, joinChannelSuccess } = this.state;
     if (peerJoinChannelSuccess && joinChannelSuccess) {
-      if (this.props.isInviter === false) {
+      if (this.isInviter === false) {
         let s;
         if (this.props.callType === 'audio') {
           s = 'invitee-audio-calling' as BottomButtonType;
@@ -605,7 +605,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     );
   }
   protected renderAvatar(): React.ReactNode {
-    const { callType, isInviter, inviteeId, inviterId, currentId } = this.props;
+    const { callType, inviteeId, inviterId, currentId } = this.props;
     const { callState, peerInfo } = this.state;
     return (
       <View
@@ -648,7 +648,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
               color: 'white',
             }}
           >
-            {isInviter === true
+            {this.isInviter === true
               ? 'Calling'
               : callType === 'audio'
               ? 'Audio Call'
@@ -836,12 +836,12 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
     }
   }
   protected renderContent(): React.ReactNode {
-    const { callType, isInviter } = this.props;
+    const { callType } = this.props;
     const { callState } = this.state;
     let content = null;
     if (
       callType === 'audio' ||
-      (isInviter === true && callState !== CallState.Calling)
+      (this.isInviter === true && callState !== CallState.Calling)
     ) {
       content = this.renderAvatar();
     } else {

@@ -83,8 +83,8 @@ const FlatListRenderItem = (
 type ContactListRef = {
   showCall: (params: {
     callType: CallType;
-    isInviter: boolean;
-    inviterId?: string;
+    currentId: string;
+    inviterId: string;
   }) => void;
   hideCall: () => void;
 };
@@ -102,8 +102,8 @@ const ContactList = React.memo((props: ContactListProps) => {
   if (propsRef?.current) {
     propsRef.current.showCall = (params: {
       callType: CallType;
-      isInviter: boolean;
-      inviterId?: string;
+      currentId: string;
+      inviterId: string;
     }) => {
       console.log('test:showCall:', params);
       const inviteeIds = [] as string[];
@@ -119,10 +119,11 @@ const ContactList = React.memo((props: ContactListProps) => {
           } as CallUser);
         }
       }
-      if (params.isInviter === true && inviteeIds.length === 0) {
+      if (params.currentId === params.inviterId && inviteeIds.length === 0) {
         Alert.alert(`error: please add invitee.`);
         return;
       }
+      // const isInviter = params.inviterId === params.currentId;
       sendHomeEvent({
         eventType: 'VoiceStateEvent',
         action:
@@ -133,8 +134,7 @@ const ContactList = React.memo((props: ContactListProps) => {
         params: {
           appKey: client.options?.appKey ?? '',
           agoraAppId: agoraAppId,
-          isInviter: params.isInviter,
-          inviterId: params.isInviter === true ? currentId : params.inviterId!,
+          inviterId: params.inviterId,
           // inviterName:
           //   params.isInviter === true
           //     ? `${currentId}_name`
@@ -155,7 +155,8 @@ const ContactList = React.memo((props: ContactListProps) => {
           //         } as CallUser,
           //       ],
           currentId: currentId,
-          inviteeIds: params.isInviter === true ? inviteeIds : [currentId],
+          inviteeIds:
+            params.inviterId === params.currentId ? inviteeIds : [currentId],
           callType: params.callType,
         },
       });
@@ -322,7 +323,7 @@ export default function HomeScreen({
         console.log('onCallReceived:', params);
         contactListRef.current.showCall({
           callType: params.callType,
-          isInviter: false,
+          currentId: currentId,
           inviterId: params.inviterId,
         });
       },
@@ -334,7 +335,7 @@ export default function HomeScreen({
     return () => {
       call.removeListener(listener);
     };
-  }, [call]);
+  }, [call, currentId]);
 
   React.useEffect(() => {
     const sub = addListener();
@@ -386,7 +387,8 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showCall({
               callType: CallType.Video1v1,
-              isInviter: true,
+              currentId: currentId,
+              inviterId: currentId,
             });
           }}
         >
@@ -397,7 +399,8 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showCall({
               callType: CallType.Audio1v1,
-              isInviter: true,
+              currentId: currentId,
+              inviterId: currentId,
             });
           }}
         >
@@ -408,7 +411,8 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showCall({
               callType: CallType.VideoMulti,
-              isInviter: true,
+              currentId: currentId,
+              inviterId: currentId,
             });
           }}
         >
@@ -419,7 +423,8 @@ export default function HomeScreen({
           onPress={() => {
             contactListRef.current.showCall({
               callType: CallType.AudioMulti,
-              isInviter: true,
+              currentId: currentId,
+              inviterId: currentId,
             });
           }}
         >

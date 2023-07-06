@@ -54,7 +54,6 @@ export function handleVoiceStateEvent(params: {
         console.log('test:stateEvent.params', stateEvent.params);
         const {
           inviterId,
-          isInviter,
           callType,
           currentId,
           inviteeIds,
@@ -64,7 +63,6 @@ export function handleVoiceStateEvent(params: {
         } = stateEvent.params as {
           appKey: string;
           agoraAppId: string;
-          isInviter: boolean;
           inviterId: string;
           currentId: string;
           inviteeIds: string[];
@@ -83,7 +81,6 @@ export function handleVoiceStateEvent(params: {
               inviteeId={inviteeIds[0] ?? ''}
               inviteeName={invitees?.[0]?.userName}
               inviteeAvatar={invitees?.[0]?.userAvatarUrl}
-              isInviter={isInviter}
               callType={callType === CallType.Audio1v1 ? 'audio' : 'video'}
               onClose={(elapsed, reason) => {
                 console.log('test:stateEvent.onClose', elapsed, reason);
@@ -165,7 +162,6 @@ export function handleVoiceStateEvent(params: {
         console.log('test:stateEvent.params:multi:', stateEvent.params);
         const {
           inviterId,
-          isInviter,
           callType,
           currentId,
           inviteeIds,
@@ -175,7 +171,6 @@ export function handleVoiceStateEvent(params: {
         } = stateEvent.params as {
           appKey: string;
           agoraAppId: string;
-          isInviter: boolean;
           inviterId: string;
           currentId: string;
           inviteeIds: string[];
@@ -192,7 +187,6 @@ export function handleVoiceStateEvent(params: {
               inviterAvatar={inviterAvatar}
               currentId={currentId}
               callType={callType === CallType.AudioMulti ? 'audio' : 'video'}
-              isInviter={isInviter}
               inviteeIds={inviteeIds}
               inviteeList={{ InviteeList: ContactList }}
               invitees={invitees}

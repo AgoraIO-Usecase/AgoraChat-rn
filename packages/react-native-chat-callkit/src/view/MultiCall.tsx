@@ -23,51 +23,125 @@ import type { IconName } from './components/LocalIcon';
 import { MiniButton } from './components/MiniButton';
 import { VideoTabs } from './components/VideoTabs';
 
+/**
+ * The maximum number of video calls.
+ */
 const VideoMaxCount = 18;
+/**
+ * The maximum amount of call audio.
+ */
 const AudioMaxCount = 128;
 const ContentBottom = 148;
 
+/**
+ * Property of the inviter list UI component in the call.
+ */
 export type InviteeListProps = {
+  /**
+   * People who have been invited to the current meeting, including yourself.
+   */
   selectedIds: string[];
+  /**
+   * Maximum number of invites. See {@link VideoMaxCount} or {@link AudioMaxCount}
+   */
   maxCount: number;
+  /**
+   * Callback notification that the invite UI component is closed.
+   *
+   * @param addedIds: A list of inviters other than those who are in a call.
+   * @param addeds: (optional) Information about the invitee. Include name and avatar.
+   */
   onClose: (addedIds: string[], addeds?: CallUser[]) => void;
+  /**
+   * Callback notification for canceling the invitation.
+   */
   onCancel: () => void;
 };
 
+/**
+ * The property object of the multi-person call UI component.
+ */
 export type MultiCallProps = BasicCallProps & {
+  /**
+   * List of IDs of invitees.
+   */
   inviteeIds: string[];
+  /**
+   * Inviter UI component.
+   * Typical application: During a call, use this component to invite people to join the call again.
+   */
   inviteeList?: {
     InviteeList: (props: InviteeListProps) => JSX.Element;
     props?: InviteeListProps;
   };
+  /**
+   * Information about the invitee. Include name and avatar.
+   */
   invitees?: CallUser[];
+  /**
+   * The ID of the multi call.
+   */
   groupId?: string;
+  /**
+   * The name of the multi call.
+   */
   groupName?: string;
+  /**
+   * The avatar of the multi call.
+   * Use group avatars when calls are minimized.
+   */
   groupAvatar?: string;
 };
+
+/**
+ * The state object of the multi call component.
+ */
 export type MultiCallState = BasicCallState & {
-  remoteUsersJoinChannelSuccess: Map<string, boolean>;
-  remoteUsersUid: Map<string, number>;
+  /**
+   * List of IDs of invitees.
+   */
   inviteeIds: string[];
+  /**
+   * Status information of inviter and invitee. including myself.
+   */
   users: User[];
-  cache: Map<number, User>;
+  /**
+   * Whether the video is zoomed in full screen alone
+   */
   isFullVideo: boolean;
+  /**
+   * The number of current callers.
+   */
   usersCount: number;
+  /**
+   * Whether to show the invite button.
+   */
   showInvite: boolean;
+  /**
+   * The ID of the person displayed in full screen.
+   */
   fullId?: string;
+  /**
+   * The channel ID of the person displayed in full screen.
+   */
   fullChannelId?: number;
 };
 
+/**
+ * Multi call UI component. The common part is detailed here. {@link BasicCall}
+ */
 export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   private _videoTabRef?: React.RefObject<VideoTabs>;
+  private _cache: Map<number, User>;
   constructor(props: MultiCallProps) {
     super(props);
     this._videoTabRef = React.createRef<VideoTabs>();
+    this._cache = new Map();
     const users = [] as User[];
     users.push({
       userId: props.inviterId,
       userHadJoined: false,
-      isSelf: props.isInviter ? true : false,
+      isSelf: this.isInviter === true,
     } as User);
     users.push(
       ...props.inviteeIds.map((userId) => {
@@ -109,7 +183,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       callState: props.callState ?? CallState.Connecting,
       bottomButtonType:
         props.bottomButtonType ??
-        (props.isInviter
+        (this.isInviter
           ? props.callType === 'audio'
             ? 'inviter-audio'
             : 'inviter-video'
@@ -123,14 +197,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       setupMode: VideoViewSetupMode.VideoViewSetupAdd,
       muteMicrophone: false,
       isInSpeaker: true,
-      remoteUsersJoinChannelSuccess: new Map(),
-      remoteUsersUid: new Map(),
       inviteeIds: props.inviteeIds,
       users: users,
       isFullVideo: false,
       usersCount: users.length,
       showInvite: false,
-      cache: new Map(),
     };
   }
 
@@ -167,7 +238,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
 
     this.manager?.addViewListener(this);
     this.props?.onInitialized?.();
-    if (this.props.isInviter === true) {
+    if (this.isInviter === true) {
       if (this.state.callState === CallState.Connecting) {
         const channelId = this.manager.createChannelId();
         this.channelId = channelId;
@@ -211,8 +282,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       // this.setState({
       //   startPreview: false,
       //   joinChannelSuccess: false,
-      //   remoteUsersJoinChannelSuccess: new Map(),
-      //   remoteUsersUid: new Map(),
       //   users: [],
       // });
     }
@@ -313,7 +382,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   private updateBottomButtons(): void {
     const { joinChannelSuccess } = this.state;
     if (joinChannelSuccess) {
-      if (this.props.isInviter === false) {
+      if (this.isInviter === false) {
         let s;
         if (this.props.callType === 'audio') {
           s = 'invitee-audio-calling' as BottomButtonType;
@@ -333,7 +402,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userHadJoined?: boolean;
   }): void {
     calllog.log('MultiCall:updateUser:', params);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     let isExisted = false;
     for (const user of users) {
       if (user.userId === params.userId) {
@@ -342,7 +411,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         user.isSelf = params.isSelf;
         isExisted = true;
         if (params.userChannelId) {
-          const u = cache.get(params.userChannelId);
+          const u = this._cache.get(params.userChannelId);
           if (u) {
             if (u.muteAudio) {
               user.muteAudio = u.muteAudio;
@@ -350,7 +419,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             if (u.muteVideo) {
               user.muteVideo = u.muteVideo;
             }
-            cache.delete(params.userChannelId);
+            this._cache.delete(params.userChannelId);
           }
         }
         break;
@@ -360,7 +429,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       let muteAudio: boolean | undefined;
       let muteVideo: boolean | undefined;
       if (params.userChannelId) {
-        const u = cache.get(params.userChannelId);
+        const u = this._cache.get(params.userChannelId);
         if (u) {
           if (u.muteAudio) {
             muteAudio = u.muteAudio;
@@ -368,7 +437,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           if (u.muteVideo) {
             muteVideo = u.muteVideo;
           }
-          cache.delete(params.userChannelId);
+          this._cache.delete(params.userChannelId);
         }
       }
       users.push({
@@ -398,7 +467,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     }[]
   ): void {
     calllog.log('MultiCall:updateUsers:', userList.length);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     for (const userP of userList) {
       let isExisted = false;
       for (const user of users) {
@@ -408,7 +477,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           user.isSelf = userP.isSelf;
           isExisted = true;
           if (userP.userChannelId) {
-            const u = cache.get(userP.userChannelId);
+            const u = this._cache.get(userP.userChannelId);
             if (u) {
               if (u.muteAudio) {
                 user.muteAudio = u.muteAudio;
@@ -416,7 +485,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
               if (u.muteVideo) {
                 user.muteVideo = u.muteVideo;
               }
-              cache.delete(userP.userChannelId);
+              this._cache.delete(userP.userChannelId);
             }
           }
           if (userP.userName) {
@@ -432,7 +501,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         let muteAudio: boolean | undefined;
         let muteVideo: boolean | undefined;
         if (userP.userChannelId) {
-          const u = cache.get(userP.userChannelId);
+          const u = this._cache.get(userP.userChannelId);
           if (u) {
             if (u.muteAudio) {
               muteAudio = u.muteAudio;
@@ -440,7 +509,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             if (u.muteVideo) {
               muteVideo = u.muteVideo;
             }
-            cache.delete(userP.userChannelId);
+            this._cache.delete(userP.userChannelId);
           }
         }
         users.push({
@@ -465,7 +534,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     userId: string;
   }): void {
     calllog.log('MultiCall:removeUser:', params);
-    const { users, fullId, cache } = this.state;
+    const { users, fullId } = this.state;
     calllog.log('MultiCall:removeUser:users:', users);
     let isExisted = false;
     for (let index = 0; index < users.length; index++) {
@@ -490,7 +559,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       // this._videoTabRef?.current?.update(users);
     }
     if (params.userChannelId) {
-      cache.delete(params.userChannelId);
+      this._cache.delete(params.userChannelId);
     }
   }
 
@@ -622,7 +691,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteVideo:', params);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteVideo = params.muted;
@@ -631,11 +700,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }
     }
     if (params.userId === '') {
-      const user = cache.get(params.userChannelId);
+      const user = this._cache.get(params.userChannelId);
       if (user) {
         user.muteVideo = params.muted;
       } else {
-        cache.set(params.userChannelId, {
+        this._cache.set(params.userChannelId, {
           userId: params.userId,
           muteVideo: params.muted,
         } as User);
@@ -650,7 +719,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onRemoteUserMuteAudio:', params);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteAudio = params.muted;
@@ -659,11 +728,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }
     }
     if (params.userId === '') {
-      const user = cache.get(params.userChannelId);
+      const user = this._cache.get(params.userChannelId);
       if (user) {
         user.muteAudio = params.muted;
       } else {
-        cache.set(params.userChannelId, {
+        this._cache.set(params.userChannelId, {
           userId: params.userId,
           muteAudio: params.muted,
         } as User);
@@ -701,7 +770,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('MultiCall:onLocalVideoStateChanged:', params);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteVideo = params.muted;
@@ -710,11 +779,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }
     }
     if (params.userId === '') {
-      const user = cache.get(params.userChannelId);
+      const user = this._cache.get(params.userChannelId);
       if (user) {
         user.muteVideo = params.muted;
       } else {
-        cache.set(params.userChannelId, {
+        this._cache.set(params.userChannelId, {
           userId: params.userId,
           muteVideo: params.muted,
         } as User);
@@ -729,7 +798,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     muted: boolean;
   }): void {
     calllog.log('BasicCall:onLocalAudioStateChanged:', params);
-    const { users, cache } = this.state;
+    const { users } = this.state;
     for (const user of users) {
       if (user.userId === params.userId) {
         user.muteAudio = params.muted;
@@ -738,11 +807,11 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
       }
     }
     if (params.userId === '') {
-      const user = cache.get(params.userChannelId);
+      const user = this._cache.get(params.userChannelId);
       if (user) {
         user.muteAudio = params.muted;
       } else {
-        cache.set(params.userChannelId, {
+        this._cache.set(params.userChannelId, {
           userId: params.userId,
           muteAudio: params.muted,
         } as User);
@@ -964,10 +1033,7 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
           style={{
             width: 76,
             height: 76,
-            // position: 'absolute',
             backgroundColor: 'grey',
-            // right: 10,
-            // top: 54,
             borderRadius: 12,
           }}
         >

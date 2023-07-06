@@ -19,6 +19,9 @@ import { IconSize, localLocalIcon } from './components/LocalIcon';
 export const StateBarHeight = StatusBar.currentHeight ?? 44;
 const BottomBarHeight = 60;
 
+/**
+ * Bottom call button group type.
+ */
 export type BottomButtonType =
   | 'inviter-video'
   | 'inviter-audio'
@@ -30,44 +33,150 @@ export type BottomButtonType =
   | 'invitee-audio-loading'
   | 'invitee-audio-calling';
 
+/**
+ * The property object of the basic call component.
+ */
 export type BasicCallProps = {
+  /**
+   * Inviter ID.
+   */
   inviterId: string;
+  /**
+   * Inviter name.
+   */
   inviterName?: string;
+  /**
+   * Inviter avatar url.
+   */
   inviterAvatar?: string;
+  /**
+   * Current user ID.
+   */
   currentId: string;
+  /**
+   * Current user name.
+   */
   currentName?: string;
+  /**
+   * Current avatar url.
+   */
   currentAvatar?: string;
+  /**
+   * Call request timeout value. The unit is milliseconds (ms).
+   */
   timeout?: number;
+  /**
+   * Bottom call button group type value.
+   */
   bottomButtonType?: BottomButtonType;
+  /**
+   * Whether to disable the camera.
+   */
   muteVideo?: boolean;
+  /**
+   * call type. video or audio.
+   */
   callType: 'audio' | 'video';
-  isInviter: boolean;
+  /**
+   * An enumerated type of call state value.
+   * The default is connecting. This parameter is not commonly used.
+   */
   callState?: CallState;
+  /**
+   * Whether the page is minimized. Typical application: After minimizing, the component becomes a floating button that can be dragged and restored to full-screen display mode. Default is false.
+   */
   isMinimize?: boolean;
+  /**
+   * Whether to enable test mode. Please set it to false or undefined during official development. Default is false.
+   */
   isTest?: boolean;
+  /**
+   * Callback notification when the call is hung up. Called when the user clicks the hangup button or when the corresponding timeout occurs.
+   */
   onHangUp?: () => void;
+  /**
+   * Cancel call notifications. Before the call is connected, click the hang up button to trigger the cancellation callback notification.
+   */
   onCancel?: () => void;
+  /**
+   * Reject callback notification. Called when the invitee clicks the decline button.
+   */
   onRefuse?: () => void;
+  /**
+   * Request to turn off notifications. Under the condition that no error occurs, the callback is triggered by clicking hangup, cancel, reject, timeout and other operations. In the callback, the user needs to destroy the component, release related resources and other operations. For similar behaviors, refer to the `Modal` UI component.
+   */
   onClose: (elapsed: number, reason?: CallEndReason) => void;
+  /**
+   * An error notification occurred. An error triggered by any behavior will generate a `CallError` object, and the error object will prompt to fix the problem or perform other operations.
+   */
   onError?: (error: CallError) => void;
+  /**
+   * Call UI component initialization completion notification. Components need to consume time and space resources during initialization. After the initialization is completed, the user will be notified, and the user can perform their own initialization operations.
+   */
   onInitialized?: () => void;
+  /**
+   * Join the channel notification yourself.
+   */
   onSelfJoined?: () => void;
 };
+
+/**
+ * The state object of the base component.
+ */
 export type BasicCallState = {
+  /**
+   * Whether self have already joined the channel.
+   */
   joinChannelSuccess: boolean;
+  /**
+   * own channel ID.
+   */
   selfUid: number;
+  /**
+   * Setting mode of the view value.
+   */
   setupMode: VideoViewSetupMode;
+  /**
+   * Whether to use open mode. Speech can be played through the device speaker in development mode. The default is false.
+   */
   isInSpeaker: boolean;
+  /**
+   * Whether to disable the microphone function.
+   */
   muteMicrophone: boolean;
+  /**
+   * Bottom call button group type value.
+   */
   bottomButtonType: BottomButtonType;
+  /**
+   * Whether to disable the camera.
+   */
   muteVideo: boolean;
+  /**
+   * An enumerated type of call state value.
+   */
   callState: CallState;
+  /**
+   * Whether the page is minimized. Typical application: After minimizing, the component becomes a floating button that can be dragged and restored to full-screen display mode.
+   */
   isMinimize: boolean;
+  /**
+   * call duration. The unit is milliseconds (ms). Default is 0.
+   */
   elapsed: number; // ms unit
+  /**
+   * The end of call reason value.
+   */
   reason?: CallEndReason;
+  /**
+   * The error information.
+   */
   error?: CallError;
-  selfInfo?: CallUser;
 };
+
+/**
+ * Basic object for calling UI components.
+ */
 export abstract class BasicCall<
     Props extends BasicCallProps,
     State extends BasicCallState
@@ -85,6 +194,7 @@ export abstract class BasicCall<
     this._startPreview = true;
     this.channelId = '';
     this.callId = '';
+    this.isInviter = props.currentId === props.inviterId;
   }
 
   componentDidMount(): void {
@@ -97,6 +207,7 @@ export abstract class BasicCall<
   }
 
   protected manager?: CallManagerImpl;
+  protected isInviter: boolean;
 
   protected abstract init(): void;
   protected abstract unInit(): void;
@@ -128,7 +239,7 @@ export abstract class BasicCall<
   }
 
   onClickHangUp = () => {
-    const { isInviter, onHangUp, onCancel, onRefuse } = this.props;
+    const { onHangUp, onCancel, onRefuse } = this.props;
     const { callState } = this.state;
     const callId = this.manager?.getCurrentCallId();
     if (callId === undefined) {
@@ -136,7 +247,7 @@ export abstract class BasicCall<
       return;
     }
     this.callId = callId;
-    if (isInviter === true) {
+    if (this.isInviter === true) {
       if (callState === CallState.Calling) {
         this.manager?.hangUpCall({
           callId: callId,

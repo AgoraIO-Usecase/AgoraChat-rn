@@ -1,3 +1,6 @@
+/**
+ * Call enumeration type.
+ */
 export enum CallType {
   Audio1v1 = 0,
   Video1v1,
@@ -5,12 +8,18 @@ export enum CallType {
   AudioMulti,
 }
 
+/**
+ * An enumerated type of call state.
+ */
 export enum CallState {
   Idle = 0,
   Connecting,
   Calling,
 }
 
+/**
+ * An enumeration type of the reason for the end of the call.
+ */
 export enum CallEndReason {
   HungUp = 0,
   Cancel,
