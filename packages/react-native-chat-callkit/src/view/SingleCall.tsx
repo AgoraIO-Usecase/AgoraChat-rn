@@ -559,6 +559,7 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
   }
 
   protected renderTopBar(): React.ReactNode {
+    const { callType } = this.props;
     return (
       <View
         style={{
@@ -584,20 +585,22 @@ export class SingleCall extends BasicCall<SingleCallProps, SingleCallState> {
           />
         </View>
         <View style={{ flexGrow: 1 }} />
-        <View
-          style={{
-            marginRight: 15,
-          }}
-        >
-          <IconButton
-            iconName="camera_spin"
-            color="white"
-            backgroundColor="rgba(255, 255, 255, 0.2)"
-            size={28}
-            containerSize={40}
-            onPress={this.switchCamera}
-          />
-        </View>
+        {callType === 'video' ? (
+          <View
+            style={{
+              marginRight: 15,
+            }}
+          >
+            <IconButton
+              iconName="camera_spin"
+              color="white"
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+              size={28}
+              containerSize={40}
+              onPress={this.switchCamera}
+            />
+          </View>
+        ) : null}
       </View>
     );
   }
