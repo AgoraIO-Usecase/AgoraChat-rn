@@ -924,14 +924,16 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
             flexDirection: 'row',
           }}
         >
-          <IconButton
-            iconName="camera_spin"
-            color="white"
-            backgroundColor="rgba(255, 255, 255, 0.2)"
-            size={28}
-            containerSize={40}
-            onPress={this.switchCamera}
-          />
+          {callType === 'video' ? (
+            <IconButton
+              iconName="camera_spin"
+              color="white"
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+              size={28}
+              containerSize={40}
+              onPress={this.switchCamera}
+            />
+          ) : null}
           <View style={{ width: 12 }} />
           <IconButton
             iconName={inviteName()}
