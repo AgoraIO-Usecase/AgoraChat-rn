@@ -553,6 +553,7 @@ function RenderBottomMenu(props: RenderBottomMenuProps): JSX.Element {
     case 'invitee-audio-calling':
       ret = (
         <Container>
+          <BottomMenuButton name={speaker()} onPress={onClickSpeaker} />
           <BottomMenuButton name={microphone()} onPress={onClickMicrophone} />
           <BottomMenuButton name="hangup" onPress={onClickHangUp} />
         </Container>
