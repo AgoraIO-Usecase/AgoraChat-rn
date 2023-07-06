@@ -1036,8 +1036,10 @@ export class CallManagerImpl
           });
           return;
         }
+        const oldInviter = call.inviter;
         call.inviter = invitee;
         this._removeInvitee(call.callId, this.userId);
+        this._addInvitee(call.callId, [oldInviter]);
         call.isInviter = true;
       }
 
