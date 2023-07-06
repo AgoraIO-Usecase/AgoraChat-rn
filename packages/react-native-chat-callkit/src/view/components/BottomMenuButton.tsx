@@ -61,7 +61,7 @@ function buttonNameConvertToIconName(name: BottomMenuButtonType): IconName {
       return 'mic_slash';
 
     case 'mute-speaker':
-      return 'speaker_wave2';
+      return 'speaker_wave1';
 
     case 'mute-video':
       return 'video_slash';
@@ -70,7 +70,7 @@ function buttonNameConvertToIconName(name: BottomMenuButtonType): IconName {
       return 'phone_answer';
 
     case 'speaker':
-      return 'speaker_wave1';
+      return 'speaker_wave2';
 
     case 'video':
       return 'video';
