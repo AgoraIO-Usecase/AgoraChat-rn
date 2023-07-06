@@ -59,10 +59,10 @@ Common properties provided by the two components are as follows:
 | :------------------ | :------ | :-------------------------------------------------------------------------------- |
 | `inviterId`         | String  | The user ID of the inviter.                                                       |
 | `inviterName `      | String  | The nickname of the inviter.                                                      |
-| `inviterAvatar `       | String  | The avatar URL of the inviter.                                                    |
+| `inviterAvatar `    | String  | The avatar URL of the inviter.                                                    |
 | `currentId `        | String  | The current user ID.                                                              |
 | `currentName `      | String  | The nickname of the current user.                                                 |
-| `currentAvatar `       | String  | The avatar URL of the current user.                                               |
+| `currentAvatar `    | String  | The avatar URL of the current user.                                               |
 | `timeout `          | Number  | The timeout time. If the timeout period expires, the call hangs up automatically. |
 | `bottomButtonType ` | String  | Initial Button group style.                                                       |
 | `muteVideo `        | Boolean | Whether to disable video.                                                         |
@@ -86,12 +86,16 @@ Common events provided by the two components are as follows:
 Besides the common properties and events, `SingleCall` provides the following property and event:
 
 - `inviteeId`: The user ID of the invitee. The property value is of the string type.
+- `inviteeName`: The user name of the invitee. The property value is of the string type.
+- `inviteeAvatar`: The user avatar url of the invitee. The property value is of the string type.
 - `onPeerJoined`: Occurs when the invitee joins the call. The caller receives this event.
 
 Besides the common properties and events, `MultiCall` provides the following properties:
 
 - `inviteeIds`: The list of user IDs of the invitees when a group call is started. The property value is of the array type.
 - `inviteeList`: The list of user IDs of the invitees during an ongoing group call. The property value is of the array type.
+- `invitees`: Information about the invitees. Include name and avatar.
+- `groupAvatar`: The avatar of the multi call. Use group avatars when calls are minimized.
 
 For group audio and video calls, the Agora Chat CallKit SDK supports up to 18 video channels and 128 audio channels.
 
