@@ -4,6 +4,9 @@ import DeviceInfo from 'react-native-device-info';
 import { uuid } from '../utils/utils';
 import { calllog } from './CallConst';
 
+/**
+ * Get the device token.
+ */
 export class CallDevice {
   _deviceToken: string;
   constructor() {

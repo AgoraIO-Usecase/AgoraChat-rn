@@ -1,3 +1,6 @@
+/**
+ * Signaling state enumeration type.
+ */
 export enum CallSignalingState {
   /**
    * Idle state.

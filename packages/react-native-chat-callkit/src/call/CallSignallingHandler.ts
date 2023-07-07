@@ -13,6 +13,9 @@ import * as K from './CallConst';
 import { calllog } from './CallConst';
 import { CallError } from './CallError';
 
+/**
+ * The event monitoring interface of the signaling manager.
+ */
 export interface CallSignallingListener {
   /**
    * The inviter initiates the invitation and the invitee receives the notice.
@@ -99,6 +102,9 @@ export interface CallSignallingListener {
   onVideoToAudio: () => void;
 }
 
+/**
+ * Signaling manager.
+ */
 export class CallSignallingHandler implements ChatMessageEventListener {
   private _listener?: CallSignallingListener | undefined;
 

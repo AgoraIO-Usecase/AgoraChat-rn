@@ -2,6 +2,9 @@ import type { ErrorCodeType } from 'react-native-agora';
 
 import { CallErrorCode, CallErrorType } from '../enums';
 
+/**
+ * Error message object. Including error code, error type, error description information. Can be formatted as a string.
+ */
 export class CallError {
   private _code: CallErrorCode | ErrorCodeType;
   private _desc: string;

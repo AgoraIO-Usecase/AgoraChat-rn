@@ -1,3 +1,6 @@
+/**
+ * Decorative information about the call partner.
+ */
 export interface CallUser {
   /**
    * Call user ID.

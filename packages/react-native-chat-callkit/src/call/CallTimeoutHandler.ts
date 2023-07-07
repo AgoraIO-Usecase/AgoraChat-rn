@@ -2,6 +2,9 @@ import { calllog } from './CallConst';
 
 export type CallTimeoutState = 'invite' | 'alert' | 'confirm' | 'answer';
 
+/**
+ * The event listening interface of the timeout handler.
+ */
 export interface CallTimeoutListener {
   /**
    * Invitation message response timeout notification.
@@ -21,6 +24,9 @@ export interface CallTimeoutListener {
   onAnswerTimeout(params: { callId: string; userId: string }): void;
 }
 
+/**
+ * Call timeout handler.
+ */
 export class CallTimeoutHandler {
   private _listener?: CallTimeoutListener | undefined;
   private _timer: Map<string, NodeJS.Timeout>;

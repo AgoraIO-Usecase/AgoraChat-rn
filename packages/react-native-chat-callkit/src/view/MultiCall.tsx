@@ -176,7 +176,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
         }
       }
     }
-    calllog.log('test:MultiCall:constructor:users:', users);
 
     this.state = {
       isMinimize: props.isMinimize ?? false,
@@ -586,7 +585,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
     this.getUserInfoList([this.props.inviterId, ...this.props.inviteeIds])
       .then((result) => {
         if (result) {
-          calllog.log('test:updateUserInfoList:result:', result);
           const { users } = this.state;
           for (const i of result) {
             for (const user of users) {
@@ -841,7 +839,6 @@ export class MultiCall extends BasicCall<MultiCallProps, MultiCallState> {
   protected renderAudio(): React.ReactNode {
     calllog.log('MultiCall:renderAudio:');
     const { users } = this.state;
-    calllog.log('test:renderAudio:users:', users);
     return (
       <View
         style={{

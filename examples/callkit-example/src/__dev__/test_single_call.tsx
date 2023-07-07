@@ -5,7 +5,6 @@ import { CallState, SingleCall } from 'react-native-chat-callkit';
 
 export function test_all() {
   const isMinimize = false; // for test
-  const isInviter = true; // !!! must
   const callState = CallState.Calling; // for test
   const callType = 'video'; // !!! must
   const bottomButtonType = 'invitee-video-init'; // for test
@@ -17,7 +16,6 @@ export function test_all() {
   return (
     <SingleCall
       isMinimize={isMinimize}
-      isInviter={isInviter}
       callState={callState}
       callType={callType}
       bottomButtonType={bottomButtonType}
