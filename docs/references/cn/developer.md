@@ -68,11 +68,7 @@ tag: 多包版本管理
 ref: https://juejin.cn/post/6934292467160514567
 ```
 
-### 添加tag
-
-```sh
-git commit -am"tag: v0.1.1 uikit-v0.1.1-beta.3 callkit-v0.1.2-beta.3" && git tag -a v0.1.1 -m"v0.1.1"
-```
+### 添加 tag
 
 ```sh
 git commit -m"tag: uikit@1.0.0 && callkit@1.0.0"
