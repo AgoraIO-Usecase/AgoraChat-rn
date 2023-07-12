@@ -6,7 +6,7 @@ import createStyleSheet from '../styles/createStyleSheet';
 import { truncatedBadgeCount } from '../utils/format';
 
 type BadgeProps = {
-  count: number;
+  count?: number;
   maxCount?: number | undefined;
   badgeColor?: string | undefined;
   textColor?: string | undefined;
@@ -27,20 +27,28 @@ export default function Badge({
   return (
     <View
       style={[
-        isSmall ? styles.badgeSmall : styles.badgeDefault,
+        count !== undefined
+          ? isSmall
+            ? styles.badgeSmall
+            : styles.badgeDefault
+          : styles.badgeDotSmall,
         {
           backgroundColor: badgeColor ?? colors.badge.background,
         },
-        count >= 10 &&
-          (isSmall ? styles.badgeSmallPadding : styles.badgeDefaultPadding),
+        count !== undefined
+          ? count >= 10 &&
+            (isSmall ? styles.badgeSmallPadding : styles.badgeDefaultPadding)
+          : styles.badgeSmallPadding,
         style,
       ]}
     >
-      <Text
-        style={[{ color: textColor ?? colors.badge.content }, fonts.caption]}
-      >
-        {truncatedBadgeCount(count, maxCount)}
-      </Text>
+      {count !== undefined ? (
+        <Text
+          style={[{ color: textColor ?? colors.badge.content }, fonts.caption]}
+        >
+          {truncatedBadgeCount(count, maxCount)}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -61,6 +69,13 @@ const styles = createStyleSheet({
     paddingTop: Platform.select({ ios: 3, android: 2 }),
     minWidth: 16,
     minHeight: 16,
+    borderRadius: 99,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeDotSmall: {
+    minWidth: 10,
+    minHeight: 10,
     borderRadius: 99,
     alignItems: 'center',
     justifyContent: 'center',
