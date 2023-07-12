@@ -109,3 +109,4 @@ export {
   removeFileHeader,
 } from './utils/platform';
 export { throttle } from './utils/throttle';
+export { default as UIKIT_VERSION } from './version';

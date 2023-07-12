@@ -18,6 +18,7 @@ import {
   getScaleFactor,
   LocalIcon,
   Services,
+  UIKIT_VERSION,
 } from 'react-native-chat-uikit';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Text } from 'react-native-paper';
@@ -87,8 +88,8 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   // const memberCount = 5;
   const [userName, setUserName] = React.useState('NickName');
   const [userId, setUserId] = React.useState('Agora ID: xx');
-  const sdkVersion = 'AgoraChat v0.0.0';
-  const uiVersion = 'AgoraChat v0.0.0';
+  const [sdkVersion, setSdkVersion] = React.useState('AgoraChat v0.0.0');
+  const [uiVersion, setUiVersion] = React.useState('AgoraChat v0.0.0');
   const urlName = 'agora.io';
   const { client, getCurrentId, logout: logoutAction } = useAppChatSdkContext();
   const [memberCount, setMemberCount] = React.useState(0);
@@ -227,6 +228,11 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
       });
   }, [client.contactManager]);
 
+  const initVersion = React.useCallback(() => {
+    setSdkVersion(client.version);
+    setUiVersion(UIKIT_VERSION);
+  }, [client.version]);
+
   const addListeners = React.useCallback(() => {
     const sub = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
@@ -272,6 +278,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
       const unsubscribe = addListeners();
       initList();
       blockList();
+      initVersion();
       return {
         unsubscribe: unsubscribe,
       };
@@ -283,7 +290,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
 
     const res = load();
     return () => unload(res);
-  }, [addListeners, blockList, initList]);
+  }, [addListeners, blockList, initList, initVersion]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', (event) => {
