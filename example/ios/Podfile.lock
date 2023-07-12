@@ -435,12 +435,12 @@ PODS:
     - glog
   - react-native-cameraroll (5.6.0):
     - React-Core
-  - react-native-chat-callkit (0.1.1-beta.1):
+  - react-native-chat-callkit (1.0.1):
     - React-Core
   - react-native-chat-sdk (1.1.2):
     - HyphenateChat (= 4.0.2)
     - React-Core
-  - react-native-chat-uikit (0.1.1-beta.2):
+  - react-native-chat-uikit (1.0.0):
     - React-Core
   - react-native-create-thumbnail (1.6.4):
     - React-Core
@@ -624,25 +624,25 @@ DEPENDENCIES:
   - glog (from `../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - GoogleUtilities
   - OpenSSL-Universal (= 1.1.1100)
-  - Permission-AppTrackingTransparency (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency`)
-  - Permission-BluetoothPeripheral (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral`)
-  - Permission-Calendars (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars`)
-  - Permission-Camera (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Camera`)
-  - Permission-Contacts (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts`)
-  - Permission-FaceID (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID`)
-  - Permission-LocationAccuracy (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy`)
-  - Permission-LocationAlways (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways`)
-  - Permission-LocationWhenInUse (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse`)
-  - Permission-MediaLibrary (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary`)
-  - Permission-Microphone (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone`)
-  - Permission-Motion (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Motion`)
-  - Permission-Notifications (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications`)
-  - Permission-PhotoLibrary (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary`)
-  - Permission-PhotoLibraryAddOnly (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly`)
-  - Permission-Reminders (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders`)
-  - Permission-Siri (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Siri`)
-  - Permission-SpeechRecognition (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition`)
-  - Permission-StoreKit (from `/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit`)
+  - Permission-AppTrackingTransparency (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency`)
+  - Permission-BluetoothPeripheral (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral`)
+  - Permission-Calendars (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars`)
+  - Permission-Camera (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Camera`)
+  - Permission-Contacts (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts`)
+  - Permission-FaceID (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID`)
+  - Permission-LocationAccuracy (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy`)
+  - Permission-LocationAlways (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways`)
+  - Permission-LocationWhenInUse (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-MediaLibrary (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary`)
+  - Permission-Microphone (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone`)
+  - Permission-Motion (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Motion`)
+  - Permission-Notifications (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications`)
+  - Permission-PhotoLibrary (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary`)
+  - Permission-PhotoLibraryAddOnly (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly`)
+  - Permission-Reminders (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders`)
+  - Permission-Siri (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Siri`)
+  - Permission-SpeechRecognition (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition`)
+  - Permission-StoreKit (from `/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit`)
   - RCT-Folly (from `../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../node_modules/react-native/Libraries/TypeSafety`)
@@ -757,43 +757,43 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../../node_modules/react-native/third-party-podspecs/glog.podspec"
   Permission-AppTrackingTransparency:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/AppTrackingTransparency"
   Permission-BluetoothPeripheral:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/BluetoothPeripheral"
   Permission-Calendars:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Calendars"
   Permission-Camera:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Camera"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Camera"
   Permission-Contacts:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Contacts"
   Permission-FaceID:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/FaceID"
   Permission-LocationAccuracy:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAccuracy"
   Permission-LocationAlways:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationAlways"
   Permission-LocationWhenInUse:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/LocationWhenInUse"
   Permission-MediaLibrary:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/MediaLibrary"
   Permission-Microphone:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Microphone"
   Permission-Motion:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Motion"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Motion"
   Permission-Notifications:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Notifications"
   Permission-PhotoLibrary:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibrary"
   Permission-PhotoLibraryAddOnly:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/PhotoLibraryAddOnly"
   Permission-Reminders:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Reminders"
   Permission-Siri:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/Siri"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/Siri"
   Permission-SpeechRecognition:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/SpeechRecognition"
   Permission-StoreKit:
-    :path: "/Users/asterisk/Codes/zuoyu/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit"
+    :path: "/Users/asterisk/Codes/rn/react-native-chat-library/node_modules/react-native-permissions/ios/StoreKit"
   RCT-Folly:
     :podspec: "../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -968,9 +968,9 @@ SPEC CHECKSUMS:
   React-jsinspector: b6ed4cb3ffa27a041cd440300503dc512b761450
   React-logger: 186dd536128ae5924bc38ed70932c00aa740cd5b
   react-native-cameraroll: 755bcc628148a90a7c9cf3f817a252be3a601bc5
-  react-native-chat-callkit: 5e189e032ba2bc2d031e90528be381762e815749
+  react-native-chat-callkit: 143d04e0ea0a6ff049469da63cd8de62bd995e50
   react-native-chat-sdk: 06f9401ef05b0e9cfe3ac659cfe83904baa50b75
-  react-native-chat-uikit: eeff57511ee51c5d29b1ec7e65cbb62546947837
+  react-native-chat-uikit: 1c02d927b5987fbb208e8671cf8a566faafa96df
   react-native-create-thumbnail: e022bcdcba8a0b4529a50d3fa1a832ec921be39d
   react-native-document-picker: 2b8f18667caee73a96708a82b284a4f40b30a156
   react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a

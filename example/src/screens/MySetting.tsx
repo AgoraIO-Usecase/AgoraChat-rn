@@ -91,6 +91,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const uiVersion = 'AgoraChat v0.0.0';
   const urlName = 'agora.io';
   const { client, getCurrentId, logout: logoutAction } = useAppChatSdkContext();
+  const [memberCount, setMemberCount] = React.useState(0);
 
   const D = () => (
     <Divider
@@ -211,6 +212,21 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
       });
   }, [client.userManager]);
 
+  const blockList = React.useCallback(() => {
+    client.contactManager
+      .getBlockListFromServer()
+      .then((result) => {
+        if (result) {
+          setMemberCount(result.length);
+        } else {
+          setMemberCount(0);
+        }
+      })
+      .catch((error) => {
+        console.warn('test:error:', error);
+      });
+  }, [client.contactManager]);
+
   const addListeners = React.useCallback(() => {
     const sub = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
@@ -255,6 +271,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
       console.log('test:load:', MySettingScreen.name);
       const unsubscribe = addListeners();
       initList();
+      blockList();
       return {
         unsubscribe: unsubscribe,
       };
@@ -266,7 +283,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
 
     const res = load();
     return () => unload(res);
-  }, [addListeners, initList]);
+  }, [addListeners, blockList, initList]);
 
   return (
     <SafeAreaView
@@ -290,7 +307,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
           <Text style={styles.id}>{userId}</Text>
         </Pressable>
         <View style={{ height: sf(40) }} />
-        {/* <Intervallum content={settings.privacy} />
+        <Intervallum content={settings.privacy} />
         <Pressable
           onPress={() => {
             navigation.navigate('ContactList', {
@@ -309,7 +326,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
               color="#A9A9A9"
             />
           </View>
-        </Pressable> */}
+        </Pressable>
         <Intervallum content={settings.about} />
         <Pressable
           onPress={() => {

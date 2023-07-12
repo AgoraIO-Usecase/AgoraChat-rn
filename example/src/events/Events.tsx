@@ -127,7 +127,8 @@ export type DataActionEventType =
   | 'delete_local_message'
   | 'recall_message'
   | 'resend_message'
-  | 'on_recall_message';
+  | 'on_recall_message'
+  | 'exec_contact_unblock';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////

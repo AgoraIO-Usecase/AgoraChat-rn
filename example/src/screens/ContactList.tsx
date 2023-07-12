@@ -195,7 +195,7 @@ const Item: EqualHeightListItemComponent = (props) => {
                 sendEventFromContactList({
                   eventType: 'AlertEvent',
                   action: 'alert_block_contact',
-                  params: { item: item },
+                  params: item,
                 });
               }}
             >
@@ -256,7 +256,7 @@ export function ContactListScreenInternal({
   const rp = route.params as any;
   const params = rp?.params as any;
   const type = params?.type as Undefinable<ContactActionType>;
-  const { header, groupInfo } = useAppI18nContext();
+  const { header, groupInfo, contactList } = useAppI18nContext();
   // const { height: screenHeight } = useWindowDimensions();
 
   const [selectedCount] = React.useState(10);
@@ -403,10 +403,9 @@ export function ContactListScreenInternal({
           }
 
           case 'block_contact': {
-            const a = item.action as ItemActionBlockDataType;
             return {
               block: {
-                name: a?.block?.name,
+                name: contactList.blockContact.buttonName,
                 onClicked: () => {
                   console.log('test:block_contact:');
                 },
@@ -458,7 +457,7 @@ export function ContactListScreenInternal({
       } as ItemDataType;
       return r;
     },
-    [manualRefresh, navigation, type]
+    [contactList.blockContact.buttonName, manualRefresh, navigation, type]
   );
 
   const initData = React.useCallback(
@@ -676,6 +675,37 @@ export function ContactListScreenInternal({
     [client.groupManager, getCurrentId, type]
   );
 
+  const unblockContactAction = React.useCallback(
+    (id: string) => {
+      console.log('test:unblockContactAction:', id);
+      client.contactManager
+        .removeUserFromBlockList(id)
+        .then(() => {
+          manualRefresh({
+            type: 'del-one',
+            items: [
+              standardizedData({
+                key: id,
+                contactID: id,
+                contactName: id,
+                actionType: 'block_contact',
+                action: undefined,
+              }),
+            ],
+          });
+          sendEventFromContactList({
+            eventType: 'ToastEvent',
+            action: 'toast_',
+            params: 'Unblocked',
+          });
+        })
+        .catch((error) => {
+          console.warn('test:error:removeUserFromBlockList:', error);
+        });
+    },
+    [client.contactManager, manualRefresh, standardizedData]
+  );
+
   const initList = React.useCallback(
     (type: Undefinable<ContactActionType>) => {
       if (type === 'contact_list') {
@@ -718,6 +748,27 @@ export function ContactListScreenInternal({
           })
           .catch((error) => {
             console.warn('test:getAllContactsFromServer:error:', error);
+          });
+      } else if (type === 'block_contact') {
+        client.contactManager
+          .getBlockListFromServer()
+          .then((result) => {
+            console.log('test:getBlockListFromServer:success:', result);
+            if (result) {
+              initData(
+                result.map((id) => {
+                  return {
+                    key: id,
+                    contactID: id,
+                    contactName: id,
+                    actionType: 'block_contact',
+                  } as ItemDataType;
+                })
+              );
+            }
+          })
+          .catch((error) => {
+            console.warn('test:getBlockListFromServer:error:', error);
           });
       }
     },
@@ -838,6 +889,12 @@ export function ContactListScreenInternal({
                 createGroupAction({ data, isInvite, isPublic });
               }
               break;
+            case 'exec_contact_unblock':
+              {
+                const id = params.contactID;
+                unblockContactAction(id);
+              }
+              break;
 
             default:
               break;
@@ -858,6 +915,7 @@ export function ContactListScreenInternal({
       navigation,
       standardizedData,
       type,
+      unblockContactAction,
     ]
   );
 

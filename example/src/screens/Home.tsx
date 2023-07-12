@@ -15,6 +15,7 @@ import {
   MessageChatSdkEvent,
   MessageChatSdkEventType,
 } from 'react-native-chat-uikit';
+import { MD3LightTheme, MD3Theme } from 'react-native-paper';
 
 import TabBarIcon from '../components/TabBarIcon';
 import { useAppChatSdkContext } from '../contexts/AppImSdkContext';
@@ -45,6 +46,10 @@ const HomeScreenInternal = React.memo((props: HomeScreenInternalProps) => {
   console.log('test:HomeScreenInternal:', props);
   const { contactFlag } = props;
   const { client, currentId } = useAppChatSdkContext();
+  const theme = {
+    ...MD3LightTheme,
+    colors: { ...MD3LightTheme.colors, secondaryContainer: 'white' }, // for test
+  } as MD3Theme;
 
   const [convBarState, setConvBarState] = React.useState<
     number | boolean | undefined
@@ -161,6 +166,7 @@ const HomeScreenInternal = React.memo((props: HomeScreenInternalProps) => {
       activeColor="blue"
       inactiveColor="black"
       barStyle={{ backgroundColor: 'white' }}
+      theme={theme}
     >
       <Home.Screen
         name="ConversationList"

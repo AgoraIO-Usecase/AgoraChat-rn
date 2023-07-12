@@ -23,6 +23,7 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "jest": "^28.1.1",
     "lerna": "^7.0.1",
+    "patch-package": "^7.0.1",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
     "typescript": "^4.5.2"
@@ -39,7 +40,8 @@
     "bootstrap": "lerna run bootstrap --verbose",
     "sdk-version": "node scripts/generate-version.js",
     "example-env": "lerna run gen-env --verbose",
-    "doctor": "lerna run doctor --verbose"
+    "doctor": "lerna run doctor --verbose",
+    "postinstall": "patch-package"
   },
   "prettier": {
     "quoteProps": "consistent",

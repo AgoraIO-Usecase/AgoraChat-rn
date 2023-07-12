@@ -162,6 +162,9 @@ export class AppStringSet extends UIKitStringSet2 {
       memberInvite: string;
       createGroup: string;
     };
+    blockContact: {
+      buttonName: string;
+    };
     toast: string[];
   };
   requestList: {
@@ -378,6 +381,9 @@ export class AppStringSet extends UIKitStringSet2 {
         publicGroup: 'Public Group',
         memberInvite: 'Allow members to invite',
         createGroup: 'Create New Group',
+      },
+      blockContact: {
+        buttonName: 'Unblock',
       },
       toast: ['1', '2', '3', '4'],
     };

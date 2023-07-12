@@ -55,11 +55,11 @@ export function handleAlertEvent(params: {
               text: 'Confirm',
               onPress: () => {
                 sendEvent({
-                  eventType: 'ToastEvent',
+                  eventType: 'DataEvent',
                   eventBizType: 'contact',
-                  params: 'Unblocked',
+                  params: { contactID: alertEvent.params.contactID },
                   senderId: 'AlertEvent',
-                  action: 'toast_',
+                  action: 'exec_contact_unblock',
                 });
               },
             },
