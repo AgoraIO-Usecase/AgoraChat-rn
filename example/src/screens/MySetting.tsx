@@ -285,6 +285,16 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     return () => unload(res);
   }, [addListeners, blockList, initList]);
 
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', (event) => {
+      console.log('test:navigation:', event);
+      if (event.target && event.target.includes('MySetting')) {
+        blockList();
+      }
+    });
+    return unsubscribe;
+  }, [blockList, navigation]);
+
   return (
     <SafeAreaView
       mode="padding"
