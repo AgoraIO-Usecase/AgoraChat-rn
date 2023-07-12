@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
+import { ChatConversationType } from 'react-native-chat-sdk';
 import {
   createStyleSheet,
   DataEventType,
@@ -8,6 +9,7 @@ import {
   getScaleFactor,
   LocalIcon,
   ScreenContainer,
+  Switch,
 } from 'react-native-chat-uikit';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
@@ -40,6 +42,10 @@ export function ContactInfoScreenInternal({
   const userId = params.userId;
   const [userName, setUserName] = React.useState(contactInfo.name('NickName'));
   const sf = getScaleFactor();
+  const [isMuted, setIsMuted] = React.useState(false);
+  const ext = React.useMemo(() => {
+    return {} as any;
+  }, []);
   console.log('test:ContactInfoScreen:', params, userName);
 
   const removeContact = React.useCallback(
@@ -71,6 +77,29 @@ export function ContactInfoScreenInternal({
         });
     },
     [client.contactManager]
+  );
+
+  const onIsMuted = React.useCallback(
+    (params: {
+      isMuted: boolean;
+      convId: string;
+      convType: ChatConversationType;
+    }) => {
+      setIsMuted(params.isMuted);
+      sendContactInfoEvent({
+        eventType: 'DataEvent',
+        action: 'update_conversation_mute',
+        params: {
+          convId: params.convId,
+          convTyp: params.convType,
+          ext: {
+            ...ext.current,
+            muted: params.isMuted,
+          },
+        },
+      });
+    },
+    [ext]
   );
 
   const addListeners = React.useCallback(() => {
@@ -143,7 +172,22 @@ export function ContactInfoScreenInternal({
       .catch((error) => {
         console.warn('test:error:', error);
       });
-  }, [client.userManager, userId]);
+    client.chatManager
+      .getConversation(userId, ChatConversationType.PeerChat, true)
+      .then((result) => {
+        if (result?.ext) {
+          ext.current = result.ext;
+        }
+        if (result?.ext?.muted) {
+          if (isMuted !== result.ext.muted) {
+            setIsMuted(result.ext.muted);
+          }
+        }
+      })
+      .catch((error) => {
+        console.warn('test:error:', error);
+      });
+  }, [client.chatManager, client.userManager, ext, isMuted, userId]);
 
   React.useEffect(() => {
     const load = () => {
@@ -190,20 +234,24 @@ export function ContactInfoScreenInternal({
         <Text style={styles.chat}>{contactInfo.chat}</Text>
       </View>
       <View style={{ height: sf(66) }} />
-      {/* <View style={styles.listItem}>
+      <View style={styles.listItem}>
         <Text style={styles.listItemText1}>{contactInfo.mute}</Text>
         <Switch
-          value={isMute}
+          value={isMuted}
           onChangeValue={function (val: boolean): void {
             console.log('test:Switch:', val);
-            setIsMute(val);
+            onIsMuted({
+              isMuted: val,
+              convId: userId,
+              convType: ChatConversationType.PeerChat,
+            });
           }}
           size={sf(28)}
           thumbColor="white"
           inactiveThumbColor="white"
           inactiveTrackColor="rgba(216, 216, 216, 1)"
         />
-      </View> */}
+      </View>
       <Pressable
         style={styles.listItem}
         onPress={() => {

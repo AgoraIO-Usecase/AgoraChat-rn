@@ -92,7 +92,7 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
   const { width: screenWidth } = useWindowDimensions();
   const extraWidth = item.sideslip?.width ?? ExtraWidth;
   const name =
-    item.ext?.muted === undefined || item.ext?.muted === 'false'
+    item.ext?.muted === undefined || item.ext?.muted === false
       ? ('bell_c' as IconName)
       : ('bell_slash' as IconName);
   return (
@@ -124,7 +124,11 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
           <Text>{messageTime(item.timestamp)}</Text>
           {item.count > 0 ? (
             <Badge
-              count={item.count}
+              count={
+                item.ext?.muted && item.ext.muted === true
+                  ? undefined
+                  : item.count
+              }
               badgeColor="rgba(255, 20, 204, 1)"
               size="default"
             />
@@ -157,10 +161,10 @@ const RenderItem: EqualHeightListItemComponent = (props) => {
             item.actions?.onMute?.(item);
             const ext = {} as any;
             if (item.ext?.muted === undefined) {
-              ext.muted = 'false';
+              ext.muted = true;
             } else {
               ext.muted = item.ext.muted;
-              ext.muted = ext.muted === 'false' ? 'true' : 'false';
+              ext.muted = ext.muted === false ? true : false;
             }
             sendConversationEvent({
               eventType: 'DataEvent',
@@ -359,7 +363,7 @@ export default function ConversationListScreen({
           }
         }}
         onData={(d) => {
-          console.log('test:', d.length);
+          console.log('test:onData:', d.length);
         }}
         onUpdateReadCount={(unreadCount) => {
           sendEvent({
