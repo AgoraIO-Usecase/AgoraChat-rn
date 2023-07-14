@@ -9,9 +9,11 @@ export type ImageProps = Omit<RNImageProps, 'onLoad' | 'onError'> & {
 
 export type ImageComponent = (props: ImageProps) => JSX.Element;
 
-function getImageComponent(): ImageComponent {
+export function getImageComponent(
+  useFastImage: boolean = true
+): ImageComponent {
   const hasFastImage = Boolean(NativeModules.FastImageView);
-  if (hasFastImage) {
+  if (hasFastImage && useFastImage === true) {
     try {
       return require('./FastImage').default;
     } catch (e) {

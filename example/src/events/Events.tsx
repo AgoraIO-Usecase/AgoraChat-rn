@@ -128,7 +128,9 @@ export type DataActionEventType =
   | 'recall_message'
   | 'resend_message'
   | 'on_recall_message'
-  | 'exec_contact_unblock';
+  | 'exec_contact_unblock'
+  | 'select_avatar_index'
+  | 'select_avatar_index_result';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////

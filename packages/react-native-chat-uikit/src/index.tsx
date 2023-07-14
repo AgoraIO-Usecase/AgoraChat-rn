@@ -9,7 +9,7 @@ export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
 export { default as CheckButton } from './components/CheckButton';
 export { default as ContentState } from './components/ContentState';
-export { DefaultAvatar } from './components/DefaultAvatars';
+export { DefaultAvatar, DefaultAvatarMemo } from './components/DefaultAvatars';
 export { default as DialogBox } from './components/DialogBox';
 export { default as Divider } from './components/Divider';
 export {

@@ -36,7 +36,7 @@ export function TabView(props: TabViewProps): JSX.Element {
       moveX === width * (pageCount - 1) ? width : Math.round(moveX % width);
     const w = width / 2;
     // console.log('test:_autoAlign:', moveX, index, d, w);
-    if (0 <= moveX && d < w) {
+    if (moveX >= 0 && d < w) {
       setIsEditable(false);
       scrollViewRef.current?.scrollTo({ x: index * width, animated: true });
       moveIndicator((index * width) / pageCount).start();

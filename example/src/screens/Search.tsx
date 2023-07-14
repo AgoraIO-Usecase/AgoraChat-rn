@@ -154,7 +154,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 
   return (
     <View style={styles.item}>
-      <DefaultAvatar size={sf(50)} radius={sf(25)} />
+      <DefaultAvatar id={item.itemId} size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         {item.itemName && item.itemName.length > 0 ? (
           <>

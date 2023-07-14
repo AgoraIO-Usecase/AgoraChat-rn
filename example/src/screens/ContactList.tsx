@@ -225,7 +225,7 @@ const Item: EqualHeightListItemComponent = (props) => {
 
   return (
     <View style={styles.item}>
-      <DefaultAvatar size={sf(50)} radius={sf(25)} />
+      <DefaultAvatar id={item.contactID} size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         <Text style={{ lineHeight: 20, fontSize: 16, fontWeight: '600' }}>
           {item.contactID}

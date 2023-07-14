@@ -125,7 +125,7 @@ const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
   return (
     <View style={styles.item}>
-      <DefaultAvatar size={sf(50)} radius={sf(25)} />
+      <DefaultAvatar id={item.en} size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         <Text>{item.en}</Text>
         <Text>{item.ch}</Text>

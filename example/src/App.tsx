@@ -43,6 +43,7 @@ import { ModalPlaceholder } from './events';
 import { sendEvent } from './events/sendEvent';
 import { AppStringSet } from './I18n/AppCStringSet.en';
 import type { RootParamsList, RootParamsName } from './routes';
+import AvatarPreviewList from './screens/AvatarPreviewList';
 import Chat from './screens/Chat';
 import ContactInfo from './screens/ContactInfo';
 import ContactList from './screens/ContactList';
@@ -344,6 +345,16 @@ export default function App() {
                     };
                   }}
                   component={ImagePreview}
+                />
+                <Root.Screen
+                  name="AvatarPreviewList"
+                  options={() => {
+                    return {
+                      headerShown: true,
+                      // presentation: 'fullScreenModal',
+                    };
+                  }}
+                  component={AvatarPreviewList}
                 />
               </Root.Group>
             </Root.Navigator>

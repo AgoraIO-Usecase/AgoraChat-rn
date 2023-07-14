@@ -5,7 +5,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import { getScaleFactor } from '../styles/createScaleFactor';
 import createStyleSheet from '../styles/createStyleSheet';
 import { LocalIcon, LocalIconName } from './Icon';
-import Image from './Image';
+import { getImageComponent } from './Image';
 
 type SubComponents = {};
 
@@ -20,13 +20,14 @@ type AvatarStateProps = {
   stateOverflow?: 'visible' | 'hidden' | 'scroll' | undefined;
 };
 
-type AvatarProps = {
-  uri: string;
+export type AvatarProps = {
+  uri: string | number;
   uriOnError?: LocalIconName | undefined;
   size?: number | undefined;
   radius?: number | undefined;
   containerStyle?: StyleProp<ViewStyle> | undefined;
   state?: AvatarStateProps | undefined;
+  useFastImage?: boolean;
 };
 
 const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
@@ -36,9 +37,12 @@ const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
   radius = AVATAR_SIZE / 2,
   containerStyle,
   state,
+  useFastImage,
 }): JSX.Element => {
   const { colors } = useThemeContext();
   const [loadDefault, setLoadDefault] = React.useState(false);
+  const uriS = typeof uri === 'number' ? uri : { uri: uri };
+  const Image = getImageComponent(useFastImage);
 
   return (
     <View
@@ -57,8 +61,10 @@ const Avatar: ((props: AvatarProps) => JSX.Element) & SubComponents = ({
         <LocalIcon name={uriOnError ?? 'default_avatar'} size={size * 1.0} />
       ) : (
         <Image
-          onError={() => setLoadDefault(true)}
-          source={{ uri }}
+          onError={() => {
+            setLoadDefault(true);
+          }}
+          source={uriS}
           resizeMode="cover"
           style={[StyleSheet.absoluteFill, { width: size, height: size }]}
         />

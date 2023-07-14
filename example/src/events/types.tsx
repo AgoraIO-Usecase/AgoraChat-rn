@@ -17,4 +17,9 @@ export type EventType =
   | ActionMenuEventType
   | VoiceStateEventType
   | DataEventType;
-export type BizEventType = UikitBizEventType | 'chat' | 'setting' | 'search';
+export type BizEventType =
+  | UikitBizEventType
+  | 'chat'
+  | 'setting'
+  | 'search'
+  | 'avatar';

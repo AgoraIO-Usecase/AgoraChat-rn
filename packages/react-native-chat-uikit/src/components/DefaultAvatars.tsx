@@ -1,11 +1,8 @@
 import React from 'react';
-import { Image, View } from 'react-native';
 
-import { ICON_ASSETS } from '../../assets/icons';
 import { hashCode } from '../utils/function';
-import { timestamp } from '../utils/generator';
-import Avatar from './Avatar';
-import type { LocalIconName } from './Icon';
+import Avatar, { AvatarProps } from './Avatar';
+import { IconName, localLocalIcon } from './Icon/LocalIcon';
 
 const AVATAR_ASSETS = [
   'agora_avatar_1',
@@ -22,56 +19,18 @@ const AVATAR_ASSETS = [
   'agora_avatar_12',
 ];
 
-type AvatarProps = {
-  size: number;
-  radius: number;
-  id?: string;
-};
-
-export function getDefaultAvatar({
-  size,
-  radius,
-  id,
-}: AvatarProps): JSX.Element {
-  let index = 0;
-  if (id) {
-    const i = hashCode(id);
-    index = Math.abs(i) % AVATAR_ASSETS.length;
-  } else {
-    index = timestamp('second') % AVATAR_ASSETS.length;
+export function DefaultAvatar(
+  props: Omit<AvatarProps, 'uri' | 'uriOnError'> & {
+    id: string;
+    avatar?: string;
   }
-  const key = AVATAR_ASSETS[index] as LocalIconName;
-  return (
-    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Image
-        source={ICON_ASSETS[key]('')}
-        resizeMode="cover"
-        style={{ height: size, width: size, borderRadius: radius }}
-        onLoad={(_) => {
-          // console.log('test:getDefaultAvatar:', e);
-        }}
-        onError={(e) => {
-          console.warn('test:getDefaultAvatar:', e);
-        }}
-      />
-    </View>
-  );
+): JSX.Element {
+  const { id, avatar, ...others } = props;
+  const i = hashCode(id);
+  const index = Math.abs(i) % AVATAR_ASSETS.length;
+  const name = AVATAR_ASSETS[index] as IconName;
+  const source = localLocalIcon(name) as number;
+  return <Avatar uri={avatar ?? source} {...others} />;
 }
 
-export function DefaultAvatarF({ size, radius, id }: AvatarProps): JSX.Element {
-  let index = 0;
-  if (id) {
-    const i = hashCode(id);
-    index = Math.abs(i) % AVATAR_ASSETS.length;
-  } else {
-    index = timestamp('second') % AVATAR_ASSETS.length;
-  }
-  const key = AVATAR_ASSETS[index] as LocalIconName;
-  return (
-    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Avatar uri={ICON_ASSETS[key]('')} size={size} radius={radius} />
-    </View>
-  );
-}
-
-export const DefaultAvatar = React.memo(DefaultAvatarF);
+export const DefaultAvatarMemo = React.memo(DefaultAvatar);

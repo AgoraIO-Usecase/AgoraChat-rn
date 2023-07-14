@@ -36,7 +36,7 @@ export const CustomMessageRenderItem = React.memo(
             },
           ]}
         >
-          <DefaultAvatar size={sf(24)} radius={sf(12)} />
+          <DefaultAvatar id={msg.msgId} size={sf(24)} radius={sf(12)} />
         </View>
         <View
           style={[

@@ -48,7 +48,7 @@ const Item: EqualHeightListItemComponent = (props) => {
   const item = props.data as ItemDataType;
   return (
     <View style={styles.item}>
-      <DefaultAvatar size={sf(50)} radius={sf(25)} />
+      <DefaultAvatar id={item.groupID} size={sf(50)} radius={sf(25)} />
       <View style={styles.itemText}>
         <Text
           numberOfLines={1}
@@ -150,7 +150,6 @@ export default function GroupListScreen({ navigation }: Props): JSX.Element {
           },
         ]);
         let hadUpdated = false;
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let index = 0; index < data.length; index++) {
           const element = data[index];
           for (const item of params.items) {

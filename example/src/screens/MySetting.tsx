@@ -14,9 +14,12 @@ import { ChatConversationType } from 'react-native-chat-sdk';
 import {
   createStyleSheet,
   DataEventType,
+  DefaultAvatar,
   Divider,
   getScaleFactor,
   LocalIcon,
+  LocalIconName,
+  localLocalIcon,
   Services,
   UIKIT_VERSION,
 } from 'react-native-chat-uikit';
@@ -33,6 +36,7 @@ import type {
   BottomTabScreenParamsList,
   RootScreenParamsList,
 } from '../routes';
+import { AVATAR_ASSETS } from './AvatarPreviewList';
 
 type RootScreenParamsListOnly = Omit<
   RootScreenParamsList,
@@ -83,7 +87,8 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const sf = getScaleFactor();
   const { settings } = useAppI18nContext();
   const cbs = Services.cbs;
-  const ms = Services.ms;
+  const ls = Services.ls;
+  // const ms = Services.ms;
   const bounces = false;
   // const memberCount = 5;
   const [userName, setUserName] = React.useState('NickName');
@@ -93,6 +98,9 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
   const urlName = 'agora.io';
   const { client, getCurrentId, logout: logoutAction } = useAppChatSdkContext();
   const [memberCount, setMemberCount] = React.useState(0);
+  const [userAvatar, setUserAvatar] = React.useState<string | undefined>(
+    undefined
+  );
 
   const D = () => (
     <Divider
@@ -156,6 +164,33 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     });
   }, [logoutAction, navigation]);
 
+  const onSelectAvatar = React.useCallback(() => {
+    navigation.navigate('AvatarPreviewList', {
+      params: {
+        avatar: '0',
+        onResult: (index: number) => {
+          setUserAvatar(localLocalIcon(AVATAR_ASSETS[index] as LocalIconName));
+          ls.setItem(
+            getCurrentId(),
+            JSON.stringify({ userInfo: { avatar: index } })
+          )
+            .then(() => {
+              ls.getItem(getCurrentId())
+                .then((result) => {
+                  console.log('test:userInfo:', result);
+                })
+                .catch((error) => {
+                  console.warn('db:error:', error);
+                });
+            })
+            .catch((error) => {
+              console.warn('db:error:', error);
+            });
+        },
+      },
+    });
+  }, [getCurrentId, ls, navigation]);
+
   const onClickHeader = React.useCallback(() => {
     sendMySettingEvent({
       eventType: 'SheetEvent',
@@ -164,21 +199,32 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     });
   }, [userId, userName]);
 
-  const openMediaLibrary = React.useCallback(() => {
-    ms.openMediaLibrary({
-      selectionLimit: 1,
-      onFailed: (result) => {
-        console.warn('test:openMediaLibrary:', result);
-      },
-    })
-      .then((result) => {
-        console.log('test:openMediaLibrary:', result);
-        // TODO:
-      })
-      .catch((error) => {
-        console.warn('test:openMediaLibrary:', error);
-      });
-  }, [ms]);
+  // const openMediaLibrary = React.useCallback(() => {
+  //   ms.openMediaLibrary({
+  //     selectionLimit: 1,
+  //     onFailed: (result) => {
+  //       console.warn('test:openMediaLibrary:', result);
+  //     },
+  //   })
+  //     .then((result) => {
+  //       console.log('test:openMediaLibrary:', result);
+  //       if (result && result.length > 0) {
+  //         const localPath = result[0]?.uri ?? '';
+  //         // client.userManager
+  //         //   .updateOwnUserInfo({ avatarUrl: localPath })
+  //         //   .then(() => {
+  //         setUserAvatar(localPath);
+  //         // })
+  //         // .catch((error) => {
+  //         //   console.warn('test:updateOwnUserInfo:result:', error);
+  //         // });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.warn('test:openMediaLibrary:', error);
+  //     });
+  // }, [ms]);
+
   const modifyMyName = React.useCallback(
     (params: { userId: string; newMyName: string }) => {
       setUserName(params.newMyName);
@@ -253,7 +299,8 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
             logout();
             break;
           case 'open_media_library':
-            openMediaLibrary();
+            onSelectAvatar();
+            // openMediaLibrary();
             break;
           case 'exec_modify_my_name':
             modifyMyName(params);
@@ -270,7 +317,7 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
     return () => {
       sub.remove();
     };
-  }, [copyMyId, logout, modifyMyName, openMediaLibrary, removeAllMessage]);
+  }, [copyMyId, logout, modifyMyName, onSelectAvatar, removeAllMessage]);
 
   React.useEffect(() => {
     const load = () => {
@@ -313,9 +360,22 @@ export default function MySettingScreen({ navigation }: Props): JSX.Element {
           onPress={() => {
             onClickHeader();
           }}
-          style={{ paddingVertical: sf(10), paddingTop: sf(20) }}
+          style={{
+            paddingVertical: sf(10),
+            paddingTop: sf(20),
+            alignItems: 'center',
+          }}
         >
-          <LocalIcon name="default_avatar" size={sf(100)} />
+          <DefaultAvatar
+            id={userId}
+            avatar={userAvatar}
+            // avatar={
+            //   'https://c-ssl.dtstatic.com/uploads/item/201507/07/20150707230928_4Mur5.thumb.1000_0.jpeg'
+            // }
+            size={sf(100)}
+            radius={sf(100)}
+            useFastImage={false}
+          />
         </Pressable>
         <TouchableOpacity onPress={() => {}} style={{ paddingVertical: sf(0) }}>
           <Text style={styles.name}>{userName}</Text>
