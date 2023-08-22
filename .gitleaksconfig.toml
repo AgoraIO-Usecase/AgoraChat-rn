@@ -1,0 +1,254 @@
+title = "gitleaks config"
+
+# whitelist
+
+[allowlist]
+description = "global allow lists"
+regexes = [
+    '''219-09-9999''',
+    '''078-05-1120''',
+    '''(9[0-9]{2}|666)-\d{2}-\d{4}''',
+    ]
+paths = [
+    '''gitleaks.toml''',
+    '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket)$''',
+    '''(go.mod|go.sum)$'''
+]
+
+
+# ----- BEGIN typeform-api-token -----
+[[rules]]
+id = "typeform-api-token"
+description = "Typeform API token"
+regex = '''(?i)(typeform[a-z0-9_ .\-,]{0,25})(=|>|:=|\|\|:|<=|=>|:).{0,5}(tfp_[a-z0-9\-_\.=]{59})'''
+secretGroup = 3
+# ----- END typeform-api-token -----
+
+
+# ----- BEGIN generic-api-key -----
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)((key|api[^Version]|token|secret|password)[a-z0-9_ .\-,]{0,25})(=|>|:=|\|\|:|<=|=>|:).{0,5}['\"]([0-9a-zA-Z\-_=]{8,64})['\"]'''
+entropy = 3.7
+secretGroup = 4
+# ----- END generic-api-key -----
+
+
+# ----- BEGIN service_connections -----
+[[rules]]
+id = "jdbc-connection"
+description = "JDBC Connection String"
+regex = '''(jdbc)(:|\\)[\S\d]+[;:/](.*)'''
+
+[[rules]]
+id = "FTP"
+description = "FTP connection"
+regex = '''(?i)ftp:\/\/(.*):(.*)@.*['\"]'''
+
+[[rules]]
+id = "LDAP"
+description = "LDAP connection"
+regex = '''(?i)ldap(s)?:\/\/.*(dc).*['\"]'''
+# ----- END service_connections -----
+
+
+# ----- BEGIN common_secrets -----
+[[rules]]
+id = "JWT"
+description = "JWT token"
+regex = '''eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+'''
+
+
+[[rules]]
+id = "K8s"
+description = "K8s secrets"
+regex = '''(?m)(^|---).*?kind: Secret.*?(---|$)'''
+
+#[[rules]]
+#id = "hashed-password-md5"
+#description = "MD5 Password"
+#regex = '''['\ "=]+[0-9a-f]{32}['\ "\n]+'''
+
+[[rules]]
+id = "authorization-basic"
+description = "Authorization basic"
+regex = '''(?i)basic [a-zA-Z0-9_\-:\.=]{20,}'''
+
+[[rules]]
+id = "authorization-bearer"
+description = "Authorization Bearer"
+regex = '''(?i)bearer [a-zA-Z0-9_\-\.=]{20,}'''
+# ----- END common_secrets -----
+
+
+# ----- BEGIN sensitive_key_files -----
+[[rules]]
+id = "RSA-PK"
+description = "RSA private key"
+regex = '''-----BEGIN RSA PRIVATE KEY-----'''
+
+[[rules]]
+id = "OPENSSH-PK"
+description = "SSH private key"
+regex = '''-----BEGIN OPENSSH PRIVATE KEY-----'''
+
+[[rules]]
+id = "PKCS7-PK"
+description = "PKCS7 private key"
+regex = '''-----BEGIN PKCS7-----'''
+
+[[rules]]
+id = "PKCS8-PK"
+description = "PKCS8 private key"
+regex = '''-----BEGIN PRIVATE KEY-----'''
+
+[[rules]]
+id = "PGP-PK"
+description = "PGP private key"
+regex = '''-----BEGIN PGP PRIVATE KEY BLOCK-----'''
+
+[[rules]]
+id = "SSH-DSA-PK"
+description = "SSH (DSA) private key"
+regex = '''-----BEGIN DSA PRIVATE KEY-----'''
+
+[[rules]]
+id = "SSH-EC-PK"
+description = "SSH (EC) private key"
+regex = '''-----BEGIN EC PRIVATE KEY-----'''
+# ----- END sensitive_key_files -----
+
+
+# The following are very popular application api key/token
+# ----- BEGIN Github -----
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Access Token"
+regex = '''gho_[0-9a-zA-Z]{36}'''
+
+[[rules]]
+id = "github-app-token"
+description = "GitHub App Token"
+regex = '''(ghu|ghs)_[0-9a-zA-Z]{36}'''
+
+[[rules]]
+id = "github-refresh-token"
+description = "GitHub Refresh Token"
+regex = '''ghr_[0-9a-zA-Z]{76}'''
+# ----- END Github -----
+
+
+# ----- BEGIN Google -----
+[[rules]]
+id = "google-api-key"
+description = "Google API Key"
+regex = '''AIza[0-9A-Za-z\\-_]{35}'''
+
+[[rules]]
+id = "google-cloud-oauth"
+description = "Google OAuth"
+regex = '''[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com'''
+# ----- END Google -----
+
+
+# ----- BEGIN AWS -----
+[[rules]]
+description = "AWS"
+id = "aws-access-token"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+keywords = [
+    "AKIA","AGPA","AIDA","AROA","AIPA","ANPA","ANVA","ASIA",
+]
+# ----- END AWS -----
+
+
+# ----- BEGIN Alibaba -----
+[[rules]]
+description = "Alibaba AccessKey ID"
+id = "alibaba-access-key-id"
+regex = '''(LTAI)(?i)[a-z0-9]{20}'''
+keywords = [
+    "LTAI",
+]
+
+[[rules]]
+description = "Alibaba Secret Key"
+id = "alibaba-secret-key"
+regex = '''(?i)(?:alibaba)(?:[0-9a-z\-_\s.]{0,20})(?:'|"){0,1}(?:=|>|:=|\|\|:|<=|=>|:)(?:'|\"|\s|=|\x60){0,5}([a-z0-9]{30})['|\"|\n|\r|\s|\x60]'''
+secretGroup = 1
+keywords = [
+    "alibaba",
+]
+# ----- END Alibaba -----
+
+
+# ----- BEGIN Atlassian -----
+[[rules]]
+description = "Atlassian API token"
+id = "atlassian-api-token"
+regex = '''(?i)(?:atlassian)(?:[0-9a-z\-_\s.]{0,20})(?:'|"){0,1}(?:=|>|:=|\|\|:|<=|=>|:)(?:'|\"|\s|=|\x60){0,5}([a-z0-9]{24})['|\"|\n|\r|\s|\x60]'''
+secretGroup = 1
+keywords = [
+    "atlassian",
+]
+# ----- END Atlassian -----
+
+
+# ----- BEGIN BitBucket -----
+[[rules]]
+description = "BitBucket Client ID"
+id = "bitbucket-client-id"
+regex = '''(?i)(?:bitbucket)(?:[0-9a-z\-_\s.]{0,20})(?:'|"){0,1}(?:=|>|:=|\|\|:|<=|=>|:)(?:'|\"|\s|=|\x60){0,5}([a-z0-9]{32})['|\"|\n|\r|\s|\x60]'''
+secretGroup = 1
+keywords = [
+    "bitbucket",
+]
+
+[[rules]]
+description = "BitBucket Client Secret"
+id = "bitbucket-client-secret"
+regex = '''(?i)(?:bitbucket)(?:[0-9a-z\-_\s.]{0,20})(?:'|"){0,1}(?:=|>|:=|\|\|:|<=|=>|:)(?:'|\"|\s|=|\x60){0,5}([a-z0-9_\-]{64})['|\"|\n|\r|\s|\x60]'''
+secretGroup = 1
+keywords = [
+    "bitbucket",
+]
+# ----- END BitBucket -----
+
+
+# ----- BEGIN grafana -----
+[[rules]]
+id = "grafana-api-token"
+description = "Grafana API token"
+regex = '''['\"]eyJrIjoi(?i)[a-z0-9-_=]{72,92}['\"]'''
+# ----- END grafana -----
+
+
+# ----- BEGIN hashicorp -----
+[[rules]]
+id = "hashicorp-tf-api-token"
+description = "HashiCorp Terraform user/org API token"
+regex = '''['\"](?i)[a-z0-9]{14}\.atlasv1\.[a-z0-9-_=]{60,70}['\"]'''
+# ----- END hashicorp -----
+
+
+# ----- BEGIN npm -----
+[[rules]]
+id = "npm-access-token"
+description = "npm access token"
+regex = '''['\"](npm_(?i)[a-z0-9]{36})['\"]'''
+# ----- END npm -----
+
+
+# ----- BEGIN Twilio -----
+[[rules]]
+id = "twilio-api-key"
+description = "Twilio API Key"
+regex = '''SK[0-9a-fA-F]{32}'''
+# ----- END Twilio -----
+
