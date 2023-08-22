@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DevApp from './test_avatar_preview';
+import DevApp from './test_provider_state';
 
 export default function dev(): JSX.Element {
   return (

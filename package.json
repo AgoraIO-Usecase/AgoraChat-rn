@@ -95,7 +95,8 @@
           "revert",
           "style",
           "test",
-          "tag"
+          "tag",
+          "example"
         ]
       ]
     }
