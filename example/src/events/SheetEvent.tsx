@@ -120,60 +120,83 @@ export function handleSheetEvent(params: {
           i18n: AppStringSet;
         };
         const { groupInfo } = extra.i18n;
+        const { role, isFriend, groupId, members } = sheetEvent.params;
+        const list = [];
+        list.push({
+          title: contactID,
+          titleColor: 'black',
+          onPress: () => {},
+          containerStyle: {
+            marginTop: sf(10),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: undefined,
+            minWidth: undefined,
+            backgroundColor: undefined,
+            borderRadius: undefined,
+          },
+          titleStyle: {
+            fontWeight: '600',
+            fontSize: sf(14),
+            lineHeight: sf(16),
+            color: 'rgba(102, 102, 102, 1)',
+            marginHorizontal: undefined,
+          },
+        });
+        if (isFriend) {
+          list.push({
+            title: groupInfo.memberSheet.chat,
+            titleColor: 'black',
+            onPress: () => {
+              sendEventFromSheet({
+                eventType: 'DataEvent',
+                eventBizType: 'contact',
+                params: {
+                  contactID: contactID,
+                },
+                action: 'open_chat',
+              });
+            },
+          });
+        } else {
+          list.push({
+            title: groupInfo.memberSheet.add,
+            titleColor: 'black',
+            onPress: () => {
+              sendEventFromSheet({
+                eventType: 'ToastEvent',
+                eventBizType: 'contact',
+                params: groupInfo.toast[4]!,
+                action: 'toast_',
+              });
+              sendEventFromSheet({
+                eventType: 'DataEvent',
+                eventBizType: 'contact',
+                action: 'add_new_contact_from_group_member',
+                params: {
+                  contactID: contactID,
+                },
+              });
+            },
+          });
+        }
+        if (role === 2) {
+          list.push({
+            title: groupInfo.memberSheet.remove,
+            titleColor: 'rgba(255, 20, 204, 1)',
+            onPress: () => {
+              sendEventFromSheet({
+                eventType: 'DataEvent',
+                eventBizType: 'contact',
+                params: { groupId, members },
+                action: 'exec_remove_group_member',
+              });
+            },
+          });
+        }
         params.sheet.openSheet({
-          sheetItems: [
-            {
-              title: contactID,
-              titleColor: 'black',
-              onPress: () => {},
-              containerStyle: {
-                marginTop: sf(10),
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: undefined,
-                minWidth: undefined,
-                backgroundColor: undefined,
-                borderRadius: undefined,
-              },
-              titleStyle: {
-                fontWeight: '600',
-                fontSize: sf(14),
-                lineHeight: sf(16),
-                color: 'rgba(102, 102, 102, 1)',
-                marginHorizontal: undefined,
-              },
-            },
-            {
-              title: groupInfo.memberSheet.add,
-              titleColor: 'black',
-              onPress: () => {
-                sendEventFromSheet({
-                  eventType: 'ToastEvent',
-                  eventBizType: 'contact',
-                  params: groupInfo.toast[4]!,
-                  action: 'toast_',
-                });
-              },
-            },
-            {
-              title: groupInfo.memberSheet.remove,
-              titleColor: 'rgba(255, 20, 204, 1)',
-              onPress: () => {
-                sendEventFromSheet({
-                  eventType: 'AlertEvent',
-                  eventBizType: 'contact',
-                  params: {},
-                  action: 'alert_remove_group_member',
-                });
-              },
-            },
-            {
-              title: groupInfo.memberSheet.chat,
-              titleColor: 'black',
-              onPress: () => {},
-            },
-          ],
+          sheetItems: list as any,
         });
       }
       break;

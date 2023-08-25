@@ -12,6 +12,7 @@ export type RadioButtonProps = {
   borderColor?: string;
   checked?: boolean;
   onChecked?: (checked: boolean) => void;
+  disabled?: boolean;
 };
 
 const sf = getScaleFactor();
@@ -26,6 +27,7 @@ export default function CheckButton(props: RadioButtonProps): JSX.Element {
     borderColor,
     checked,
     onChecked,
+    disabled,
   } = props;
   const [_checked, setChecked] = React.useState(checked ?? false);
   // console.log('test:CheckButton:', _checked);
@@ -74,7 +76,7 @@ export default function CheckButton(props: RadioButtonProps): JSX.Element {
           backgroundColor: hover ? cc.paddingColor : undefined,
         },
       ]}
-      onPress={_onCheck}
+      onPress={disabled === true ? undefined : _onCheck}
       delayHoverIn={_delayTime}
       delayHoverOut={_delayTime}
       onHoverIn={() => {

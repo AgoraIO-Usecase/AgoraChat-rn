@@ -59,7 +59,7 @@ export function handlePromptEvent(params: {
               action: 'exec_modify_group_name',
               params: {
                 groupId: promptEvent.params.groupId,
-                newGroupName: text,
+                groupName: text,
               },
               eventBizType: 'group',
             });

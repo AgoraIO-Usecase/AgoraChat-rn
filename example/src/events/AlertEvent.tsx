@@ -74,6 +74,7 @@ export function handleAlertEvent(params: {
           i18n: AppStringSet;
         };
         const { groupInfo } = extra.i18n;
+        const { list } = alertEvent.params;
         params.alert.openAlert({
           title: groupInfo.inviteAlert.title,
           message: groupInfo.inviteAlert.message,
@@ -96,7 +97,7 @@ export function handleAlertEvent(params: {
                 sendEvent({
                   eventType: 'DataEvent',
                   eventBizType: 'contact',
-                  params: { isConfirmed: true },
+                  params: { isConfirmed: true, list },
                   senderId: 'AlertEvent',
                   action: 'alert_group_member_modify_result',
                 });

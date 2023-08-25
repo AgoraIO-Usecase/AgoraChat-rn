@@ -1,7 +1,10 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { DeviceEventEmitter, Pressable, Text, View } from 'react-native';
-import { ChatConversationType } from 'react-native-chat-sdk';
+import {
+  ChatConversationType,
+  ChatGroupPermissionType,
+} from 'react-native-chat-sdk';
 import {
   createStyleSheet,
   DataEventType,
@@ -10,6 +13,7 @@ import {
   LocalIcon,
   ScreenContainer,
   Services,
+  Switch,
 } from 'react-native-chat-uikit';
 
 import { useAppI18nContext } from '../contexts/AppI18nContext';
@@ -52,14 +56,22 @@ export function GroupInfoScreenInternal({
   const { client } = useAppChatSdkContext();
   const cbs = Services.cbs;
   const groupId = params.groupId ?? 'GroupId: xxx';
-  // const memberCount = 5;
+  const [memberCount, setMemberCount] = React.useState(0);
+  const [role, setRole] = React.useState<ChatGroupPermissionType>(0);
   const [groupName, setGroupName] = React.useState('GroupName');
   const [groupDesc, setGroupDesc] = React.useState(groupInfo.groupDescription);
-  const [, setIsAllMemberMuted] = React.useState(false);
+  const [isAllMemberMuted, setIsAllMemberMuted] = React.useState(false);
 
-  // const onMute = (isMute: boolean) => {
-  //   setIsAllMemberMuted(isMute);
-  // };
+  const onMute = (isMute: boolean) => {
+    client.groupManager
+      .muteAllMembers(groupId)
+      .then(() => {
+        setIsAllMemberMuted(isMute);
+      })
+      .catch((error) => {
+        console.warn('test:onChangeName:error:', error);
+      });
+  };
 
   const onChangeName = React.useCallback(
     (groupId: string, groupName: string) => {
@@ -69,11 +81,6 @@ export function GroupInfoScreenInternal({
           .then(() => {
             console.log('test:onChangeName:');
             setGroupName(groupName);
-            sendEventFromGroupInfo({
-              eventType: 'DataEvent',
-              action: 'exec_modify_group_name',
-              params: { groupId, groupName },
-            });
           })
           .catch((error) => {
             console.warn('test:onChangeName:error:', error);
@@ -116,9 +123,14 @@ export function GroupInfoScreenInternal({
     });
   };
 
-  // const onInvite = () => {};
-
-  // const onMembers = () => {};
+  const onInvite = () => {
+    navigation.push('ContactList' as any, {
+      params: {
+        type: 'group_member_modify',
+        groupId: groupId,
+      },
+    });
+  };
 
   const onDestroyGroup = React.useCallback(
     (groupId: string) => {
@@ -169,6 +181,12 @@ export function GroupInfoScreenInternal({
     [cbs, groupInfo.toast]
   );
 
+  const onMembers = React.useCallback(() => {
+    navigation.push('ContactList', {
+      params: { type: 'group_member', groupId: groupId, role: role } as any,
+    });
+  }, [groupId, navigation, role]);
+
   const addListeners = React.useCallback(() => {
     const sub = DeviceEventEmitter.addListener(
       'DataEvent' as DataEventType,
@@ -188,7 +206,7 @@ export function GroupInfoScreenInternal({
             onDestroyGroup(params.groupId);
             break;
           case 'exec_modify_group_name':
-            onChangeName(params.groupId, params.newGroupName);
+            onChangeName(params.groupId, params.groupName);
             break;
           case 'exec_modify_group_description':
             onChangeDescription(params.groupId, params.newGroupDescription);
@@ -222,6 +240,8 @@ export function GroupInfoScreenInternal({
           setGroupName(result.groupName);
           setGroupDesc(result.description);
           setIsAllMemberMuted(result.isAllMemberMuted);
+          setMemberCount(result.memberCount);
+          setRole(result.permissionType);
         }
       })
       .catch((error) => {
@@ -276,14 +296,15 @@ export function GroupInfoScreenInternal({
           width: 130,
         }}
       >
-        {/* <Pressable onPress={onInvite}>
+        <Pressable onPress={onInvite}>
           <View style={styles.chatButton}>
             <LocalIcon name="group_invite" size={sf(30)} />
           </View>
           <Text style={[styles.chat, { marginTop: sf(5) }]}>
             {groupInfo.invite}
           </Text>
-        </Pressable> */}
+        </Pressable>
+        <View style={{ width: 36 }} />
         <View>
           <Pressable
             onPress={() => {
@@ -299,7 +320,7 @@ export function GroupInfoScreenInternal({
         </View>
       </View>
       <View style={{ height: sf(66) }} />
-      {/* <Pressable onPress={onMembers} style={styles.listItem}>
+      <Pressable onPress={onMembers} style={styles.listItem}>
         <Text style={styles.listItemText1}>{groupInfo.members}</Text>
         <View
           style={{
@@ -312,8 +333,8 @@ export function GroupInfoScreenInternal({
           <View style={{ width: sf(5) }} />
           <LocalIcon name="go_small_black_mobile" size={sf(14)} />
         </View>
-      </Pressable> */}
-      {/* <View style={styles.listItem}>
+      </Pressable>
+      <View style={styles.listItem}>
         <Text style={styles.listItemText1}>{groupInfo.mute}</Text>
         <Switch
           value={isAllMemberMuted}
@@ -325,7 +346,7 @@ export function GroupInfoScreenInternal({
           inactiveThumbColor="white"
           inactiveTrackColor="rgba(216, 216, 216, 1)"
         />
-      </View> */}
+      </View>
       <Pressable
         style={styles.listItem}
         onPress={() => {

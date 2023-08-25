@@ -204,16 +204,21 @@ const Item: EqualHeightListItemComponent = (props) => {
           </View>
         );
       case 'group_member_modify':
+        const enabled = (item.action as ItemActionModifyGroupMemberDataType)
+          ?.modifyGroupMember?.isActionEnabled;
         return (
           <View style={styles.rightItem}>
             <CheckButton
+              disabled={enabled !== undefined ? !enabled : undefined}
               checked={
                 (item.action as ItemActionModifyGroupMemberDataType)
                   ?.modifyGroupMember?.isInvited
               }
               onChecked={
-                (item.action as ItemActionModifyGroupMemberDataType)
-                  ?.modifyGroupMember?.onAction
+                enabled === true || enabled === undefined
+                  ? (item.action as ItemActionModifyGroupMemberDataType)
+                      ?.modifyGroupMember?.onAction
+                  : () => {}
               }
             />
           </View>
@@ -240,9 +245,11 @@ const Item: EqualHeightListItemComponent = (props) => {
 const NavigationHeaderTitle = (type: Undefinable<ContactActionType>) => {
   switch (type) {
     case 'group_member_modify':
-      return 'Members';
+      return 'Add Members';
     case 'block_contact':
       return 'Blocked Lists';
+    case 'group_member':
+      return 'Members';
     default:
       return undefined;
   }
@@ -264,6 +271,14 @@ export function ContactListScreenInternal({
   const listRef = React.useRef<EqualHeightListRef>(null);
   const enableRefresh = type === 'contact_list' ? true : false;
   const enableAlphabet = type === 'contact_list' ? true : false;
+  const groupId =
+    type === 'group_member' || type === 'group_member_modify'
+      ? params.groupId
+      : undefined;
+  const role =
+    type === 'group_member' || type === 'group_member_modify'
+      ? params.role
+      : undefined;
   const enableHeader = false;
   const data: ItemDataType[] = React.useMemo(() => [], []); // for search
   const [isEmpty, setIsEmpty] = React.useState(true);
@@ -364,6 +379,30 @@ export function ContactListScreenInternal({
     [data]
   );
 
+  const isFriendAction = React.useCallback(
+    (id: string, result: (isFriend: boolean) => void) => {
+      client.contactManager
+        .getAllContactsFromDB()
+        .then((r) => {
+          if (r) {
+            for (const contactId of r) {
+              if (id === contactId) {
+                result(true);
+                return;
+              }
+            }
+            result(false);
+          } else {
+            result(false);
+          }
+        })
+        .catch((error) => {
+          console.warn('test:error:getAllContactsFromDB:', error);
+        });
+    },
+    [client.contactManager]
+  );
+
   const standardizedData = React.useCallback(
     (item: Omit<ItemDataType, 'onLongPress' | 'onPress'>): ItemDataType => {
       const createAction = (
@@ -419,8 +458,15 @@ export function ContactListScreenInternal({
               modifyGroupMember: {
                 isActionEnabled: a?.modifyGroupMember?.isActionEnabled,
                 isInvited: a?.modifyGroupMember?.isInvited,
-                onAction: () => {
+                onAction: (checked: boolean) => {
                   console.log('test:onAction:group_member_modify:');
+                  if (a.modifyGroupMember?.isInvited !== undefined) {
+                    a.modifyGroupMember.isInvited = checked;
+                  }
+                  manualRefresh({
+                    type: 'update-one',
+                    items: [standardizedData(item)],
+                  });
                 },
               },
             };
@@ -441,10 +487,18 @@ export function ContactListScreenInternal({
               params: { chatId: data.contactID, chatType: 0 },
             });
           } else if (type === 'group_member') {
-            sendEventFromContactList({
-              eventType: 'SheetEvent',
-              action: 'sheet_group_member',
-              params: { contactID: contactID },
+            isFriendAction(contactID, (isFriend) => {
+              sendEventFromContactList({
+                eventType: 'SheetEvent',
+                action: 'sheet_group_member',
+                params: {
+                  contactID: contactID,
+                  role: role,
+                  isFriend: isFriend,
+                  groupId: groupId,
+                  members: [data.contactID],
+                },
+              });
             });
           } else {
             navigation.navigate({
@@ -457,7 +511,15 @@ export function ContactListScreenInternal({
       } as ItemDataType;
       return r;
     },
-    [contactList.blockContact.buttonName, manualRefresh, navigation, type]
+    [
+      contactList.blockContact.buttonName,
+      groupId,
+      isFriendAction,
+      manualRefresh,
+      navigation,
+      role,
+      type,
+    ]
   );
 
   const initData = React.useCallback(
@@ -480,6 +542,24 @@ export function ContactListScreenInternal({
   //   const r = sf(screenHeight - 450 - 340);
   //   return r;
   // };
+
+  const inviteeList = React.useCallback(() => {
+    if (type === 'group_member_modify') {
+      return data
+        .map((item) => {
+          const action = item.action as ItemActionModifyGroupMemberDataType;
+          const isActionEnabled = action.modifyGroupMember?.isActionEnabled;
+          const isInvited = action.modifyGroupMember?.isInvited;
+          if (isActionEnabled === true && isInvited === true) {
+            return item.key;
+          } else {
+            return undefined;
+          }
+        })
+        .filter((value) => value !== undefined);
+    }
+    return undefined;
+  }, [data, type]);
 
   const NavigationHeaderRight = React.useCallback(
     (_: HeaderButtonProps) => {
@@ -529,10 +609,11 @@ export function ContactListScreenInternal({
             );
           } else if (type === 'group_member_modify') {
             const _addMember = () => {
+              const list = inviteeList();
               sendEventFromContactList({
                 eventType: 'AlertEvent',
                 action: 'alert_group_member_modify',
-                params: {},
+                params: { list: list },
               });
             };
             const right = `${header.addMembers}(${selectedCount})`;
@@ -556,7 +637,10 @@ export function ContactListScreenInternal({
           onPress={() => {
             if (type === 'group_member') {
               navigation.push('ContactList' as any, {
-                params: { type: 'group_member_modify' },
+                params: {
+                  type: 'group_member_modify',
+                  groupId: groupId,
+                },
               });
             } else {
               sendEventFromContactList({
@@ -574,9 +658,11 @@ export function ContactListScreenInternal({
       );
     },
     [
+      groupId,
       header.addMembers,
       header.createGroup,
       header.groupInvite,
+      inviteeList,
       navigation,
       route.params,
       selectedCount,
@@ -706,73 +792,146 @@ export function ContactListScreenInternal({
     [client.contactManager, manualRefresh, standardizedData]
   );
 
+  const fetchContacts = React.useCallback(
+    (result: (contacts: string[]) => void) => {
+      client.contactManager
+        .getAllContactsFromServer()
+        .then((r) => {
+          result(r);
+        })
+        .catch((error) => {
+          console.warn('test:getAllContactsFromServer:error:', error);
+        });
+    },
+    [client.contactManager]
+  );
+
+  const fetchGroupMembers = React.useCallback(
+    (result: (members: string[]) => void) => {
+      client.groupManager
+        .fetchGroupInfoFromServer(groupId, true)
+        .then((r) => {
+          if (r) {
+            const owner = r.owner;
+            const admins = r.adminList;
+            const members = r.memberList;
+            const list = [owner, ...admins, ...members];
+            result(list);
+          }
+        })
+        .catch((error) => {
+          console.warn('test:fetchMemberListFromServer:error:', error);
+        });
+    },
+    [client.groupManager, groupId]
+  );
+
+  const fetchBlockList = React.useCallback(
+    (result: (members: string[]) => void) => {
+      client.contactManager
+        .getBlockListFromServer()
+        .then((r) => {
+          console.log('test:getBlockListFromServer:success:', r);
+          if (r) {
+            result(r);
+          } else {
+            result([]);
+          }
+        })
+        .catch((error) => {
+          console.warn('test:getBlockListFromServer:error:', error);
+        });
+    },
+    [client.contactManager]
+  );
+
   const initList = React.useCallback(
     (type: Undefinable<ContactActionType>) => {
       if (type === 'contact_list') {
-        client.contactManager
-          .getAllContactsFromServer()
-          .then((result) => {
-            initData(
-              result.map((id) => {
-                return {
-                  key: id,
-                  contactID: id,
-                  contactName: id,
-                  actionType: 'contact_list',
-                  action: undefined,
-                } as ItemDataType;
-              })
-            ); // for test
-          })
-          .catch((error) => {
-            console.warn('test:getAllContactsFromServer:error:', error);
-          });
+        fetchContacts((list) => {
+          initData(
+            list.map((id) => {
+              return {
+                key: id,
+                contactID: id,
+                contactName: id,
+                actionType: 'contact_list',
+                action: undefined,
+              } as ItemDataType;
+            })
+          ); // for test
+        });
       } else if (type === 'create_group') {
-        client.contactManager
-          .getAllContactsFromServer()
-          .then((result) => {
-            console.log('test:getAllContactsFromServer:success:', result);
+        fetchContacts((list) => {
+          initData(
+            list.map((id) => {
+              return {
+                key: id,
+                contactID: id,
+                contactName: id,
+                actionType: 'create_group',
+                action: {
+                  createGroup: { isActionEnabled: true, isInvited: false },
+                },
+              } as ItemDataType;
+            })
+          ); // for test
+        });
+      } else if (type === 'block_contact') {
+        fetchBlockList((list: string[]) => {
+          initData(
+            list.map((id) => {
+              return {
+                key: id,
+                contactID: id,
+                contactName: id,
+                actionType: 'block_contact',
+              } as ItemDataType;
+            })
+          );
+        });
+      } else if (type === 'group_member') {
+        if (groupId) {
+          fetchGroupMembers((list: string[]) => {
             initData(
-              result.map((id) => {
+              list.map((id) => {
                 return {
                   key: id,
                   contactID: id,
                   contactName: id,
-                  actionType: 'create_group',
-                  action: {
-                    createGroup: { isActionEnabled: true, isInvited: false },
-                  },
+                  actionType: 'group_member',
                 } as ItemDataType;
               })
-            ); // for test
-          })
-          .catch((error) => {
-            console.warn('test:getAllContactsFromServer:error:', error);
+            );
           });
-      } else if (type === 'block_contact') {
-        client.contactManager
-          .getBlockListFromServer()
-          .then((result) => {
-            console.log('test:getBlockListFromServer:success:', result);
-            if (result) {
+        }
+      } else if (type === 'group_member_modify') {
+        if (groupId) {
+          fetchGroupMembers((members: string[]) => {
+            fetchContacts((contacts: string[]) => {
               initData(
-                result.map((id) => {
+                contacts.map((id) => {
+                  const existed = members.includes(id);
                   return {
                     key: id,
                     contactID: id,
                     contactName: id,
-                    actionType: 'block_contact',
+                    actionType: 'group_member_modify',
+                    action: {
+                      modifyGroupMember: {
+                        isActionEnabled: !existed,
+                        isInvited: existed,
+                      },
+                    },
                   } as ItemDataType;
                 })
               );
-            }
-          })
-          .catch((error) => {
-            console.warn('test:getBlockListFromServer:error:', error);
+            });
           });
+        }
       }
     },
-    [client, initData]
+    [fetchBlockList, fetchContacts, fetchGroupMembers, groupId, initData]
   );
 
   const duplicateCheck = React.useCallback(
@@ -785,6 +944,59 @@ export function ContactListScreenInternal({
       return false;
     },
     [data]
+  );
+
+  const sendContactRequest = React.useCallback(
+    (id: string) => {
+      client.contactManager
+        .addContact(id, 'Request to be a friend.')
+        .then()
+        .catch((error) => {
+          console.warn('test:error:', error);
+        });
+    },
+    [client.contactManager]
+  );
+
+  const inviteMember = React.useCallback(
+    (list: string[]) => {
+      if (groupId) {
+        client.groupManager
+          .inviteUser(groupId, list, 'invite your join group')
+          .then()
+          .catch((error) => {
+            console.warn('test:error:', error);
+          });
+      }
+    },
+    [client.groupManager, groupId]
+  );
+
+  const removeGroupMember = React.useCallback(
+    (groupId: string, members: string[]) => {
+      client.groupManager
+        .removeMembers(groupId, members)
+        .then(() => {
+          for (const member of members) {
+            manualRefresh({
+              type: 'del-one',
+              items: [
+                standardizedData({
+                  key: member,
+                  contactID: member,
+                  contactName: member,
+                  actionType: 'group_member',
+                  action: undefined,
+                }),
+              ],
+            });
+          }
+        })
+        .catch((error) => {
+          console.warn('test:error:', error);
+        });
+    },
+    [client.groupManager, manualRefresh, standardizedData]
   );
 
   const addListeners = React.useCallback(
@@ -862,6 +1074,7 @@ export function ContactListScreenInternal({
                   action: 'toast_',
                   params: groupInfo.toast[0]!,
                 });
+                inviteMember(params.list);
               } else {
                 navigation.goBack();
               }
@@ -895,6 +1108,27 @@ export function ContactListScreenInternal({
                 unblockContactAction(id);
               }
               break;
+            case 'open_chat':
+              {
+                const id = params.contactID;
+                navigation.navigate('Chat', {
+                  params: { chatId: id, chatType: 0 },
+                });
+              }
+              break;
+            case 'add_new_contact_from_group_member':
+              {
+                const id = params.contactID;
+                sendContactRequest(id);
+              }
+              break;
+            case 'exec_remove_group_member':
+              {
+                const members = params.members;
+                const groupId = params.groupId;
+                removeGroupMember(groupId, members);
+              }
+              break;
 
             default:
               break;
@@ -911,8 +1145,11 @@ export function ContactListScreenInternal({
       data,
       duplicateCheck,
       groupInfo.toast,
+      inviteMember,
       manualRefresh,
       navigation,
+      removeGroupMember,
+      sendContactRequest,
       standardizedData,
       type,
       unblockContactAction,

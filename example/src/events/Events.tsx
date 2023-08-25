@@ -130,7 +130,10 @@ export type DataActionEventType =
   | 'on_recall_message'
   | 'exec_contact_unblock'
   | 'select_avatar_index'
-  | 'select_avatar_index_result';
+  | 'select_avatar_index_result'
+  | 'open_chat'
+  | 'add_new_contact_from_group_member'
+  | 'exec_remove_group_member';
 
 ////////////////////////////////////////////////////////////////////////////////
 //// ActionEventType ///////////////////////////////////////////////////////////
