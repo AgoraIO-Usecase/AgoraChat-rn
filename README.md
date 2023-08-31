@@ -4,9 +4,18 @@ _English | [中文](./README.zh.md)_
 
 # Overview
 
-This is a multi-package managed repository. Includes uikit sdk and callkit sdk.
+Agora Chat UIKit for React-Native is a development kit with an user interface that enables an easy and fast integration of standard chat features into new or existing client apps. Agora Chat CallKit for React-Native is a development kit with an user interface that enables an easy and fast integration of RTC video/audio calling into new or existing client app.
 
-## Environmental Preparation
+The repository mainly includes the following sub-projects:
+
+- `example`: This is a demo example of a relatively complete UIKit. Including user login, logout, session management, contact management, group management, chat management, basic settings, etc.
+- `examples/callkit-example`: This is a demonstration example of audio and video calls. Including single-person and multi-person audio and video call functions.
+- `packages/react-native-chat-uikit`: UIKit SDK project
+- `packages/react-native-chat-callkit`: CallKit SDK project
+
+Find out more about Agora Chat UIKit or CallKit for React-Native at [DOCS](./docs/v2/index.md). If you need any help in resolving any issues or have questions, [visit our community](https://github.com/AgoraIO-Usecase/AgoraChat-rn).
+
+## Requirements
 
 - operating system:
   - MacOS 10.15.7 or above
@@ -24,101 +33,52 @@ This is a multi-package managed repository. Includes uikit sdk and callkit sdk.
   - npm and related tools (**not recommended**, please solve related problems by yourself)
   - expo 6.0.0 or above
 
-## Source Code Download
+⚑ More details, please see https://reactnative.dev/docs/environment-setup
+⚑ we strongly recommend installing yarn using corepack
 
-[download link](https://github.com/AgoraIO-Usecase/AgoraChat-rn)
+## Try the example app
+
+**Download repository [from here](https://github.com/AgoraIO-Usecase/AgoraChat-rn).**
+
+**Project initialization.**
 
 ```sh
-git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
+yarn && yarn run example-env && yarn run sdk-version
 ```
 
-## Project Structure
+**Configure the necessary parameters.**
+In the `example` project, add `appKey` and other information to the `example/src/env.ts`. In the `examples/callkit-example` project, add `appKey` and other information to the `examples/callkit-example/src/env.ts` file.
 
-This is a multi-package management project managed by `lerna` and `yarn workspace`.
+**Configure FCM file.**
+In the `example` project, for the Android platform, please put `google-services.json` under the `examples/android/app` folder, and for the iOS platform, please put `GoogleService-Info.plist` under the `example/iOS/ChatUikitExample` folder.
+In the `examples/callkit-example` project, for the Android platform, please put `google-services.json` under the `examples/callkit-example/android/app` folder, for the iOS platform, please put `GoogleService-Info.plist` under the `examples/callkit-example/iOS/ChatCallkitExample` folder.
 
-- `example`: A relatively complete example project, used for demonstration and test development.
-- `examples/callkit-example`: callkit example project, mainly for demonstration of `callkit sdk`.
-- `packages/react-native-chat-uikit`: uikit project
-- `packages/react-native-chat-callkit`: callkit project
+**Compile and Run example app.**
 
-**Note** The commands run by the project are generally in the project root directory, not the corresponding package directory or example directory.
+```sh
+cd example && yarn run Android
+# or
+cd example && yarn run pods && yarn run iOS
+```
 
-## Compile and Run
+## Development
 
-#### Project Initialization
+We tried development on macOS systems. You might encounter problems in running sample or scripts like yarn build in Windows machines.
 
-1. Use `vscode` to open the project `react-native-chat-library`
-2. Use `terminal` to initialize the project `yarn`
-3. If it is the first project initialization, you also need to execute the command `yarn run generate-source-env` to generate the corresponding files. For example: `env.ts`.
+## Quick Start Examples
 
-**Note** `yarn` will execute additional commands. For developers who don’t understand commands, if they need to use `npm` command instead, they need to understand more trustworthy content.
-**Note** When creating this project, the scaffolding has preset some `yarn` related commands, so it is recommended to use `yarn` to complete most of the work.
-**Note** Because `example` uses `firebase cloud message (fcm)` related content, if users need to use related content, they need to set the corresponding file (GoogleService-Info.plist is required for ios platform, google-services is required for android platform .json), if you don’t need it, just delete the relevant content.
+If you want to experience a simpler demo project, you can refer to other repositories.
+[Quick Start UIKit Demo](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
+[Quick Start CallKit Demo](https://github.com/AgoraIO-Usecase/AgoraChat-Callkit-rn)
 
-#### Universal Compilation
+## More Detail Development
 
-The operation steps are as follows:
-
-1. Use `terminal` to change directory to `example`
-2. Execute the command `yarn run ios` to compile and run the `iOS` application
-3. Execute the command `yarn run android` to compile and run the `Android` application
-
-**NOTE** This mode is deprecated for compilation.
-**Modify Command** Please refer to `example/package.json` related content.
-**Reference** For more information on compiling and running commands, please refer to `expo` related content.
-
-#### Universal Operation
-
-Running an application in development mode requires additional local services, which can dynamically detect file source code modifications and perform dynamic debugging.
-
-1. Using the `terminal` tool, switch to `cd example/ios`
-2. Using the `terminal` tool, execute the `yarn run start` command to start the service.
-
-#### iOS Platform
-
-**<span style="color:orange">compile and build the project</span>**
-
-In the compilation phase, the `iOS` platform needs to execute the `pod install` command to generate the Xcode `xcworkspace` project file.
-
-1. Using the `terminal` tool, switch to `cd example/ios`
-2. Use the `terminal` tool to execute `pod install` to generate `example/ios/example.xcworkspace`.
-3. Use the `Xcode` tool to open the project file `example/ios/example.xcworkspace`
-4. If you use the simulator, you need to choose `iOS` 12.4 or below
-5. If you use a real device, the developer mode needs to be enabled on the real device, and `singing & capabilities` related content needs to be set in the project
-6. Use the `Xcode` tool to execute the compile operation.
-
-**Note** For developers who do not use `Xcode` to compile, they can use the official recommended method to compile. If there is a problem, it is generally difficult to find the cause of the problem.
-**Note** The `react-native` native service is automatically started, not the `expo` service, and an error will be reported. Just turn off the service.
-
-**<span style="color:orange">run the project</span>**
-
-Use the command provided by the `expo` tool to start the local service, refer to the `General Operation` chapter.
-
-**Note** If the running application is not loaded correctly, you need to refresh the page, or close the application and restart it. For error reporting problems, you can generally solve them through corresponding prompts.
-
-#### Android Platform
-
-**<span style="color:orange">compile and build the project</span>**
-
-During the compilation phase, the `Android` platform needs to execute the `sync` initialization project.
-
-1. Start the `android studio (referred to as as)` tool, open the project file `example/android`,
-2. Click the `sync project with gradle files` button to execute the `initialization` operation,
-3. If using an emulator, please select or create an emulator of version 6.0 or above,
-4. If it is a real device, you need to enable the developer mode of the device,
-5. When `sync` is successful, click the `run app` button to compile and run the project.
-
-**Note** If you use `as` for the first time, it may take a lot of downloading and the waiting time will be longer.
-**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example`uses the`expo` tool, it does it for you, so no manual work is required.
-
-**<span style="color:orange">run the project</span>**
-
-Use the command provided by the `expo` tool to start the local service, refer to the `General Operation` chapter.
-
-**Note** If the running application is not loaded correctly, you need to refresh the page, or close the application and restart it. For error reporting problems, you can generally solve them through corresponding prompts.
-**Note** `Android platform devices need data forwarding. The command for data forwarding is `adb reverse tcp:8081 tcp:8081`. Since `example`uses the`expo` tool, it does it for you, so no manual work is required.
+More detailed development help can be found here.
+[detail development helper](./docs/dev.md)
 
 # More instructions
+
+See the description of each sub-item for details.
 
 [uikit example helper](./example/README.md)
 [callkit example helper](./examples/callkit-example/README.md)
