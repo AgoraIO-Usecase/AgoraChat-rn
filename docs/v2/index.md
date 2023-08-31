@@ -4,11 +4,79 @@ With Agora Chat UIKit for React Native, you can easily build an in-app chat with
 
 UIKit for React Native is available for you to build and customize views at a component level.
 
-UiKit provides basic components and advanced fragment components. Base components are used by fragment components. Fragment components provide methods, properties, and callback notifications. You can actively call methods through ref, change styles through attributes, and receive notifications through callbacks. To learn more about our development kits, please visit the following pages.
+UIKit provides basic components and advanced fragment components. Base components are used by fragment components. Fragment components provide methods, properties, and callback notifications. Fragment components are developed around the chat business, which is more suitable for quickly building chat applications.
 
-# Quick Start
+UIKit SDK mainly includes the following fragment components:
 
-**Target: Send your first message.**
+<table>
+  <tr>
+    <td>Module</td>
+    <td>Methods And Properties</td>
+    <td>Description</td>
+  </tr>
+  <tr>
+    <td rowspan="7" style="font-weight: bold">Conversation List</td>
+  </tr>
+  <tr>
+    <td>Conversation list</td>
+    <td style="font-size: 15px">
+      Presents the conversation information, including the user's avatar and nickname, content of the last message, unread message count, and the time when the last message is sent or received. Support custom session list item style, support custom side menu.
+    </td>
+  </tr>
+  <tr>
+    <td>Add conversation</td>
+    <td style="font-size: 15px">
+      Adds the conversation to the conversation list. Typical application scenario: Receive a new message and open a new session.
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation</td>
+    <td style="font-size: 15px">
+      Updates the conversation in the conversation list.
+    </td>
+  </tr>
+  <tr>
+    <td>Delete conversation</td>
+    <td style="font-size: 15px">
+      Deletes the conversation from the conversation list.
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation read count</td>
+    <td style="font-size: 15px">
+      All messages for this conversation have been read.
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation extension attribute</td>
+    <td style="font-size: 15px">
+      Update session custom attributes. Typical application scenario: conversation do not disturb.
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="5" style="font-weight: bold">Chat</td>
+  </tr>
+  <tr>
+    <td>Message Bubble List</td>
+    <td style="font-size: 15px">
+      Provides built-in bubble styles for messages of some types and support custom message bubble styles. Support message bubble click event, long press event operation. Support message bubble adding, updating and deleting.
+    </td>
+  </tr>
+  <tr>
+    <td>Send Message</td>
+    <td style="font-size: 15px">Supports sending various types of messages. Update message delivery status. Supports sending notifications before and after a message is sent.</td>
+  </tr>
+  <tr>
+    <td>emoji</td>
+    <td style="font-size: 15px">Supports the display, sending and receiving of emoji expressions.</td>
+  </tr>
+  <tr>
+    <td>Input Bar</td>
+    <td style="font-size: 15px">Supports text and expression input, voice recording, and customizable more menus.</td>
+  </tr>
+</table>
+
+# Send your first message
 
 We'll take the easiest way to build the chat app you want. The chat application page can be built mainly using the components `UikitContainer` and `ChatFragment`.
 
@@ -67,7 +135,7 @@ add permission properties in `android/app/src/main/AndroidManifest.xml` file.
 
 ## CodingSource Code Implementation
 
-Initialize the UiKit SDK. Fill in the necessary parameters. For example: appkey.
+Initialize the UIKit SDK. Fill in the necessary parameters. For example: appkey.
 
 ```typescript
 import {
@@ -108,9 +176,9 @@ export default function ChatScreen(): JSX.Element {
 
 If you need to view the complete code or run it, you can download the project and try it locally. [portal](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
 
-# UiKit Detail
+# UIKit Detail
 
-## Download UiKit SDK && Examples
+## Download UIKit SDK && Examples
 
 ```sh
 git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
@@ -142,68 +210,7 @@ yarn && yarn run example-env && yarn run sdk-version
 
 ## Fragment Components
 
-UiKit SDK fragment components usually consists of three parts. Method, property and callback notifications. The method part is called through the `propRef` object and can be executed actively. For example: let the child component get focus. Properties can change the style of a component and affect its behavior. Callback notifications can receive component state changes.
-
-UiKit SDK mainly includes the following fragment components:
-
-<table>
-  <tr>
-    <td>Module</td>
-    <td>Function</td>
-    <td>Description</td>
-  </tr>
-  <tr>
-    <td rowspan="5" style="font-weight: bold">Conversation List</td>
-  </tr>
-  <tr>
-    <td>Conversation list</td>
-    <td style="font-size: 15px">
-      Presents the conversation information, including the user's avatar and nickname, content of the last message, unread message count, and the time when the last message is sent or received.
-    </td>
-  </tr>
-  <tr>
-    <td>Add conversation</td>
-    <td style="font-size: 15px">
-      Adds the conversation to the conversation list
-    </td>
-  </tr>
-  <tr>
-    <td>Update conversation</td>
-    <td style="font-size: 15px">
-      Updates the conversation in the conversation list
-    </td>
-  </tr>
-  <tr>
-    <td>Delete conversation</td>
-    <td style="font-size: 15px">
-      Deletes the conversation from the conversation list
-    </td>
-  </tr>
-  <tr>
-    <td rowspan="5" style="font-weight: bold">Chat</td>
-  </tr>
-  <tr>
-    <td>Message Bubble</td>
-    <td style="font-size: 15px">
-      Provides built-in bubble styles for messages of some types and support custom 
-      message bubble styles. 
-    </td>
-  </tr>
-  <tr>
-    <td>Send Message</td>
-    <td style="font-size: 15px">Supports message sending.</td>
-  </tr>
-  <tr>
-    <td>Message Bubble Event</td>
-    <td style="font-size: 15px">
-      Supports events for clicking and holding down message bubbles.
-    </td>
-  </tr>
-  <tr>
-    <td>emoji</td>
-    <td style="font-size: 15px">Support ink emojis with Unicode codes.</td>
-  </tr>
-</table>
+UIKit SDK fragment components usually consists of three parts. Method, property and callback notifications. The method part is called through the `propRef` object and can be executed actively. For example: let the child component get focus. Properties can change the style of a component and affect its behavior. Callback notifications can receive component state changes.
 
 ## Conversation List Fragment Component
 
