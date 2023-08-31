@@ -96,7 +96,8 @@
           "style",
           "test",
           "tag",
-          "example"
+          "example",
+          "test"
         ]
       ]
     }
