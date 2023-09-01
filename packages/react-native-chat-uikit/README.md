@@ -126,63 +126,30 @@ add permission properties in `android/app/src/main/AndroidManifest.xml` file.
 
 #### Implement Application Code
 
-Initialize the UIKit SDK. Fill in the necessary parameters. For example: appkey.
+Minimize integration. If you need to log in, please add additional information or refer to the demo.
 
 ```typescript
 import {
+  ChatFragment,
   GlobalContainer as UikitContainer,
   UikitModalPlaceholder,
 } from 'react-native-chat-uikit';
 export default function App() {
-  return (
-    <React.StrictMode>
-      <UikitContainer
-        option={{
-          appKey: '<your app key>',
-          autoLogin: false,
-          debugModel: true,
-        }}
-        ModalComponent={() => <UikitModalPlaceholder />}
-      />
-    </React.StrictMode>
-  );
-}
-```
-
-Add the ChatFragment component. This component contains records of recent chat partners.
-
-```typescript
-import * as React from 'react';
-import {
-  ConversationListFragment,
-  ScreenContainer,
-} from 'react-native-chat-uikit';
-export default function ChatScreen(): JSX.Element {
-  const chatId = 'xxx';
-  const chatType = 0;
-  return (
-    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
-      <ConversationListFragment />
-    </ScreenContainer>
-  );
-}
-```
-
-Add the ChatFragment component. This component includes an input component and a message display component.
-
-```typescript
-import * as React from 'react';
-import { ChatFragment, ScreenContainer } from 'react-native-chat-uikit';
-export default function ChatScreen(): JSX.Element {
+  const appKey = '<your app key>';
   const chatId = '<peer target ID>'; // The Chat ID. It can be a person or a group.
   const chatType = 0; // 0 means single person chat. 1 means group chat.
   return (
-    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+    <UikitContainer
+      option={{ appKey: appKey }}
+      ModalComponent={() => <UikitModalPlaceholder />}
+    >
       <ChatFragment screenParams={{ chatId, chatType }} />
-    </ScreenContainer>
+    </UikitContainer>
   );
 }
 ```
+
+![img](./res/6b599bfbdc165de390eab379845e4fc6.png)
 
 If you want to experience it quickly, you can refer to this project.
 [UIKit Quick Start Demo](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
