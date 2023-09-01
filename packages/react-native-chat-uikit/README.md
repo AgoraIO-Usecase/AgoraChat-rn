@@ -149,7 +149,7 @@ export default function App() {
 }
 ```
 
-![img](../../res/6b599bfbdc165de390eab379845e4fc6.png)
+![img](../../res/6b599bfbdc165de390eab379845e4fc6.jpg)
 
 If you want to experience it quickly, you can refer to this project.
 [UIKit Quick Start Demo](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
