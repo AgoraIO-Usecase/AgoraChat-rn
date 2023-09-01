@@ -41,6 +41,7 @@ import {
   ChatVideoMessageBody,
   ChatVoiceMessageBody,
 } from 'react-native-chat-sdk';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import RNFS from 'react-native-fs';
 // import {
 //   type LocalIconName,
@@ -606,6 +607,7 @@ const ChatContent = React.memo(
     const faceHeight = sf(300);
     const faceHeightRef = React.useRef(new Animated.Value(0)).current;
     const { client, getCurrentId } = useChatSdkContext();
+    const { bottom } = useSafeAreaInsets();
 
     const getMsgListRef = React.useCallback(() => {
       if (messageBubbleList) {
@@ -2024,8 +2026,9 @@ const ChatContent = React.memo(
     );
 
     // There are problems with react-navigation native stack and keyboard being used together.
+    const chatInputHeight = 60;
     const keyboardVerticalOffsetInternal = sf(
-      Platform.select({ ios: 64, android: 0 })!
+      Platform.select({ ios: chatInputHeight + bottom, android: 0 })!
     );
 
     return (
@@ -2057,6 +2060,9 @@ const ChatContent = React.memo(
           keyboardVerticalOffset={
             keyboardVerticalOffset ?? keyboardVerticalOffsetInternal
           }
+          onLayout={(event) => {
+            console.log('test:zuoyu:1:', event.nativeEvent);
+          }}
         >
           <ChatInput
             inputRef={inputRef ? inputRef : TextInputRef}
