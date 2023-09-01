@@ -7,10 +7,11 @@ _English | [中文](./README.zh.md)_
 Agora Chat UIKit for React-Native is a development kit with an user interface that enables an easy and fast integration of standard chat features into new or existing client apps. Agora Chat CallKit for React-Native is a development kit with an user interface that enables an easy and fast integration of RTC video/audio calling into new or existing client app.
 
 The general structure of the repository is as follows:
-.
-├── UIKit SDK
-├── CallKit SDK
-├── UIKit Demo
+
+.  
+├── UIKit SDK  
+├── CallKit SDK  
+├── UIKit Demo  
 └── CallKit Demo
 
 - `example`: This is a demo example of a relatively complete UIKit. Including user login, logout, session management, contact management, group management, chat management, basic settings, etc.
@@ -53,7 +54,7 @@ yarn && yarn run example-env && yarn run sdk-version
 In the `example` project, add `appKey` and other information to the `example/src/env.ts`. In the `examples/callkit-example` project, add `appKey` and other information to the `examples/callkit-example/src/env.ts` file.
 
 **Configure FCM file.**
-In the `example` project, for the Android platform, please put `google-services.json` under the `examples/android/app` folder, and for the iOS platform, please put `GoogleService-Info.plist` under the `example/iOS/ChatUikitExample` folder.
+In the `example` project, for the Android platform, please put `google-services.json` under the `examples/android/app` folder, and for the iOS platform, please put `GoogleService-Info.plist` under the `example/iOS/ChatUikitExample` folder.  
 In the `examples/callkit-example` project, for the Android platform, please put `google-services.json` under the `examples/callkit-example/android/app` folder, for the iOS platform, please put `GoogleService-Info.plist` under the `examples/callkit-example/iOS/ChatCallkitExample` folder.
 
 **Compile and Run example app.**
@@ -75,23 +76,23 @@ More detailed development help can be found here.
 
 Find out more about Agora Chat UIKit for React-Native please see the link below. If you need any help in resolving any issues or have questions, [visit our community](https://github.com/AgoraIO-Usecase/AgoraChat-rn).
 
-[UIKit detail](./packages/react-native-chat-UIKit/README.md)
-[UIKit example detail](./example/README.md)
+- [UIKit detail](./packages/react-native-chat-uikit/README.md)
+- [UIKit example detail](./example/README.md)
 
 If you want to experience the fastest and easiest integration, please take a look at this project.
 
-[Quick Start for UIKit](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
+- [Quick Start for UIKit](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
 
 ## CallKit Detail
 
 Find out more about Agora Chat Callkit for React-Native please see the link below. If you need any help in resolving any issues or have questions, [visit our community](https://github.com/AgoraIO-Usecase/AgoraChat-rn).
 
-[callkit detail](./packages/react-native-chat-callkit/README.md)
-[callkit example detail](./examples/callkit-example/README.md)
+- [callkit detail](./packages/react-native-chat-callkit/README.md)
+- [callkit example detail](./examples/callkit-example/README.md)
 
 If you want to experience the fastest and easiest integration, please take a look at this project.
 
-[Quick Start for CallKit](https://github.com/AgoraIO-Usecase/AgoraChat-Callkit-rn)
+- [Quick Start for CallKit](https://github.com/AgoraIO-Usecase/AgoraChat-Callkit-rn)
 
 ---
 
