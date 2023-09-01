@@ -4,60 +4,38 @@ _English | [中文](./README.zh.md)_
 
 # Quick-Start
 
-Take you to quickly complete the compilation and operation of the project.
+This project demonstrates how to use Agora Chat UIKit.
 
-## Environmental Preparation
-
-- operating system:
-  - MacOS 10.15.7 or above
-- Tools collection:
-  - Xcode 13.4 or above (if developing iOS platform reference)
-  - Android studio 2021.3.1 or above (if developing Android platform applications) (as for short)
-  - Visual Studio Code latest (vscode for short)
-- Compile and run environment:
-  - Java JDK 1.8.0 or above (it is recommended to use Android studio's own)
-  - Objective-C 2.0 or above (recommended to use Xcode comes with it)
-  - Typescript 4.0 or above
-  - Nodejs 16.18.0 or above (brew installation is recommended)
-  - yarn 1.22.19 or above (brew installation is recommended)
-  - React-Native 0.63.5 or above
-  - npm and related tools (**not recommended**, please solve related problems by yourself)
-  - expo 6.0.0 or above
-
-## Source Code Download
-
-[download link](https://github.com/AgoraIO-Usecase/AgoraChat-rn)
-
-```sh
-git clone git@github.com:AgoraIO-Usecase/AgoraChat-rn.git
-```
+**See the [parent document](./../../README.md) for details on the project development environment, repository download address, configuration information and configuration files.**
 
 ## Compile and run
 
-1. Initialize all projects in the `repo` root directory
+After the repository initialization is complete, compile and run the sample project.
 
 ```sh
-yarn
+cd example && yarn run gen-env
 ```
 
-2. Execute `example` project initialization
-
-```sh
-cd example && yarn run gse
-```
-
-3. If it is `iOS` platform, `pod install` is required
+If it is `iOS` platform, `pod install` is required.
 
 ```sh
 cd example/ios && pod install
 ```
 
-4. If it is `Android` platform, `gradle sync project` is required
+If it is `Android` platform, `gradle sync project` is required.
 
-5. Run the debug service
+Run the debug service.
 
 ```sh
 cd example && yarn run start
+```
+
+Run ios or Android
+
+```sh
+cd example && yarn run ios
+# or
+cd example && yarn run android
 ```
 
 ## Parameter Settings
@@ -644,6 +622,7 @@ export default function ChatScreen(): JSX.Element {
   );
 }
 ```
+
 https://github.com/AgoraIO-Usecase/AgoraChat-rnassets/11733363/e5fed2c3-ede4-47f4-86c3-c185800158f0
 
 ## Quick integration session list
@@ -815,11 +794,7 @@ export default function ChatScreen(): JSX.Element {
 }
 ```
 
-
-
 https://github.com/AgoraIO-Usecase/AgoraChat-rnassets/11733363/0a3ac24c-9fae-4961-8395-89a3c2e6ef5e
-
-
 
 ---
 

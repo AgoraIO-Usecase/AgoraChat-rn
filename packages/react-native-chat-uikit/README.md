@@ -4,7 +4,7 @@ Agora Chat UIKit for React-Native is a development kit with an user interface th
 
 Agora Chat UiKit provides basic components and advanced fragment components. Base components are used by fragment components. Fragment components provide methods, properties, and callback notifications. Fragment components are developed around the chat business, which is more suitable for quickly building chat applications.
 
-**See the [parent document](./../../README.md) for details on the project development environment, repository download address, configuration information and configuration files.**
+UIKit SDK mainly includes the following fragment components:
 
 <table>
   <tr>
@@ -13,7 +13,7 @@ Agora Chat UiKit provides basic components and advanced fragment components. Bas
     <td>Description</td>
   </tr>
   <tr>
-    <td rowspan="5" style="font-weight: bold">Conversation List</td>
+    <td rowspan="7" style="font-weight: bold">Conversation List</td>
   </tr>
   <tr>
     <td>Conversation list</td>
@@ -24,28 +24,40 @@ Agora Chat UiKit provides basic components and advanced fragment components. Bas
   <tr>
     <td>Add conversation</td>
     <td style="font-size: 15px">
-      Adds the conversation to the conversation list
+      Adds the conversation to the conversation list. Typical application scenario: Receive a new message and open a new session.
     </td>
   </tr>
   <tr>
     <td>Update conversation</td>
     <td style="font-size: 15px">
-      Updates the conversation in the conversation list
+      Updates the conversation in the conversation list.
     </td>
   </tr>
   <tr>
     <td>Delete conversation</td>
     <td style="font-size: 15px">
-      Deletes the conversation from the conversation list
+      Deletes the conversation from the conversation list.
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation read count</td>
+    <td style="font-size: 15px">
+      All messages for this conversation have been read.
+    </td>
+  </tr>
+  <tr>
+    <td>Update conversation extension attribute</td>
+    <td style="font-size: 15px">
+      Update session custom attributes. Typical application scenario: conversation do not disturb.
     </td>
   </tr>
   <tr>
     <td rowspan="5" style="font-weight: bold">Chat</td>
   </tr>
   <tr>
-    <td>Message Bubble</td>
+    <td>Message Bubble List</td>
     <td style="font-size: 15px">
-      Provides built-in bubble styles for messages of some types and support custom message bubble styles. Support message bubble click event, long press event operation.
+      Provides built-in bubble styles for messages of some types and support custom message bubble styles. Support message bubble click event, long press event operation. Support message bubble adding, updating and deleting.
     </td>
   </tr>
   <tr>
@@ -53,18 +65,126 @@ Agora Chat UiKit provides basic components and advanced fragment components. Bas
     <td style="font-size: 15px">Supports sending various types of messages. Update message delivery status. Supports sending notifications before and after a message is sent.</td>
   </tr>
   <tr>
-    <td>Message Bubble Event</td>
-    <td style="font-size: 15px">
-      Supports events for clicking and holding down message bubbles.
-    </td>
-  </tr>
-  <tr>
     <td>emoji</td>
     <td style="font-size: 15px">Supports the display, sending and receiving of emoji expressions.</td>
   </tr>
+  <tr>
+    <td>Input Bar</td>
+    <td style="font-size: 15px">Supports text and expression input, voice recording, and customizable more menus.</td>
+  </tr>
 </table>
 
-## Conversation List Fragment Component
+**See the [parent document](./../../README.md) for details on the project development environment, repository download address, configuration information and configuration files.**
+
+## Integrate UIKit Into Your Project.
+
+#### Create Your Project
+
+```sh
+npx react-native init ChatApp
+```
+
+#### Install UIKit and the required dependencies
+
+```sh
+yarn add react-native-chat-uikit
+```
+
+#### Permission Requirements
+
+On iOS platform:
+
+add permission properties in `ios/example/Info.plist` file.
+
+```xml
+<dict>
+  <key>NSCameraUsageDescription</key>
+  <string></string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string></string>
+  <key>NSPhotoLibraryUsageDescription</key>
+</dict>
+```
+
+On Android platform:
+
+add permission properties in `android/app/src/main/AndroidManifest.xml` file.
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.hyphenate.rn.example">
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+</manifest>
+```
+
+#### Implement Application Code
+
+Initialize the UIKit SDK. Fill in the necessary parameters. For example: appkey.
+
+```typescript
+import {
+  GlobalContainer as UikitContainer,
+  UikitModalPlaceholder,
+} from 'react-native-chat-uikit';
+export default function App() {
+  return (
+    <React.StrictMode>
+      <UikitContainer
+        option={{
+          appKey: '<your app key>',
+          autoLogin: false,
+          debugModel: true,
+        }}
+        ModalComponent={() => <UikitModalPlaceholder />}
+      />
+    </React.StrictMode>
+  );
+}
+```
+
+Add the ChatFragment component. This component contains records of recent chat partners.
+
+```typescript
+import * as React from 'react';
+import {
+  ConversationListFragment,
+  ScreenContainer,
+} from 'react-native-chat-uikit';
+export default function ChatScreen(): JSX.Element {
+  const chatId = 'xxx';
+  const chatType = 0;
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ConversationListFragment />
+    </ScreenContainer>
+  );
+}
+```
+
+Add the ChatFragment component. This component includes an input component and a message display component.
+
+```typescript
+import * as React from 'react';
+import { ChatFragment, ScreenContainer } from 'react-native-chat-uikit';
+export default function ChatScreen(): JSX.Element {
+  const chatId = '<peer target ID>'; // The Chat ID. It can be a person or a group.
+  const chatType = 0; // 0 means single person chat. 1 means group chat.
+  return (
+    <ScreenContainer mode="padding" edges={['right', 'left', 'bottom']}>
+      <ChatFragment screenParams={{ chatId, chatType }} />
+    </ScreenContainer>
+  );
+}
+```
+
+## UIKit References
+
+#### Conversation List Fragment Component
 
 The methods it provides include:
 
@@ -83,7 +203,7 @@ The properties and callback notifications it provides include:
 - sortPolicy: Sets the rules of sorting out conversation list items.
 - RenderItem: Customizes the style of the conversation list items.
 
-## Chat Detail Fragment Component
+#### Chat Detail Fragment Component
 
 The methods it provides include:
 
@@ -136,7 +256,7 @@ The properties and callback notifications it provides include:
 - VideoMessageItem: Customizes the style of video messages.
 - CustomMessageItem: Customizes the style of custom messages.
 
-### Other components
+##### Other components
 
 Other components are in the experimental stage. If you are interested, you can try to use them.
 
@@ -150,9 +270,13 @@ Other components are in the experimental stage. If you are interested, you can t
 - Permission service: Provides services for applying for iOS or Android platform permissions.
 - File service: Provides folder management service.
 
-## Example Demo
+## UIKit Example Demo
 
-[Reference](../../example/README.md)
+[UIKit Example Demo](../../example/README.md)
+
+## Quick Start Example Demo
+
+[UIKit Quick Start Demo](https://github.com/AgoraIO-Usecase/AgoraChat-UIKit-rn)
 
 ## Contributing
 
