@@ -8,7 +8,7 @@
     "rn-start": "react-native start",
     "pods": "pod-install --quiet",
     "start": "expo start --dev-client",
-    "startr": "expo start --dev-client --clear",
+    "startr": "expo start --dev-client --clear ",
     "android": "expo run:android",
     "androidd": "expo run:android --device \"MX6\"",
     "ios": "expo run:ios",

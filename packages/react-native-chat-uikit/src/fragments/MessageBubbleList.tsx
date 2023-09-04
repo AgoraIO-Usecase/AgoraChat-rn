@@ -53,6 +53,8 @@ import type { MessageItemStateType } from './types';
 //   wait,
 // } from 'react-native-chat-uikit';
 
+export type updateMessageStateType = 'one-all' | 'one-state' | 'all-state';
+
 export interface MessageItemType {
   sender: string;
   timestamp: number;
@@ -110,14 +112,20 @@ export interface FileMessageItemType extends MessageItemType {
 export const convertState = (state?: MessageItemStateType): LocalIconName => {
   let r = 'sent' as LocalIconName;
   switch (state) {
-    case 'arrived':
-      r = 'read';
-      break;
     case 'failed':
       r = 'ex_mark';
       break;
     case 'sending':
       r = 'loading2';
+      break;
+    case 'sended':
+      r = 'sent';
+      break;
+    case 'arrived':
+      r = 'delivered';
+      break;
+    case 'read':
+      r = 'read';
       break;
     default:
       break;
@@ -125,13 +133,25 @@ export const convertState = (state?: MessageItemStateType): LocalIconName => {
   return r;
 };
 
+//"read" | "arrived" | "played" | "sended" | "failed" | "receiving" | "received" | "recalled"
+
 export const StateLabel = React.memo(
   ({ state }: { state?: MessageItemStateType }) => {
     const sf = getScaleFactor();
     if (state === 'sending') {
       return <Loading name={convertState(state)} size={sf(12)} />;
-    } else {
+    } else if (state === 'sended') {
       return <LocalIcon name={convertState(state)} size={sf(12)} />;
+    } else if (state === 'arrived') {
+      return <LocalIcon name={convertState(state)} size={sf(12)} />;
+    } else if (state === 'read') {
+      return <LocalIcon name={convertState(state)} size={sf(12)} />;
+    } else if (state === 'receiving') {
+      return null;
+    } else if (state === 'received') {
+      return null;
+    } else {
+      return null;
     }
   }
 );
@@ -781,9 +801,8 @@ export type MessageBubbleListRef = {
   }) => void;
   updateMessageState: (params: {
     localMsgId: string;
-    result: boolean;
-    reason?: any;
-    item?: MessageItemType;
+    type: updateMessageStateType;
+    items: MessageItemType[];
   }) => void;
   delMessage: (params: { localMsgId?: string; msgId?: string }) => void;
   resendMessage: (localMsgId: string) => void;
@@ -1026,8 +1045,14 @@ const MessageBubbleList = (
             const item = items[index];
             if (item) {
               for (const i of list) {
-                if (item.key === i.key) {
-                  items[index] = i;
+                if (i.key === undefined) {
+                  if (item?.msgId === i.msgId) {
+                    items[index] = i;
+                  }
+                } else {
+                  if (item.key === i.key) {
+                    items[index] = i;
+                  }
                 }
               }
             }
@@ -1037,10 +1062,20 @@ const MessageBubbleList = (
           for (let index = 0; index < items.length; index++) {
             const item = items[index];
             for (const i of list) {
-              if (item?.key === i.key) {
-                const old = item;
-                items[index] = (old ? { ...old, ...i } : i) as MessageItemType;
-                break;
+              if (i.key === undefined) {
+                if (item?.msgId === i.msgId) {
+                  const old = item;
+                  items[index] = (
+                    old ? { ...old, ...i } : i
+                  ) as MessageItemType;
+                }
+              } else {
+                if (item?.key === i.key) {
+                  const old = item;
+                  items[index] = (
+                    old ? { ...old, ...i } : i
+                  ) as MessageItemType;
+                }
               }
             }
           }
@@ -1084,25 +1119,36 @@ const MessageBubbleList = (
   const updateMessageState = React.useCallback(
     (params: {
       localMsgId: string;
-      result: boolean;
-      reason?: any;
-      item?: MessageItemType;
+      type: updateMessageStateType;
+      items: MessageItemType[];
     }) => {
-      if (params.result === true && params.item) {
+      console.log('test:zuoyu:', params);
+      if (params.type === 'one-all') {
         updateData({
           type: 'update-all',
-          list: [params.item],
+          list: [params.items[0]!],
           direction: 'after',
         });
-      } else {
+      } else if (params.type === 'one-state') {
         updateData({
           type: 'update-part',
           list: [
             {
-              key: params.localMsgId,
-              state: 'failed',
+              key: params.items[0]!.key,
+              state: params.items[0]!.state,
             } as MessageItemType,
           ],
+          direction: 'after',
+        });
+      } else if (params.type === 'all-state') {
+        updateData({
+          type: 'update-part',
+          list: currentData.current.map((value) => {
+            return {
+              key: value.key,
+              state: params.items[0]!.state,
+            } as MessageItemType;
+          }),
           direction: 'after',
         });
       }
@@ -1130,9 +1176,8 @@ const MessageBubbleList = (
       },
       updateMessageState: (params: {
         localMsgId: string;
-        result: boolean;
-        reason?: any;
-        item?: MessageItemType;
+        type: updateMessageStateType;
+        items: MessageItemType[];
       }) => {
         updateMessageState(params);
       },

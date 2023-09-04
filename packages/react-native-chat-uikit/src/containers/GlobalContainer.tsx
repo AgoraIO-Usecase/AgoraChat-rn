@@ -65,6 +65,8 @@ export type GlobalContainerProps = React.PropsWithChildren<{
     autoLogin: boolean;
     debugModel?: boolean;
     pushConfig?: ChatPushConfig;
+    requireAck?: boolean;
+    requireDeliveryAck?: boolean;
   };
   localization?: StringSetContextType | undefined;
   theme?: ThemeContextType | undefined;
@@ -234,6 +236,8 @@ export function GlobalContainer({
           appKey: option.appKey,
           debugModel: option.debugModel ?? false,
           pushConfig: option.pushConfig,
+          requireAck: option.requireAck,
+          requireDeliveryAck: option.requireDeliveryAck,
         })
       )
       .then(async () => {

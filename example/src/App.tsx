@@ -180,6 +180,8 @@ export default function App() {
           appKey: appKey,
           autoLogin: autoLogin.current,
           debugModel: true,
+          requireAck: true,
+          requireDeliveryAck: true,
         }}
         onInitialized={() => {
           isOnInitialized.current = true;

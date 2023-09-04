@@ -28,6 +28,7 @@ import {
   ChatDownloadStatus,
   ChatError,
   ChatFileMessageBody,
+  ChatGroupMessageAck,
   ChatImageMessageBody,
   ChatLocationMessageBody,
   ChatMessage,
@@ -98,6 +99,7 @@ import MessageBubbleList, {
   type MessageBubbleListRef,
   type MessageItemType,
   type TextMessageItemType,
+  updateMessageStateType,
   VideoMessageItemType,
   type VoiceMessageItemType,
 } from './MessageBubbleList';
@@ -820,11 +822,11 @@ const ChatContent = React.memo(
     );
 
     const convertFromMessage = React.useCallback(
-      (msg: ChatMessage): MessageItemType => {
+      (msg: ChatMessage, state?: MessageItemStateType): MessageItemType => {
         const convertFromMessageState = (msg: ChatMessage) => {
-          let ret: MessageItemStateType;
+          let ret: MessageItemStateType | undefined;
           if (msg.status === ChatMessageStatus.SUCCESS) {
-            ret = 'arrived' as MessageItemStateType;
+            ret = 'sended' as MessageItemStateType;
           } else if (msg.status === ChatMessageStatus.CREATE) {
             ret = 'sending' as MessageItemStateType;
           } else if (msg.status === ChatMessageStatus.FAIL) {
@@ -836,9 +838,20 @@ const ChatContent = React.memo(
           } else {
             ret = 'failed' as MessageItemStateType;
           }
+          if (msg.direction === ChatMessageDirection.RECEIVE) {
+            ret = 'received';
+          }
           if (ret === 'sending' || ret === 'receiving') {
             if (timestamp() > msg.localTime + 1000 * 60) {
               ret = 'failed';
+            }
+          }
+          if (ret === 'sended') {
+            if (msg.hasDeliverAck === true) {
+              ret = 'arrived';
+            }
+            if (msg.hasReadAck === true) {
+              ret = 'read';
             }
           }
           return ret;
@@ -947,7 +960,7 @@ const ChatContent = React.memo(
             msg.direction === ChatMessageDirection.RECEIVE ? false : true,
           key: msg.localMsgId,
           msgId: msg.msgId,
-          state: convertFromMessageState(msg),
+          state: state ?? convertFromMessageState(msg),
           ext: msg.attributes,
         } as MessageItemType;
         convertFromMessageBody(msg, r);
@@ -959,9 +972,8 @@ const ChatContent = React.memo(
     const updateMessageState = React.useCallback(
       (params: {
         localMsgId: string;
-        result: boolean;
-        reason?: any;
-        item?: MessageItemType;
+        type: updateMessageStateType;
+        items: MessageItemType[];
       }) => {
         getMsgListRef().current?.updateMessageState(params);
       },
@@ -988,8 +1000,8 @@ const ChatContent = React.memo(
             onSuccess: (message: ChatMessage): void => {
               updateMessageState({
                 localMsgId: message.localMsgId,
-                result: true,
-                item: convertFromMessage(message),
+                type: 'one-all',
+                items: [convertFromMessage(message)],
               });
             },
           } as ChatMessageStatusCallback);
@@ -1091,15 +1103,15 @@ const ChatContent = React.memo(
             },
             onError: (localMsgId: string, error: ChatError): void => {
               console.log('test:sendToServer:onError', localMsgId);
+              msg.status = ChatMessageStatus.FAIL;
               updateMessageState({
                 localMsgId,
-                result: false,
-                reason: error,
+                type: 'one-state',
+                items: [convertFromMessage(msg)],
               });
               // msg.status = ChatMessageStatus.FAIL; // !!! Error: You attempted to set the key `status` with the value `3` on an object that is meant to be immutable and has been frozen.
               onSendMessageEnd?.({
                 ...msg,
-                status: ChatMessageStatus.FAIL,
               } as ChatMessage);
               // onSendResult({
               //   ...msg,
@@ -1114,8 +1126,8 @@ const ChatContent = React.memo(
               console.log('test:sendToServer:onSuccess', message.localMsgId);
               updateMessageState({
                 localMsgId: message.localMsgId,
-                result: true,
-                item: convertFromMessage(message),
+                type: 'one-all',
+                items: [convertFromMessage(message, 'sended')],
               });
               onSendMessageEnd?.(message);
               // onSendResult(message);
@@ -1461,7 +1473,7 @@ const ChatContent = React.memo(
 
         getMsgListRef().current?.addMessage({
           direction: 'after',
-          msgs: [convertFromMessage(msg)],
+          msgs: [{ ...convertFromMessage(msg), state: 'sending' }],
         });
         timeoutTask(() => {
           getMsgListRef().current?.scrollToEnd();
@@ -1644,8 +1656,8 @@ const ChatContent = React.memo(
                   onSuccess(message: ChatMessage) {
                     updateMessageState({
                       localMsgId: message.localMsgId,
-                      result: true,
-                      item: convertFromMessage(message),
+                      type: 'one-all',
+                      items: [convertFromMessage(message)],
                     });
                     onResult?.({ message });
                   },
@@ -1872,10 +1884,11 @@ const ChatContent = React.memo(
         MessageChatSdkEvent,
         (event) => {
           const eventType = event.type as MessageChatSdkEventType;
-          const eventParams = event.params as { messages: ChatMessage[] };
+
           switch (eventType) {
             case 'onMessagesReceived':
               {
+                const eventParams = event.params as { messages: ChatMessage[] };
                 /// todo: !!! 10000 message count ???
                 const messages = eventParams.messages;
                 const r = [] as ChatMessage[];
@@ -1904,6 +1917,70 @@ const ChatContent = React.memo(
 
             //   break;
             // }
+            case 'onConversationRead':
+              updateMessageState({
+                localMsgId: '',
+                type: 'all-state',
+                items: [
+                  {
+                    state: 'read',
+                  } as MessageItemType,
+                ],
+              });
+              break;
+            case 'onMessagesRead':
+              {
+                const eventParams = event.params as { messages: ChatMessage[] };
+                for (const msg of eventParams.messages) {
+                  updateMessageState({
+                    localMsgId: msg.localMsgId,
+                    type: 'one-state',
+                    items: [
+                      {
+                        key: msg.localMsgId,
+                        state: 'read',
+                      } as MessageItemType,
+                    ],
+                  });
+                }
+              }
+              break;
+            case 'onGroupMessageRead':
+              {
+                const eventParams = event.params as {
+                  messagesAcks: ChatGroupMessageAck[];
+                };
+                for (const ack of eventParams.messagesAcks) {
+                  updateMessageState({
+                    localMsgId: ack.msg_id,
+                    type: 'one-state',
+                    items: [
+                      {
+                        msgId: ack.msg_id,
+                        state: 'read',
+                      } as MessageItemType,
+                    ],
+                  });
+                }
+              }
+              break;
+            case 'onMessagesDelivered':
+              {
+                const eventParams = event.params as { messages: ChatMessage[] };
+                for (const msg of eventParams.messages) {
+                  updateMessageState({
+                    localMsgId: msg.localMsgId,
+                    type: 'one-state',
+                    items: [
+                      {
+                        key: msg.localMsgId,
+                        state: 'arrived',
+                      } as MessageItemType,
+                    ],
+                  });
+                }
+              }
+              break;
             default:
               break;
           }
@@ -1913,7 +1990,7 @@ const ChatContent = React.memo(
       return () => {
         sub2.remove();
       };
-    }, [chatId, loadMessage]);
+    }, [chatId, loadMessage, updateMessageState]);
 
     const initDirs = React.useCallback((convIds: string[]) => {
       for (const convId of convIds) {
