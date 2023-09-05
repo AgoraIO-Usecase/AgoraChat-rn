@@ -68,6 +68,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // } from 'react-native-chat-uikit';
 import moji from 'twemoji';
 
+import { FACE_ASSETS } from '../../assets/faces';
 import Button from '../components/Button';
 import { FaceList } from '../components/FaceList';
 import { LocalIcon, type LocalIconName } from '../components/Icon';
@@ -168,6 +169,7 @@ type ChatInputProps = BaseProps & {
   onClickInputMoreButton?: () => void;
   onPressInInputVoiceButton?: () => void;
   onPressOutInputVoiceButton?: () => void;
+  isFaceVisible?: boolean;
 };
 
 type ChatContentRef = {
@@ -293,14 +295,17 @@ const ChatInput = React.memo((props: ChatInputProps) => {
     onClickInputMoreButton,
     onPressInInputVoiceButton,
     onPressOutInputVoiceButton,
+    isFaceVisible,
     ...others
   } = props;
   const sf = getScaleFactor();
   const { chat } = useI18nContext();
   // const TextInputRef = React.useRef<RNTextInput>(null);
-  const faces = ['face', 'key'] as ('face' | 'key')[];
+  const faces = React.useMemo(() => ['face', 'key'] as ('face' | 'key')[], []);
   const waves = ['wave_in_circle', 'key'] as ('wave_in_circle' | 'key')[];
-  const [face, setFace] = React.useState(faces[0]);
+  const [face, setFace] = React.useState(
+    isFaceVisible === true ? faces[1] : faces[0]
+  );
   const [wave, setWave] = React.useState(waves[0]);
   const [content, setContent] = React.useState('');
   // const content = React.useRef('');
@@ -321,10 +326,20 @@ const ChatInput = React.memo((props: ChatInputProps) => {
     return sf(width - 15 * 2 - 28 - 15 * 2 - (isInput === true ? 66 : 28));
   }, [isInput, sf, width]);
 
-  const _onFace = (value?: 'face' | 'key') => {
-    setFace(value);
-    onFace?.(value);
-  };
+  const _onFace = React.useCallback(
+    (value?: 'face' | 'key') => {
+      setFace(value);
+      onFace?.(value);
+    },
+    [onFace]
+  );
+
+  if (inputRef?.current) {
+    const inputRefs = inputRef?.current as any;
+    inputRefs.onFace = (face: 'face' | 'key') => {
+      _onFace(face === 'face' ? 'key' : 'face');
+    };
+  }
 
   React.useEffect(() => {
     onInit?.({
@@ -610,6 +625,7 @@ const ChatContent = React.memo(
     const faceHeightRef = React.useRef(new Animated.Value(0)).current;
     const { client, getCurrentId } = useChatSdkContext();
     const { bottom } = useSafeAreaInsets();
+    const [faceDelVisible, setFaceDelVisible] = React.useState(false);
 
     const getMsgListRef = React.useCallback(() => {
       if (messageBubbleList) {
@@ -635,6 +651,7 @@ const ChatContent = React.memo(
             duration: 250,
             useNativeDriver: false,
           }).start();
+          setFaceDelVisible(true);
         },
         hideFace: () => {
           Animated.timing(faceHeightRef, {
@@ -642,6 +659,7 @@ const ChatContent = React.memo(
             duration: 250,
             useNativeDriver: false,
           }).start();
+          setFaceDelVisible(false);
         },
       };
     }, [faceHeight, faceHeightRef]);
@@ -1770,10 +1788,29 @@ const ChatContent = React.memo(
 
     const onFaceInternal = React.useCallback((face: string) => {
       const content = getContentRef.current();
-      const s = content + moji.convert.fromCodePoint(face);
+      const mj = moji.convert.fromCodePoint(face);
+      const s = content + mj;
       setContentRef.current(s);
       setIsInputRef.current(true);
     }, []);
+
+    const convertFace = React.useMemo(() => {
+      return FACE_ASSETS.map((face) => {
+        return moji.convert.fromCodePoint(face);
+      });
+    }, []);
+
+    const onFaceRemove = React.useCallback(() => {
+      const content = getContentRef.current();
+      if (content.length >= 2) {
+        const last = content.substring(content.length - 2);
+        if (convertFace.includes(last)) {
+          const s = content.substring(0, content.length - 2);
+          setContentRef.current(s);
+          setIsInputRef.current(true);
+        }
+      }
+    }, [convertFace]);
 
     React.useEffect(() => {
       const subscription1 = Keyboard.addListener('keyboardWillHide', (_) => {
@@ -2112,8 +2149,10 @@ const ChatContent = React.memo(
       <View style={{ flex: 1 }}>
         <TouchableWithoutFeedback
           onPress={() => {
-            Keyboard.dismiss();
             _onFace('face');
+            const ref = getInputRef()?.current as any;
+            ref?.onFace?.('key');
+            Keyboard.dismiss();
           }}
         >
           <View
@@ -2137,9 +2176,6 @@ const ChatContent = React.memo(
           keyboardVerticalOffset={
             keyboardVerticalOffset ?? keyboardVerticalOffsetInternal
           }
-          onLayout={(event) => {
-            console.log('test:zuoyu:1:', event.nativeEvent);
-          }}
         >
           <ChatInput
             inputRef={inputRef ? inputRef : TextInputRef}
@@ -2178,9 +2214,22 @@ const ChatContent = React.memo(
             onClickInputMoreButton={onClickInputMoreButton}
             onPressInInputVoiceButton={onPressInInputVoiceButton}
             onPressOutInputVoiceButton={onPressOutInputVoiceButton}
+            isFaceVisible={faceDelVisible}
           />
 
           <FaceList height={faceHeightRef} onFace={onFaceInternal} />
+          <View
+            style={{
+              position: 'absolute',
+              display: faceDelVisible === true ? 'flex' : 'none',
+              bottom: 20,
+              right: 20,
+            }}
+          >
+            <TouchableOpacity onPress={onFaceRemove}>
+              <LocalIcon name={'backspace_clr'} size={40} />
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
       </View>
     );

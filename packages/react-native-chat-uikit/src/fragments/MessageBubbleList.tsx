@@ -828,7 +828,7 @@ const MessageBubbleList = (
   props: MessageBubbleListProps,
   ref?: React.Ref<MessageBubbleListRef>
 ): JSX.Element => {
-  const { showTimeLabel, style } = props;
+  const { showTimeLabel, style, onPressed } = props;
 
   GTextMessageItem = props.TextMessageItem;
   GImageMessageItem = props.ImageMessageItem;
@@ -1122,7 +1122,6 @@ const MessageBubbleList = (
       type: updateMessageStateType;
       items: MessageItemType[];
     }) => {
-      console.log('test:zuoyu:', params);
       if (params.type === 'one-all') {
         updateData({
           type: 'update-all',
@@ -1268,7 +1267,7 @@ const MessageBubbleList = (
           return item.key;
           // return index.toString();
         }}
-        // onTouchEnd={onPressed}
+        onTouchEnd={onPressed}
       />
     </View>
   );

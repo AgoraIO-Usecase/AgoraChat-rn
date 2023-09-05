@@ -856,6 +856,15 @@ export const ICON_ASSETS = {
       return require('./icons/Global/avatar_selected.png');
     }
   },
+  'backspace_clr': (size: string) => {
+    if (size === '3x') {
+      return require('./icons/Global/backspace_clr_3x.png');
+    } else if (size === '2x') {
+      return require('./icons/Global/backspace_clr_2x.png');
+    } else {
+      return require('./icons/Global/backspace_clr.png');
+    }
+  },
   'badge': (size: string) => {
     if (size === '3x') {
       return require('./icons/Global/badge_3x.png');
