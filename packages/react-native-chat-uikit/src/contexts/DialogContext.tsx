@@ -1,10 +1,10 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { DeviceEventEmitter, Platform } from 'react-native';
 
-import ActionMenu from '../components/ActionMenu';
-import Alert from '../components/Alert';
-import BottomSheet from '../components/BottomSheet';
-import Prompt from '../components/Prompt';
+import ActionMenu, { ActionMenuItem } from '../components/ActionMenu';
+import Alert, { AlertItem } from '../components/Alert';
+import BottomSheet, { BottomSheetItem } from '../components/BottomSheet';
+import Prompt, { PromptItem } from '../components/Prompt';
 import { useForceUpdate } from '../hooks';
 import type { DialogPropsT, DialogTask } from '../types';
 import type { DialogContextType } from './types';
@@ -45,6 +45,114 @@ type DialogContextProps = React.PropsWithChildren<{
   };
 }>;
 const TIMEOUT = 3000;
+
+type DialogContextViewProps = React.PropsWithChildren<{
+  openAlert: (props: AlertItem) => void;
+  openMenu: (props: ActionMenuItem) => void;
+  openPrompt: (props: PromptItem) => void;
+  openSheet: (props: BottomSheetItem) => void;
+  manualClose: () => Promise<void>;
+  workingTask: React.MutableRefObject<DialogTask | undefined>;
+  updateToHide: () => Promise<void>;
+  shiftTask: () => void;
+  visibleState: React.MutableRefObject<boolean>;
+  defaultLabels?: {
+    alert?: { ok?: string };
+    prompt?: { placeholder?: string; ok?: string; cancel?: string };
+  };
+  AUTO_FOCUS: boolean;
+}>;
+const DialogContextView = (props: DialogContextViewProps) => {
+  const {
+    // openAlert,
+    // openMenu,
+    // openPrompt,
+    // openSheet,
+    // manualClose,
+    workingTask,
+    updateToHide,
+    shiftTask,
+    visibleState,
+    children,
+    defaultLabels,
+    AUTO_FOCUS,
+  } = props;
+
+  const update = useForceUpdate();
+
+  React.useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(
+      'uikit_modal_update',
+      (event) => {
+        console.log('test:zuoyu:1', event);
+        update();
+      }
+    );
+    return () => {
+      sub.remove();
+    };
+  }, [update]);
+
+  return (
+    <>
+      {children}
+      {workingTask.current?.type === 'ActionMenu' && (
+        <ActionMenu
+          onHide={updateToHide}
+          onDismiss={shiftTask}
+          visible={visibleState.current}
+          title={workingTask.current.props.title}
+          menuItems={workingTask.current.props.menuItems}
+        />
+      )}
+      {workingTask.current?.type === 'Alert' && (
+        <Alert
+          onHide={updateToHide}
+          onDismiss={shiftTask}
+          visible={visibleState.current}
+          title={workingTask.current.props.title}
+          message={workingTask.current.props.message}
+          buttons={
+            workingTask.current.props.buttons ?? [
+              { text: defaultLabels?.alert?.ok || 'OK' },
+            ]
+          }
+        />
+      )}
+      {workingTask.current?.type === 'Prompt' && (
+        <Prompt
+          onHide={updateToHide}
+          onDismiss={shiftTask}
+          visible={visibleState.current}
+          title={workingTask.current.props.title}
+          onSubmit={workingTask.current.props.onSubmit}
+          defaultValue={workingTask.current.props.defaultValue}
+          submitLabel={
+            workingTask.current.props.submitLabel ?? defaultLabels?.prompt?.ok
+          }
+          cancelLabel={
+            workingTask.current.props.cancelLabel ??
+            defaultLabels?.prompt?.cancel
+          }
+          placeholder={
+            workingTask.current.props.placeholder ??
+            defaultLabels?.prompt?.placeholder
+          }
+          autoFocus={AUTO_FOCUS}
+        />
+      )}
+      {workingTask.current?.type === 'BottomSheet' && (
+        <BottomSheet
+          onHide={updateToHide}
+          onDismiss={shiftTask}
+          visible={visibleState.current}
+          sheetItems={workingTask.current.props.sheetItems}
+        />
+      )}
+    </>
+  );
+};
+
 export const DialogContextProvider = ({
   defaultLabels,
   children,
@@ -65,7 +173,7 @@ export const DialogContextProvider = ({
     [completeDismiss]
   );
 
-  const update = useForceUpdate();
+  // const update = useForceUpdate();
 
   const taskQueue = React.useRef<DialogTask[]>([]);
   const workingTask = React.useRef<DialogTask>();
@@ -81,16 +189,18 @@ export const DialogContextProvider = ({
 
   const updateToShow = React.useCallback(() => {
     visibleState.current = true;
-    update();
-  }, [update]);
+    // update();
+    DeviceEventEmitter.emit('uikit_modal_update');
+  }, []);
 
   const updateToHide = React.useCallback((): Promise<void> => {
     return new Promise((resolve) => {
       visibleState.current = false;
-      update();
+      // update();
+      DeviceEventEmitter.emit('uikit_modal_update');
       waitDismiss(resolve);
     });
-  }, [update, waitDismiss]);
+  }, [waitDismiss]);
 
   const shiftTask = React.useCallback(() => {
     completeDismiss();
@@ -136,13 +246,44 @@ export const DialogContextProvider = ({
   ]);
   const manualClose = updateToHide;
 
+  // return (
+  //   <DialogContextView
+  //     openAlert={openAlert}
+  //     openMenu={openMenu}
+  //     openPrompt={openPrompt}
+  //     openSheet={openSheet}
+  //     manualClose={manualClose}
+  //     workingTask={workingTask}
+  //     updateToHide={updateToHide}
+  //     shiftTask={shiftTask}
+  //     visibleState={visibleState}
+  //     defaultLabels={defaultLabels}
+  //     AUTO_FOCUS={AUTO_FOCUS}
+  //   />
+  // );
+
   return (
     <AlertContext.Provider value={{ openAlert }}>
       <ActionMenuContext.Provider value={{ openMenu }}>
         <PromptContext.Provider value={{ openPrompt }}>
           <BottomSheetContext.Provider value={{ openSheet }}>
             <ManualCloseContext.Provider value={{ manualClose }}>
-              {children}
+              <DialogContextView
+                openAlert={openAlert}
+                openMenu={openMenu}
+                openPrompt={openPrompt}
+                openSheet={openSheet}
+                manualClose={manualClose}
+                workingTask={workingTask}
+                updateToHide={updateToHide}
+                shiftTask={shiftTask}
+                visibleState={visibleState}
+                defaultLabels={defaultLabels}
+                AUTO_FOCUS={AUTO_FOCUS}
+              >
+                {children}
+              </DialogContextView>
+              {/* {children}
               {workingTask.current?.type === 'ActionMenu' && (
                 <ActionMenu
                   onHide={updateToHide}
@@ -196,7 +337,7 @@ export const DialogContextProvider = ({
                   visible={visibleState.current}
                   sheetItems={workingTask.current.props.sheetItems}
                 />
-              )}
+              )} */}
             </ManualCloseContext.Provider>
           </BottomSheetContext.Provider>
         </PromptContext.Provider>
