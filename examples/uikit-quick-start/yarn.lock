@@ -6198,8 +6198,10 @@ react-native-chat-sdk@^1.1.2, react-native-chat-sdk@^1.2.0:
   resolved "https://registry.npmmirror.com/react-native-chat-sdk/-/react-native-chat-sdk-1.2.1.tgz#b68047a64fb7b95668683c3cc9af49d23fa90180"
   integrity sha512-C8tYk0ugSl/d0N9XkewO9ZSjw3F2dwAIODEE9XXUrFjwjTccy8AMTXgIuZjyvuPvLTBMYzC8dGH8mqrItgNzvA==
 
-"react-native-chat-uikit@file:../../../../../Desktop/react-native-chat-uikit":
-  version "1.0.2-beta.0"
+react-native-chat-uikit@^1.0.0:
+  version "1.0.2-beta.1"
+  resolved "https://registry.npmmirror.com/react-native-chat-uikit/-/react-native-chat-uikit-1.0.2-beta.1.tgz#36c1a592975d4767ccdc0749a095bc6d118d0bf0"
+  integrity sha512-v/ldYxqca62OpYsR4r4HYjQP5d9D9XBvZEEO5lf34n18X8egtGJeNv1jz0nkD7f8owRBFlyF9k256SLF2Vi29w==
   dependencies:
     "@react-native-async-storage/async-storage" "1.17.11"
     "@react-native-camera-roll/camera-roll" "^5.6.0"
