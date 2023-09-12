@@ -727,7 +727,10 @@ const CustomMessageRenderItemDefault: ListRenderItem<MessageItemType> =
         return <RenderRecallMessage {...item} />;
       }
 
-      return <SubComponent {...SubComponentProps} />;
+      if (SubComponent) {
+        return <SubComponent {...SubComponentProps} />;
+      }
+      return <View />;
     }
   );
 

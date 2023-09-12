@@ -1,4 +1,4 @@
-import type { ChatClient } from 'react-native-chat-sdk';
+import type { ChatClient, ChatMessageChatType } from 'react-native-chat-sdk';
 
 import type {
   ButtonStateColor,
@@ -61,6 +61,11 @@ export interface ChatSdkContextType {
     onResult: (result: { result: boolean; error?: any }) => void;
   }) => Promise<void>;
   getCurrentId: () => string;
+}
+
+export interface ChatSdkChatContextType {
+  setChat: (params: { chatId: string; chatType: ChatMessageChatType }) => void;
+  getChat: () => { chatId: string; chatType: ChatMessageChatType };
 }
 
 export type HeaderContextType = {

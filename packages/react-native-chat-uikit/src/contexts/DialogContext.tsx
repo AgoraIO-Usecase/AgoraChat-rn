@@ -81,13 +81,9 @@ const DialogContextView = (props: DialogContextViewProps) => {
   const update = useForceUpdate();
 
   React.useEffect(() => {
-    const sub = DeviceEventEmitter.addListener(
-      'uikit_modal_update',
-      (event) => {
-        console.log('test:zuoyu:1', event);
-        update();
-      }
-    );
+    const sub = DeviceEventEmitter.addListener('uikit_modal_update', () => {
+      update();
+    });
     return () => {
       sub.remove();
     };

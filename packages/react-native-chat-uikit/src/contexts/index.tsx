@@ -16,6 +16,11 @@ export {
 export { HeaderStyleProvider, useHeaderContext } from './HeaderContext';
 export { I18nContextProvider, useI18nContext } from './I18nContext';
 export {
+  ChatSdkChatContextProvider,
+  UIKitChatSdkChatContext,
+  useChatSdkChatContext,
+} from './ImSdkChatContext';
+export {
   ChatSdkContextProvider,
   UIKitChatSdkContext,
   useChatSdkContext,
