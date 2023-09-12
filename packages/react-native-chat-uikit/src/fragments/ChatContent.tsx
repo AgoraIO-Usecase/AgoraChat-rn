@@ -485,15 +485,19 @@ export const ChatContent = React.memo(
             },
             onError: (localMsgId: string, error: ChatError): void => {
               console.log('test:sendToServer:onError', localMsgId);
-              msg.status = ChatMessageStatus.FAIL;
               updateMessageState({
                 localMsgId,
                 type: 'one-state',
-                items: [standardizedData(convertFromMessage({ msg }))],
+                items: [
+                  standardizedData(
+                    convertFromMessage({ msg, state: 'failed' })
+                  ),
+                ],
               });
               // msg.status = ChatMessageStatus.FAIL; // !!! Error: You attempted to set the key `status` with the value `3` on an object that is meant to be immutable and has been frozen.
               onSendMessageEnd?.({
                 ...msg,
+                status: ChatMessageStatus.FAIL,
               } as ChatMessage);
               onResult?.({
                 localMsgId,
@@ -1636,10 +1640,17 @@ export const ChatContent = React.memo(
                   localPath: result.path,
                 })
                 .then(() => {
-                  onVoiceRecordEnd?.({
-                    localPath,
-                    duration: result.pos / 1000,
-                  });
+                  if (onVoiceRecordEnd) {
+                    onVoiceRecordEnd({
+                      localPath,
+                      duration: result.pos / 1000,
+                    });
+                  } else {
+                    onVoiceRecordEndInternal({
+                      localPath,
+                      duration: result.pos / 1000,
+                    });
+                  }
                 })
                 .catch((error) => {
                   console.warn('test:startRecordAudio:save:error', error);

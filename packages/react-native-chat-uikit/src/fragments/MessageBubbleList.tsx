@@ -146,6 +146,8 @@ export const StateLabel = React.memo(
       return <LocalIcon name={convertState(state)} size={sf(12)} />;
     } else if (state === 'read') {
       return <LocalIcon name={convertState(state)} size={sf(12)} />;
+    } else if (state === 'failed') {
+      return <LocalIcon name={convertState(state)} size={sf(12)} />;
     } else if (state === 'receiving') {
       return null;
     } else if (state === 'received') {
