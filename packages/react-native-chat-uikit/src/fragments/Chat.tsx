@@ -180,17 +180,17 @@ export type ChatFragmentProps = {
    * Message bubble list component
    */
   messageBubbleList?: {
-    MessageBubbleListP: React.ForwardRefExoticComponent<
+    bubbleList: React.ForwardRefExoticComponent<
       MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
     >;
-    MessageBubbleListPropsP: MessageBubbleListProps;
-    MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+    bubbleListProps: MessageBubbleListProps;
+    bubbleListRef: React.RefObject<MessageBubbleListRef>;
   };
   /**
    * Message bubble item component for custom type message
    */
   customMessageBubble?: {
-    CustomMessageRenderItemP: React.FunctionComponent<
+    messageRenderItem: React.FunctionComponent<
       MessageItemType & { eventType: string; data: any }
     >;
   };

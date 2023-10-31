@@ -221,14 +221,14 @@ type ChatFragmentProps = {
     };
   };
   messageBubbleList?: {
-    MessageBubbleListP: React.ForwardRefExoticComponent<
+    bubbleList: React.ForwardRefExoticComponent<
       MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
     >;
-    MessageBubbleListPropsP: MessageBubbleListProps;
-    MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+    bubbleListProps: MessageBubbleListProps;
+    bubbleListRef: React.RefObject<MessageBubbleListRef>;
   };
   customMessageBubble?: {
-    CustomMessageRenderItemP: React.FunctionComponent<
+    messageRenderItem: React.FunctionComponent<
       MessageItemType & { eventType: string; data: any }
     >;
   };
@@ -381,13 +381,13 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleListFragment,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleListFragment,
+          bubbleListProps: {
             TextMessageItem: MyTextMessageBubble,
             VideoMessageItem: MyVideoMessageBubble,
             FileMessageItem: MyFileMessageBubble,
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>
@@ -583,11 +583,11 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleListFragment,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleListFragment,
+          bubbleListProps: {
             style: { backgroundColor: 'yellow' },
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>
@@ -606,11 +606,11 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleListFragment,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleListFragment,
+          bubbleListProps: {
             showTimeLabel: false,
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>
@@ -631,13 +631,13 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleListFragment,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleListFragment,
+          bubbleListProps: {
             TextMessageItem: (info: ListRenderItemInfo<MessageItemType>) => {
               return <Text>{info.item.sender}</Text>;
             },
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>

@@ -133,7 +133,7 @@ export const convertFromMessage = (params: {
   msg: ChatMessage;
   state?: MessageItemStateType;
   customMessageBubble?: {
-    CustomMessageRenderItemP: React.FunctionComponent<
+    messageRenderItem: React.FunctionComponent<
       MessageItemType & { eventType: string; data: any }
     >;
   };
@@ -176,7 +176,7 @@ export const convertFromMessage = (params: {
     msg: ChatMessage;
     item: MessageItemType;
     customMessageBubble?: {
-      CustomMessageRenderItemP: React.FunctionComponent<
+      messageRenderItem: React.FunctionComponent<
         MessageItemType & { eventType: string; data: any }
       >;
     };
@@ -228,7 +228,7 @@ export const convertFromMessage = (params: {
             data: body.params,
             ...item,
           } as MessageItemType & { eventType: string; data: any };
-          r.SubComponent = customMessageBubble?.CustomMessageRenderItemP!; // !!! must
+          r.SubComponent = customMessageBubble?.messageRenderItem!; // !!! must
           r.type = ChatMessageType.CUSTOM;
         }
         break;

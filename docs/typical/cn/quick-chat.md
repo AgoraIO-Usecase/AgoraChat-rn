@@ -71,14 +71,14 @@ type ChatFragmentProps = {
     };
   };
   messageBubbleList?: {
-    MessageBubbleListP: React.ForwardRefExoticComponent<
+    bubbleList: React.ForwardRefExoticComponent<
       MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
     >;
-    MessageBubbleListPropsP: MessageBubbleListProps;
-    MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+    bubbleListProps: MessageBubbleListProps;
+    bubbleListRef: React.RefObject<MessageBubbleListRef>;
   };
   customMessageBubble?: {
-    CustomMessageRenderItemP: React.FunctionComponent<
+    messageRenderItem: React.FunctionComponent<
       MessageItemType & { eventType: string; data: any }
     >;
   };
@@ -207,11 +207,11 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleList,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleList,
+          bubbleListProps: {
             onPressed: () => {},
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP as any,
         }}
       />
     </ScreenContainer>
@@ -240,7 +240,7 @@ export default function ChatScreen(): JSX.Element {
       <ChatFragment
         screenParams={{ chatId, chatType }}
         customMessageBubble={{
-          CustomMessageRenderItemP: CustomMessageRenderItem,
+          messageRenderItem: CustomMessageRenderItem,
         }}
       />
     </ScreenContainer>

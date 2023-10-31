@@ -468,15 +468,15 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
         propsRef={chatRef}
         screenParams={route.params as any}
         messageBubbleList={{
-          MessageBubbleListP: MessageBubbleListFragment,
-          MessageBubbleListPropsP: {
+          bubbleList: MessageBubbleListFragment,
+          bubbleListProps: {
             TextMessageItem: MyTextMessageBubble,
             VideoMessageItem: MyVideoMessageBubble,
             FileMessageItem: MyFileMessageBubble,
             showTimeLabel: showTimeLabel,
             // style: { backgroundColor: 'yellow' },
           } as MessageBubbleListProps,
-          MessageBubbleListRefP: messageBubbleListRefP as any,
+          bubbleListRef: messageBubbleListRefP,
         }}
         onUpdateReadCount={onUpdateReadCount}
         onClickMessageBubble={onClickMessageBubble}

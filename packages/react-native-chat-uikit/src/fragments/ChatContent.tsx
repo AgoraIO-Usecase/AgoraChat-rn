@@ -168,11 +168,11 @@ export type ChatContentRef = {
 type ChatContentProps = BaseProps & {
   propsRef?: React.RefObject<ChatContentRef>;
   messageBubbleList?: {
-    MessageBubbleListP: React.ForwardRefExoticComponent<
+    bubbleList: React.ForwardRefExoticComponent<
       MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
     >;
-    MessageBubbleListPropsP: MessageBubbleListProps;
-    MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+    bubbleListProps: MessageBubbleListProps;
+    bubbleListRef: React.RefObject<MessageBubbleListRef>;
   };
 
   onUpdateReadCount?: (unreadCount: number) => void;
@@ -228,7 +228,7 @@ export const ChatContent = React.memo(
 
     const getMsgListRef = React.useCallback(() => {
       if (messageBubbleList) {
-        return messageBubbleList.MessageBubbleListRefP;
+        return messageBubbleList.bubbleListRef;
       } else {
         return msgListRef;
       }
@@ -1448,17 +1448,15 @@ export const ChatContent = React.memo(
 
     const onRequestHistoryMessage = React.useCallback(
       (params: { earliestId: string }) => {
-        if (
-          messageBubbleList?.MessageBubbleListPropsP.onRequestHistoryMessage
-        ) {
-          messageBubbleList?.MessageBubbleListPropsP.onRequestHistoryMessage({
+        if (messageBubbleList?.bubbleListProps.onRequestHistoryMessage) {
+          messageBubbleList?.bubbleListProps.onRequestHistoryMessage({
             earliestId: params.earliestId,
           });
         } else {
           requestHistoryMessage(params.earliestId);
         }
       },
-      [messageBubbleList?.MessageBubbleListPropsP, requestHistoryMessage]
+      [messageBubbleList?.bubbleListProps, requestHistoryMessage]
     );
 
     const onVoiceRecordEndInternal = React.useCallback(
@@ -1757,11 +1755,11 @@ export const ChatContent = React.memo(
 const ChatMessageBubbleList = React.memo(
   (props: {
     messageBubbleList?: {
-      MessageBubbleListP: React.ForwardRefExoticComponent<
+      bubbleList: React.ForwardRefExoticComponent<
         MessageBubbleListProps & React.RefAttributes<MessageBubbleListRef>
       >;
-      MessageBubbleListPropsP: MessageBubbleListProps;
-      MessageBubbleListRefP: React.RefObject<MessageBubbleListRef>;
+      bubbleListProps: MessageBubbleListProps;
+      bubbleListRef: React.RefObject<MessageBubbleListRef>;
     };
     _onFace: (value?: 'face' | 'key') => void;
     onRequestHistoryMessage: (params: { earliestId: string }) => void;
@@ -1770,13 +1768,13 @@ const ChatMessageBubbleList = React.memo(
     const { messageBubbleList, _onFace, onRequestHistoryMessage, msgListRef } =
       props;
     return messageBubbleList ? (
-      <messageBubbleList.MessageBubbleListP
-        ref={messageBubbleList.MessageBubbleListRefP}
-        {...messageBubbleList.MessageBubbleListPropsP}
+      <messageBubbleList.bubbleList
+        ref={messageBubbleList.bubbleListRef}
+        {...messageBubbleList.bubbleListProps}
         onPressed={() => {
           Keyboard.dismiss();
           _onFace('face');
-          messageBubbleList.MessageBubbleListPropsP?.onPressed?.();
+          messageBubbleList.bubbleListProps?.onPressed?.();
         }}
         onRequestHistoryMessage={onRequestHistoryMessage}
       />
