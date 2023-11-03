@@ -74,7 +74,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
   const params = rp?.params as { chatId: string; chatType: number };
   const chatId = params.chatId;
   const chatType = params.chatType as ChatConversationType;
-  const messageBubbleListRefP = React.useRef<MessageBubbleListRef>({} as any);
+  const messageBubbleListRef = React.useRef<MessageBubbleListRef>({} as any);
   const chatRef = React.useRef<ChatFragmentRef>({} as any);
   const { client, currentId } = useAppChatSdkContext();
   const showTimeLabel = true;
@@ -427,7 +427,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
           case 'on_recall_message':
             {
               const { tip } = params;
-              messageBubbleListRefP.current?.delMessage({
+              messageBubbleListRef.current?.delMessage({
                 localMsgId: tip.localMsgId,
               });
               chatRef.current?.insertMessage({ msg: tip });
@@ -476,7 +476,7 @@ export default function ChatScreen({ route, navigation }: Props): JSX.Element {
             showTimeLabel: showTimeLabel,
             // style: { backgroundColor: 'yellow' },
           } as MessageBubbleListProps,
-          bubbleListRef: messageBubbleListRefP,
+          bubbleListRef: messageBubbleListRef,
         }}
         onUpdateReadCount={onUpdateReadCount}
         onClickMessageBubble={onClickMessageBubble}
