@@ -78,6 +78,12 @@ UIKit SDK mainly includes the following fragment components:
 
 **See the [parent document](./../../README.md) for details on the project development environment, repository download address, configuration information and configuration files.**
 
+## Important features
+
+Conversation List
+Chatting in a conversation
+Message bubble List in a conversation
+
 ## Integrate UIKit Into Your Project.
 
 #### Create Your Project
