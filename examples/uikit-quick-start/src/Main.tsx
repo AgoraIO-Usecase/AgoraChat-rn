@@ -15,7 +15,7 @@ import {
   dlog,
   RootParamsList,
 } from './AppConfig';
-import { LogMemo } from './AppLog';
+// import { LogMemo } from './AppLog';
 
 export function MainScreen({
   navigation,
@@ -94,7 +94,7 @@ export function MainScreen({
             START CHAT
           </Button>
         </View>
-        <LogMemo />
+        {/* <LogMemo /> */}
       </View>
     </ScreenContainer>
   );
