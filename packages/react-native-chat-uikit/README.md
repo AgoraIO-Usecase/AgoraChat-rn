@@ -80,9 +80,9 @@ UIKit SDK mainly includes the following fragment components:
 
 ## Important features
 
-Conversation List
-Chatting in a conversation
-Message bubble List in a conversation
+- Conversation List
+- Chatting in a conversation
+- Message bubble List in a conversation
 
 ## Integrate UIKit Into Your Project.
 
