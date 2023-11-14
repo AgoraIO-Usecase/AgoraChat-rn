@@ -1793,6 +1793,11 @@
   resolved "https://registry.npmmirror.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
+"@humanz/react-native-create-thumbnail@^1.6.4":
+  version "1.6.4"
+  resolved "https://registry.npmmirror.com/@humanz/react-native-create-thumbnail/-/react-native-create-thumbnail-1.6.4.tgz#f7f6f371c0dcd3d76f4bf7e62c0ab3c69ad3f666"
+  integrity sha512-M3SVVZPC72awvAX1EHlpruXU1Il2zESLUXsHKmTjbdmR4rmPI+a4kvQGPN6jkQA4z1BznalI7ozeqZJkJ56A1A==
+
 "@hutson/parse-repository-url@^3.0.0":
   version "3.0.2"
   resolved "https://registry.npmmirror.com/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz#98c23c950a3d9b6c8f0daed06da6c3af06981340"
@@ -11830,11 +11835,6 @@ react-native-codegen@^0.71.5:
     flow-parser "^0.185.0"
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
-
-react-native-create-thumbnail@^1.6.4:
-  version "1.6.4"
-  resolved "https://registry.npmmirror.com/react-native-create-thumbnail/-/react-native-create-thumbnail-1.6.4.tgz#90f5b0a587de6e3738a7632fe3d9a9624ed83581"
-  integrity sha512-JWuKXswDXtqUPfuqh6rjCVMvTSSG3kUtwvSK/YdaNU0i+nZKxeqHmt/CO2+TyI/WSUFynGVmWT1xOHhCZAFsRQ==
 
 react-native-device-info@^10.6.0:
   version "10.6.0"
